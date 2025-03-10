@@ -1,0 +1,6 @@
+framework module flutter_scanner_devxhub {
+  umbrella header "flutter_scanner_devxhub-umbrella.h"
+
+  export *
+  module * { export * }
+}
