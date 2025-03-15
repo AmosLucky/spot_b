@@ -1360,7 +1360,9 @@ class SystemRepo extends ApiClient {
       print("Syncing started");
       print("Unsyc order length ${unsyncedOrders.length}");
       List data = unsyncedOrders.map((d) {
-        print(d.items);
+        //print(d.items);
+        var aa = jsonDecode(d.items);
+        //print("Warehouse ==>> ${aa[0]['product']['stock']['warehouse_id']}");
         return {
           "company": {
             "id": user.id,
@@ -1381,13 +1383,17 @@ class SystemRepo extends ApiClient {
           "sale_items": jsonDecode(d.items).map((e)=> ({
               "product_id": e['product']['stock']['product_id'],
               "quantity": e['quantity'],
-              "price": e['totalAmount'].toString()
-            })
+              "product_price": e['totalAmount'].toString(),
+            "discount_type": 1,
+            "discount_value": 0,
+            "tax_value": 0,
+            "tax_type": 1
+          })
           ).toList(),
           "shipping": 0,
           "status": d.status,
           "tax_rate": 0,
-          "warehouse_id": 37
+          "warehouse_id": aa[0]['product']['stock']['warehouse_id']
         };
       }).toList();
 

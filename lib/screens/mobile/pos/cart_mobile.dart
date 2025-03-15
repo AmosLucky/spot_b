@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/cart_provider.dart';
@@ -51,162 +52,204 @@ class _CartMobileState extends State<CartMobile> {
     UserDetails user = Provider.of<UserProvider>(context).user;
 
     return Consumer<CartProvider>(
-      builder: (context, cart, child) => Scaffold(
-          backgroundColor: backgroundColor,
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            backgroundColor: primaryColor,
-            centerTitle: true,
-            title: const Text(
-              'Purchase Cart',
-              style: TextStyle(color: whiteColor),
-            ),
-            actions: [
-              cart.items.isNotEmpty
-                  ? IconButton(
-                      color: whiteColor,
-                      onPressed: () {
+      builder: (context, cart, child) => Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  cart.items.isNotEmpty
+                      ? Padding(
+                        padding: const EdgeInsets.only(left: 5),
+                        child: GestureDetector(
+                                            onTap: () {
                         cart.removeAll();
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(MdiIcons.delete))
-                  : SizedBox(),
+                        //Navigator.pop(context);
+                                            },
+                                            child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: Colors.purple,
+                            borderRadius: BorderRadius.circular(100)
+                        ),
+                        child: Text("Clear Cart", style: TextStyle(
+                            color: Colors.white
+                        ),),
+                                            ),),
+                      )
+                      : SizedBox(),
+
+                  SizedBox(width: 3.w,),
+
+                  _isInvoiceOpen
+                      ? const SizedBox()
+                      :  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (_registerInfo.isNotEmpty) {
+                          _isInvoiceOpen = true;
+                        }
+                      });
+                    },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                        color: Colors.purple,
+                        borderRadius: BorderRadius.circular(100)
+                                              ),
+                                              child: Text("Show Invoice", style: TextStyle(
+                                                color: Colors.white
+                                              ),),
+                                            ),)
+                      // ),IconButton(
+                      // color: const Color.fromARGB(255, 244, 183, 183),
+                      // onPressed: () {
+                      //   setState(() {
+                      //     if (_registerInfo.isNotEmpty) {
+                      //       _isInvoiceOpen = true;
+                      //     }
+                      //   });
+                      // },
+                      // icon: Icon(MdiIcons.menu)),
+                ],
+              ),
+
+              SizedBox(height: 1.h,),
+
               _isInvoiceOpen
-                  ? const SizedBox()
-                  : IconButton(
-                      color: const Color.fromARGB(255, 244, 183, 183),
-                      onPressed: () {
-                        setState(() {
-                          if (_registerInfo.isNotEmpty) {
-                            _isInvoiceOpen = true;
-                          }
-                        });
-                      },
-                      icon: Icon(MdiIcons.menu))
+                  ? Expanded(
+                    child: InvoiceListMobile(
+                    mediaQuery: MediaQuery.of(context).size,
+                    systemProvider: widget.systemProvider,
+                    registerInfo: _registerInfo,
+                    closeInvoice: () {
+                      print("------------- close invoice -----------");
+                      setState(() {
+                        if (_registerInfo.isNotEmpty) {
+                          _isInvoiceOpen = false;
+                        }
+                      });
+                    }),
+                  )
+                  : Expanded(
+                    child: Container(
+                                   // height: screenSize.height,
+                                    //width: double.infinity,
+                                    child: cart.items.length == 0
+                      ? Center(child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset("assets/images/emptycart.png", height: 15.h,),
+                          Text("Cart is currently empty\nAdd items to cart", textAlign: TextAlign.center,),
+                        ],
+                      ),)
+                      : ListView.builder(
+                                          shrinkWrap: false,
+                                          itemCount: cart.items.length,
+                                          itemBuilder: (context, index) {
+                      var product = cart.items[index].product!;
+                      var cartItem = cart.items[index];
+                      final String imageUrl = (product['images'] is Map &&
+                          product['images']['imageUrls'] is List &&
+                          product['images']['imageUrls'].isNotEmpty &&
+                          product['images']['imageUrls'][0] is String)
+                          ? product['images']['imageUrls'][0]
+                          : 'https://via.placeholder.com/150';
+                      return Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.horizontal,
+                        background: Container(
+                          color: primaryColor,
+                        ),
+                        onDismissed: (direction) {
+                          cart.del(index);
+                        },
+                        child: ListTile(
+                          onTap: () {
+                            // showBS(context, index, product);
+                          },
+                          title: Text(
+                            product['name'],
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold),
+                          ),
+                          leading: CachedNetworkImage(
+                            height: screenSize.height * 0.13,
+                            width: screenSize.width * 0.1,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator()),
+                            imageUrl: "${imageUrl}",
+                          ),
+                          subtitle:
+                          Row(
+                            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(Money.format(cartItem.totalAmount!)),
+                              IconButton(
+                                iconSize: 16,
+                                icon: Icon(MdiIcons.delete),
+                                onPressed: () {
+                                  cart.del(index);
+                                },
+                              ),
+                              IconButton(
+                                iconSize: 16,
+                                icon: Icon(MdiIcons.pencil),
+                                onPressed: () {
+                                  _editPrice(
+                                    context,
+                                    cartItem.trackID!,
+                                    cartItem.totalAmount!,
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  Provider.of<CartProvider>(context,
+                                      listen: false)
+                                      .decrementQuantity(index);
+                                },
+                              ),
+                              Text(
+                                cartItem.quantity.toString(),
+                                style: TextStyle(
+                                    color: primaryColor, fontSize: 14),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  Provider.of<CartProvider>(context,
+                                      listen: false)
+                                      .incrementQuantity(index);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                                          },
+                                    ),
+                                  ),
+                  ),
+
+              CartSummaryWidget(
+                registerInfo: _registerInfo,
+                isMobile: Responsive.isMobile(context),
+                systemProvider: widget.systemProvider,
+                user: user,
+              )
             ],
           ),
-          body: _isInvoiceOpen
-              ? InvoiceListMobile(
-                  mediaQuery: MediaQuery.of(context).size,
-                  systemProvider: widget.systemProvider,
-                  registerInfo: _registerInfo,
-                  closeInvoice: () {
-                    print("------------- close invoice -----------");
-                    setState(() {
-                      if (_registerInfo.isNotEmpty) {
-                        _isInvoiceOpen = false;
-                      }
-                    });
-                  })
-              : Container(
-                  height: screenSize.height,
-                  width: double.infinity,
-                  child: cart.items.length == 0
-                      ? SizedBox()
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: cart.items.length,
-                          itemBuilder: (context, index) {
-                            var product = cart.items[index].product!;
-                            var cartItem = cart.items[index];
-                            final String imageUrl = (product['images'] is Map &&
-                                    product['images']['imageUrls'] is List &&
-                                    product['images']['imageUrls'].isNotEmpty &&
-                                    product['images']['imageUrls'][0] is String)
-                                ? product['images']['imageUrls'][0]
-                                : 'https://via.placeholder.com/150';
-                            return Dismissible(
-                              key: UniqueKey(),
-                              direction: DismissDirection.horizontal,
-                              background: Container(
-                                color: primaryColor,
-                              ),
-                              onDismissed: (direction) {
-                                cart.del(index);
-                              },
-                              child: ListTile(
-                                onTap: () {
-                                  // showBS(context, index, product);
-                                },
-                                title: Text(
-                                  product['name'],
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                leading: CachedNetworkImage(
-                                  height: screenSize.height * 0.13,
-                                  width: screenSize.width * 0.1,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
-                                      child: CircularProgressIndicator()),
-                                  imageUrl: "${imageUrl}",
-                                ),
-                                subtitle:
-                                    Row(
-                                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Text(Money.format(cartItem.totalAmount!)),
-                                        IconButton(
-                                          iconSize: 16,
-                                          icon: Icon(MdiIcons.delete),
-                                          onPressed: () {
-                                            cart.del(index);
-                                          },
-                                        ),
-                                        IconButton(
-                                          iconSize: 16,
-                                          icon: Icon(MdiIcons.pencil),
-                                          onPressed: () {
-                                            _editPrice(
-                                              context,
-                                              cartItem.trackID!,
-                                              cartItem.totalAmount!,
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.remove),
-                                      onPressed: () {
-                                        Provider.of<CartProvider>(context,
-                                                listen: false)
-                                            .decrementQuantity(index);
-                                      },
-                                    ),
-                                    Text(
-                                      cartItem.quantity.toString(),
-                                      style: TextStyle(
-                                          color: primaryColor, fontSize: 14),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.add),
-                                      onPressed: () {
-                                        Provider.of<CartProvider>(context,
-                                                listen: false)
-                                            .incrementQuantity(index);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                ),
-          bottomNavigationBar: CartSummaryWidget(
-            registerInfo: _registerInfo,
-            isMobile: Responsive.isMobile(context),
-            systemProvider: widget.systemProvider,
-            user: user,
-          )),
     );
   }
 
