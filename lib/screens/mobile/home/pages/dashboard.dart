@@ -113,8 +113,8 @@ class _DashboardMobileScreenState extends State<DashboardMobileScreen> {
                       return 'Please enter the cash amount at hand';
                     }
                     if (double.tryParse(value) == null ||
-                        double.parse(value) <= 0) {
-                      return 'Please enter a valid amount greater than 0';
+                        double.parse(value) > 0) {
+                      return 'Please enter a valid amount';
                     }
                     return null;
                   },

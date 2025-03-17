@@ -1360,7 +1360,7 @@ class SystemRepo extends ApiClient {
       print("Syncing started");
       print("Unsyc order length ${unsyncedOrders.length}");
       List data = unsyncedOrders.map((d) {
-        //print(d.items);
+        print(d.items);
         var aa = jsonDecode(d.items);
         //print("Warehouse ==>> ${aa[0]['product']['stock']['warehouse_id']}");
         return {
@@ -1371,7 +1371,7 @@ class SystemRepo extends ApiClient {
             "dob": '',
             "salary_date": ''
           },
-          "customer_id": 17,
+          "customer_id": null,
           "date": d.createdAt.toIso8601String(),
           "discount": 0,
           "grand_total": d.amount.toString(),
@@ -1380,7 +1380,7 @@ class SystemRepo extends ApiClient {
           "payment_status": d.status,
           "payment_type": d.paymentMethod,
           "received_amount": int.parse(d.amount.toString().replaceAll('.0', '')),
-          "sale_items": jsonDecode(d.items).map((e)=> ({
+          "sale_items": jsonDecode(d.items).map((e) => ({
               "product_id": e['product']['stock']['product_id'],
               "quantity": e['quantity'],
               "product_price": e['totalAmount'].toString(),
@@ -1393,7 +1393,9 @@ class SystemRepo extends ApiClient {
           "shipping": 0,
           "status": d.status,
           "tax_rate": 0,
-          "warehouse_id": aa[0]['product']['stock']['warehouse_id']
+          "warehouse_id": aa[0]['product']['stock']['warehouse_id'],
+          "is_offline": 1, //0 for NO, 1 for YES
+          "offline_customer_name": d.customerName
         };
       }).toList();
 
@@ -1412,13 +1414,23 @@ class SystemRepo extends ApiClient {
         );
 
         print("Syncing");
-        print(response.body);
+        log("response body ==> ${response.body}");
+        log("response ==> ${response.statusCode}");
         var jsonData = json.decode(response.body);
-        if (response.statusCode == 200 && jsonData['status'] == true) {
-          unsyncedOrders.map((d) => {
-          //d.sync = 1; // Mark as synced
-               orderBox.put(d)// Update the order
-          });
+        if (response.statusCode == 200) {
+          print("dataaaa ==> ${unsyncedOrders}");
+          for (var itemData in unsyncedOrders) {
+            print("sync data ==> $itemData");
+            itemData.sync = 1;
+            orderBox.put(itemData);// Update the order
+          }
+          // var syncValue = unsyncedOrders.map((d) => ({
+          //   if(jsonDecode(d.items) != []) {
+          //     print("sync data ==> $d");
+          //     d.sync = 1;
+          //     orderBox.put(d);// Update the order
+          //   }
+          // }));
           return {'status': true, 'message': jsonData['message']};
         } else {
           return {'status': false, 'message': jsonData['message']};

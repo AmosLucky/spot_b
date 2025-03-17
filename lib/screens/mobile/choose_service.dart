@@ -1,5 +1,6 @@
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
+import 'package:spotstock_inventory/screens/mobile/pos/ecosystem_mobile_2.dart';
 import 'package:spotstock_inventory/screens/mobile/pos/pos_mobile.dart';
 import 'package:spotstock_inventory/widgets/dialogs.dart';
 // import 'package:spotstock_inventory/widgets/widgets.dart';
@@ -77,9 +78,9 @@ class ServiceBox extends StatelessWidget {
         // Handle onTap logic
         if (service.url == '/pos') {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return PosMobileScreen(
+            return EcosystemMobile2Screen(
               systemProvider: systemProvider,
-              isMobile: isMobile,
+              category: const {"id": 0, "name": "Products"},
             );
           }));
         }

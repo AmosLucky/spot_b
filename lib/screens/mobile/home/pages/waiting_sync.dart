@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
@@ -31,6 +33,7 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
   List transactionData = [];
   List _foundProducts = [];
   bool? loading;
+  bool _isLoading = false;
   //List? _products;
   Orders? product;
   final searchTextController = TextEditingController();
@@ -71,7 +74,6 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
   }
 
   Widget _productsList(BuildContext context, SystemProvider systemProvider) {
-    bool _isLoading = false;
 
     return Scaffold(
         backgroundColor: backgroundColor,
@@ -106,6 +108,7 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
                 UserDetails user =
                     Provider.of<UserProvider>(context, listen: false).user;
                 var response = await systemProvider.syncAllTransactions(user);
+                log("response value ==>> ${response.toString()}");
                 if (response['status'] == true) {
                   setState(() {
                     _isLoading = !_isLoading;
@@ -131,7 +134,7 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
                 }
               },
               label: _isLoading == true
-                  ? const Text('Loading...')
+                  ? const Text('Syncing...')
                   : const Text('Sync All'),
               icon: const Icon(Icons.sync),
             )),
@@ -217,7 +220,9 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
 
                       })
               ) :  Center(
-                child: CircularProgressIndicator(),
+                child: Center(
+                  child: Text("Nothing to sync"),
+                ),
               )])));
   }
 
