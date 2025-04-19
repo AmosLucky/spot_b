@@ -188,6 +188,12 @@
       "languageVersion": "2.19"
     },
     {
+      "name": "chip_list",
+      "rootUri": "file:///Users/trustbancgroup/.pub-cache/hosted/pub.dev/chip_list-3.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "cli_util",
       "rootUri": "file:///Users/trustbancgroup/.pub-cache/hosted/pub.dev/cli_util-0.4.2",
       "packageUri": "lib/",
@@ -1160,7 +1166,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2025-03-10T12:18:42.723145Z",
+  "generated": "2025-04-07T13:45:55.002003Z",
   "generator": "pub",
   "generatorVersion": "3.5.0",
   "flutterRoot": "file:///Users/trustbancgroup/fvm/versions/3.24.0",

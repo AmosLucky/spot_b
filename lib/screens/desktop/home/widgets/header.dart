@@ -5,6 +5,7 @@ import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
+import 'package:spotstock_inventory/screens/desktop/home/hotel_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/frontdesk_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
@@ -93,12 +94,24 @@ class Header extends StatelessWidget {
                 SizedBox(
                   width: 10,
                 ),
+
                 OutlinedButton(
                   onPressed: () async {
-                    _navigateToPage(
-                      context,
-                      ChooseModuleDesktop(),
-                    );
+                    // Check if the register is open before navigating
+                    bool isOpen = await _isOpenRegister("HOTEL");
+
+                    if (isOpen) {
+                      _navigateToPage(
+                        context,
+                        FrontDeskDesktop(
+                          systemProvider: systemProvider,
+                          user: user,
+                        ),
+                      );
+                    } else {
+                      // Show POS dialog if register is not open
+                      _showPOSDialog(context, "HOTEL");
+                    }
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
@@ -113,10 +126,38 @@ class Header extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    "APPS",
+                    "HOTEL",
                     style: TextStyle(color: primaryColor),
                   ),
                 ),
+                // SizedBox(
+                //   width: 10,
+                // ),
+                //
+                // OutlinedButton(
+                //   onPressed: () async {
+                //     _navigateToPage(
+                //       context,
+                //       ChooseModuleDesktop(),
+                //     );
+                //   },
+                //   style: OutlinedButton.styleFrom(
+                //     side: BorderSide(
+                //         color: primaryColor,
+                //         width: 1), // Outline color and width
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(8), // Rounded corners
+                //     ),
+                //     padding: const EdgeInsets.symmetric(
+                //       horizontal: 24, // Horizontal padding
+                //       vertical: 16, // Vertical padding
+                //     ),
+                //   ),
+                //   child: Text(
+                //     "APPS",
+                //     style: TextStyle(color: primaryColor),
+                //   ),
+                // ),
               ],
             ),
           ]),
@@ -259,17 +300,26 @@ class Header extends StatelessWidget {
 
                   // Open register with the entered cash amount
                   var response = await SystemRepo(refresh: false, online: false)
-                      .openRegister(
-                          module: module, amount: amountController.text);
+                      .openRegister(module: module, amount: amountController.text);
 
                   if (response['status'] == true) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return EcosystemDesktop(
-                        systemProvider: systemProvider,
-                        user: user,
-                      );
-                    }));
+                    if(module == 'INVENTORY') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return EcosystemDesktop(
+                              systemProvider: systemProvider,
+                              user: user,
+                            );
+                          }));
+                    } else if (module == 'HOTEL') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return FrontDeskDesktop(
+                              systemProvider: systemProvider,
+                              user: user,
+                            );
+                          }));
+                    };
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

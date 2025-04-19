@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/booking_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
@@ -23,6 +24,8 @@ import '../../pos/widgets/payform.dart';
 class RoomSummary extends StatefulWidget {
   final Map<String, dynamic>? room;
   final List<dynamic> rooms;
+  final DateTime? checkInDate;
+  final DateTime? checkOutDate;
   final Size mediaQuery;
   final Map registerInfo;
   final SystemProvider systemProvider;
@@ -30,6 +33,8 @@ class RoomSummary extends StatefulWidget {
 
   const RoomSummary({
     super.key,
+    required this.checkInDate,
+    required this.checkOutDate,
     required this.room,
     required this.mediaQuery,
     required this.registerInfo,
@@ -43,8 +48,8 @@ class RoomSummary extends StatefulWidget {
 }
 
 class _RoomSummaryState extends State<RoomSummary> {
-  DateTime? _checkInDate;
-  DateTime? _checkOutDate;
+  // DateTime? _checkInDate;
+  // DateTime? _checkOutDate;
   String? _bookingType = "Checked-in";
   String? _paymentType;
   int _duration = 0;
@@ -85,9 +90,9 @@ class _RoomSummaryState extends State<RoomSummary> {
 
   // Calculate duration in days
   void _calculateDuration() {
-    if (_checkInDate != null && _checkOutDate != null) {
+    if (widget.checkInDate != null && widget.checkOutDate != null) {
       setState(() {
-        _duration = _checkOutDate!.difference(_checkInDate!).inDays;
+        _duration = widget.checkOutDate!.difference(widget.checkInDate!).inDays;
         _duration = _duration > 0 ? _duration : 0; // Prevent negative duration
         _calculateTotalAmount();
       });
@@ -97,21 +102,22 @@ class _RoomSummaryState extends State<RoomSummary> {
   void _onRoomDataChanged() {
     // Recalculate total amount based on updated room price
     _calculateTotalAmount();
+    _calculateDuration();
   }
 
   // Calculate total amount based on duration and room price
   void _calculateTotalAmount() {
-    final roomPrice = widget.room?['attributes']?['price'] ?? 0;
+    final roomPrice = widget.room?['room_type']?['fare'] ?? 0;
     setState(() {
-      _totalAmount = (_duration * roomPrice).toDouble();
+      _totalAmount = (_duration * double.parse(roomPrice.toString())).toDouble();
     });
   }
 
   void _resetInputs() {
     setState(() {
       // Reset date fields
-      _checkInDate = null;
-      _checkOutDate = null;
+      // _checkInDate = null;
+      // _checkOutDate = null;
       _bookingType = "Checked-in"; // Reset to default value
       _paymentType = null; // Reset to null or default value
       _isFolioChecked = false;
@@ -128,36 +134,38 @@ class _RoomSummaryState extends State<RoomSummary> {
   }
 
   // Select a date
-  void _selectDate(BuildContext context, bool isCheckIn) async {
-    DateTime currentDate = DateTime.now();
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: currentDate,
-      firstDate: currentDate, // Disable past dates
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate != null) {
-      setState(() {
-        if (isCheckIn) {
-          _checkInDate = pickedDate;
-          if (_checkOutDate != null && _checkOutDate!.isBefore(_checkInDate!)) {
-            _checkOutDate = _checkInDate;
-          }
-        } else {
-          _checkOutDate = pickedDate;
-        }
-        _calculateDuration();
-      });
-    }
-  }
+  // void _selectDate(BuildContext context, bool isCheckIn) async {
+  //   DateTime currentDate = DateTime.now();
+  //   DateTime? pickedDate = await showDatePicker(
+  //     context: context,
+  //     initialDate: currentDate,
+  //     firstDate: currentDate, // Disable past dates
+  //     lastDate: DateTime(2100),
+  //   );
+  //   if (pickedDate != null) {
+  //     setState(() {
+  //       if (isCheckIn) {
+  //         _checkInDate = pickedDate;
+  //         if (_checkOutDate != null && _checkOutDate!.isBefore(_checkInDate!)) {
+  //           _checkOutDate = _checkInDate;
+  //         }
+  //       } else {
+  //         _checkOutDate = pickedDate;
+  //       }
+  //       _calculateDuration();
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     var title = widget.room?.isNotEmpty == true
-        ? "Booking for ${widget.room?['attributes']?['name'] ?? 'Unknown Room'}"
+        ? "Booking room ${widget.room?['room_number'] ?? 'Unknown Room'}"
         : "Booking Summary";
 
     _onRoomDataChanged();
+    _calculateTotalAmount();
+    _calculateDuration();
 
     return Container(
       width: widget.mediaQuery.width * 0.3, // Adjust width based on screen size
@@ -185,45 +193,45 @@ class _RoomSummaryState extends State<RoomSummary> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Check-in and Check-out
-                        Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _selectDate(context, true),
-                                child: TextField(
-                                  controller: TextEditingController(
-                                    text: _checkInDate != null
-                                        ? "${_checkInDate!.year}-${_checkInDate!.month.toString().padLeft(2, '0')}-${_checkInDate!.day.toString().padLeft(2, '0')}"
-                                        : '',
-                                  ),
-                                  enabled: false,
-                                  decoration: const InputDecoration(
-                                    labelText: "Check-in Date",
-                                    suffixIcon: Icon(Icons.calendar_today),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _selectDate(context, false),
-                                child: TextField(
-                                  controller: TextEditingController(
-                                    text: _checkOutDate != null
-                                        ? "${_checkOutDate!.year}-${_checkOutDate!.month.toString().padLeft(2, '0')}-${_checkOutDate!.day.toString().padLeft(2, '0')}"
-                                        : '',
-                                  ),
-                                  enabled: false,
-                                  decoration: const InputDecoration(
-                                    labelText: "Check-out Date",
-                                    suffixIcon: Icon(Icons.calendar_today),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: GestureDetector(
+                        //         onTap: () => _selectDate(context, true),
+                        //         child: TextField(
+                        //           controller: TextEditingController(
+                        //             text: widget.checkInDate != null
+                        //                 ? "${widget.checkInDate!.year}-${widget.checkInDate!.month.toString().padLeft(2, '0')}-${widget.checkInDate!.day.toString().padLeft(2, '0')}"
+                        //                 : '',
+                        //           ),
+                        //           enabled: false,
+                        //           decoration: const InputDecoration(
+                        //             labelText: "Check-in Date",
+                        //             suffixIcon: Icon(Icons.calendar_today),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     const SizedBox(width: 10),
+                        //     Expanded(
+                        //       child: GestureDetector(
+                        //         onTap: () => _selectDate(context, false),
+                        //         child: TextField(
+                        //           controller: TextEditingController(
+                        //             text: widget.checkOutDate != null
+                        //                 ? "${widget.checkOutDate!.year}-${widget.checkOutDate!.month.toString().padLeft(2, '0')}-${widget.checkOutDate!.day.toString().padLeft(2, '0')}"
+                        //                 : '',
+                        //           ),
+                        //           enabled: false,
+                        //           decoration: const InputDecoration(
+                        //             labelText: "Check-out Date",
+                        //             suffixIcon: Icon(Icons.calendar_today),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                         const SizedBox(height: 10),
 
                         // Booking Type
@@ -270,6 +278,10 @@ class _RoomSummaryState extends State<RoomSummary> {
                               value: "Compliment",
                               child: Text("Compliment"),
                             ),
+                            DropdownMenuItem(
+                              value: "Unpaid",
+                              child: Text("Unpaid"),
+                            ),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -280,6 +292,49 @@ class _RoomSummaryState extends State<RoomSummary> {
                             labelText: "Payment Type",
                           ),
                         ),
+
+                        const SizedBox(height: 10),
+
+                        Text(
+                          "Check-in Date: ${widget.checkInDate!.toIso8601String().replaceRange(10, 24, "")}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+
+                        SizedBox(height: 1.h,),
+
+                        Text(
+                          "Check-out Date: ${widget.checkOutDate!.toIso8601String().replaceRange(10, 24, "")}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+
+                        SizedBox(height: 1.h,),
+
+                        Text(
+                          "Nights: ${_duration}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+
+                        SizedBox(height: 1.h,),
+
+                        Text(
+                          "Room type: ${widget.room!['room_type']['name']}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+
+                        SizedBox(height: 1.h,),
+
+                        Text(
+                          "Room number: ${widget.room!['room_number']}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+
+                        SizedBox(height: 1.h,),
+
+                        Text(
+                          "Price per Room/Night: ${widget.room!['room_type']['fare']}",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+
                         const SizedBox(height: 10),
 
                         // Folio Section
@@ -384,12 +439,21 @@ class _RoomSummaryState extends State<RoomSummary> {
           CustomButton(
             label: "Book Now",
             icon: MdiIcons.cash,
-            color: Colors.green,
+            color: Colors.deepPurple,
             onTap: () {
               // Booking logic
               if (_totalAmount > 0) {
-                _showPaymentDialog(context, _totalAmount);
-                print("Room ==>> ${widget.room?['attributes']?['name']}");
+                if(_paymentType != null) {
+                  _showPaymentDialog(context, _totalAmount);
+                  print("Room ==>> ${widget.room?['attributes']?['name']}");
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content:
+                      Text('Select a payment type to continue'),
+                    ),
+                  );
+                }
               }
             },
           ),
@@ -439,9 +503,9 @@ class _RoomSummaryState extends State<RoomSummary> {
             BookingX booking = BookingX(
               id: 0,
               uid: widget.user.id.toString(),
-              perNight: (widget.room?['attributes']['price'].toString())!,
-              checkin: _checkInDate!.toIso8601String(),
-              checkout: _checkOutDate!.toIso8601String(),
+              perNight: (widget.room?['room_type']?['fare'].toString())!,
+              checkin: widget.checkInDate!.toIso8601String(),
+              checkout: widget.checkOutDate!.toIso8601String(),
               amount: _totalAmount,
               roomId: (widget.room?['id'].toString())!,
               folio: json.encode(folio),
@@ -449,12 +513,12 @@ class _RoomSummaryState extends State<RoomSummary> {
               bookingOption: _bookingType!,
               duration: _duration.toString(),
               userId: widget.user.id.toString(),
-              roomName: widget.room?['attributes']?['name'],
+              roomName: widget.room?['room_number'],
               others: jsonEncode(paymentData),
               amountPayable: _totalAmount,
               paymentType: _paymentType,
               folioId: widget.registerInfo['id'],
-              createdAt: _checkInDate!..toIso8601String(),
+              createdAt: widget.checkInDate!..toIso8601String(),
               companyId: widget.user.company!.id.toString(),
               checkinTime: DateFormat('hh:mm:ss').format(DateTime.now()),
               searchDate: searchDate(DateTime.now()),

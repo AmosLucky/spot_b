@@ -23,6 +23,7 @@ class PrimaryTextField extends StatefulWidget {
   final Function(String?)? onSaved;
   final bool? enableInteractiveSelection;
   final FocusNode? focusNode;
+  final double? titleSize;
   final Function(String)? validate;
   final Color? fillColor;
   final Function(String)? onFieldSubmitted;
@@ -38,6 +39,7 @@ class PrimaryTextField extends StatefulWidget {
         this.maxLength,
         this.keyboardType,
         this.onSaved,
+        this.titleSize,
         this.validate,
         this.suffixIcon,
         required this.hintText,
@@ -73,7 +75,7 @@ class _PrimaryTextFieldState extends State<PrimaryTextField> {
         if (hasTitle) Text(
           widget.title,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontSize: 16.sp,
+            fontSize: widget.titleSize ?? 16.sp,
             color: Colors.black,
             fontWeight: FontWeight.w400,
           ),

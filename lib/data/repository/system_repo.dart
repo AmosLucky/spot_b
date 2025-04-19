@@ -83,6 +83,33 @@ class SystemRepo extends ApiClient {
     }
   }
 
+  // Perform GET request with caching and token authorization
+  Future<Response> _fetchRoomTypes(String endpoint, {bool refresh = false}) async {
+    String token = await getToken(); // Get token using the helper method
+
+    print("Fetching: $baseUri$endpoint");
+
+    try {
+      var res = await dio.get(
+        '$baseUri$endpoint',
+        options: Options(
+          headers: {
+            HttpHeaders.contentTypeHeader: "application/json",
+            HttpHeaders.authorizationHeader: "Bearer $token",
+          },
+        ),
+      );
+
+      // Print response for debugging
+      print(res);
+
+      return res;
+    } catch (e) {
+      print("Error fetching data: $e");
+      rethrow;
+    }
+  }
+
   // Fetch Users
   Future<Response> fetchUsersAPI({bool refresh = false}) async {
     return await _fetchData('users-login', refresh: refresh);
@@ -124,11 +151,20 @@ class SystemRepo extends ApiClient {
   // Fetch Hotel Rooms
   Future<Response> fetchHotelRoomsAPI({bool refresh = false}) async {
     return await _fetchData('hotel-rooms?page[size]=0', refresh: refresh);
+    //return await _fetchData('hotel/rooms', refresh: refresh);
   }
 
   // Fetch Hotel Reservations
   Future<Response> fetchHotelReservationsAPI({bool refresh = false}) async {
     return await _fetchData('hotel-bookings?page[size]=0', refresh: refresh);
+  }
+
+  Future<Response> fetchRoomTypes({bool refresh = false}) async {
+    return await _fetchData('hotel/room-types', refresh: refresh);
+  }
+
+  Future<Response> fetchAvailableRooms({bool refresh = false, required String roomTypeId, required noOfAdult, required noOfChildren, required startDate, required endDate, required noOfRooms}) async {
+    return await _fetchData('hotel/book-rooms/room-search?room_type_id=${roomTypeId}&adult=${noOfAdult}&children=${noOfChildren}&date=${startDate}-${endDate}&rooms=${noOfRooms}', refresh: refresh);
   }
 
   // Fetch Products

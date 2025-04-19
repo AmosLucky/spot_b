@@ -11,6 +11,8 @@ import 'summary.dart';
 class SideContainer extends StatelessWidget {
   final String action;
   final Map<String, dynamic>? room;
+  final DateTime? checkInDate;
+  final DateTime? checkOutDate;
   final Size mediaQuery;
   final Map registerInfo;
   final List rooms;
@@ -21,6 +23,8 @@ class SideContainer extends StatelessWidget {
   const SideContainer({
     super.key,
     this.action = "book_now",
+    required this.checkInDate,
+    required this.checkOutDate,
     required this.room,
     required this.rooms,
     required this.mediaQuery,
@@ -34,6 +38,8 @@ class SideContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     if (action == "book_now") {
       return RoomSummary(
+        checkInDate: checkInDate,
+        checkOutDate: checkOutDate,
         room: room,
         rooms: rooms,
         mediaQuery: mediaQuery,

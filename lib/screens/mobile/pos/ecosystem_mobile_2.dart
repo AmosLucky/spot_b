@@ -180,38 +180,38 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
           ),
           actions: [
             // Navigate to the Search Screen
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CartMobile(
-                              systemProvider: widget.systemProvider,
-                            )));
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 0, right: 15, top: 5, bottom: 15),
-                child: Stack(
-                  children: [
-                    const Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Icon(Icons.shopping_cart_rounded,
-                            color: Colors.white, size: 25)),
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Consumer<CartProvider>(
-                        builder: (context, value, child) => CartCounter(
-                          count: value.totalCart.toString(),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
+            // InkWell(
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => CartMobile(
+            //                   systemProvider: widget.systemProvider,
+            //                 )));
+            //   },
+            //   child: Padding(
+            //     padding: const EdgeInsets.only(
+            //         left: 0, right: 15, top: 5, bottom: 15),
+            //     child: Stack(
+            //       children: [
+            //         const Align(
+            //             alignment: Alignment.bottomCenter,
+            //             child: Icon(Icons.shopping_cart_rounded,
+            //                 color: Colors.white, size: 25)),
+            //         Positioned(
+            //           top: 0,
+            //           left: 0,
+            //           right: 0,
+            //           child: Consumer<CartProvider>(
+            //             builder: (context, value, child) => CartCounter(
+            //               count: value.totalCart.toString(),
+            //             ),
+            //           ),
+            //         )
+            //       ],
+            //     ),
+            //   ),
+            // ),
             IconButton(
                 color: whiteColor,
                 onPressed: () async {

@@ -52,6 +52,7 @@ class SalesReportWidget extends StatelessWidget {
                     return TransactionTile(
                       transactionId: sale.trxId,
                       amount: sale.amount,
+                      customer: sale.customerName,
                       createdAt: sale.createdAt,
                       isSynced: sale.sync == 1,
                       paymentMethod: sale.paymentMethod,

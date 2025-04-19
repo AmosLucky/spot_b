@@ -167,13 +167,14 @@ class _CartMobileState extends State<CartMobile> {
                           cart.del(index);
                         },
                         child: ListTile(
+                          contentPadding: EdgeInsets.only(right: 0, left: 10),
                           onTap: () {
                             // showBS(context, index, product);
                           },
                           title: Text(
                             product['name'],
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold),
                           ),
                           leading: CachedNetworkImage(
@@ -186,7 +187,7 @@ class _CartMobileState extends State<CartMobile> {
                           ),
                           subtitle:
                           Row(
-                            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(Money.format(cartItem.totalAmount!)),
                               IconButton(
@@ -211,6 +212,7 @@ class _CartMobileState extends State<CartMobile> {
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.remove),
@@ -220,11 +222,23 @@ class _CartMobileState extends State<CartMobile> {
                                       .decrementQuantity(index);
                                 },
                               ),
-                              Text(
-                                cartItem.quantity.toString(),
-                                style: TextStyle(
-                                    color: primaryColor, fontSize: 14),
+                              SizedBox(width: 3.w,),
+                              GestureDetector(
+                                onTap: () {
+                                  _editQuantity(
+                                    context,
+                                    index,
+                                    cartItem.quantity!,
+                                  );
+
+                                },
+                                child: Text(
+                                  cartItem.quantity.toString(),
+                                  style: TextStyle(
+                                      color: primaryColor, fontSize: 18.sp),
+                                ),
                               ),
+                              SizedBox(width: 3.w,),
                               IconButton(
                                 icon: const Icon(Icons.add),
                                 onPressed: () {
@@ -434,6 +448,55 @@ class _CartMobileState extends State<CartMobile> {
                     context,
                     "Invalid Price",
                     "Please enter a valid price.",
+                    "OK",
+                    "",
+                    [],
+                  );
+                }
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _editQuantity(BuildContext context, int index, int currentQuantity) {
+    final TextEditingController quantityController = TextEditingController(
+      text: currentQuantity.toString(),
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Quantity"),
+          content: TextField(
+            controller: quantityController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: "Quantity"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                final newQuantity = int.tryParse(quantityController.text);
+                if (newQuantity != null) {
+                  Provider.of<CartProvider>(context, listen: false)
+                      .updateQuantity(index, newQuantity);
+                  Navigator.of(context).pop();
+                } else {
+                  // Show error if the price is not a valid number
+                  Dialogs.alertDialog(
+                    context,
+                    "Invalid Quantity",
+                    "Please enter a valid quantity.",
                     "OK",
                     "",
                     [],

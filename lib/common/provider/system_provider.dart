@@ -32,6 +32,12 @@ class SystemProvider with ChangeNotifier {
   bool _dataFetched = false;
   bool get dataFetched => _dataFetched;
 
+  List _roomTypesItems = [];
+  List get roomTypesItems => _roomTypesItems;
+
+  Map _roomResult = {};
+  Map get roomResult => _roomResult;
+
   int? _warehouseIds;
   int? get warehouseIds => _warehouseIds;
 
@@ -105,6 +111,7 @@ class SystemProvider with ChangeNotifier {
     await fetchHotelCategories(true, connectionResult);
     await fetchHotelAmenities(true, connectionResult);
     await fetchHotelRooms(true, connectionResult);
+    await getRoomTypes();
     //fetchHotelReservations(true, connectionResult);
     print("fetcheddd");
     await fetchCustomers(true, connectionResult);
@@ -609,7 +616,7 @@ class SystemProvider with ChangeNotifier {
             await SystemRepo(refresh: refresh, online: connectionStatus)
                 .fetchHotelRoomsAPI();
         print("============= system Repo Result Hotel Rooms ===============");
-
+        print("hotel rooms data ==>> ${response.data["data"]}");
         if (response.statusCode == 200) {
           final categoryData = response.data["data"];
 
@@ -813,6 +820,34 @@ class SystemProvider with ChangeNotifier {
       return response;
     } catch (error) {
       return [];
+      // throw (error);
+    }
+  }
+
+  Future<List<dynamic>> getRoomTypes() async {
+    try {
+      var response = await SystemRepo(refresh: false, online: false).fetchRoomTypes();
+      _roomTypesItems = response.data['data'];
+      print("Fetched room data ${response}");
+      return response.data;
+    } catch (error) {
+      return [];
+      // throw (error);
+    }
+  }
+
+  Future<Map> getAvailableRooms(String roomTypeId, noOfAdult, noOfChildren, noOfRooms, startDate, endDate) async {
+    try {
+      var response = await SystemRepo(refresh: false, online: false).fetchAvailableRooms(roomTypeId: roomTypeId, noOfAdult: noOfAdult, noOfChildren: noOfChildren, startDate: startDate, endDate: endDate, noOfRooms: noOfRooms);
+
+      if (response.statusCode == 200) {
+        _roomResult = response.data;
+        print("Room search result ${roomResult['rooms']}");
+        notifyListeners();
+      }
+      return response.data;
+    } catch (error) {
+      return {};
       // throw (error);
     }
   }

@@ -20,8 +20,9 @@ class AuthRepo extends ApiClient {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
+        //"platform":"mobile"
         body: jsonEncode(
-            {"email": email, 'password': password, 'language_code': 'en'}),
+            {"email": email, 'password': password, 'language_code': 'en', "platform":"mobile"}, ),
       );
       print(data.body);
       jsonData = json.decode(data.body)['data'];
