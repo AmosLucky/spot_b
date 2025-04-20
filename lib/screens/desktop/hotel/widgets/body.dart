@@ -482,7 +482,7 @@ class _BodyState extends State<Body> {
                                               customBorder: RoundedRectangleBorder( borderRadius: BorderRadius. circular(20),),
                                               onTap: () {
                                                 //amountController.text = amount[i];
-                                                if(!selectedRooms.contains(roomResult['rooms'][i]) && selectedRooms.length <= int.parse(roomNoController.text)) {
+                                                if(!selectedRooms.contains(roomResult['rooms'][i]) && selectedRooms.length <= (int.parse(roomNoController.text) - 1)) {
                                                   selectedRooms.add(roomResult['rooms'][i]);
                                                   selectedRooms.toSet().toList();
                                                   print("selected room $selectedRooms");
@@ -492,17 +492,19 @@ class _BodyState extends State<Body> {
                                                     selectedRooms.contains(roomResult['rooms'][i]);
                                                   });
                                                 } else {
-                                                  selectedRooms.remove(roomResult['rooms'][i]);
-                                                  // ScaffoldMessenger.of(context).showSnackBar(
-                                                  //   const SnackBar(
-                                                  //     content: Text('You can only select the number of rooms specified during search'),
-                                                  //   ),
-                                                  // );
-                                                  if(selectedRooms.isEmpty) {
-                                                    setState(() {
-                                                      selectedRoom = {};
-                                                      btnAction = "k";
-                                                    });
+                                                  setState(() {
+                                                    selectedRooms.remove(roomResult['rooms'][i]);
+                                                    if(selectedRooms.isEmpty) {
+                                                        selectedRoom = {};
+                                                        btnAction = "k";
+                                                    }
+                                                  });
+                                                  if(selectedRooms.length == (int.parse(roomNoController.text))) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text('You can only select the number of rooms specified during search'),
+                                                      ),
+                                                    );
                                                   }
                                                   print("selected room $selectedRooms");
                                                 }
