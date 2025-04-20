@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/helpers/internet_connectivity.dart';
@@ -113,8 +114,8 @@ class _DashboardMobileScreenState extends State<DashboardMobileScreen> {
                       return 'Please enter the cash amount at hand';
                     }
                     if (double.tryParse(value) == null ||
-                        double.parse(value) <= 0) {
-                      return 'Please enter a valid amount greater than 0';
+                        double.parse(value) > 0) {
+                      return 'Please enter a valid amount';
                     }
                     return null;
                   },
@@ -346,6 +347,7 @@ class _DashboardMobileScreenState extends State<DashboardMobileScreen> {
                       iconColor: const Color.fromARGB(255, 195, 220, 30),
                       icon: MdiIcons.chartBar,
                     ),
+                    SizedBox(width: 2.w,),
                     DashboardCard(
                       cardWidth: 0.45,
                       title: "Unsynced",

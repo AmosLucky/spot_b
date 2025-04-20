@@ -62,7 +62,7 @@ class _SecondaryCustomDropDownState extends State<SecondaryCustomDropDown> {
                       //SizedBox(width: 2.w,),
 
                       SizedBox(
-                        width: 20.w,
+                        width: 15.w,
                         child: Text(widget.hintText!, style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,

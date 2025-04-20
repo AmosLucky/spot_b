@@ -95,10 +95,20 @@ class Header extends StatelessWidget {
                 OutlinedButton(
                   onPressed: () async {
                     // Check if the register is open before navigating
-                    _navigateToPage(
-                      context,
-                      ChooseModuleDesktop(),
-                    );
+                    bool isOpen = await _isOpenRegister("INVENTORY");
+
+                    if (isOpen) {
+                      _navigateToPage(
+                        context,
+                          EcosystemDesktop(
+                            systemProvider: systemProvider,
+                            user: user,
+                          ),
+                      );
+                    } else {
+                      // Show POS dialog if register is not open
+                      _showPOSSDialog(context, "INVENTORY");
+                    }
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
@@ -113,10 +123,38 @@ class Header extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    "APPS",
+                    "POS",
                     style: TextStyle(color: secondaryColor),
                   ),
                 ),
+                // SizedBox(
+                //   width: 10,
+                // ),
+                // OutlinedButton(
+                //   onPressed: () async {
+                //     // Check if the register is open before navigating
+                //     _navigateToPage(
+                //       context,
+                //       ChooseModuleDesktop(),
+                //     );
+                //   },
+                //   style: OutlinedButton.styleFrom(
+                //     side: BorderSide(
+                //         color: secondaryColor,
+                //         width: 1), // Outline color and width
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(8), // Rounded corners
+                //     ),
+                //     padding: const EdgeInsets.symmetric(
+                //       horizontal: 24, // Horizontal padding
+                //       vertical: 16, // Vertical padding
+                //     ),
+                //   ),
+                //   child: Text(
+                //     "APPS",
+                //     style: TextStyle(color: secondaryColor),
+                //   ),
+                // ),
               ],
             ),
           ]),
@@ -276,6 +314,102 @@ class Header extends StatelessWidget {
                       const SnackBar(
                         content:
                             Text('Failed to open register. Please try again.'),
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text("Open"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Register closed!')),
+                );
+              },
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method to show the POS dialog with validation
+  void _showPOSSDialog(BuildContext context, String module) {
+    final TextEditingController amountController = TextEditingController();
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("$module Register"),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize:
+              MainAxisSize.min, // Set column height based on content
+              children: [
+                const Text("Open register to start your daily sales!"),
+                const SizedBox(height: 16), // Add spacing
+                // TextField for cash at hand with validation
+                TextFormField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: "Cash at Hand",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the cash amount at hand';
+                    }
+                    if (double.tryParse(value) == null ||
+                        double.parse(value) < 0) {
+                      return 'Please enter a valid amount greater than 0';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                // Validate the form before proceeding
+                if (_formKey.currentState?.validate() ?? false) {
+                  Navigator.of(context).pop(); // Close the dialog
+
+                  // Open register with the entered cash amount
+                  var response = await SystemRepo(refresh: false, online: false)
+                      .openRegister(module: module, amount: amountController.text);
+
+                  if (response['status'] == true) {
+                    if(module == 'INVENTORY') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return EcosystemDesktop(
+                              systemProvider: systemProvider,
+                              user: user,
+                            );
+                          }));
+                    } else if (module == 'HOTEL') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return FrontDeskDesktop(
+                              systemProvider: systemProvider,
+                              user: user,
+                            );
+                          }));
+                    };
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                        Text('Failed to open register. Please try again.'),
                       ),
                     );
                   }

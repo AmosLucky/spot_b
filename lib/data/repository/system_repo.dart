@@ -83,6 +83,33 @@ class SystemRepo extends ApiClient {
     }
   }
 
+  // Perform GET request with caching and token authorization
+  Future<Response> _fetchRoomTypes(String endpoint, {bool refresh = false}) async {
+    String token = await getToken(); // Get token using the helper method
+
+    print("Fetching: $baseUri$endpoint");
+
+    try {
+      var res = await dio.get(
+        '$baseUri$endpoint',
+        options: Options(
+          headers: {
+            HttpHeaders.contentTypeHeader: "application/json",
+            HttpHeaders.authorizationHeader: "Bearer $token",
+          },
+        ),
+      );
+
+      // Print response for debugging
+      print(res);
+
+      return res;
+    } catch (e) {
+      print("Error fetching data: $e");
+      rethrow;
+    }
+  }
+
   // Fetch Users
   Future<Response> fetchUsersAPI({bool refresh = false}) async {
     return await _fetchData('users-login', refresh: refresh);
@@ -124,11 +151,20 @@ class SystemRepo extends ApiClient {
   // Fetch Hotel Rooms
   Future<Response> fetchHotelRoomsAPI({bool refresh = false}) async {
     return await _fetchData('hotel-rooms?page[size]=0', refresh: refresh);
+    //return await _fetchData('hotel/rooms', refresh: refresh);
   }
 
   // Fetch Hotel Reservations
   Future<Response> fetchHotelReservationsAPI({bool refresh = false}) async {
     return await _fetchData('hotel-bookings?page[size]=0', refresh: refresh);
+  }
+
+  Future<Response> fetchRoomTypes({bool refresh = false}) async {
+    return await _fetchData('hotel/room-types', refresh: refresh);
+  }
+
+  Future<Response> fetchAvailableRooms({bool refresh = false, required String roomTypeId, required noOfAdult, required noOfChildren, required startDate, required endDate, required noOfRooms}) async {
+    return await _fetchData('hotel/book-rooms/room-search?room_type_id=${roomTypeId}&adult=${noOfAdult}&children=${noOfChildren}&date=${startDate}-${endDate}&rooms=${noOfRooms}', refresh: refresh);
   }
 
   // Fetch Products
@@ -1361,6 +1397,8 @@ class SystemRepo extends ApiClient {
       print("Unsyc order length ${unsyncedOrders.length}");
       List data = unsyncedOrders.map((d) {
         print(d.items);
+        var aa = jsonDecode(d.items);
+        //print("Warehouse ==>> ${aa[0]['product']['stock']['warehouse_id']}");
         return {
           "company": {
             "id": user.id,
@@ -1369,7 +1407,7 @@ class SystemRepo extends ApiClient {
             "dob": '',
             "salary_date": ''
           },
-          "customer_id": 17,
+          "customer_id": null,
           "date": d.createdAt.toIso8601String(),
           "discount": 0,
           "grand_total": d.amount.toString(),
@@ -1378,16 +1416,22 @@ class SystemRepo extends ApiClient {
           "payment_status": d.status,
           "payment_type": d.paymentMethod,
           "received_amount": int.parse(d.amount.toString().replaceAll('.0', '')),
-          "sale_items": jsonDecode(d.items).map((e)=> ({
+          "sale_items": jsonDecode(d.items).map((e) => ({
               "product_id": e['product']['stock']['product_id'],
               "quantity": e['quantity'],
-              "price": e['totalAmount'].toString()
-            })
+              "product_price": e['totalAmount'].toString(),
+            "discount_type": 1,
+            "discount_value": 0,
+            "tax_value": 0,
+            "tax_type": 1
+          })
           ).toList(),
           "shipping": 0,
           "status": d.status,
           "tax_rate": 0,
-          "warehouse_id": 37
+          "warehouse_id": aa[0]['product']['stock']['warehouse_id'],
+          "is_offline": 1, //0 for NO, 1 for YES
+          "offline_customer_name": d.customerName
         };
       }).toList();
 
@@ -1406,13 +1450,23 @@ class SystemRepo extends ApiClient {
         );
 
         print("Syncing");
-        print(response.body);
+        log("response body ==> ${response.body}");
+        log("response ==> ${response.statusCode}");
         var jsonData = json.decode(response.body);
-        if (response.statusCode == 200 && jsonData['status'] == true) {
-          unsyncedOrders.map((d) => {
-          //d.sync = 1; // Mark as synced
-               orderBox.put(d)// Update the order
-          });
+        if (response.statusCode == 200) {
+          print("dataaaa ==> ${unsyncedOrders}");
+          for (var itemData in unsyncedOrders) {
+            print("sync data ==> $itemData");
+            itemData.sync = 1;
+            orderBox.put(itemData);// Update the order
+          }
+          // var syncValue = unsyncedOrders.map((d) => ({
+          //   if(jsonDecode(d.items) != []) {
+          //     print("sync data ==> $d");
+          //     d.sync = 1;
+          //     orderBox.put(d);// Update the order
+          //   }
+          // }));
           return {'status': true, 'message': jsonData['message']};
         } else {
           return {'status': false, 'message': jsonData['message']};

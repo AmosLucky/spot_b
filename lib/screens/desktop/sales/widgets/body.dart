@@ -127,6 +127,7 @@ class _BodyState extends State<Body> {
                                           return TransactionTile(
                                             transactionId: transaction.trxId,
                                             amount: transaction.amount,
+                                            customer: transaction.customerName,
                                             createdAt: transaction.createdAt,
                                             isSynced: transaction.sync == 1,
                                             paymentMethod:
@@ -225,6 +226,7 @@ class _BodyState extends State<Body> {
                                           return TransactionTile(
                                             transactionId: syncItem.trxId,
                                             amount: syncItem.amount,
+                                            customer: syncItem.customerName,
                                             createdAt: syncItem.createdAt,
                                             isSynced: syncItem.sync == 1,
                                             paymentMethod:

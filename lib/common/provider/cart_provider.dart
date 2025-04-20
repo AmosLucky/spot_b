@@ -106,6 +106,12 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateQuantity(int index, quantityValue) {
+    items[index].quantity = quantityValue;
+    totalPriceSum(); // Update subtotal when quantity is incremented
+    notifyListeners();
+  }
+
   void decrementQuantity(int index) {
     if (items[index].quantity > 1) {
       items[index].quantity--;

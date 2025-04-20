@@ -1,3 +1,4 @@
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/cart_provider.dart';
@@ -124,7 +125,6 @@ class _OrderSummaryState extends State<OrderSummary> {
                   await deleteInvoice(cartProvider.selectedInvoiceId);
                   Provider.of<CartProvider>(context, listen: false)
                       .deleteIndex();
-
                 }
               } else {
                 // Show error dialog or message
@@ -290,17 +290,22 @@ class _OrderSummaryState extends State<OrderSummary> {
                                       cart.decrementQuantity(index);
                                     },
                                   )),
-                              const SizedBox(
-                                width: 10,
+                              SizedBox(width: 2.w,),
+                              GestureDetector(
+                                onTap: () {
+                                  _editQuantity(
+                                    context,
+                                    index,
+                                    cartItem.quantity!,
+                                  );
+                                },
+                                child: Text(
+                                  cartItem.quantity.toString(),
+                                  style: TextStyle(
+                                      color: primaryColor, fontSize: 12.sp),
+                                ),
                               ),
-                              Text(
-                                cartItem.quantity.toString(),
-                                style: TextStyle(
-                                    color: primaryColor, fontSize: 14),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
+                              SizedBox(width: 2.w,),
                               Container(
                                   width: 40,
                                   height: 40,
@@ -416,6 +421,55 @@ class _OrderSummaryState extends State<OrderSummary> {
           ),
         ),
       ]),
+    );
+  }
+
+  void _editQuantity(BuildContext context, int index, int currentQuantity) {
+    final TextEditingController quantityController = TextEditingController(
+      text: currentQuantity.toString(),
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Quantity"),
+          content: TextField(
+            controller: quantityController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: "Quantity"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                final newQuantity = int.tryParse(quantityController.text);
+                if (newQuantity != null) {
+                  Provider.of<CartProvider>(context, listen: false)
+                      .updateQuantity(index, newQuantity);
+                  Navigator.of(context).pop();
+                } else {
+                  // Show error if the price is not a valid number
+                  Dialogs.alertDialog(
+                    context,
+                    "Invalid Quantity",
+                    "Please enter a valid quantity.",
+                    "OK",
+                    "",
+                    [],
+                  );
+                }
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

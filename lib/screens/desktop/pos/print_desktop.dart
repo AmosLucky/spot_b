@@ -112,7 +112,7 @@ class _PrintScreenDialogState extends State<PrintScreenDialog> {
                 Text(
                   widget.transactionData['trx'] == null
                       ? "You have successfully purchased goods worth of ${widget.transactionData['amount']} Naira"
-                      : "You have successfully booked the ${widget.transactionData['roomName']} room for a duration of ${widget.transactionData['duration']}day(s) for ${widget.transactionData['amount']} Naira only",
+                      : "You have successfully booked room ${widget.transactionData['roomName']} for a duration of ${widget.transactionData['duration']}day(s) for ${widget.transactionData['amount']} Naira only",
                   style:
                       const TextStyle(color: Color(0xff063057), fontSize: 14),
                   textAlign: TextAlign.center,

@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
@@ -5,17 +6,35 @@ import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
+import 'package:spotstock_inventory/screens/desktop/home/hotel_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/frontdesk_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
 
 import '../../choose_module_desktop.dart';
 
-class Header extends StatelessWidget {
+class Header extends StatefulWidget {
   final UserDetails user;
   final SystemProvider systemProvider;
   const Header({super.key, required this.user, required this.systemProvider});
 
+  @override
+  State<Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends State<Header> {
+
+  @override
+  void initState() {
+    getData();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  void getData() async {
+    await Provider.of<SystemProvider>(context, listen: false)
+        .forcefulRefresh(true);
+  }
   @override
   Widget build(BuildContext context) {
     // Format today's date
@@ -64,8 +83,8 @@ class Header extends StatelessWidget {
                       _navigateToPage(
                         context,
                         EcosystemDesktop(
-                          systemProvider: systemProvider,
-                          user: user,
+                          systemProvider: widget.systemProvider,
+                          user: widget.user,
                         ),
                       );
                     } else {
@@ -93,12 +112,24 @@ class Header extends StatelessWidget {
                 SizedBox(
                   width: 10,
                 ),
+
                 OutlinedButton(
                   onPressed: () async {
-                    _navigateToPage(
-                      context,
-                      ChooseModuleDesktop(),
-                    );
+                    // Check if the register is open before navigating
+                    bool isOpen = await _isOpenRegister("HOTEL");
+
+                    if (isOpen) {
+                      _navigateToPage(
+                        context,
+                        FrontDeskDesktop(
+                          systemProvider: widget.systemProvider,
+                          user: widget.user,
+                        ),
+                      );
+                    } else {
+                      // Show POS dialog if register is not open
+                      _showPOSDialog(context, "HOTEL");
+                    }
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
@@ -113,10 +144,38 @@ class Header extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    "APPS",
+                    "HOTEL",
                     style: TextStyle(color: primaryColor),
                   ),
                 ),
+                // SizedBox(
+                //   width: 10,
+                // ),
+                //
+                // OutlinedButton(
+                //   onPressed: () async {
+                //     _navigateToPage(
+                //       context,
+                //       ChooseModuleDesktop(),
+                //     );
+                //   },
+                //   style: OutlinedButton.styleFrom(
+                //     side: BorderSide(
+                //         color: primaryColor,
+                //         width: 1), // Outline color and width
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(8), // Rounded corners
+                //     ),
+                //     padding: const EdgeInsets.symmetric(
+                //       horizontal: 24, // Horizontal padding
+                //       vertical: 16, // Vertical padding
+                //     ),
+                //   ),
+                //   child: Text(
+                //     "APPS",
+                //     style: TextStyle(color: primaryColor),
+                //   ),
+                // ),
               ],
             ),
           ]),
@@ -125,7 +184,7 @@ class Header extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Welcome, ${user.firstName}',
+                'Welcome, ${widget.user.firstName}',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
               InkWell(
@@ -259,17 +318,26 @@ class Header extends StatelessWidget {
 
                   // Open register with the entered cash amount
                   var response = await SystemRepo(refresh: false, online: false)
-                      .openRegister(
-                          module: module, amount: amountController.text);
+                      .openRegister(module: module, amount: amountController.text);
 
                   if (response['status'] == true) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return EcosystemDesktop(
-                        systemProvider: systemProvider,
-                        user: user,
-                      );
-                    }));
+                    if(module == 'INVENTORY') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return EcosystemDesktop(
+                              systemProvider: widget.systemProvider,
+                              user: widget.user,
+                            );
+                          }));
+                    } else if (module == 'HOTEL') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return FrontDeskDesktop(
+                              systemProvider: widget.systemProvider,
+                              user: widget.user,
+                            );
+                          }));
+                    };
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

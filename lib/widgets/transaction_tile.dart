@@ -4,6 +4,7 @@ import 'package:spotstock_inventory/common/money.dart';
 
 class TransactionTile extends StatelessWidget {
   final String transactionId;
+  final String customer;
   final double amount;
   final DateTime createdAt;
   final bool isSynced; // Sync status
@@ -14,6 +15,7 @@ class TransactionTile extends StatelessWidget {
   const TransactionTile({
     Key? key,
     required this.transactionId,
+    required this.customer,
     required this.amount,
     required this.createdAt,
     required this.isSynced,
@@ -39,6 +41,10 @@ class TransactionTile extends StatelessWidget {
           children: [
             Text(
               Money.format(amount),
+              style: TextStyle(color: blackColor, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "Customer: $customer",
               style: TextStyle(color: blackColor, fontWeight: FontWeight.bold),
             ),
             Text(

@@ -50,6 +50,7 @@ dependencies:
   sqflite_common_ffi: ^2.3.3+1
   win32: ^5.9.0
   flutter_scanner_devxhub: ^1.0.3
+  chip_list: ^3.1.0
 
     
 

@@ -69,7 +69,7 @@ class _BodyState extends State<Body> {
     readCategories();
     readProducts();
     readRegisterInfo();
-    //_filterByCategories();
+    _filterByCategories();
     _productSearchResult = _products;
     _categoryResult = _products;
     _foundProducts = _productSearchResult;
