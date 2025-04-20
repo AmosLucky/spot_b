@@ -230,7 +230,6 @@ class _CartMobileState extends State<CartMobile> {
                                     index,
                                     cartItem.quantity!,
                                   );
-
                                 },
                                 child: Text(
                                   cartItem.quantity.toString(),

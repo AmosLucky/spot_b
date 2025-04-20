@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
@@ -12,11 +13,28 @@ import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
 
 import '../../choose_module_desktop.dart';
 
-class Header extends StatelessWidget {
+class Header extends StatefulWidget {
   final UserDetails user;
   final SystemProvider systemProvider;
   const Header({super.key, required this.user, required this.systemProvider});
 
+  @override
+  State<Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends State<Header> {
+
+  @override
+  void initState() {
+    getData();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  void getData() async {
+    await Provider.of<SystemProvider>(context, listen: false)
+        .forcefulRefresh(true);
+  }
   @override
   Widget build(BuildContext context) {
     // Format today's date
@@ -65,8 +83,8 @@ class Header extends StatelessWidget {
                       _navigateToPage(
                         context,
                         EcosystemDesktop(
-                          systemProvider: systemProvider,
-                          user: user,
+                          systemProvider: widget.systemProvider,
+                          user: widget.user,
                         ),
                       );
                     } else {
@@ -104,8 +122,8 @@ class Header extends StatelessWidget {
                       _navigateToPage(
                         context,
                         FrontDeskDesktop(
-                          systemProvider: systemProvider,
-                          user: user,
+                          systemProvider: widget.systemProvider,
+                          user: widget.user,
                         ),
                       );
                     } else {
@@ -166,7 +184,7 @@ class Header extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Welcome, ${user.firstName}',
+                'Welcome, ${widget.user.firstName}',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
               InkWell(
@@ -307,16 +325,16 @@ class Header extends StatelessWidget {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
                             return EcosystemDesktop(
-                              systemProvider: systemProvider,
-                              user: user,
+                              systemProvider: widget.systemProvider,
+                              user: widget.user,
                             );
                           }));
                     } else if (module == 'HOTEL') {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
                             return FrontDeskDesktop(
-                              systemProvider: systemProvider,
-                              user: user,
+                              systemProvider: widget.systemProvider,
+                              user: widget.user,
                             );
                           }));
                     };

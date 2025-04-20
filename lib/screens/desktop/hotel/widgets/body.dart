@@ -374,7 +374,7 @@ class _BodyState extends State<Body> {
                           Container(
                             width: 30.w,
                             height: 5.h,
-                            child: Expanded(child: !searchingRooms ? ElevatedButton(
+                            child: !searchingRooms ? ElevatedButton(
                                 style: ElevatedButton.styleFrom(backgroundColor: secondaryColor),
                                 onPressed: () {
                                   if(selectedRoomTypeId != '' && _selectedDateRange != null) {
@@ -395,7 +395,7 @@ class _BodyState extends State<Body> {
                                 color: Colors.white
                             ),)) : Center(
                               child: CircularProgressIndicator(color: Colors.deepPurple,),
-                            )),
+                            ),
                           ),
                         ],
                       ),
@@ -482,21 +482,33 @@ class _BodyState extends State<Body> {
                                               customBorder: RoundedRectangleBorder( borderRadius: BorderRadius. circular(20),),
                                               onTap: () {
                                                 //amountController.text = amount[i];
-                                                if(!selectedRooms.contains(roomResult['rooms'][i])) {
+                                                if(!selectedRooms.contains(roomResult['rooms'][i]) && selectedRooms.length <= int.parse(roomNoController.text)) {
                                                   selectedRooms.add(roomResult['rooms'][i]);
                                                   selectedRooms.toSet().toList();
-                                                  print("selected room ${selectedRooms}");
+                                                  print("selected room $selectedRooms");
                                                   setState(() {
                                                     selectedRoom = roomResult['rooms'][i];
                                                     btnAction = "book_now";
+                                                    selectedRooms.contains(roomResult['rooms'][i]);
                                                   });
                                                 } else {
                                                   selectedRooms.remove(roomResult['rooms'][i]);
-                                                  print("selected room ${selectedRooms}");
+                                                  // ScaffoldMessenger.of(context).showSnackBar(
+                                                  //   const SnackBar(
+                                                  //     content: Text('You can only select the number of rooms specified during search'),
+                                                  //   ),
+                                                  // );
+                                                  if(selectedRooms.isEmpty) {
+                                                    setState(() {
+                                                      selectedRoom = {};
+                                                      btnAction = "k";
+                                                    });
+                                                  }
+                                                  print("selected room $selectedRooms");
                                                 }
-                                                setState(() {
-                                                  selectedRooms.contains(roomResult['rooms'][i]);
-                                                });
+                                                // setState(() {
+                                                //   selectedRooms.contains(roomResult['rooms'][i]);
+                                                // });
                                               },
                                               child: Padding(
                                                 padding: EdgeInsets.only(

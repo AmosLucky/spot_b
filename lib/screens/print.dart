@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:typed_data';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -8,14 +7,8 @@ import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/screens/mobile/home/home_screen_mobile.dart';
 import 'package:flutter/material.dart' hide Image;
-// import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
-// import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/services.dart';
-// import 'package:flutter_bluetooth_basic/flutter_bluetooth_basic.dart';
 import 'dart:io' show Platform;
-import 'package:image/image.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import '../common/provider/user_provider.dart';
 import '../widgets/custom_btn.dart';
 import 'desktop/pos/list_printers.dart';

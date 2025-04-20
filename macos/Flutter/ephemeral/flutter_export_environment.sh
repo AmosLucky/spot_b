@@ -7,7 +7,6 @@ export "FLUTTER_TARGET=/Users/trustbancgroup/Documents/Github/Inventory_MobileAp
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=0.1.0"
 export "FLUTTER_BUILD_NUMBER=0.1.0"
-export "DART_DEFINES=Zmx1dHRlci5pbnNwZWN0b3Iuc3RydWN0dXJlZEVycm9ycz10cnVl"
 export "DART_OBFUSCATION=false"
 export "TRACK_WIDGET_CREATION=true"
 export "TREE_SHAKE_ICONS=false"

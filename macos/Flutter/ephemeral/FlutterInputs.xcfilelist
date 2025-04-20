@@ -205,7 +205,6 @@
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/characters-1.3.0/lib/src/grapheme_clusters/table.dart
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/checked_yaml-2.0.3/LICENSE
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/chip_list-3.1.0/LICENSE
-/Users/trustbancgroup/.pub-cache/hosted/pub.dev/chip_list-3.1.0/lib/chip_list.dart
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/cli_util-0.4.2/LICENSE
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/clock-1.1.1/LICENSE
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/clock-1.1.1/lib/clock.dart
@@ -2265,7 +2264,7 @@
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/xml-6.5.0/lib/xml.dart
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/xml-6.5.0/lib/xml_events.dart
 /Users/trustbancgroup/.pub-cache/hosted/pub.dev/yaml-3.1.3/LICENSE
-/Users/trustbancgroup/Documents/Github/Inventory_MobileApp/DOES_NOT_EXIST_RERUN_FOR_WILDCARD302454940
+/Users/trustbancgroup/Documents/Github/Inventory_MobileApp/DOES_NOT_EXIST_RERUN_FOR_WILDCARD165322114
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/assets/fonts/Inter-Black.ttf
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/assets/fonts/Inter-Bold.ttf
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/assets/fonts/Inter-Light.ttf
@@ -2362,11 +2361,8 @@
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/edit_booking.dart
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/folio_history.dart
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/maintain_booking.dart
-/Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/room_action.dart
-/Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/room_card.dart
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/scaffold.dart
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/side_container.dart
-/Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/statuses.dart
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/summary.dart
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/hotel/widgets/transfer_booking.dart
 /Users/trustbancgroup/Documents/Github/Inventory_MobileApp/lib/screens/desktop/login_desktop.dart
