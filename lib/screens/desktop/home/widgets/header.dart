@@ -24,14 +24,22 @@ class Header extends StatefulWidget {
 
 class _HeaderState extends State<Header> {
 
-  @override
-  void initState() {
-    getData();
-    // TODO: implement initState
+  // @override
+  // void initState() {
+  //   getData();
+  //   // TODO: implement initState
+  //   super.initState();
+  // }
+
+    void initState() {
     super.initState();
+    // Delay the data fetch until after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getData();
+    });
   }
 
-  void getData() async {
+ Future  <void> getData() async {
     await Provider.of<SystemProvider>(context, listen: false)
         .forcefulRefresh(true);
   }

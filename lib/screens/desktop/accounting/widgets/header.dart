@@ -4,6 +4,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/theme.dart';
 
 import '../../../../widgets/custom_dropdown.dart';
 
@@ -33,43 +34,64 @@ class _HeaderState extends State<Header> {
   DateTimeRange? pickedDateRange;
 
   List ranges = [
-
-    {'date' : DateTimeRange(
-      start: DateUtils.dateOnly(DateTime.now().subtract(Duration(days: 1))),
-      end: DateTime.now()
-    ), 'label': 'Today'},
     {
-      "date" : DateTimeRange(
-      start: DateUtils.dateOnly(DateTime.now().subtract(const Duration(days: 2))),
-    end: DateUtils.dateOnly(DateTime.now().subtract(Duration(days: 1)))), "label": "Yesterday",
+      'date': DateTimeRange(
+          start: DateUtils.dateOnly(DateTime.now().subtract(Duration(days: 1))),
+          end: DateTime.now()),
+      'label': 'Today'
     },
     {
-      "date" : DateTimeRange(
-        start: DateUtils.dateOnly(DateTime.now().subtract(const Duration(days: 7))),
+      "date": DateTimeRange(
+          start: DateUtils.dateOnly(
+              DateTime.now().subtract(const Duration(days: 2))),
+          end: DateUtils.dateOnly(DateTime.now().subtract(Duration(days: 1)))),
+      "label": "Yesterday",
+    },
+    {
+      "date": DateTimeRange(
+        start: DateUtils.dateOnly(
+            DateTime.now().subtract(const Duration(days: 7))),
         end: DateUtils.dateOnly(DateTime.now()),
-      ), "label": "7 days ago"
+      ),
+      "label": "7 days ago"
     },
-
     {
-      "date" : DateTimeRange(
-        start: DateUtils.dateOnly(DateTime.now().subtract(const Duration(days: 30))),
-        end: DateUtils.dateOnly(DateTime.now()),), "label" : "30 days ago"
+      "date": DateTimeRange(
+        start: DateUtils.dateOnly(
+            DateTime.now().subtract(const Duration(days: 30))),
+        end: DateUtils.dateOnly(DateTime.now()),
+      ),
+      "label": "30 days ago"
     }
-
   ];
 
   Future<void> _selectDateRange(BuildContext context) async {
     final DateTimeRange? pickedDateRange = await showDateRangePicker(
-      context: context,
-      saveText: 'Fetch Report',
-      initialDateRange: _selectedDateRange ??
-          DateTimeRange(
-            start: DateTime.now().subtract(const Duration(days: 7)),
-            end: DateTime.now(),
-          ),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-    );
+        context: context,
+        helpText: 'Select Date',
+        saveText: 'Fetch Report',
+        initialDateRange: _selectedDateRange ??
+            DateTimeRange(
+              start: DateTime.now().subtract(const Duration(days: 7)),
+              end: DateTime.now(),
+            ),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2101),
+        
+        builder: (context, child) {
+          return Theme(
+              data: Theme.of(context).copyWith(
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.only(
+                      right: 150,
+                    ), // Adjust spacing
+                  ),
+                ),
+              ),
+              child: child!);
+        }
+        );
     if (pickedDateRange != null && pickedDateRange != _selectedDateRange) {
       setState(() {
         _selectedDateRange = pickedDateRange;
@@ -102,9 +124,9 @@ class _HeaderState extends State<Header> {
                 widget.title,
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
-
-              SizedBox(width: 5.w,),
-
+              SizedBox(
+                width: 5.w,
+              ),
               Expanded(
                 child: CustomDropdown(
                   items: ranges,
@@ -124,12 +146,14 @@ class _HeaderState extends State<Header> {
                           _selectedDateRange!); // Pass the selected date range to parent
                     }
                   },
-                  hintText: hintValue == '' ? "Selected a date range" : hintValue,
+                  hintText:
+                      hintValue == '' ? "Selected a date range" : hintValue,
                   dropdownColor: Colors.white,
-                ),),
-
-              SizedBox(width: 5.w,),
-
+                ),
+              ),
+              SizedBox(
+                width: 5.w,
+              ),
               InkWell(
                 onTap: () {
                   _selectDateRange(context);

@@ -16,7 +16,6 @@ import '../../../mobile/home/pages/transactions.dart';
 import '../../home/hotel_screen_desktop.dart';
 import 'side_container.dart';
 
-
 class Body extends StatefulWidget {
   final UserDetails user;
   final SystemProvider systemProvider;
@@ -60,7 +59,7 @@ class _BodyState extends State<Body> {
   Map? selectedRange;
   String hintValue = '';
   DateTimeRange? pickedDateRange;
-  bool searchingRooms  = false;
+  bool searchingRooms = false;
   bool roomSearched = false;
   Map roomResult = {};
   List selectedRooms = [];
@@ -93,7 +92,7 @@ class _BodyState extends State<Body> {
   Future<void> _selectDateRange(BuildContext context) async {
     final DateTimeRange? pickedDateRange = await showDateRangePicker(
       context: context,
-      saveText: 'Select Range',
+      saveText: 'Select Date',
       initialDateRange: _selectedDateRange ??
           DateTimeRange(
             start: DateTime.now().subtract(const Duration(days: 7)),
@@ -129,9 +128,7 @@ class _BodyState extends State<Body> {
     // print(data);
     systemProvider.roomTypesItems;
     print("All room types ==>> ${systemProvider.roomTypesItems}");
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   Future<void> searchRooms() async {
@@ -140,7 +137,13 @@ class _BodyState extends State<Body> {
       roomSearched = false;
     });
     //var response;
-    var response = await widget.systemProvider.getAvailableRooms(selectedRoomTypeId, adultController.text.trim(), childrenController.text.trim(), roomNoController.text.trim(), formatter.format(_selectedDateRange!.start), formatter.format(_selectedDateRange!.end));
+    var response = await widget.systemProvider.getAvailableRooms(
+        selectedRoomTypeId,
+        adultController.text.trim(),
+        childrenController.text.trim(),
+        roomNoController.text.trim(),
+        formatter.format(_selectedDateRange!.start),
+        formatter.format(_selectedDateRange!.end));
     print("---------------- rooms types -------------");
     print(response);
     //systemProvider.roomTypesItems;
@@ -211,7 +214,7 @@ class _BodyState extends State<Body> {
                 ConstrainedBox(
                   constraints: BoxConstraints(
                     maxHeight:
-                    MediaQuery.of(context).size.height, // Set max height
+                        MediaQuery.of(context).size.height, // Set max height
                   ),
                   child: Container(
                     width: 200, // Fixed width for sidebar
@@ -229,144 +232,182 @@ class _BodyState extends State<Body> {
                     children: [
                       // Header Section for Search Bar and Barcode Scanner
 
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(width: 20.w,
-                        child: Consumer<SystemProvider>(
-                        builder: (context, systemProvider, child) =>
-                            SecondaryCustomDropDown(
-                                color: Colors.grey.withOpacity(0.3),
-                                hintText: selectedRoomType,
-                                titleText: "Room Type",
-                                onTap: () {
-                                  showModalBottomSheet(
-                                      backgroundColor: Colors.transparent,
-                                      barrierColor: Colors.black.withOpacity(0.5),
-                                      isDismissible: true,
-                                      context: context,
-                                      builder: (context) {
-                                        return CustomSelectorBottomSheet3(
-                                          height: 40.h,
-                                          onSelect: (value, index) {
-                                            setState(() {
-                                              selectedRoomTypeId = value['attributes']['id'].toString();
-                                              selectedRoomType = value['attributes']['name'];
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20.w,
+                            child: Consumer<SystemProvider>(
+                              builder: (context, systemProvider, child) =>
+                                  SecondaryCustomDropDown(
+                                      color: Colors.grey.withOpacity(0.3),
+                                      hintText: selectedRoomType,
+                                      titleText: "Room Type",
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                            backgroundColor: Colors.transparent,
+                                            barrierColor:
+                                                Colors.black.withOpacity(0.5),
+                                            isDismissible: true,
+                                            context: context,
+                                            builder: (context) {
+                                              return CustomSelectorBottomSheet3(
+                                                height: 40.h,
+                                                onSelect: (value, index) {
+                                                  setState(() {
+                                                    selectedRoomTypeId =
+                                                        value['attributes']
+                                                                ['id']
+                                                            .toString();
+                                                    selectedRoomType =
+                                                        value['attributes']
+                                                            ['name'];
+                                                  });
+                                                  debugPrint(
+                                                      "valueeee ===>> $selectedRoomType");
+                                                },
+                                                items: systemProvider
+                                                    .roomTypesItems,
+                                              );
                                             });
-                                            debugPrint("valueeee ===>> $selectedRoomType");
-                                          },
-                                          items: systemProvider.roomTypesItems,
-                                        );
-                                      });
-                                }),
-                          //const SizedBox(height: 15),
-                            // SizedBox(height: 5.h, width: 30.w,
-                            //   child: GestureDetector(
-                            //     onTap: () {
-                            //       log(systemProvider.roomTypesItems.toString());
-                            //     },
-                            //     child: CustomDropdown(
-                            //       items: systemProvider.roomTypesItems.toSet().toList(),
-                            //       selectedItem: selectedRoomItem,
-                            //       getItemLabel: (item) => item['attributes']['name'],
-                            //       onChanged: (value) {
-                            //         selectedRoomItem = value;
-                            //         selectedRoomType = value!['attributes']['name'];
-                            //       },
-                            //       hintText: "Select room type",
-                            //       dropdownColor: Colors.white,
-                            //     ),
-                            //   ),),
-                        ),
-                      ),
-
-                      SizedBox(width: 2.w,),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Check-in & Check-out Dates",
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontSize: 13.sp,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400,
-                              ),
+                                      }),
+                              //const SizedBox(height: 15),
+                              // SizedBox(height: 5.h, width: 30.w,
+                              //   child: GestureDetector(
+                              //     onTap: () {
+                              //       log(systemProvider.roomTypesItems.toString());
+                              //     },
+                              //     child: CustomDropdown(
+                              //       items: systemProvider.roomTypesItems.toSet().toList(),
+                              //       selectedItem: selectedRoomItem,
+                              //       getItemLabel: (item) => item['attributes']['name'],
+                              //       onChanged: (value) {
+                              //         selectedRoomItem = value;
+                              //         selectedRoomType = value!['attributes']['name'];
+                              //       },
+                              //       hintText: "Select room type",
+                              //       dropdownColor: Colors.white,
+                              //     ),
+                              //   ),),
                             ),
-                            SizedBox(
-                              height: 1.2.h,
+                          ),
+                          SizedBox(
+                            width: 2.w,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Check-in & Check-out Dates",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        fontSize: 13.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                ),
+                                SizedBox(
+                                  height: 1.2.h,
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    _selectDateRange(context);
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: primaryColor.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 13.0,
+                                      horizontal: 25.0,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.calendar_today,
+                                            size: 16),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          getFormattedDateRange(),
+                                          style: TextStyle(fontSize: 12.sp),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            InkWell(
-                              onTap: () {
-                                _selectDateRange(context);
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 40.0, left: 30),
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                // Check if the register is open before navigating
+                                _navigateToPage(
+                                  context,
+                                  HotelScreenDesktop(),
+                                );
                               },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: primaryColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(16),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                    color: secondaryColor,
+                                    width: 1), // Outline color and width
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      8), // Rounded corners
                                 ),
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 13.0,
-                                  horizontal: 25.0,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.calendar_today, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      getFormattedDateRange(),
-                                      style: TextStyle(fontSize: 12.sp),
-                                    ),
-                                  ],
+                                  horizontal: 24, // Horizontal padding
+                                  vertical: 16, // Vertical padding
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 40.0, left: 30),
-                        child: OutlinedButton(
-                          onPressed: () async {
-                            // Check if the register is open before navigating
-                            _navigateToPage(
-                              context,
-                              HotelScreenDesktop(),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                                color: secondaryColor, width: 1), // Outline color and width
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // Rounded corners
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24, // Horizontal padding
-                              vertical: 16, // Vertical padding
+                              child: Text(
+                                "DASHBOARD",
+                                style: TextStyle(color: secondaryColor),
+                              ),
                             ),
                           ),
-                          child: Text(
-                            "DASHBOARD",
-                            style: TextStyle(color: secondaryColor),
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                      SizedBox(height: 1.h,),
+                      SizedBox(
+                        height: 1.h,
+                      ),
                       Row(
                         children: [
-                          Expanded(child: PrimaryTextField( controller: roomNoController, hintText: "Enter number of rooms", titleSize: 12.sp, title: "No of rooms")),
-                          SizedBox(width: 1.w,),
-                          Expanded(child: PrimaryTextField( controller: adultController, hintText: "Enter number of adults", titleSize: 12.sp,title: "Adults")),
-                          SizedBox(width: 1.w,),
-                          Expanded(child: PrimaryTextField( controller: childrenController, hintText: "Enter number of children", titleSize: 12.sp,title: "Children")),
+                          Expanded(
+                              child: PrimaryTextField(
+                                  controller: roomNoController,
+                                  hintText: "Enter number of rooms",
+                                  titleSize: 12.sp,
+                                  title: "No of rooms")),
+                          SizedBox(
+                            width: 1.w,
+                          ),
+                          Expanded(
+                              child: PrimaryTextField(
+                                  controller: adultController,
+                                  hintText: "Enter number of adults",
+                                  titleSize: 12.sp,
+                                  title: "Adults")),
+                          SizedBox(
+                            width: 1.w,
+                          ),
+                          Expanded(
+                              child: PrimaryTextField(
+                                  controller: childrenController,
+                                  hintText: "Enter number of children",
+                                  titleSize: 12.sp,
+                                  title: "Children")),
                         ],
                       ),
 
-                      SizedBox(height: 4.h,),
+                      SizedBox(
+                        height: 4.h,
+                      ),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -374,187 +415,287 @@ class _BodyState extends State<Body> {
                           Container(
                             width: 30.w,
                             height: 5.h,
-                            child: !searchingRooms ? ElevatedButton(
-                                style: ElevatedButton.styleFrom(backgroundColor: secondaryColor),
-                                onPressed: () {
-                                  if(selectedRoomTypeId != '' && _selectedDateRange != null) {
-                                    setState(() {
-                                      selectedRoom = {};
-                                      btnAction = "k";
-                                    });
-                                    searchRooms();
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                        Text('Provide all required details to continue'),
-                                      ),
-                                    );
-                                  }
-                            }, child: Text("Search Rooms", style: TextStyle(
-                                color: Colors.white
-                            ),)) : Center(
-                              child: CircularProgressIndicator(color: Colors.deepPurple,),
-                            ),
+                            child: !searchingRooms
+                                ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: secondaryColor),
+                                    onPressed: () {
+                                      if (selectedRoomTypeId != '' &&
+                                          _selectedDateRange != null) {
+                                        setState(() {
+                                          selectedRoom = {};
+                                          btnAction = "k";
+                                        });
+                                        searchRooms();
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Provide all required details to continue'),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Text(
+                                      "Search Rooms",
+                                      style: TextStyle(color: Colors.white),
+                                    ))
+                                : Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.deepPurple,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
 
-                      SizedBox(height: 10.h,),
+                      SizedBox(
+                        height: 10.h,
+                      ),
 
-                      roomSearched && roomResult.isNotEmpty ? Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                            borderRadius: BorderRadius.circular(20)
-                        ),
-                        child: Column(
-                          children: [
-
-                            SizedBox(height: 2.h,),
-
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      roomSearched && roomResult.isNotEmpty
+                          ? Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
+                              width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(100)
-                              ),
-                              child: Text("Please select rooms for each day of your stay. You need to select the \nsame number of rooms for each day.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                color: Colors.blue
-                              ),),
-                            ),
-
-                            SizedBox(height: 5.h,),
-
-                            Container(
-                              width: 70.w,
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                              decoration: BoxDecoration(
-                                  color: Colors.deepPurple,
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Column(
                                 children: [
-                                  Text("Date", style: TextStyle(
-                                    color: Colors.white
-                                  ),),
-                                  Text("Rooms", style: TextStyle(
-                                      color: Colors.white
-                                  ),)
-                                ],
-                              ),
-                            ),
+                                  SizedBox(
+                                    height: 2.h,
+                                  ),
 
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 10),
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.1),
+                                        borderRadius:
+                                            BorderRadius.circular(100)),
+                                    child: Text(
+                                      "Please select rooms for each day of your stay. You need to select the \nsame number of rooms for each day.",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.blue),
+                                    ),
+                                  ),
 
-                            Container(
-                              padding: EdgeInsets.symmetric(vertical: 20),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _selectedDateRange != null ? Text("${formatter.format(_selectedDateRange!.start)} - ${formatter.format(_selectedDateRange!.end)}", style: TextStyle(
-                                    fontSize: 12.sp,
-                                  ),) : Text("Select Range"),
-                                 GestureDetector(
-                                    onTap: () {
-                                      //print(sysP.roomResult);
-                                    },
-                                    child: Container(
-                                      //width: MediaQuery.of(context).size.width,
-                                      //height: 20.h,
-                                      decoration: BoxDecoration(
-                                        //color: Colors.pink,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      padding: EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-                                      child: Wrap(
-                                        runAlignment: WrapAlignment.spaceBetween,
-                                        spacing: 0.2.w,
-                                        //runSpacing: 0.0,
-                                        children: List.generate(
-                                          roomResult['rooms'].length, (i) {
-                                          return Material(
-                                            color: Colors.transparent,
-                                            child: InkWell(
-                                              customBorder: RoundedRectangleBorder( borderRadius: BorderRadius. circular(20),),
-                                              onTap: () {
-                                                //amountController.text = amount[i];
-                                                if(!selectedRooms.contains(roomResult['rooms'][i]) && selectedRooms.length <= (int.parse(roomNoController.text) - 1)) {
-                                                  selectedRooms.add(roomResult['rooms'][i]);
-                                                  selectedRooms.toSet().toList();
-                                                  print("selected room $selectedRooms");
-                                                  setState(() {
-                                                    selectedRoom = roomResult['rooms'][i];
-                                                    btnAction = "book_now";
-                                                    selectedRooms.contains(roomResult['rooms'][i]);
-                                                  });
-                                                } else {
-                                                  setState(() {
-                                                    selectedRooms.remove(roomResult['rooms'][i]);
-                                                    if(selectedRooms.isEmpty) {
-                                                        selectedRoom = {};
-                                                        btnAction = "k";
-                                                    }
-                                                  });
-                                                  if(selectedRooms.length == (int.parse(roomNoController.text))) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text('You can only select the number of rooms specified during search'),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+
+                                  Container(
+                                    width: 70.w,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 15),
+                                    decoration: BoxDecoration(
+                                        color: Colors.deepPurple,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Date",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        Text(
+                                          "Rooms",
+                                          style: TextStyle(color: Colors.white),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+
+                                  Container(
+                                    padding: EdgeInsets.symmetric(vertical: 20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        _selectedDateRange != null
+                                            ? Text(
+                                                "${formatter.format(_selectedDateRange!.start)} - ${formatter.format(_selectedDateRange!.end)}",
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                ),
+                                              )
+                                            : Text("Select Date"),
+                                        GestureDetector(
+                                          onTap: () {
+                                            //print(sysP.roomResult);
+                                          },
+                                          child: Container(
+                                            //width: MediaQuery.of(context).size.width,
+                                            //height: 20.h,
+                                            decoration: BoxDecoration(
+                                              //color: Colors.pink,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 11, vertical: 5),
+                                            child: Wrap(
+                                              runAlignment:
+                                                  WrapAlignment.spaceBetween,
+                                              spacing: 0.2.w,
+                                              //runSpacing: 0.0,
+                                              children: List.generate(
+                                                roomResult['rooms'].length,
+                                                (i) {
+                                                  return Material(
+                                                    color: Colors.transparent,
+                                                    child: InkWell(
+                                                      customBorder:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
                                                       ),
-                                                    );
-                                                  }
-                                                  print("selected room $selectedRooms");
-                                                }
-                                                // setState(() {
-                                                //   selectedRooms.contains(roomResult['rooms'][i]);
-                                                // });
-                                              },
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                  // left: 2.w,
-                                                  // right: 2.w,
-                                                  // bottom: 1.h,
-                                                  // top: 1.h,
-                                                ),
-                                                child: Container(
-                                                  width: 5.w,
-                                                  height: 5.h,
-                                                  padding: const EdgeInsets.symmetric(vertical: 5,),
-                                                  decoration: BoxDecoration(
-                                                    color: selectedRooms.contains(roomResult['rooms'][i]) ? Colors.deepPurple : Colors.grey.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(6),
-                                                  ),
-                                                  child: Center(child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                                    children: [
-                                                      Text(roomResult['rooms'][i]['room_number'], style: TextStyle(
-                                                          fontSize: 10.sp,
-                                                          color: selectedRooms.contains(roomResult['rooms'][i]) ? Colors.white : Colors.black,
-                                                          fontWeight: FontWeight.bold
-                                                      ),)
-                                                    ],
-                                                  )),
-                                                ),
+                                                      onTap: () {
+                                                        //amountController.text = amount[i];
+                                                        if (!selectedRooms.contains(
+                                                                roomResult[
+                                                                        'rooms']
+                                                                    [i]) &&
+                                                            selectedRooms
+                                                                    .length <=
+                                                                (int.parse(roomNoController
+                                                                        .text) -
+                                                                    1)) {
+                                                          selectedRooms.add(
+                                                              roomResult[
+                                                                  'rooms'][i]);
+                                                          selectedRooms
+                                                              .toSet()
+                                                              .toList();
+                                                          print(
+                                                              "selected room $selectedRooms");
+                                                          setState(() {
+                                                            selectedRoom =
+                                                                roomResult[
+                                                                    'rooms'][i];
+                                                            btnAction =
+                                                                "book_now";
+                                                            selectedRooms.contains(
+                                                                roomResult[
+                                                                        'rooms']
+                                                                    [i]);
+                                                          });
+                                                        } else {
+                                                          setState(() {
+                                                            selectedRooms.remove(
+                                                                roomResult[
+                                                                        'rooms']
+                                                                    [i]);
+                                                            if (selectedRooms
+                                                                .isEmpty) {
+                                                              selectedRoom = {};
+                                                              btnAction = "k";
+                                                            }
+                                                          });
+                                                          if (selectedRooms
+                                                                  .length ==
+                                                              (int.parse(
+                                                                  roomNoController
+                                                                      .text))) {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                    'You can only select the number of rooms specified during search'),
+                                                              ),
+                                                            );
+                                                          }
+                                                          print(
+                                                              "selected room $selectedRooms");
+                                                        }
+                                                        // setState(() {
+                                                        //   selectedRooms.contains(roomResult['rooms'][i]);
+                                                        // });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                // left: 2.w,
+                                                                // right: 2.w,
+                                                                // bottom: 1.h,
+                                                                // top: 1.h,
+                                                                ),
+                                                        child: Container(
+                                                          width: 5.w,
+                                                          height: 5.h,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            vertical: 5,
+                                                          ),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: selectedRooms
+                                                                    .contains(
+                                                                        roomResult['rooms']
+                                                                            [i])
+                                                                ? Colors
+                                                                    .deepPurple
+                                                                : Colors.grey
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        6),
+                                                          ),
+                                                          child: Center(
+                                                              child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                roomResult['rooms']
+                                                                        [i][
+                                                                    'room_number'],
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        10.sp,
+                                                                    color: selectedRooms.contains(roomResult['rooms']
+                                                                            [i])
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              )
+                                                            ],
+                                                          )),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             ),
-                                          );
-                                        },
+                                          ),
                                         ),
-                                      ),),
+                                      ],
+                                    ),
                                   ),
+
+                                  //SizedBox(height: 2.h,),
                                 ],
                               ),
-                            ),
-
-                            //SizedBox(height: 2.h,),
-                          ],
-                        ),
-                      ) : SizedBox()
-,                      // Padding(
+                            )
+                          : SizedBox(), // Padding(
                       //   padding: const EdgeInsets.symmetric(
                       //       vertical: 3.0, horizontal: 16.0),
                       //   child: HeaderSection(
@@ -822,8 +963,10 @@ class _BodyState extends State<Body> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   child: SideContainer(
-                    checkInDate: DateTime.parse(roomResult['check_in'] ?? DateTime.now().toString()),
-                    checkOutDate: DateTime.parse(roomResult['check_out'] ?? DateTime.now().toString()),
+                    checkInDate: DateTime.parse(
+                        roomResult['check_in'] ?? DateTime.now().toString()),
+                    checkOutDate: DateTime.parse(
+                        roomResult['check_out'] ?? DateTime.now().toString()),
                     rooms: _dataRooms,
                     action: btnAction,
                     room: selectedRoom,
