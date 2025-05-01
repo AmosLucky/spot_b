@@ -3,18 +3,18 @@ import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/provider/maintenance_provider.dart';
+import 'package:spotstock_inventory/common/provider/markroomfor_maintenance_provider.dart';
 
-class MarkRoomDirtyDialog extends StatelessWidget {
-  const MarkRoomDirtyDialog({super.key});
+class SetRoomForMaintenance extends StatelessWidget {
+  const SetRoomForMaintenance({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<MarkDirtyRoomProvider>(context);
+    final provider = Provider.of<MarkRoomForMaintenanceProvider>(context);
     final rooms = {
       for (var type in provider.roomTypes)
         type: ['$type Room 101', '$type Room 102'] // Example room names
     };
-
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: SingleChildScrollView(
@@ -23,30 +23,43 @@ class MarkRoomDirtyDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Row(
               children: [
-                const Icon(Icons.cleaning_services_rounded,
-                    size: 20, color: ColorsRes.cardpurple),
-                const Gap(10),
-                const Text("Mark Room as Dirty",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: ColorsRes.cardpurple)),
-                const Spacer(),
+                Icon(
+                  Icons.cleaning_services_rounded,
+                  size: 20,
+                  color: ColorsRes.cardpurple,
+                ),
+                Gap(10),
+                const Text(
+                  " Set  Room for Maintenance",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: ColorsRes.cardpurple),
+                ),
+                Spacer(),
                 IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.cancel_outlined),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.cancel_outlined,
+                  ),
                 ),
               ],
             ),
-            const Divider(
-                color: Color.fromARGB(115, 96, 96, 96),
-                height: 1,
-                thickness: 0.3),
-            const Gap(40),
-
+            Divider(
+              color: const Color.fromARGB(
+                115,
+                96,
+                96,
+                96,
+              ),
+              height: 1,
+              thickness: 0.3,
+            ),
+            Gap(40),
             // Error message
             if (provider.error != null)
               Padding(
@@ -54,18 +67,18 @@ class MarkRoomDirtyDialog extends StatelessWidget {
                 child: Text('Something Went Wrong, Login again',
                     style: const TextStyle(color: Colors.red)),
               ),
-
-            // Room Type Dropdown
+            // Select Room Type
             const Text("Select Room Type"),
             const SizedBox(height: 8),
             Container(
-              constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * 0.7,
+              padding: EdgeInsets.only(
+                left: 10,
               ),
-              padding: const EdgeInsets.only(left: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: ColorsRes.btndarkshadow),
+                border: Border.all(
+                  color: ColorsRes.btndarkshadow,
+                ),
               ),
               child: DropdownButtonFormField<String>(
                 isExpanded: true,
@@ -91,17 +104,18 @@ class MarkRoomDirtyDialog extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Room Dropdown
+            // Select Room
             const Text("Select Room"),
             const SizedBox(height: 8),
             Container(
-              constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * 0.7,
+              padding: EdgeInsets.only(
+                left: 10,
               ),
-              padding: const EdgeInsets.only(left: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: ColorsRes.btndarkshadow),
+                border: Border.all(
+                  color: ColorsRes.btndarkshadow,
+                ),
               ),
               child: DropdownButtonFormField<String>(
                 isExpanded: true,
@@ -130,15 +144,14 @@ class MarkRoomDirtyDialog extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Cleaning Note
+            // Cleaning Instructions/Note
             const Text("Cleaning Instructions/Note"),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(width: 1, color: ColorsRes.btndarkshadow),
-              ),
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(width: 1, color: ColorsRes.btndarkshadow)),
               child: TextFormField(
                 onChanged: (value) => provider.cleaningNote = value,
                 decoration: const InputDecoration(
@@ -150,8 +163,8 @@ class MarkRoomDirtyDialog extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Expected Date
-            const Text("Expected Cleaning Completion Date"),
+            // Expected Cleaning Completion Date
+            const Text("Expected Completion Date"),
             const SizedBox(height: 8),
             InkWell(
               onTap: () async {
@@ -185,7 +198,7 @@ class MarkRoomDirtyDialog extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             const Text(
-              "Optional. If specified, the room will be flagged if not cleaned by this date.",
+              "Leave empty if you are unsure when maintenance will be completed.",
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 30),
@@ -198,57 +211,53 @@ class MarkRoomDirtyDialog extends StatelessWidget {
                   onPressed:
                       provider.isLoading ? null : () => Navigator.pop(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: ColorsRes.btndarkshadow,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: const Text('Cancel'),
-                  ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                          color: ColorsRes.btndarkshadow,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: const Text('Cancel')),
                 ),
                 const SizedBox(width: 10),
                 Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: ColorsRes.cardyellow,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: provider.isLoading
-                        ? const CircularProgressIndicator()
-                        : GestureDetector(
-                            onTap: () async {
-                              if (provider.selectedRoom == null) {
-                                provider.error = 'Please select a room';
-                                provider.notifyListeners();
-                                return;
-                              }
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                      color: ColorsRes.cardpurple,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: provider.isLoading
+                      ? const CircularProgressIndicator()
+                      : GestureDetector(
+                          onTap: () async {
+                            if (provider.selectedRoom == null) {
+                              provider.error = 'Please select a room';
+                              provider.notifyListeners();
+                              return;
+                            }
 
-                              try {
-                                await provider.markRoomAsDirty();
-                                if (provider.error == null) {
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Room marked as dirty successfully')),
-                                  );
-                                }
-                              } catch (e) {
-                                // Error will be displayed via provider's error state
+                            try {
+                              await provider.setRoomForMaintain();
+                              if (provider.error == null) {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Set for maintenace successfully')),
+                                );
                               }
-                            },
-                            child: provider.isLoading
-                                ? const CircularProgressIndicator()
-                                : const Row(
-                                    children: [
-                                      Icon(Icons.build),
-                                      Text("Mark as Dirty"),
-                                    ],
-                                  ),
-                          ),
-                          ),
+                            } catch (e) {
+                              // Error will be displayed via provider's error state
+                            }
+                          },
+                          child: provider.isLoading
+                              ? const CircularProgressIndicator()
+                              : const Row(
+                                  children: [
+                                    Icon(Icons.build),
+                                    Text("Set for Maintenance"),
+                                  ],
+                                ),
+                        ),
+                ),
               ],
             ),
           ],

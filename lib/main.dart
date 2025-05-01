@@ -13,10 +13,12 @@ import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 import 'package:spotstock_inventory/common/provider/folio_data_provider.dart';
 import 'package:spotstock_inventory/common/provider/general_provider.dart';
 import 'package:spotstock_inventory/common/provider/maintenance_provider.dart';
+import 'package:spotstock_inventory/common/provider/markroomfor_maintenance_provider.dart';
 import 'package:spotstock_inventory/common/provider/preference_settings_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
+import 'package:spotstock_inventory/data/repository/system_repo.dart';
 
 import 'package:spotstock_inventory/objectbox.g.dart';
 import 'package:spotstock_inventory/screens/desktop/splashscreen_desktop.dart';
@@ -134,8 +136,14 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(create: (_) => SystemProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
-        ChangeNotifierProvider(create: (_) => MaintenanceProvider()),
+        ChangeNotifierProvider(
+            create: (_) => MarkDirtyRoomProvider(
+                  SystemRepo(refresh: false, online: true),
+                )),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(
+            create: (_) => MarkRoomForMaintenanceProvider(
+                SystemRepo(refresh: false, online: true))),
         ChangeNotifierProvider(
           create: (_) => PreferenceSettingsProvider(
             preferenceSettingsHelper: PreferenceSettingsHelper(

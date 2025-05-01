@@ -10,6 +10,7 @@ import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/datetime.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
+import 'package:spotstock_inventory/data/models/maintenance_model.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
@@ -84,7 +85,8 @@ class SystemRepo extends ApiClient {
   }
 
   // Perform GET request with caching and token authorization
-  Future<Response> _fetchRoomTypes(String endpoint, {bool refresh = false}) async {
+  Future<Response> _fetchRoomTypes(String endpoint,
+      {bool refresh = false}) async {
     String token = await getToken(); // Get token using the helper method
 
     print("Fetching: $baseUri$endpoint");
@@ -106,6 +108,80 @@ class SystemRepo extends ApiClient {
       return res;
     } catch (e) {
       print("Error fetching data: $e");
+      rethrow;
+    }
+  }
+
+// Mark room as Dirty
+  Future<Response> markRoomAsDirty({
+    required int roomId,
+    required String maintenanceNote,
+    DateTime? expectedEndDate,
+  }) async {
+    String token = await getToken();
+    String endpoint = 'hotel/maintenance/mark-dirty';
+    try {
+      final response = await dio.post(
+        '$baseUri$endpoint', // Verify this endpoint
+        data: {
+          'room_id': roomId,
+          'maintenance_note': maintenanceNote,
+          'expected_end_date': expectedEndDate?.toIso8601String().split('T')[0],
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          validateStatus: (status) =>
+              status! < 500, // Don't throw for 4xx errors
+        ),
+      );
+
+      if (response.statusCode == 404) {
+        throw Exception('Endpoint not found. Please check the API URL');
+      }
+
+      return response;
+    } catch (e) {
+      print("Error marking room as dirty: $e");
+      rethrow;
+    }
+  }
+
+// Mark room as Dirty
+  Future<Response> setRoomForMaintain({
+    required int roomId,
+    required String maintenanceNote,
+    DateTime? expectedEndDate,
+  }) async {
+    String token = await getToken();
+    String endpoint = 'hotel/maintenance/set';
+    try {
+      final response = await dio.post(
+        '$baseUri$endpoint', // Verify this endpoint
+        data: {
+          'room_id': roomId,
+          'maintenance_note': maintenanceNote,
+          'expected_end_date': expectedEndDate?.toIso8601String().split('T')[0],
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          validateStatus: (status) =>
+              status! < 500, // Don't throw for 4xx errors
+        ),
+      );
+
+      if (response.statusCode == 404) {
+        throw Exception('Endpoint not found. Please check the API URL');
+      }
+
+      return response;
+    } catch (e) {
+      print("Error marking room as dirty: $e");
       rethrow;
     }
   }
@@ -163,23 +239,141 @@ class SystemRepo extends ApiClient {
     return await _fetchData('hotel/room-types', refresh: refresh);
   }
 
-  Future<Response> fetchAvailableRooms({bool refresh = false, required String roomTypeId, required noOfAdult, required noOfChildren, required startDate, required endDate, required noOfRooms}) async {
-    return await _fetchData('hotel/book-rooms/room-search?room_type_id=${roomTypeId}&adult=${noOfAdult}&children=${noOfChildren}&date=${startDate}-${endDate}&rooms=${noOfRooms}', refresh: refresh);
+  // Hotel mantenance roomtype
+  Future<Response> fetchMaintenanceRoomTypesAPI({bool refresh = false}) async {
+    return await _fetchData('hotel/maintenance/rooms', refresh: refresh);
+  }
+
+  Future<Response> fetchAvailableRooms(
+      {bool refresh = false,
+      required String roomTypeId,
+      required noOfAdult,
+      required noOfChildren,
+      required startDate,
+      required endDate,
+      required noOfRooms}) async {
+    return await _fetchData(
+        'hotel/book-rooms/room-search?room_type_id=${roomTypeId}&adult=${noOfAdult}&children=${noOfChildren}&date=${startDate}-${endDate}&rooms=${noOfRooms}',
+        refresh: refresh);
   }
 
   // Fetch Products
-  Future<Response> fetchProductsAPI({bool refresh = false, required int? id}) async {
-
+  Future<Response> fetchProductsAPI(
+      {bool refresh = false, required int? id}) async {
     var warehouseId = await systemProvider.getWarehouse();
     print("warehouseid.o == ${warehouseId[0]['id']}");
     print("Fetching product now");
-    return await _fetchData("products?filter[brand_id]=&filter[product_category_id]=&page[size]=0&warehouse_id=${id ?? warehouseId[0]['id']}", refresh: refresh);
+    return await _fetchData(
+        "products?filter[brand_id]=&filter[product_category_id]=&page[size]=0&warehouse_id=${id ?? warehouseId[0]['id']}",
+        refresh: refresh);
   }
 
   // Future<Response> fetchWarehouseAPI({bool refresh = false}) async {
   //   print("Fetching product now");
   //   return await _fetchData('pos-warehouses?page[size]=0', refresh: refresh);
   // }
+
+  Future<MaintenanceRoomResponse> fetchMaintenanceRooms(
+      {bool refresh = false}) async {
+    try {
+      final response =
+          await _fetchData('hotel/maintenance/rooms', refresh: refresh);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.data);
+        final responseModel = MaintenanceRoomResponse.fromJson(data);
+
+        // Save to local storage
+        await _saveMaintenanceRooms(responseModel.rooms.data);
+
+        return responseModel;
+      }
+      throw Exception('Failed to load maintenance rooms');
+    } catch (e) {
+      // Fallback to local data
+      final localRooms = await _getLocalMaintenanceRooms();
+      if (localRooms.isNotEmpty) {
+        return MaintenanceRoomResponse(
+          rooms: MaintenanceRoomData(
+            currentPage: 1,
+            data: localRooms,
+            links: PaginationLinks(),
+          ),
+          roomTypes: [],
+          stats: MaintenanceStats(
+            totalRooms: localRooms.length,
+            maintenanceRooms:
+                localRooms.where((r) => r.status == 'dirty').length,
+            maintenancePercentage: 0,
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<Response> makeRoomAvailable(int roomId) async {
+    String token = await getToken();
+    String endpoint = 'hotel/maintenance/make-available';
+
+    try {
+      final response = await dio.post(
+        '$baseUri$endpoint',
+        data: {'room_id': roomId},
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          validateStatus: (status) => status! < 500,
+        ),
+      );
+
+      if (response.statusCode == 404) {
+        throw Exception('Endpoint not found. Please check the API URL');
+      }
+
+      // Update local storage if API call succeeds
+      if (response.statusCode == 200) {
+        await _updateLocalRoomStatus(
+          roomId: roomId,
+          status: 'available',
+        );
+      }
+
+      return response;
+    } catch (e) {
+      print("Error making room available: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> _updateLocalRoomStatus({
+    required int roomId,
+    required String status,
+  }) async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    final room = box.get(roomId);
+
+    if (room != null) {
+      room.status = status;
+      room.updatedAt = DateTime.now();
+      box.put(room);
+    }
+  }
+
+  Future<void> _saveMaintenanceRooms(List<MaintenanceRoom> rooms) async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    box.putMany(rooms);
+  }
+
+  Future<List<MaintenanceRoom>> _getLocalMaintenanceRooms() async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    return box.getAll();
+  }
 
   // Fetch Products
   Future<Response> fetchTablesAPI({bool refresh = false}) async {
@@ -468,15 +662,15 @@ class SystemRepo extends ApiClient {
 
     final totalReserved = await bookingBox
         .query(BookingX_.userId
-        .equals(user.id.toString())
-        .and(BookingX_.bookingOption.equals('Reserved')))
+            .equals(user.id.toString())
+            .and(BookingX_.bookingOption.equals('Reserved')))
         .build()
         .count();
 
     final totalAvailable = await bookingBox
         .query(BookingX_.userId
-        .equals(user.id.toString())
-        .and(BookingX_.bookingOption.equals('Reserved')))
+            .equals(user.id.toString())
+            .and(BookingX_.bookingOption.equals('Reserved')))
         .build()
         .count();
 
@@ -646,7 +840,7 @@ class SystemRepo extends ApiClient {
       'hotelRoomCount': hotelRoomCount ?? 0,
       'totalCheckedIn': totalCheckedIn,
       'totalCheckedOut': totalCheckedOut,
-      'totalReserved' : totalReserved,
+      'totalReserved': totalReserved,
       'todayHotelSales': todayHotelSales,
       'yesterdayHotelSales': yesterdayHotelSales,
       'weeklyHotelSales': weeklyHotelSales,
@@ -894,8 +1088,8 @@ class SystemRepo extends ApiClient {
     final warehouseBox = store.box<StoreX>();
     final warehouses = await warehouseBox
         .query(StoreX_.billerId
-        .equals(user.id.toString())
-        .and(StoreX_.name.equals('warehouses')))
+            .equals(user.id.toString())
+            .and(StoreX_.name.equals('warehouses')))
         .build()
         .findFirst();
     print("=========== warehouses ============");
@@ -1004,6 +1198,22 @@ class SystemRepo extends ApiClient {
       categoryBox.put(hotelRooms);
       print('New Hotel Room record inserted.');
     }
+  }
+
+  // Hotel maintenance
+  Future<void> upsertMaintenanceRooms(List<dynamic> roomsData) async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+
+    final rooms =
+        roomsData.map((json) => MaintenanceRoom.fromJson(json)).toList();
+    box.putMany(rooms);
+  }
+
+  Future<List<MaintenanceRoom>> getLocalMaintenanceRooms() async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    return box.getAll();
   }
 
   UserDetails? _getCurrentUser() {
@@ -1328,9 +1538,7 @@ class SystemRepo extends ApiClient {
   }
 
   Future<List<Register>> getAllRegisterByDate(
-      {DateTime? startDate,
-      DateTime? endDate,
-      required String app}) async {
+      {DateTime? startDate, DateTime? endDate, required String app}) async {
     UserDetails user =
         Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
     final store = await DatabaseEngine.instance.getStore();
@@ -1384,7 +1592,9 @@ class SystemRepo extends ApiClient {
     return unsyncedTransactions;
   }
 
-  Future<Map<String, dynamic>> syncAllTransactions(UserDetails user,) async {
+  Future<Map<String, dynamic>> syncAllTransactions(
+    UserDetails user,
+  ) async {
     final store = await DatabaseEngine.instance.getStore();
 
     final orderBox = store.box<Orders>();
@@ -1393,91 +1603,90 @@ class SystemRepo extends ApiClient {
         .build()
         .find();
 
-      print("Syncing started");
-      print("Unsyc order length ${unsyncedOrders.length}");
-      List data = unsyncedOrders.map((d) {
-        print(d.items);
-        var aa = jsonDecode(d.items);
-        //print("Warehouse ==>> ${aa[0]['product']['stock']['warehouse_id']}");
-        return {
-          "company": {
-            "id": user.id,
-            "first_name": user.firstName,
-            "last_name": user.lastName,
-            "dob": '',
-            "salary_date": ''
-          },
-          "customer_id": null,
-          "date": d.createdAt.toIso8601String(),
-          "discount": 0,
-          "grand_total": d.amount.toString(),
-          "hold_ref_no": "",
-          "note": "",
-          "payment_status": d.status,
-          "payment_type": d.paymentMethod,
-          "received_amount": int.parse(d.amount.toString().replaceAll('.0', '')),
-          "sale_items": jsonDecode(d.items).map((e) => ({
-              "product_id": e['product']['stock']['product_id'],
-              "quantity": e['quantity'],
-              "product_price": e['totalAmount'].toString(),
-            "discount_type": 1,
-            "discount_value": 0,
-            "tax_value": 0,
-            "tax_type": 1
-          })
-          ).toList(),
-          "shipping": 0,
-          "status": d.status,
-          "tax_rate": 0,
-          "warehouse_id": aa[0]['product']['stock']['warehouse_id'],
-          "is_offline": 1, //0 for NO, 1 for YES
-          "offline_customer_name": d.customerName
-        };
-      }).toList();
+    print("Syncing started");
+    print("Unsyc order length ${unsyncedOrders.length}");
+    List data = unsyncedOrders.map((d) {
+      print(d.items);
+      var aa = jsonDecode(d.items);
+      //print("Warehouse ==>> ${aa[0]['product']['stock']['warehouse_id']}");
+      return {
+        "company": {
+          "id": user.id,
+          "first_name": user.firstName,
+          "last_name": user.lastName,
+          "dob": '',
+          "salary_date": ''
+        },
+        "customer_id": null,
+        "date": d.createdAt.toIso8601String(),
+        "discount": 0,
+        "grand_total": d.amount.toString(),
+        "hold_ref_no": "",
+        "note": "",
+        "payment_status": d.status,
+        "payment_type": d.paymentMethod,
+        "received_amount": int.parse(d.amount.toString().replaceAll('.0', '')),
+        "sale_items": jsonDecode(d.items)
+            .map((e) => ({
+                  "product_id": e['product']['stock']['product_id'],
+                  "quantity": e['quantity'],
+                  "product_price": e['totalAmount'].toString(),
+                  "discount_type": 1,
+                  "discount_value": 0,
+                  "tax_value": 0,
+                  "tax_type": 1
+                }))
+            .toList(),
+        "shipping": 0,
+        "status": d.status,
+        "tax_rate": 0,
+        "warehouse_id": aa[0]['product']['stock']['warehouse_id'],
+        "is_offline": 1, //0 for NO, 1 for YES
+        "offline_customer_name": d.customerName
+      };
+    }).toList();
 
-      print("data ==>> $data");
+    print("data ==>> $data");
 
-      //print("Order items ==>> ${order.items}");
-      try {
-        var response = await http.post(
-          Uri.parse('${baseUrl}bulk-sync-sales'),
+    //print("Order items ==>> ${order.items}");
+    try {
+      var response = await http.post(Uri.parse('${baseUrl}bulk-sync-sales'),
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': "Bearer ${user.token}"
           },
-          body: jsonEncode(data)
-        );
+          body: jsonEncode(data));
 
-        print("Syncing");
-        log("response body ==> ${response.body}");
-        log("response ==> ${response.statusCode}");
-        var jsonData = json.decode(response.body);
-        if (response.statusCode == 200) {
-          print("dataaaa ==> ${unsyncedOrders}");
-          for (var itemData in unsyncedOrders) {
-            print("sync data ==> $itemData");
-            itemData.sync = 1;
-            orderBox.put(itemData);// Update the order
-          }
-          // var syncValue = unsyncedOrders.map((d) => ({
-          //   if(jsonDecode(d.items) != []) {
-          //     print("sync data ==> $d");
-          //     d.sync = 1;
-          //     orderBox.put(d);// Update the order
-          //   }
-          // }));
-          return {'status': true, 'message': jsonData['message']};
-        } else {
-          return {'status': false, 'message': jsonData['message']};
+      print("Syncing");
+      log("response body ==> ${response.body}");
+      log("response ==> ${response.statusCode}");
+      var jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        print("dataaaa ==> ${unsyncedOrders}");
+        for (var itemData in unsyncedOrders) {
+          print("sync data ==> $itemData");
+          itemData.sync = 1;
+          orderBox.put(itemData); // Update the order
         }
-      } catch (e) {
-        debugPrint("Sync error$e");
-        return {
-          'status': false,
-          'message': 'Internet connection error!',
-        };
+        // var syncValue = unsyncedOrders.map((d) => ({
+        //   if(jsonDecode(d.items) != []) {
+        //     print("sync data ==> $d");
+        //     d.sync = 1;
+        //     orderBox.put(d);// Update the order
+        //   }
+        // }));
+        return {'status': true, 'message': jsonData['message']};
+      } else {
+        return {'status': false, 'message': jsonData['message']};
       }
+    } catch (e) {
+      debugPrint("Sync error$e");
+      return {
+        'status': false,
+        'message': 'Internet connection error!',
+      };
+    }
 
     return {};
   }
@@ -1691,7 +1900,8 @@ class SystemRepo extends ApiClient {
     };
   }
 
-  Future<Map<String, dynamic>> holdInvoice(total, registerId, data, table, customerName, customerPhone) async {
+  Future<Map<String, dynamic>> holdInvoice(
+      total, registerId, data, table, customerName, customerPhone) async {
     UserDetails user =
         Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
     var txnID = generateRandomString(12);

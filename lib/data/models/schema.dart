@@ -406,3 +406,148 @@ class FolioX {
     };
   }
 }
+
+// @Entity()
+// class MaintenanceRoom {
+//   @Id()
+//   int id = 0;
+  
+//   String? roomNumber;
+//   String? status;
+//   String? maintenanceNote;
+//   String? maintenanceDate;
+//   String? maintenanceExpectedEndDate;
+  
+//   @Property(type: PropertyType.date)
+//   DateTime? createdAt;
+  
+//   @Property(type: PropertyType.date)
+//   DateTime? updatedAt;
+
+// //   MaintenanceRoom({
+// //     this.id = 0,
+// //     this.roomNumber,
+// //     this.status,
+// //     this.maintenanceNote,
+// //     this.maintenanceDate,
+// //     this.maintenanceExpectedEndDate,
+// //     this.createdAt,
+// //     this.updatedAt,
+// //   });
+
+// //   factory MaintenanceRoom.fromJson(Map<String, dynamic> json) {
+// //     return MaintenanceRoom(
+// //       id: json['id'] ?? 0,
+// //       roomNumber: json['room_number'],
+// //       status: json['status'],
+// //       maintenanceNote: json['maintenance_note'],
+// //       maintenanceDate: json['maintenance_date'],
+// //       maintenanceExpectedEndDate: json['maintenance_expected_end_date'],
+// //       createdAt: json['created_at'] != null 
+// //           ? DateTime.parse(json['created_at']) 
+// //           : null,
+// //       updatedAt: json['updated_at'] != null
+// //           ? DateTime.parse(json['updated_at'])
+// //           : null,
+// //     );
+// //   }
+
+// //   Map<String, dynamic> toJson() {
+// //     return {
+// //       'id': id,
+// //       'room_number': roomNumber,
+// //       'status': status,
+// //       'maintenance_note': maintenanceNote,
+// //       'maintenance_date': maintenanceDate,
+// //       'maintenance_expected_end_date': maintenanceExpectedEndDate,
+// //       'created_at': createdAt?.toIso8601String(),
+// //       'updated_at': updatedAt?.toIso8601String(),
+// //     };
+// //   }
+// // }
+
+
+@Entity()
+class MaintenanceRoom {
+  @Id()
+  int id = 0;
+
+  @Property()
+  int companyId;
+
+  @Property()
+  int roomTypeId;
+
+  @Property()
+  String roomNumber;
+
+  @Property()
+  String status;
+
+  @Property()
+  String? maintenanceNote;
+
+  @Property()
+  DateTime? maintenanceDate;
+
+  @Property()
+  DateTime? maintenanceExpectedEndDate;
+
+  @Property()
+  DateTime createdAt;
+
+  @Property()
+  DateTime updatedAt;
+
+  @Property()
+  String roomTypeName;
+
+  @Property()
+  double roomTypeFare;
+
+  @Property()
+  int roomTypeTotalAdult;
+
+  @Property()
+  int roomTypeTotalChild;
+
+  MaintenanceRoom({
+    required this.companyId,
+    required this.roomTypeId,
+    required this.roomNumber,
+    required this.status,
+    this.maintenanceNote,
+    this.maintenanceDate,
+    this.maintenanceExpectedEndDate,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.roomTypeName,
+    required this.roomTypeFare,
+    required this.roomTypeTotalAdult,
+    required this.roomTypeTotalChild, required id,
+  });
+
+  // Add fromJson factory constructor
+  factory MaintenanceRoom.fromJson(Map<String, dynamic> json) {
+    return MaintenanceRoom(
+      id: json['id'] ?? 0,
+      companyId: json['company_id'],
+      roomTypeId: json['room_type_id'],
+      roomNumber: json['room_number'],
+      status: json['status'],
+      maintenanceNote: json['maintenance_note'],
+      maintenanceDate: json['maintenance_date'] != null 
+          ? DateTime.parse(json['maintenance_date']) 
+          : null,
+      maintenanceExpectedEndDate: json['maintenance_expected_end_date'] != null
+          ? DateTime.parse(json['maintenance_expected_end_date'])
+          : null,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+      roomTypeName: json['room_type']['name'] ?? '',
+      roomTypeFare: double.parse(json['room_type']['fare'] ?? '0'),
+      roomTypeTotalAdult: json['room_type']['total_adult'] ?? 0,
+      roomTypeTotalChild: json['room_type']['total_child'] ?? 0,
+    );
+  }
+}

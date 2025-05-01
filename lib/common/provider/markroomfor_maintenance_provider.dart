@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
 
-class MarkDirtyRoomProvider with ChangeNotifier {
+class MarkRoomForMaintenanceProvider extends ChangeNotifier {
   int roomsUnderMaintenance = 0;
   int dirtyRooms = 0;
   int overdueMaintenance = 0;
@@ -11,23 +11,18 @@ class MarkDirtyRoomProvider with ChangeNotifier {
 
   String? selectedRoomType;
   String? selectedRoom;
-  String? cleaningNote;
+  String cleaningNote = '';
   DateTime? expectedCleaningDate;
 
   List<String> roomTypes = [];
   List<MaintenanceRoom> allRooms = []; // Added to store all rooms
-  List<MaintenanceRoom> dirtyRoomsList = [];
+  List<MaintenanceRoom> maintenanceRoomList = [];
   bool isLoading = false;
   String? error;
 
-  double get maintenanceRate {
-    if (totalRooms == 0) return 0.0;
-    return (roomsUnderMaintenance / totalRooms) * 100;
-  }
-
   final SystemRepo _systemRepo;
 
-  MarkDirtyRoomProvider(this._systemRepo);
+  MarkRoomForMaintenanceProvider(this._systemRepo);
 
   Future<void> fetchMaintenanceRooms({bool refresh = false}) async {
     isLoading = true;
@@ -42,17 +37,18 @@ class MarkDirtyRoomProvider with ChangeNotifier {
           .toList();
 
       allRooms = roomsData;
-      dirtyRoomsList =
+      maintenanceRoomList =
           roomsData.where((room) => room.status == 'dirty').toList();
 
       // Update counts based on status
-       // Update counts based on status
-      roomsUnderMaintenance = roomsData.where((room) => room.status == 'maintenance').length;
-      dirtyRooms = dirtyRoomsList.length;
+      // Update counts based on status
+      roomsUnderMaintenance =
+          roomsData.where((room) => room.status == 'maintenance').length;
+      dirtyRooms = maintenanceRoomList.length;
       totalRooms = roomsData.length;
 
       // Extract unique room types
-     roomTypes = roomsData
+      roomTypes = roomsData
           .map((room) => room.roomTypeName)
           .whereType<String>()
           .toSet()
@@ -61,8 +57,8 @@ class MarkDirtyRoomProvider with ChangeNotifier {
       // Check for overdue maintenance
       final now = DateTime.now();
       overdueMaintenance = roomsData.where((room) {
-        return room.maintenanceExpectedEndDate != null && 
-               room.maintenanceExpectedEndDate!.isBefore(now);
+        return room.maintenanceExpectedEndDate != null &&
+            room.maintenanceExpectedEndDate!.isBefore(now);
       }).length;
     } on DioException catch (e) {
       error = 'Failed to load rooms: ${e.message}';
@@ -74,8 +70,8 @@ class MarkDirtyRoomProvider with ChangeNotifier {
     }
   }
 
-// In MarkDirtyRoomProvider's markRoomAsDirty method:
-  Future<void> markRoomAsDirty() async {
+//  MarkDirtyRoomProvider's markRoomAsDirty method:
+  Future<void> setRoomForMaintain() async {
     if (selectedRoom == null) {
       error = 'Please select a room';
       notifyListeners();
@@ -94,7 +90,8 @@ class MarkDirtyRoomProvider with ChangeNotifier {
         throw Exception('Invalid room number format');
       }
 
-      await _systemRepo.markRoomAsDirty(
+ 
+      await _systemRepo.setRoomForMaintain(
         roomId: roomId,
         maintenanceNote: cleaningNote ?? '',
         expectedEndDate: expectedCleaningDate,
@@ -117,7 +114,7 @@ class MarkDirtyRoomProvider with ChangeNotifier {
   }
 
 
-  Future<void> makeRoomAvailable(int roomId) async {
+   Future<void> makeRoomAvailable(int roomId) async {
     try {
       await _systemRepo.makeRoomAvailable(roomId);
       await fetchMaintenanceRooms(refresh: true);
@@ -126,19 +123,33 @@ class MarkDirtyRoomProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  void setRoomForMaintenance() {
-    roomsUnderMaintenance++;
-    totalRooms++;
+
+  void setRoomType(String value) {
+    selectedRoomType = value;
+    selectedRoom = null; // Reset room when type changes
     notifyListeners();
   }
 
-  void resetFilters() {
-    // Implement filter reset logic here if needed
+  void setRoom(String value) {
+    selectedRoom = value;
+    notifyListeners();
+  }
+
+  void setCleaningNote(String value) {
+    cleaningNote = value;
+    notifyListeners();
+  }
+
+  void setExpectedCleaningDate(DateTime date) {
+    expectedCleaningDate = date;
+    notifyListeners();
+  }
+
+  void clearAll() {
     selectedRoomType = null;
     selectedRoom = null;
-    cleaningNote = null;
+    cleaningNote = '';
     expectedCleaningDate = null;
-    error = null;
     notifyListeners();
   }
 }

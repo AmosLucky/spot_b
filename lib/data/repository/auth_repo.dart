@@ -22,7 +22,13 @@ class AuthRepo extends ApiClient {
         },
         //"platform":"mobile"
         body: jsonEncode(
-            {"email": email, 'password': password, 'language_code': 'en', "platform":"mobile"}, ),
+          {
+            "email": email,
+            'password': password,
+            'language_code': 'en',
+            "platform": "mobile"
+          },
+        ),
       );
       print(data.body);
       jsonData = json.decode(data.body)['data'];
@@ -31,11 +37,12 @@ class AuthRepo extends ApiClient {
         box.write("token", jsonData['token']);
         box.write("email", email.toString());
         box.write("password", password.toString());
+        print(' thissssss issss jsonnnnnn dattttaaaa $jsonData');
         return {
           'status': true,
           'message': jsonData['message'],
           'token': jsonData['token'].toString(),
-          'data': UserDetails.fromJson(jsonData['user'])
+          'data': UserDetails.fromJson(jsonData['user']),
         };
         // UserDetails.fromJson(jsonData['user']);
       } else {

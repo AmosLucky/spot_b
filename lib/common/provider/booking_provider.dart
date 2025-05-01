@@ -185,7 +185,8 @@ class BookingProvider with ChangeNotifier {
   DateTime? _dateTo;
   String _checkInStatus = 'All Check-in Statuses';
   String _checkOutStatus = 'All Check-out Statuses';
-  String _paymentStatus = 'All';
+  String _paymentStatus = 'All Payment Statuses';
+  String _allActivePending = 'All';
   String _status = 'All Statuses';
   String _viewMode = 'Grid';
   int _itemsPerPage = 15;
@@ -197,6 +198,7 @@ class BookingProvider with ChangeNotifier {
   String get checkInStatus => _checkInStatus;
   String get checkOutStatus => _checkOutStatus;
   String get paymentStatus => _paymentStatus;
+  String get allActivePending => _allActivePending;
   String get status => _status;
   String get viewMode => _viewMode;
   int get itemsPerPage => _itemsPerPage;
@@ -228,7 +230,7 @@ class BookingProvider with ChangeNotifier {
   }
 
   void setPaymentStatus(String value) {
-    _paymentStatus = value;
+    _allActivePending = value;
     notifyListeners();
   }
 
