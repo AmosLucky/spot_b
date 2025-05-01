@@ -34,141 +34,145 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
       // appBar: AppBar(
       //     // title: const Text('Booking History'),
       //     ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height,
-                    ),
-                    child: SizedBox(
-                      width: 200,
-                      child: SideBarHotel(
-                        vertical: 20,
-                        user: widget.user,
-                        systemProvider: widget.systemProvider,
+      body: LayoutBuilder(builder: (context, constrint) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height,
+                      ),
+                      child: SizedBox(
+                        width: 200,
+                        child: SideBarHotel(
+                          vertical: 20,
+                          user: widget.user,
+                          systemProvider: widget.systemProvider,
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.78,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Booking History',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                              Spacer(),
-                              Container(
-                                height: 50,
-                                width: 120,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(05),
-                                  border:
-                                      Border.all(color: ColorsRes.cardpurple),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.refresh,
-                                      color: ColorsRes.cardpurple,
-                                    ),
-                                    Text(
-                                      'Refresh',
-                                      style: TextStyle(
-                                          color: ColorsRes.cardpurple),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Gap(20),
-                        Gap(20),
-                        Container(
-                          color: ColorsRes.white,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 20),
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.bottomLeft,
-                                child: const Text(
-                                  'Filters',
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.78,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Booking History',
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              Gap(10),
-                              _buildBookingNumberFilter(context),
-                              // const SizedBox(height: 16),
-                              Gap(20),
-                              _buildDateToFilter(context),
-                            ],
-                          ),
-                        ),
-                        Gap(50),
-                        _buildPaymentStatusFilter(context),
-                        Gap(30),
-                        if (provider.allActivePending.isNotEmpty)
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 20),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: ColorsRes.white),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Showing 0 to 0 of 0 entries'),
-                                Gap(10),
+                                Spacer(),
                                 Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 10),
+                                  height: 50,
+                                  width: 120,
+                                  alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                      color: ColorsRes.cardblue,
-                                      borderRadius: BorderRadius.circular(5)),
-                                  child: (Row(
+                                    borderRadius: BorderRadius.circular(05),
+                                    border:
+                                        Border.all(color: ColorsRes.cardpurple),
+                                  ),
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        Icons.info,
-                                        color: ColorsRes.white,
+                                        Icons.refresh,
+                                        color: ColorsRes.cardpurple,
                                       ),
-                                      Gap(10),
                                       Text(
-                                        'No booking records found matching your filters.: ${provider.allActivePending}',
-                                        style: TextStyle(color: Colors.white),
-                                      )
+                                        'Refresh',
+                                        style: TextStyle(
+                                            color: ColorsRes.cardpurple),
+                                      ),
                                     ],
-                                  )),
-                                )
+                                  ),
+                                ),
                               ],
                             ),
-                          )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ],
+                          ),
+                          Gap(20),
+                          Gap(20),
+                          Container(
+                            color: ColorsRes.white,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 20),
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: const Text(
+                                    'Filters',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Gap(10),
+                                _buildBookingNumberFilter(context),
+                                // const SizedBox(height: 16),
+                                Gap(20),
+                                _buildDateToFilter(context),
+                              ],
+                            ),
+                          ),
+                          Gap(50),
+                          _buildPaymentStatusFilter(context),
+                          Gap(30),
+                          if (provider.allActivePending.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 20),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: ColorsRes.white),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Showing 0 to 0 of 0 entries'),
+                                  Gap(10),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    decoration: BoxDecoration(
+                                        color: ColorsRes.cardblue,
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: (Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.info,
+                                          color: ColorsRes.white,
+                                        ),
+                                        Gap(10),
+                                        Text(
+                                          'No booking records found matching your filters.: ${provider.allActivePending}',
+                                          style: TextStyle(color: Colors.white),
+                                        )
+                                      ],
+                                    )),
+                                  )
+                                ],
+                              ),
+                            )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
