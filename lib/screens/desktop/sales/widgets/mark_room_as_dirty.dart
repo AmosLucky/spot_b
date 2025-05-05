@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/provider/maintenance_provider.dart';
@@ -10,10 +11,6 @@ class MarkRoomDirtyDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<MarkDirtyRoomProvider>(context);
-    final rooms = {
-      for (var type in provider.roomTypes)
-        type: ['$type Room 101', '$type Room 102'] // Example room names
-    };
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -51,8 +48,10 @@ class MarkRoomDirtyDialog extends StatelessWidget {
             if (provider.error != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Text('Something Went Wrong, Login again',
-                    style: const TextStyle(color: Colors.red)),
+                child: Text(
+                  provider.error!,
+                  style: const TextStyle(color: Colors.red),
+                ),
               ),
 
             // Room Type Dropdown
@@ -72,13 +71,21 @@ class MarkRoomDirtyDialog extends StatelessWidget {
                 value: provider.selectedRoomType,
                 decoration: const InputDecoration(
                   hintText: 'Choose a room type',
-                  border: OutlineInputBorder(),
+                  border: InputBorder.none,
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
                 items: provider.roomTypes
-                    .map((type) =>
-                        DropdownMenuItem(value: type, child: Text(type)))
+                    .map((type) => DropdownMenuItem(
+                          value: type,
+                          child: Text(
+                            type,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ))
                     .toList(),
                 onChanged: (value) {
                   if (value != null) {
@@ -109,15 +116,31 @@ class MarkRoomDirtyDialog extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: provider.selectedRoomType == null
                       ? 'Please select a room type first'
-                      : 'Select a room',
-                  border: const OutlineInputBorder(),
+                      : provider.allRooms
+                              .where((room) =>
+                                  room.roomTypeName ==
+                                  provider.selectedRoomType)
+                              .isEmpty
+                          ? 'No rooms available'
+                          : 'Select a room',
+                  border: InputBorder.none,
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
                 items: provider.selectedRoomType != null
-                    ? rooms[provider.selectedRoomType]!
-                        .map((room) =>
-                            DropdownMenuItem(value: room, child: Text(room)))
+                    ? provider.allRooms
+                        .where((room) =>
+                            room.roomTypeName == provider.selectedRoomType)
+                        .map((room) => DropdownMenuItem(
+                              value: room.roomNumber,
+                              child: Text(
+                                '${room.roomTypeName} ${room.roomNumber}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ))
                         .toList()
                     : null,
                 onChanged: (value) {
@@ -167,19 +190,24 @@ class MarkRoomDirtyDialog extends StatelessWidget {
                 }
               },
               child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                    border: Border.all(color: ColorsRes.btndarkshadow)),
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    hintText: "Select expected completion date",
-                    border: OutlineInputBorder(),
-                  ),
-                  child: Text(
-                    provider.expectedCleaningDate != null
-                        ? "${provider.expectedCleaningDate!.toLocal()}"
-                            .split(' ')[0]
-                        : 'Select expected completion date',
-                  ),
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(color: ColorsRes.btndarkshadow),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      provider.expectedCleaningDate != null
+                          ? DateFormat('yyyy-MM-dd')
+                              .format(provider.expectedCleaningDate!)
+                          : 'Select expected completion date',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    const Icon(Icons.calendar_today, size: 20),
+                  ],
                 ),
               ),
             ),
@@ -208,47 +236,48 @@ class MarkRoomDirtyDialog extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: ColorsRes.cardyellow,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorsRes.cardyellow,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: provider.isLoading
-                        ? const CircularProgressIndicator()
-                        : GestureDetector(
-                            onTap: () async {
-                              if (provider.selectedRoom == null) {
-                                provider.error = 'Please select a room';
-                                provider.notifyListeners();
-                                return;
-                              }
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                  ),
+                  onPressed: provider.isLoading
+                      ? null
+                      : () async {
+                          if (provider.selectedRoom == null) {
+                            provider.error = 'Please select a room';
+                            provider.notifyListeners();
+                            return;
+                          }
 
-                              try {
-                                await provider.markRoomAsDirty();
-                                if (provider.error == null) {
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Room marked as dirty successfully')),
-                                  );
-                                }
-                              } catch (e) {
-                                // Error will be displayed via provider's error state
-                              }
-                            },
-                            child: provider.isLoading
-                                ? const CircularProgressIndicator()
-                                : const Row(
-                                    children: [
-                                      Icon(Icons.build),
-                                      Text("Mark as Dirty"),
-                                    ],
-                                  ),
-                          ),
-                          ),
+                          try {
+                            await provider.markRoomAsDirty();
+                            if (provider.error == null) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Room marked as dirty successfully')),
+                              );
+                            }
+                          } catch (e) {
+                            // Error will be displayed via provider's error state
+                          }
+                        },
+                  child: provider.isLoading
+                      ? const CircularProgressIndicator()
+                      : const Row(
+                          children: [
+                            Icon(Icons.build),
+                            SizedBox(width: 8),
+                            Text("Mark as Dirty"),
+                          ],
+                        ),
+                ),
               ],
             ),
           ],

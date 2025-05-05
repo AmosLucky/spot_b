@@ -3,10 +3,12 @@ import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
+import 'package:spotstock_inventory/common/provider/booking_history_provider.dart';
 import 'package:spotstock_inventory/common/provider/booking_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/objectbox.g.dart';
+import 'package:spotstock_inventory/screens/desktop/hotel/widgets/booking_card.dart';
 import 'package:spotstock_inventory/screens/print.dart';
 import 'package:spotstock_inventory/widgets/sidebar.dart';
 
@@ -27,8 +29,19 @@ class BookingHistoryScreen extends StatefulWidget {
 
 class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
   @override
+  void initState() {
+    super.initState();
+    // Initialize data when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider =
+          Provider.of<BookingHistoryProvider>(context, listen: false);
+      provider.loadBookings(refresh: true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<BookingProvider>(context);
+    final provider = Provider.of<BookingHistoryProvider>(context);
     return Scaffold(
       backgroundColor: ColorsRes.bgcolor,
       // appBar: AppBar(
@@ -126,43 +139,90 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                           Gap(50),
                           _buildPaymentStatusFilter(context),
                           Gap(30),
-                          if (provider.allActivePending.isNotEmpty)
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: ColorsRes.white),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Showing 0 to 0 of 0 entries'),
-                                  Gap(10),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 05),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: ColorsRes.white,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    'Showing ${provider.bookings.isEmpty ? 0 : 1} to ${provider.bookings.length} of ${provider.totalBookings} entries'),
+                                Gap(10),
+                                if (provider.isLoading &&
+                                    provider.bookings.isEmpty)
+                                  Center(child: CircularProgressIndicator()),
+                                if (provider.error != null &&
+                                    provider.bookings.isEmpty)
                                   Container(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 30, vertical: 10),
                                     decoration: BoxDecoration(
-                                        color: ColorsRes.cardblue,
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: (Row(
+                                      color: ColorsRes.cardblue,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.info,
-                                          color: ColorsRes.white,
-                                        ),
+                                        Icon(Icons.error,
+                                            color: ColorsRes.white),
                                         Gap(10),
                                         Text(
-                                          'No booking records found matching your filters.: ${provider.allActivePending}',
+                                          provider.error!,
                                           style: TextStyle(color: Colors.white),
-                                        )
+                                        ),
                                       ],
-                                    )),
+                                    ),
+                                  ),
+                                if (provider.bookings.isNotEmpty)
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3, // Number of columns
+                                      crossAxisSpacing:
+                                          16, // Space between columns
+                                      mainAxisSpacing: 16, // Space between rows
+                                      childAspectRatio:
+                                          1.5, // Width/height ratio of each item
+                                    ),
+                                    itemCount: provider.bookings.length,
+                                    itemBuilder: (context, index) {
+                                      return BookingCard(
+                                          booking: provider.bookings[index]);
+                                    },
                                   )
-                                ],
-                              ),
-                            )
+                                else if (!provider.isLoading &&
+                                    provider.error == null)
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: ColorsRes.cardblue,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.info,
+                                            color: ColorsRes.white),
+                                        Gap(10),
+                                        Text(
+                                          'No booking records found matching your filters',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     )

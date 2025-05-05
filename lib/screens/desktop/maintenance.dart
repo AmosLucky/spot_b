@@ -8,6 +8,7 @@ import 'package:spotstock_inventory/common/provider/markroomfor_maintenance_prov
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/screens/desktop/sales/widgets/dirty_room_available_dialog.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/mark_room_as_dirty.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/setroom_for_maintenance.dart';
 import 'package:spotstock_inventory/widgets/sidebar.dart';
@@ -82,52 +83,96 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
                                     ),
                                     Spacer(),
                                     GestureDetector(
-                                      onTap: () {
-                                        // showDialog(
-                                        //   context: context,
-                                        //   builder: (context) =>
-                                        //       ChangeNotifierProvider(
-                                        //     create: (_) => MarkRoomDirtyProvider(),
-                                        //     child: const MarkRoomDirtyDialog(),
-                                        //   ),
-                                        // );
-                                        context
-                                            .read<MarkDirtyRoomProvider>()
-                                            .fetchMaintenanceRooms()
-                                            .then((_) {
+                                      onTap: () async {
+                                        final provider = context
+                                            .read<MarkDirtyRoomProvider>();
+                                        final scaffold =
+                                            ScaffoldMessenger.of(context);
+                                        try {
+                                          // Show loading indicator
                                           showDialog(
                                             context: context,
-                                            builder: (context) =>
-                                                const MarkRoomDirtyDialog(),
+                                            barrierDismissible: false,
+                                            builder: (context) => const Center(
+                                                child:
+                                                    CircularProgressIndicator()),
                                           );
-                                        });
+
+                                          // Refresh room data
+                                          await provider.fetchMaintenanceRooms(
+                                              refresh: true);
+
+                                          // Close loading dialog
+                                          if (context.mounted)
+                                            Navigator.of(context).pop();
+
+                                          // Show the mark dirty dialog
+                                          if (context.mounted) {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  ChangeNotifierProvider.value(
+                                                value: provider,
+                                                child:
+                                                    const MarkRoomDirtyDialog(),
+                                              ),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          // Close loading dialog if still open
+                                          if (context.mounted)
+                                            Navigator.of(context).pop();
+
+                                          // Show error message
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Failed to load room data: ${e.toString()}'),
+                                                duration:
+                                                    const Duration(seconds: 3),
+                                              ),
+                                            );
+                                          }
+                                        }
                                       },
                                       child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 10),
-                                          decoration: BoxDecoration(
-                                            color: ColorsRes.grey,
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.build,
-                                                size: 15,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: ColorsRes.grey,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              blurRadius: 2,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.build,
+                                              size: 15,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              'Mark Room as Dirty',
+                                              style: TextStyle(
                                                 color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
                                               ),
-                                              Gap(5),
-                                              FittedBox(
-                                                child: const Text(
-                                                  'Mark Room as Dirty',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12),
-                                                ),
-                                              ),
-                                            ],
-                                          )),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                     const SizedBox(width: 12),
                                     GestureDetector(
@@ -396,8 +441,7 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
     MarkDirtyRoomProvider provider,
     MarkRoomForMaintenanceProvider provideMaintenance,
   ) {
-    final hasMaintenanceRooms =
-        provideMaintenance.maintenanceRoomList.isNotEmpty;
+    final hasMaintenanceRooms = provideMaintenance.maintenanceRooms.isNotEmpty;
     final hasDirtyRooms = provider.dirtyRoomsList.isNotEmpty;
 
     if (hasMaintenanceRooms || hasDirtyRooms) {
@@ -417,14 +461,14 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: provideMaintenance.maintenanceRoomList.length,
+                  itemCount: provideMaintenance.maintenanceRooms.length,
                   itemBuilder: (context, index) {
-                    final room = provideMaintenance.maintenanceRoomList[index];
+                    final room = provideMaintenance.maintenanceRooms[index];
                     return _buildMaintenanceRoomCard(
                       room,
                       provideMaintenance,
                       index,
-                      provideMaintenance.maintenanceRoomList.length,
+                      provideMaintenance.maintenanceRooms.length,
                     );
                   },
                 ),
@@ -542,14 +586,63 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
-                onPressed: () => provider.makeRoomAvailable(room.id),
+                onPressed: provider.isLoading
+                    ? null
+                    : () async {
+                        try {
+                          // Verify a room is selected
+                          if (provider.selectedRoom == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select a room first'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Attempt to make room available
+                          // await provider.makeRoomAvailable(context);
+                          provider.showDialogBox();
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => const MakeRoomAvailableDialog(
+                              roomNumber: "102",
+                              roomType: "DELUXE",
+                            ),
+                          );
+                        } catch (e) {
+                          // Errors are already handled by the provider
+                          // This catch prevents the exception from bubbling up
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
+                  disabledBackgroundColor: Colors.green.withOpacity(0.5),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 2,
                 ),
-                child: const Text('Make Available',
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
+                child: provider.isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Make Available',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
               ),
             ),
 
@@ -636,18 +729,59 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
 
             const SizedBox(height: 10),
             Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () => provider.makeRoomAvailable(room.id),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                ),
-                child: const Text('Make Available',
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
-              ),
-            ),
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: provider.isLoading
+                      ? null
+                      : () async {
+                          if (provider.selectedRoom == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Please select a room first')),
+                            );
+                            return;
+                          }
+
+                          try {
+                            // Extract the actual room ID from your room object
+                            final selectedRoom = provider.allRooms.firstWhere(
+                                (room) =>
+                                    '${room.roomTypeName} ${room.roomNumber}' ==
+                                    provider.selectedRoom,
+                                orElse: () =>
+                                    throw Exception('Selected room not found'));
+
+                            await provider.makeRoomAvailable(
+                                selectedRoom.id, context);
+                          } on Exception catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    disabledBackgroundColor: Colors.green.withOpacity(0.5),
+                  ),
+                  child: provider.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.check_circle_outline,
+                                color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Make Available',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                )),
 
             if (index != totalDirtyRooms - 1)
               const Divider(height: 20, thickness: 1),
