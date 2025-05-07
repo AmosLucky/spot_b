@@ -3,10 +3,12 @@ import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
+import 'package:spotstock_inventory/common/provider/booking_history_provider.dart';
 import 'package:spotstock_inventory/common/provider/booking_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/objectbox.g.dart';
+import 'package:spotstock_inventory/screens/desktop/hotel/widgets/booking_card.dart';
 import 'package:spotstock_inventory/screens/print.dart';
 import 'package:spotstock_inventory/widgets/sidebar.dart';
 
@@ -27,25 +29,38 @@ class BookingHistoryScreen extends StatefulWidget {
 
 class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
   @override
+  void initState() {
+    super.initState();
+    // Initialize data when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider =
+          Provider.of<BookingHistoryProvider>(context, listen: false);
+      provider.loadBookings(refresh: true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<BookingProvider>(context);
+    final provider = Provider.of<BookingHistoryProvider>(context);
     return Scaffold(
       backgroundColor: ColorsRes.bgcolor,
       // appBar: AppBar(
       //     // title: const Text('Booking History'),
       //     ),
       body: LayoutBuilder(builder: (context, constrint) {
-        return SingleChildScrollView(
+        return Container(
+          height: MediaQuery.of(context).size.height,
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height,
+                        maxHeight: MediaQuery.of(context).size.height* 0.90,
                       ),
                       child: SizedBox(
                         width: 200,
@@ -57,7 +72,8 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                       ),
                     ),
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.78,
+                      width: MediaQuery.of(context).size.width * 0.80,
+                    
                       child: Column(
                         children: [
                           Padding(
@@ -99,8 +115,9 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                             ),
                           ),
                           Gap(20),
-                          Gap(20),
+                          // Gap(20),
                           Container(
+                            height:  306,
                             color: ColorsRes.white,
                             padding: EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 20),
@@ -118,51 +135,98 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                 Gap(10),
                                 _buildBookingNumberFilter(context),
                                 // const SizedBox(height: 16),
-                                Gap(20),
+                                Gap(10),
                                 _buildDateToFilter(context),
                               ],
                             ),
                           ),
-                          Gap(50),
+                          Gap(10),
                           _buildPaymentStatusFilter(context),
-                          Gap(30),
-                          if (provider.allActivePending.isNotEmpty)
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 20),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: ColorsRes.white),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Showing 0 to 0 of 0 entries'),
-                                  Gap(10),
+                          Gap(10),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 05),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: ColorsRes.white,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    'Showing ${provider.bookings.isEmpty ? 0 : 1} to ${provider.bookings.length} of ${provider.totalBookings} entries'),
+                                Gap(10),
+                                if (provider.isLoading &&
+                                    provider.bookings.isEmpty)
+                                  Center(child: CircularProgressIndicator()),
+                                if (provider.error != null &&
+                                    provider.bookings.isEmpty)
                                   Container(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 30, vertical: 10),
                                     decoration: BoxDecoration(
-                                        color: ColorsRes.cardblue,
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: (Row(
+                                      color: ColorsRes.cardblue,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.info,
-                                          color: ColorsRes.white,
-                                        ),
+                                        Icon(Icons.error,
+                                            color: ColorsRes.white),
                                         Gap(10),
                                         Text(
-                                          'No booking records found matching your filters.: ${provider.allActivePending}',
+                                          provider.error!,
                                           style: TextStyle(color: Colors.white),
-                                        )
+                                        ),
                                       ],
-                                    )),
+                                    ),
+                                  ),
+                                if (provider.bookings.isNotEmpty)
+                                  GridView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3, // Number of columns
+                                      crossAxisSpacing:
+                                          16, // Space between columns
+                                      mainAxisSpacing: 16, // Space between rows
+                                      childAspectRatio:
+                                          1.5, // Width/height ratio of each item
+                                    ),
+                                    itemCount: provider.bookings.length,
+                                    itemBuilder: (context, index) {
+                                      return BookingCard(
+                                          booking: provider.bookings[index]);
+                                    },
                                   )
-                                ],
-                              ),
-                            )
+                                else if (!provider.isLoading &&
+                                    provider.error == null)
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: ColorsRes.cardblue,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.info,
+                                            color: ColorsRes.white),
+                                        Gap(10),
+                                        Text(
+                                          'No booking records found matching your filters',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     )
@@ -182,6 +246,8 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
+        width: 1000,
+        height: 112,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -233,150 +299,146 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                 ),
                 Gap(20),
                 SizedBox(
-                  // height: 200.h,
-                  width: 750,
+                  height: 80,
+                  width: 700,
                   child: Row(
                     children: [
                       Container(
                         height: 80,
-                        width: 200,
-                        child: Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Date From'),
-                              Gap(10),
-                              Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                        color: ColorsRes.btndarkshadow)),
-                                child: InkWell(
-                                  onTap: () =>
-                                      _selectDate(context, isFromDate: true),
-                                  child: InputDecorator(
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 12),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          provider.dateFrom == null
-                                              ? 'From date'
-                                              : '${provider.dateFrom!.day}/${provider.dateFrom!.month}/${provider.dateFrom!.year}',
-                                        ),
-                                        const Icon(
-                                            Icons.calendar_month_outlined,
-                                            size: 16),
-                                      ],
-                                    ),
+                        width: 160,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Date From'),
+                            Gap(10),
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                      color: ColorsRes.btndarkshadow)),
+                              child: InkWell(
+                                onTap: () =>
+                                    _selectDate(context, isFromDate: true),
+                                child: InputDecorator(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 12),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        provider.dateFrom == null
+                                            ? 'From date'
+                                            : '${provider.dateFrom!.day}/${provider.dateFrom!.month}/${provider.dateFrom!.year}',
+                                      ),
+                                      const Icon(
+                                          Icons.calendar_month_outlined,
+                                          size: 16),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                       Gap(20),
                       Container(
                         height: 80,
-                        width: 200,
-                        child: Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Date To'),
-                              Gap(10),
-                              Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                        color: ColorsRes.btndarkshadow)),
-                                child: InkWell(
-                                  onTap: () =>
-                                      _selectDate(context, isFromDate: false),
-                                  child: InputDecorator(
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 12),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          provider.dateTo == null
-                                              ? 'To date'
-                                              : '${provider.dateTo!.day}/${provider.dateTo!.month}/${provider.dateTo!.year}',
-                                        ),
-                                        const Icon(
-                                            Icons.calendar_month_outlined,
-                                            size: 16),
-                                      ],
-                                    ),
+                        width: 160,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Date To'),
+                            Gap(10),
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                      color: ColorsRes.btndarkshadow)),
+                              child: InkWell(
+                                onTap: () =>
+                                    _selectDate(context, isFromDate: false),
+                                child: InputDecorator(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 12),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        provider.dateTo == null
+                                            ? 'To date'
+                                            : '${provider.dateTo!.day}/${provider.dateTo!.month}/${provider.dateTo!.year}',
+                                      ),
+                                      const Icon(
+                                          Icons.calendar_month_outlined,
+                                          size: 16),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                      Gap(20),
+                      Gap(10),
                       Container(
-                        child: Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Status'),
-                              const SizedBox(height: 4),
-                              DropdownButtonFormField<String>(
-                                value: provider.status,
-                                decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: ColorsRes
-                                          .btndarkshadow, // Light grey when inactive
-                                      width: 0.5,
-                                    ),
+                        width: 160,
+                        height: 80,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Status'),
+                            const SizedBox(height: 4),
+                            DropdownButtonFormField<String>(
+                              value: provider.status,
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: ColorsRes
+                                        .btndarkshadow, // Light grey when inactive
+                                    width: 0.5,
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: ColorsRes
-                                          .btndarkshadow, // Blue when focused
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: ColorsRes.black, width: 1),
-                                  ),
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 4),
                                 ),
-                                items: [
-                                  'All Statuses',
-                                  'Active',
-                                  'Cancelled',
-                                  'Completed',
-                                ]
-                                    .map((status) => DropdownMenuItem(
-                                          value: status,
-                                          child: Text(status),
-                                        ))
-                                    .toList(),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    provider.setStatus(value);
-                                  }
-                                },
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: ColorsRes
+                                        .btndarkshadow, // Blue when focused
+                                    width: 0.5,
+                                  ),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: ColorsRes.black, width: 1),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
                               ),
-                            ],
-                          ),
+                              items: [
+                                'All Statuses',
+                                'Active',
+                                'Cancelled',
+                                'Completed',
+                              ]
+                                  .map((status) => DropdownMenuItem(
+                                        value: status,
+                                        child: Text(status),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  provider.setStatus(value);
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -395,97 +457,102 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
   Widget _buildPaymentStatusFilter(BuildContext context) {
     final provider = Provider.of<BookingProvider>(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Payment Status',
-          style: TextStyle(
-            fontSize: 16,
-            // fontWeight: FontWeight.bold,
+    return Container(
+      height: 85,
+      width: 900,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Payment Status',
+            style: TextStyle(
+              fontSize: 16,
+              // fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            _buildStatusChip('All (0)', provider.allActivePending,
-                provider.setPaymentStatus),
-            Gap(10),
-            _buildStatusChip('Active (0)', provider.allActivePending,
-                provider.setPaymentStatus),
-            Gap(10),
-            _buildStatusChip('Pending Check-in (0)', provider.allActivePending,
-                provider.setPaymentStatus),
-            Gap(10),
-            _buildStatusChip('Checked in (0)', provider.allActivePending,
-                provider.setPaymentStatus),
-            Gap(10),
-            _buildStatusChip('Completed (0)', provider.allActivePending,
-                provider.setPaymentStatus),
-            Gap(10),
-            _buildStatusChip('Cancelled (0)', provider.allActivePending,
-                provider.setPaymentStatus),
-            Spacer(),
-            Container(
-              height: 50,
-              width: 130,
-              child: Row(
-                children: [
-                  const Text('Show:'),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: ColorsRes.btndarkshadow,
-                        ),
-                        borderRadius: BorderRadius.circular(5)),
-                    child: DropdownButton<int>(
-                      underline: Container(),
-                      elevation: 5,
-                      focusColor: Colors.transparent,
-                      value: provider.itemsPerPage,
-                      items: [15, 30, 50, 100]
-                          .map((value) => DropdownMenuItem(
-                                value: value,
-                                child: Text('$value'),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          provider.setItemsPerPage(value);
-                        }
-                      },
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              _buildStatusChip('All (0)', provider.allActivePending,
+                  provider.setPaymentStatus),
+              Gap(10),
+              _buildStatusChip('Active (0)', provider.allActivePending,
+                  provider.setPaymentStatus),
+              Gap(10),
+              _buildStatusChip('Pending Check-in (0)', provider.allActivePending,
+                  provider.setPaymentStatus),
+              Gap(10),
+              _buildStatusChip('Checked in (0)', provider.allActivePending,
+                  provider.setPaymentStatus),
+              Gap(10),
+              _buildStatusChip('Completed (0)', provider.allActivePending,
+                  provider.setPaymentStatus),
+              Gap(10),
+              _buildStatusChip('Cancelled (0)', provider.allActivePending,
+                  provider.setPaymentStatus),
+              Spacer(),
+              Container(
+                height: 50,
+                width: 130,
+                child: Row(
+                  children: [
+                    const Text('Show:'),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: ColorsRes.btndarkshadow,
+                          ),
+                          borderRadius: BorderRadius.circular(5)),
+                      child: DropdownButton<int>(
+                        underline: Container(),
+                        elevation: 5,
+                        focusColor: Colors.transparent,
+                        value: provider.itemsPerPage,
+                        items: [15, 30, 50, 100]
+                            .map((value) => DropdownMenuItem(
+                                  value: value,
+                                  child: Text('$value'),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            provider.setItemsPerPage(value);
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-        // const SizedBox(height: 12),
-      ],
+                  ],
+                ),
+              )
+            ],
+          ),
+          // const SizedBox(height: 12),
+        ],
+      ),
     );
   }
 
   Widget _buildDateToFilter(BuildContext context) {
     final provider = Provider.of<BookingProvider>(context);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // const Divider(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const SizedBox(width: 16),
-              Container(
-                color: Colors.white,
-                child: Expanded(
+    return Container(
+      height: 105,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // const Divider(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(width: 16),
+                Container(
+                  color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -542,11 +609,11 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                     ],
                   ),
                 ),
-              ),
-              Gap(20),
-              Container(
-                color: Colors.white,
-                child: Expanded(
+                Gap(20),
+                Container(
+                  height: 104,
+                  width: 230,
+                  color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -599,135 +666,139 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                     ],
                   ),
                 ),
-              ),
-              Gap(20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Check-out Status'),
-                  const SizedBox(height: 4),
-                  Container(
-                    height: 80,
-                    width: 230,
-                    child: DropdownButtonFormField<String>(
-                      value: provider.checkOutStatus,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: ColorsRes
-                                .btndarkshadow, // Light grey when inactive
-                            width: 0.5,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: ColorsRes.btndarkshadow, // Blue when focused
-                            width: 0.5,
-                          ),
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: ColorsRes.black, width: 1),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      ),
-                      items: [
-                        'All Check-out Statuses',
-                        'Checked Out',
-                        'Not Checked Out',
-                      ]
-                          .map((status) => DropdownMenuItem(
-                                value: status,
-                                child: Text(status),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          provider.setCheckOutStatus(value);
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Gap(20),
-              Container(
-                height: 80,
-                width: 230,
-                child: Column(
+                Gap(20),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('View Mode'),
-                    Gap(4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          // height: 50,
-                          width: 100,
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 08,
+                    const Text('Check-out Status'),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 80,
+                      width: 230,
+                      child: DropdownButtonFormField<String>(
+                        value: provider.checkOutStatus,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: ColorsRes
+                                  .btndarkshadow, // Light grey when inactive
+                              width: 0.5,
+                            ),
                           ),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1, color: ColorsRes.cardpurple),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.grid_view_outlined,
-                                color: ColorsRes.cardpurple,
-                              ),
-                              Gap(10),
-                              Text(
-                                'Grid',
-                                style: TextStyle(
-                                  color: ColorsRes.cardpurple,
-                                ),
-                              ),
-                            ],
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: ColorsRes.btndarkshadow, // Blue when focused
+                              width: 0.5,
+                            ),
                           ),
+                          border: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: ColorsRes.black, width: 1),
+                          ),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         ),
-                        Gap(10),
-                        Container(
-                          // height: 50,
-                          width: 100,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 08),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 1, color: ColorsRes.cardpurple),
-                              borderRadius: BorderRadius.circular(5)),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.list,
-                                color: ColorsRes.cardpurple,
-                              ),
-                              Gap(10),
-                              Text(
-                                'List',
-                                style: TextStyle(
-                                  color: ColorsRes.cardpurple,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
+                        items: [
+                          'All Check-out Statuses',
+                          'Checked Out',
+                          'Not Checked Out',
+                        ]
+                            .map((status) => DropdownMenuItem(
+                                  value: status,
+                                  child: Text(status),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            provider.setCheckOutStatus(value);
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
-              )
-            ],
-          ),
-        ],
+                Gap(20),
+                Container(
+                  height: 80,
+                  width: 200,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text('View Mode'),
+                      Gap(4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            // height: 50,
+                            width: 90,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 08,
+                            ),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 1, color: ColorsRes.cardpurple),
+                                borderRadius: BorderRadius.circular(5)),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.grid_view_outlined,
+                                  color: ColorsRes.cardpurple,
+                                  size: 15,
+                                ),
+                                Gap(10),
+                                Text(
+                                  'Grid',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: ColorsRes.cardpurple,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Gap(10),
+                          Container(
+                            // height: 50,
+                            width: 90,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 08),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    width: 1, color: ColorsRes.cardpurple),
+                                borderRadius: BorderRadius.circular(5)),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.list,
+                                  color: ColorsRes.cardpurple,
+                                  size: 15,
+                                ),
+                                Gap(10),
+                                Text(
+                                  'List',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: ColorsRes.cardpurple,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -735,15 +806,17 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
   Widget _buildStatusFilter(BuildContext context) {
     final provider = Provider.of<BookingProvider>(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Divider(),
-        Row(
-          children: [
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
+    return Container(
+      height: 80,
+      width: 100,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(),
+          Row(
+            children: [
+              const SizedBox(width: 10),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('View Mode'),
@@ -753,7 +826,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       contentPadding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     ),
                     items: ['Grid', 'List']
                         .map((mode) => DropdownMenuItem(
@@ -769,10 +842,10 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -804,6 +877,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
       label: Text(
         label,
         style: TextStyle(
+          fontSize: 10,
           color: isSelected
               ? ColorsRes.cardpurple
               : Colors.black, // change text color

@@ -8,6 +8,7 @@ import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/preference_settings.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
 import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
+import 'package:spotstock_inventory/common/provider/booking_history_provider.dart';
 import 'package:spotstock_inventory/common/provider/booking_provider.dart';
 import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 import 'package:spotstock_inventory/common/provider/folio_data_provider.dart';
@@ -143,6 +144,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(
             create: (_) => MarkRoomForMaintenanceProvider(
+                SystemRepo(refresh: false, online: true))),
+        ChangeNotifierProvider(
+            create: (_) => BookingHistoryProvider(
                 SystemRepo(refresh: false, online: true))),
         ChangeNotifierProvider(
           create: (_) => PreferenceSettingsProvider(

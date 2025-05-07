@@ -141,7 +141,7 @@ class _BodyState extends State<Body> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header
-                      Header(
+                      Header( 
                         title: "${widget.app} Accounting",
                         user: widget.user,
                         systemProvider: widget.systemProvider,

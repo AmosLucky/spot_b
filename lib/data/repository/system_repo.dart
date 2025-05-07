@@ -113,6 +113,42 @@ class SystemRepo extends ApiClient {
   }
 
 // Mark room as Dirty
+  // Future<Response> markRoomAsDirty({
+  //   required int roomId,
+  //   required String maintenanceNote,
+  //   DateTime? expectedEndDate,
+  // }) async {
+  //   String token = await getToken();
+  //   String endpoint = 'hotel/maintenance/mark-dirty';
+  //   try {
+  //     final response = await dio.post(
+  //       '$baseUri$endpoint', // Verify this endpoint
+  //       data: {
+  //         'room_id': roomId,
+  //         'maintenance_note': maintenanceNote,
+  //         'expected_end_date': expectedEndDate?.toIso8601String().split('T')[0],
+  //       },
+  //       options: Options(
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': 'Bearer $token',
+  //         },
+  //         validateStatus: (status) =>
+  //             status! < 500, // Don't throw for 4xx errors
+  //       ),
+  //     );
+
+  //     if (response.statusCode == 404) {
+  //       throw Exception('Endpoint not found. Please check the API URL');
+  //     }
+
+  //     return response;
+  //   } catch (e) {
+  //     print("Error marking room as dirty: $e");
+  //     rethrow;
+  //   }
+  // }
+
   Future<Response> markRoomAsDirty({
     required int roomId,
     required String maintenanceNote,
@@ -120,9 +156,10 @@ class SystemRepo extends ApiClient {
   }) async {
     String token = await getToken();
     String endpoint = 'hotel/maintenance/mark-dirty';
+
     try {
       final response = await dio.post(
-        '$baseUri$endpoint', // Verify this endpoint
+        '$baseUri$endpoint',
         data: {
           'room_id': roomId,
           'maintenance_note': maintenanceNote,
@@ -133,19 +170,24 @@ class SystemRepo extends ApiClient {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
           },
-          validateStatus: (status) =>
-              status! < 500, // Don't throw for 4xx errors
+          validateStatus: (status) => status! < 500,
         ),
       );
 
-      if (response.statusCode == 404) {
-        throw Exception('Endpoint not found. Please check the API URL');
+      // Handle specific error cases
+      if (response.data['success'] == false) {
+        throw Exception(
+            response.data['message'] ?? 'Failed to mark room as dirty');
       }
 
       return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message'] ?? e.message);
+      }
+      throw Exception('Network error: ${e.message}');
     } catch (e) {
-      print("Error marking room as dirty: $e");
-      rethrow;
+      throw Exception('Failed to mark room as dirty: $e');
     }
   }
 
@@ -157,9 +199,10 @@ class SystemRepo extends ApiClient {
   }) async {
     String token = await getToken();
     String endpoint = 'hotel/maintenance/set';
+
     try {
       final response = await dio.post(
-        '$baseUri$endpoint', // Verify this endpoint
+        '$baseUri$endpoint',
         data: {
           'room_id': roomId,
           'maintenance_note': maintenanceNote,
@@ -170,19 +213,24 @@ class SystemRepo extends ApiClient {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
           },
-          validateStatus: (status) =>
-              status! < 500, // Don't throw for 4xx errors
+          validateStatus: (status) => status! < 500,
         ),
       );
 
-      if (response.statusCode == 404) {
-        throw Exception('Endpoint not found. Please check the API URL');
+      // Handle specific error cases
+      if (response.data['success'] == false) {
+        throw Exception(
+            response.data['message'] ?? 'Failed to mark room for maintenance');
       }
 
       return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message'] ?? e.message);
+      }
+      throw Exception('Network error: ${e.message}');
     } catch (e) {
-      print("Error marking room as dirty: $e");
-      rethrow;
+      throw Exception('Failed to mark room as dirty: $e');
     }
   }
 
@@ -242,6 +290,11 @@ class SystemRepo extends ApiClient {
   // Hotel mantenance roomtype
   Future<Response> fetchMaintenanceRoomTypesAPI({bool refresh = false}) async {
     return await _fetchData('hotel/maintenance/rooms', refresh: refresh);
+  }
+
+  // Hotel  booking history
+  Future<Response> fetchBookingHistory({bool refresh = false}) async {
+    return await _fetchData('hotel/bookings/history', refresh: refresh);
   }
 
   Future<Response> fetchAvailableRooms(

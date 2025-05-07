@@ -8,6 +8,7 @@ import 'package:spotstock_inventory/common/provider/markroomfor_maintenance_prov
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/screens/desktop/sales/widgets/dirty_room_available_dialog.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/mark_room_as_dirty.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/setroom_for_maintenance.dart';
 import 'package:spotstock_inventory/widgets/sidebar.dart';
@@ -38,357 +39,400 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
 
     return Scaffold(
         backgroundColor: const Color(0xFFF5F7FA),
-        body: SingleChildScrollView(
-            child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // AppBAr
-
-                      Row(children: [
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height,
-                          ),
-                          child: SizedBox(
-                            width: 200,
-                            child: SideBarHotel(
-                              vertical: 20,
-                              user: widget.user,
-                              systemProvider: widget.systemProvider,
-                            ),
-                          ),
+        body: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // AppBAr
+        
+                  Row(children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.90,
+                      ),
+                      child: SizedBox(
+                        width: 200,
+                        child: SideBarHotel(
+                          vertical: 20,
+                          user: widget.user,
+                          systemProvider: widget.systemProvider,
                         ),
-                        Container(
-                          // height: 100,
-                          width: MediaQuery.of(context).size.width * 0.75,
-                          child: Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                    ),
+                    Container(
+                      // height: 100,
+                      width: MediaQuery.of(context).size.width * 0.80,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            child: Row(
                               children: [
-                                Row(
-                                  children: [
-                                    const Text(
-                                      'Room Maintenance & Cleaning',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    GestureDetector(
-                                      onTap: () {
-                                        // showDialog(
-                                        //   context: context,
-                                        //   builder: (context) =>
-                                        //       ChangeNotifierProvider(
-                                        //     create: (_) => MarkRoomDirtyProvider(),
-                                        //     child: const MarkRoomDirtyDialog(),
-                                        //   ),
-                                        // );
-                                        context
-                                            .read<MarkDirtyRoomProvider>()
-                                            .fetchMaintenanceRooms()
-                                            .then((_) {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) =>
+                                const Text(
+                                  'Room Maintenance & Cleaning',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Spacer(),
+                                GestureDetector(
+                                  onTap: () async {
+                                    final provider = context
+                                        .read<MarkDirtyRoomProvider>();
+                                    final scaffold =
+                                        ScaffoldMessenger.of(context);
+                                    try {
+                                      // Show loading indicator
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) => const Center(
+                                            child:
+                                                CircularProgressIndicator()),
+                                      );
+                                                  
+                                      // Refresh room data
+                                      await provider.fetchMaintenanceRooms(
+                                          refresh: true);
+                                                  
+                                      // Close loading dialog
+                                      if (context.mounted)
+                                        Navigator.of(context).pop();
+                                                  
+                                      // Show the mark dirty dialog
+                                      if (context.mounted) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              ChangeNotifierProvider.value(
+                                            value: provider,
+                                            child:
                                                 const MarkRoomDirtyDialog(),
-                                          );
-                                        });
-                                      },
-                                      child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 10),
-                                          decoration: BoxDecoration(
-                                            color: ColorsRes.grey,
-                                            borderRadius:
-                                                BorderRadius.circular(5),
                                           ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.build,
-                                                size: 15,
-                                                color: Colors.white,
-                                              ),
-                                              Gap(5),
-                                              FittedBox(
-                                                child: const Text(
-                                                  'Mark Room as Dirty',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12),
-                                                ),
-                                              ),
-                                            ],
-                                          )),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      // Close loading dialog if still open
+                                      if (context.mounted)
+                                        Navigator.of(context).pop();
+                                                  
+                                      // Show error message
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Failed to load room data: ${e.toString()}'),
+                                            duration:
+                                                const Duration(seconds: 3),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: ColorsRes.grey,
+                                      borderRadius:
+                                          BorderRadius.circular(5),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color:
+                                              Colors.black.withOpacity(0.1),
+                                          blurRadius: 2,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(width: 12),
-                                    GestureDetector(
-                                      onTap: () {
-                                        context
-                                            .read<
-                                                MarkRoomForMaintenanceProvider>()
-                                            .fetchMaintenanceRooms()
-                                            .then((_) {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) =>
-                                                const SetRoomForMaintenance(),
-                                          );
-                                        });
-                                        // showDialog(
-                                        //   context: context,
-                                        //   builder: (context) =>
-                                        //       ChangeNotifierProvider(
-                                        //     create: (_) =>
-                                        //         MarkRoomForMaintenanceProvider(
-
-                                        //         ),
-                                        //     child:
-                                        //         const SetRoomForMaintenance(),
-                                        //   ),
-                                        // );
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 10),
-                                        decoration: BoxDecoration(
-                                          color: ColorsRes.cardpurple,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.add,
-                                              color: Colors.white,
-                                            ),
-                                            Gap(5),
-                                            FittedBox(
-                                              child: const Text(
-                                                'Set Room for Maintenance',
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                Gap(30),
-                                // Top Cards
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    _buildInfoCard(
-                                      icon: Icons.build,
-                                      title: 'Rooms Under Maintenance',
-                                      count: provider.roomsUnderMaintenance,
-                                      subtitle:
-                                          'of total ${provider.totalRooms}',
-                                      color: Colors.blueAccent,
-                                    ),
-                                    Gap(10),
-                                    _buildInfoCard(
-                                      icon: Icons.cleaning_services,
-                                      title: 'Dirty Rooms',
-                                      count: provider.dirtyRooms,
-                                      subtitle: 'need cleaning',
-                                      color: Colors.grey,
-                                    ),
-                                    Gap(10),
-                                    _buildInfoCard(
-                                      icon: Icons.pie_chart,
-                                      title: 'Maintenance Rate',
-                                      count: provider.maintenanceRate.toInt(),
-                                      subtitle: 'percentage of total rooms',
-                                      color: Colors.green,
-                                    ),
-                                    Gap(10),
-                                    _buildInfoCard(
-                                      icon: Icons.warning,
-                                      title: 'Overdue Maintenance',
-                                      count: provider.overdueMaintenance,
-                                      subtitle: 'rooms require attention',
-                                      color: Colors.orange,
-                                    ),
-                                  ],
-                                ),
-                                Gap(20),
-                                // Search and Filters
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 30, vertical: 60),
-                                  decoration:
-                                      const BoxDecoration(color: Colors.white),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Search Field
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 1,
-                                            color: ColorsRes.btndarkshadow,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        width: 200,
-                                        child: TextField(
-                                          decoration: InputDecoration(
-                                            prefixIcon:
-                                                const Icon(Icons.search),
-                                            hintText: 'Search by room number',
-                                            hintStyle: TextStyle(fontSize: 12),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const Gap(10),
-                                      // Room Type Dropdown
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 1,
-                                            color: ColorsRes.btndarkshadow,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        width: 200,
-                                        child: DropdownButtonFormField<String>(
-                                          hint: const Text(
-                                            'Filter by room type',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          items: const [],
-                                          onChanged: (value) {},
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const Gap(10),
-                                      // Status Dropdown
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 1,
-                                            color: ColorsRes.btndarkshadow,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        width: 200,
-                                        child: DropdownButtonFormField<String>(
-                                          hint: Text(
-                                            'Filter by status',
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          items: ['Dirty Room', 'Maintenance']
-                                              .map((status) => DropdownMenuItem(
-                                                  value: status,
-                                                  child: Text(status)))
-                                              .toList(),
-                                          onChanged: (value) {},
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Gap(10),
-                                      const Spacer(),
-                                      // Buttons
-                                      ElevatedButton.icon(
-                                        onPressed: () {
-                                          // apply filters
-                                        },
-                                        icon: const Icon(
-                                          Icons.filter_alt,
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.build,
+                                          size: 15,
                                           color: Colors.white,
-                                          size: 16,
                                         ),
-                                        label: const Text('Apply Filters',
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'Mark Room as Dirty',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                GestureDetector(
+                                  onTap: () {
+                                    context
+                                        .read<
+                                            MarkRoomForMaintenanceProvider>()
+                                        .fetchMaintenanceRooms()
+                                        .then((_) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            const SetRoomForMaintenance(),
+                                      );
+                                    });
+                                    // showDialog(
+                                    //   context: context,
+                                    //   builder: (context) =>
+                                    //       ChangeNotifierProvider(
+                                    //     create: (_) =>
+                                    //         MarkRoomForMaintenanceProvider(
+                                                  
+                                    //         ),
+                                    //     child:
+                                    //         const SetRoomForMaintenance(),
+                                    //   ),
+                                    // );
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: ColorsRes.cardpurple,
+                                      borderRadius:
+                                          BorderRadius.circular(5),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
+                                        Gap(5),
+                                        FittedBox(
+                                          child: const Text(
+                                            'Set Room for Maintenance',
                                             style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.normal)),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: ColorsRes.cardpurple,
-                                          fixedSize: Size(120, 45),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 20),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
+                                                fontSize: 12),
                                           ),
                                         ),
-                                      ),
-                                      const Gap(5),
-                                      OutlinedButton(
-                                        onPressed: provider.resetFilters,
-                                        child: const Text(
-                                          'Reset',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                        style: OutlinedButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 20),
-                                          side: const BorderSide(
-                                              color: Colors.grey),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Gap(20),
-                                // Empty Room Message
-
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 20),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Center(
-                                    child: _buildRoomStatusContent(
-                                        provider, provideMaintenance),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        )
-                      ])
-                    ]))));
+                      
+                          Gap(30),
+                          // Top Cards
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildInfoCard(
+                                icon: Icons.build,
+                                title: 'Rooms Under Maintenance',
+                                count: provider.roomsUnderMaintenance,
+                                subtitle:
+                                    'of total ${provider.totalRooms}',
+                                color: Colors.blueAccent,
+                              ),
+                              Gap(10),
+                              _buildInfoCard(
+                                icon: Icons.cleaning_services,
+                                title: 'Dirty Rooms',
+                                count: provider.dirtyRooms,
+                                subtitle: 'need cleaning',
+                                color: Colors.grey,
+                              ),
+                              Gap(10),
+                              _buildInfoCard(
+                                icon: Icons.pie_chart,
+                                title: 'Maintenance Rate',
+                                count: provider.maintenanceRate.toInt(),
+                                subtitle: 'percentage of total rooms',
+                                color: Colors.green,
+                              ),
+                              Gap(10),
+                              _buildInfoCard(
+                                icon: Icons.warning,
+                                title: 'Overdue Maintenance',
+                                count: provider.overdueMaintenance,
+                                subtitle: 'rooms require attention',
+                                color: Colors.orange,
+                              ),
+                            ],
+                          ),
+                          Gap(20),
+                          // Search and Filters
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 60),
+                            decoration:
+                                const BoxDecoration(color: Colors.white),
+                            child: Row(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                // Search Field
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 1,
+                                      color: ColorsRes.btndarkshadow,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.circular(5),
+                                  ),
+                                  width: 200,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      prefixIcon:
+                                          const Icon(Icons.search),
+                                      hintText: 'Search by room number',
+                                      hintStyle: TextStyle(fontSize: 12),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const Gap(10),
+                                // Room Type Dropdown
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 1,
+                                      color: ColorsRes.btndarkshadow,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.circular(5),
+                                  ),
+                                  width: 200,
+                                  child: DropdownButtonFormField<String>(
+                                    hint: const Text(
+                                      'Filter by room type',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    items: const [],
+                                    onChanged: (value) {},
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const Gap(10),
+                                // Status Dropdown
+                                Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      width: 1,
+                                      color: ColorsRes.btndarkshadow,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.circular(5),
+                                  ),
+                                  width: 200,
+                                  child: DropdownButtonFormField<String>(
+                                    hint: Text(
+                                      'Filter by status',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    items: ['Dirty Room', 'Maintenance']
+                                        .map((status) => DropdownMenuItem(
+                                            value: status,
+                                            child: Text(status)))
+                                        .toList(),
+                                    onChanged: (value) {},
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Gap(10),
+                                const Spacer(),
+                                // Buttons
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    // apply filters
+                                  },
+                                  icon: const Icon(
+                                    Icons.filter_alt,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  label: const Text('Apply Filters',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.normal)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ColorsRes.cardpurple,
+                                    fixedSize: Size(120, 45),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 20),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                                const Gap(5),
+                                OutlinedButton(
+                                  onPressed: provider.resetFilters,
+                                  child: const Text(
+                                    'Reset',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 20),
+                                    side: const BorderSide(
+                                        color: Colors.grey),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Gap(20),
+                          // Empty Room Message
+                      
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Center(
+                              child: _buildRoomStatusContent(
+                                  provider, provideMaintenance),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ])
+                ])));
   }
 
 // Add this new helper method to your _RoomMaintenanceScreenState class:
@@ -396,8 +440,7 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
     MarkDirtyRoomProvider provider,
     MarkRoomForMaintenanceProvider provideMaintenance,
   ) {
-    final hasMaintenanceRooms =
-        provideMaintenance.maintenanceRoomList.isNotEmpty;
+    final hasMaintenanceRooms = provideMaintenance.maintenanceRooms.isNotEmpty;
     final hasDirtyRooms = provider.dirtyRoomsList.isNotEmpty;
 
     if (hasMaintenanceRooms || hasDirtyRooms) {
@@ -417,14 +460,14 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: provideMaintenance.maintenanceRoomList.length,
+                  itemCount: provideMaintenance.maintenanceRooms.length,
                   itemBuilder: (context, index) {
-                    final room = provideMaintenance.maintenanceRoomList[index];
+                    final room = provideMaintenance.maintenanceRooms[index];
                     return _buildMaintenanceRoomCard(
                       room,
                       provideMaintenance,
                       index,
-                      provideMaintenance.maintenanceRoomList.length,
+                      provideMaintenance.maintenanceRooms.length,
                     );
                   },
                 ),
@@ -542,14 +585,63 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
-                onPressed: () => provider.makeRoomAvailable(room.id),
+                onPressed: provider.isLoading
+                    ? null
+                    : () async {
+                        try {
+                          // Verify a room is selected
+                          if (provider.selectedRoom == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select a room first'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Attempt to make room available
+                          // await provider.makeRoomAvailable(context);
+                          provider.showDialogBox();
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => const MakeRoomAvailableDialog(
+                              roomNumber: "102",
+                              roomType: "DELUXE",
+                            ),
+                          );
+                        } catch (e) {
+                          // Errors are already handled by the provider
+                          // This catch prevents the exception from bubbling up
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
+                  disabledBackgroundColor: Colors.green.withOpacity(0.5),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 2,
                 ),
-                child: const Text('Make Available',
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
+                child: provider.isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Make Available',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
               ),
             ),
 
@@ -636,18 +728,59 @@ class _RoomMaintenanceScreenState extends State<RoomMaintenanceScreen> {
 
             const SizedBox(height: 10),
             Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () => provider.makeRoomAvailable(room.id),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                ),
-                child: const Text('Make Available',
-                    style: TextStyle(color: Colors.white, fontSize: 12)),
-              ),
-            ),
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: provider.isLoading
+                      ? null
+                      : () async {
+                          if (provider.selectedRoom == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Please select a room first')),
+                            );
+                            return;
+                          }
+
+                          try {
+                            // Extract the actual room ID from your room object
+                            final selectedRoom = provider.allRooms.firstWhere(
+                                (room) =>
+                                    '${room.roomTypeName} ${room.roomNumber}' ==
+                                    provider.selectedRoom,
+                                orElse: () =>
+                                    throw Exception('Selected room not found'));
+
+                            await provider.makeRoomAvailable(
+                                selectedRoom.id, context);
+                          } on Exception catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    disabledBackgroundColor: Colors.green.withOpacity(0.5),
+                  ),
+                  child: provider.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.check_circle_outline,
+                                color: Colors.white),
+                            SizedBox(width: 8),
+                            Text('Make Available',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                )),
 
             if (index != totalDirtyRooms - 1)
               const Divider(height: 20, thickness: 1),
