@@ -338,7 +338,7 @@ class SystemRepo extends ApiClient {
 
         // Save to local storage
         await _saveMaintenanceRooms(responseModel.rooms.data);
-
+        print('Maintenance Room ======>>>>>> $response');
         return responseModel;
       }
       throw Exception('Failed to load maintenance rooms');
@@ -1699,7 +1699,7 @@ class SystemRepo extends ApiClient {
       };
     }).toList();
 
-    print("data ==>> $data");
+    print("dataaaaaaaaa ==>> $data");
 
     //print("Order items ==>> ${order.items}");
     try {
@@ -1711,14 +1711,17 @@ class SystemRepo extends ApiClient {
           },
           body: jsonEncode(data));
 
-      print("Syncing");
+      print("Syncing....>>>>>>>>>>>>>>>>>>>");
       log("response body ==> ${response.body}");
       log("response ==> ${response.statusCode}");
       var jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
-        print("dataaaa ==> ${unsyncedOrders}");
+        print(
+            '=========================================================================================');
+        print(
+            "dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa........>>>>>>>>>>> ==> ${unsyncedOrders}");
         for (var itemData in unsyncedOrders) {
-          print("sync data ==> $itemData");
+          print("sync data......... .....>>>>>>> ==> $itemData");
           itemData.sync = 1;
           orderBox.put(itemData); // Update the order
         }

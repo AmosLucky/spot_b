@@ -19,7 +19,7 @@ class RoomCard extends StatelessWidget {
     this.status,
     this.backgroundColor = Colors.blue,
     this.buttonLabel = "Choose Room",
-    this.onAction,
+    this.onAction, required int index,
   });
 
   @override

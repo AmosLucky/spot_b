@@ -41,7 +41,6 @@ class SystemProvider with ChangeNotifier {
   int? _warehouseIds;
   int? get warehouseIds => _warehouseIds;
 
-
   Map<String, dynamic> _dashboardStats = {};
   Map<String, dynamic> get dashboardStats => _dashboardStats;
 
@@ -68,8 +67,8 @@ class SystemProvider with ChangeNotifier {
     print(isConnected);
     _getDashboardFeed();
     fetchWarehouses(true, isConnected
-      // _connectionStatus
-    );
+        // _connectionStatus
+        );
     fetchCategories(true, isConnected // _connectionStatus
         );
     fetchHotelCategories(true, isConnected
@@ -105,6 +104,13 @@ class SystemProvider with ChangeNotifier {
     _responseState = ResponseState.loading;
     _dataFetched = true;
     notifyListeners();
+
+    print(
+        ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Datas Syncinggg');
+    print(
+        ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Datas Syncinggg');
+    print(
+        ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Datas Syncinggg');
     await _getDashboardFeed();
     await fetchWarehouses(true, connectionResult);
     await fetchCategories(true, connectionResult);
@@ -146,7 +152,7 @@ class SystemProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           final warehouseData = response.data["data"];
 
-          _warehouseIds =  response.data['data'][0]['id'];
+          _warehouseIds = response.data['data'][0]['id'];
           print("warehouse data ==>> $warehouseData");
 
           // Convert the warehouse data into a list of StoreX objects
@@ -743,7 +749,8 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId) async {
+  Future<bool> fetchProducts(
+      bool refresh, bool connectionStatus, int? warehouseId) async {
     print("Fetching products");
     UserDetails user =
         Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
@@ -826,7 +833,8 @@ class SystemProvider with ChangeNotifier {
 
   Future<List<dynamic>> getRoomTypes() async {
     try {
-      var response = await SystemRepo(refresh: false, online: false).fetchRoomTypes();
+      var response =
+          await SystemRepo(refresh: false, online: false).fetchRoomTypes();
       _roomTypesItems = response.data['data'];
       print("Fetched room data ${response}");
       return response.data;
@@ -836,9 +844,17 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-  Future<Map> getAvailableRooms(String roomTypeId, noOfAdult, noOfChildren, noOfRooms, startDate, endDate) async {
+  Future<Map> getAvailableRooms(String roomTypeId, noOfAdult, noOfChildren,
+      noOfRooms, startDate, endDate) async {
     try {
-      var response = await SystemRepo(refresh: false, online: false).fetchAvailableRooms(roomTypeId: roomTypeId, noOfAdult: noOfAdult, noOfChildren: noOfChildren, startDate: startDate, endDate: endDate, noOfRooms: noOfRooms);
+      var response = await SystemRepo(refresh: false, online: false)
+          .fetchAvailableRooms(
+              roomTypeId: roomTypeId,
+              noOfAdult: noOfAdult,
+              noOfChildren: noOfChildren,
+              startDate: startDate,
+              endDate: endDate,
+              noOfRooms: noOfRooms);
 
       if (response.statusCode == 200) {
         _roomResult = response.data;
@@ -934,7 +950,7 @@ class SystemProvider with ChangeNotifier {
   Future<List<dynamic>> getWarehouse() async {
     try {
       var response =
-      await SystemRepo(refresh: false, online: false).getWarehouses();
+          await SystemRepo(refresh: false, online: false).getWarehouses();
       return response;
     } catch (error) {
       return [];
@@ -1144,10 +1160,14 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> syncAllTransactions(UserDetails user,) async {
+  Future<Map<String, dynamic>> syncAllTransactions(
+    UserDetails user,
+  ) async {
     try {
-      var response = await SystemRepo(refresh: false, online: false)
-          .syncAllTransactions(user,);
+      var response =
+          await SystemRepo(refresh: false, online: false).syncAllTransactions(
+        user,
+      );
       return response;
     } catch (error) {
       return {};

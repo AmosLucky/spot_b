@@ -54,11 +54,16 @@ class _RoomSummaryState extends State<RoomSummary> {
   String? _paymentType;
   int _duration = 0;
   double _totalAmount = 0.0;
-
+  double subtotal = 0.0;
   bool _isFolioChecked = false;
+  List<String> customers = [];
+
   final TextEditingController _folioNameController = TextEditingController();
   final TextEditingController _folioAddressController = TextEditingController();
   final TextEditingController _folioAmountController = TextEditingController();
+  final TextEditingController _folioPhoneController = TextEditingController();
+  final TextEditingController _folioReceivedAmountController =
+      TextEditingController();
 
   // Additional DateTime variables for folio dates
   DateTime? _folioArrivalDate;
@@ -109,7 +114,8 @@ class _RoomSummaryState extends State<RoomSummary> {
   void _calculateTotalAmount() {
     final roomPrice = widget.room?['room_type']?['fare'] ?? 0;
     setState(() {
-      _totalAmount = (_duration * double.parse(roomPrice.toString())).toDouble();
+      _totalAmount =
+          (_duration * double.parse(roomPrice.toString())).toDouble();
     });
   }
 
@@ -300,35 +306,45 @@ class _RoomSummaryState extends State<RoomSummary> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
-                        SizedBox(height: 1.h,),
+                        SizedBox(
+                          height: 1.h,
+                        ),
 
                         Text(
                           "Check-out Date: ${widget.checkOutDate!.toIso8601String().replaceRange(10, 24, "")}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
-                        SizedBox(height: 1.h,),
+                        SizedBox(
+                          height: 1.h,
+                        ),
 
                         Text(
                           "Nights: ${_duration}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
-                        SizedBox(height: 1.h,),
+                        SizedBox(
+                          height: 1.h,
+                        ),
 
                         Text(
                           "Room type: ${widget.room!['room_type']['name']}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
-                        SizedBox(height: 1.h,),
+                        SizedBox(
+                          height: 1.h,
+                        ),
 
                         Text(
                           "Room number: ${widget.room!['room_number']}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 
-                        SizedBox(height: 1.h,),
+                        SizedBox(
+                          height: 1.h,
+                        ),
 
                         Text(
                           "Price per Room/Night: ${widget.room!['room_type']['fare']}",
@@ -372,6 +388,28 @@ class _RoomSummaryState extends State<RoomSummary> {
                             keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
                               labelText: "Folio Amount",
+                            ),
+                          ),
+                          TextField(
+                            controller: _folioPhoneController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: "Phone no.",
+                            ),
+                          ),
+                          // TextField(
+                          //   controller: _folioPhoneController,
+                          //   keyboardType: TextInputType.number,
+                          //   decoration: const InputDecoration(
+                          //     labelText: "Phone no.",
+                          //   ),
+                          // ),
+                          Text('Amount to Pay ${Money.format(subtotal)}'),
+                          TextField(
+                            controller: _folioReceivedAmountController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: "Received Amount",
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -443,14 +481,13 @@ class _RoomSummaryState extends State<RoomSummary> {
             onTap: () {
               // Booking logic
               if (_totalAmount > 0) {
-                if(_paymentType != null) {
+                if (_paymentType != null) {
                   _showPaymentDialog(context, _totalAmount);
                   print("Room ==>> ${widget.room?['attributes']?['name']}");
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content:
-                      Text('Select a payment type to continue'),
+                      content: Text('Select a payment type to continue'),
                     ),
                   );
                 }

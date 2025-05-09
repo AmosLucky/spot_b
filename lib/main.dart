@@ -22,6 +22,8 @@ import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
 
 import 'package:spotstock_inventory/objectbox.g.dart';
+import 'package:spotstock_inventory/screens/desktop/hotel/widgets/operations_provider.dart';
+import 'package:spotstock_inventory/screens/desktop/hotel/widgets/paymentstate.dart';
 import 'package:spotstock_inventory/screens/desktop/splashscreen_desktop.dart';
 import 'package:spotstock_inventory/screens/mobile/splashscreen_mobile.dart';
 import 'package:spotstock_inventory/widgets/responsive.dart';
@@ -142,6 +144,8 @@ class _MyAppState extends State<MyApp> {
                   SystemRepo(refresh: false, online: true),
                 )),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => OperationsProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentState()),
         ChangeNotifierProvider(
             create: (_) => MarkRoomForMaintenanceProvider(
                 SystemRepo(refresh: false, online: true))),
