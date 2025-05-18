@@ -7,6 +7,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/preference_settings.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
+import 'package:spotstock_inventory/common/provider/attendant_model.dart';
 import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
 import 'package:spotstock_inventory/common/provider/booking_history_provider.dart';
 import 'package:spotstock_inventory/common/provider/booking_provider.dart';
@@ -127,6 +128,7 @@ class _MyAppState extends State<MyApp> {
 
     return MultiProvider(
       providers: [
+          ChangeNotifierProvider(create: (_) => AttendantProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(
           create: (_) =>

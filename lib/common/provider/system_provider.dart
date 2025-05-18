@@ -1160,6 +1160,16 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
+//   Future<List<Map<String, dynamic>>> getAttendants() async {
+//   try {
+//     final response = await get('attendants'); // Adjust endpoint as needed
+//     return List<Map<String, dynamic>>.from(response['data'] ?? []);
+//   } catch (e) {
+//     print('Error fetching attendants: $e');
+//     return [];
+//   }
+// }
+
   Future<Map<String, dynamic>> syncAllTransactions(
     UserDetails user,
   ) async {
@@ -1173,5 +1183,117 @@ class SystemProvider with ChangeNotifier {
       return {};
       // throw (error);
     }
+  }
+  // Temporary dummy data method - returns Map data matching AttendantModel
+  List<Map<String, dynamic>> getAttendants() {
+    return [
+      {
+        'id': '1',
+        'name': 'John Doe',
+        'department': 'Administration',
+        'pin_set': true,
+        'pin': '1234',
+      },
+      {
+        'id': '2',
+        'name': 'Jane Smith',
+        'department': 'Management',
+        'pin_set': true,
+        'pin': '5678',
+      },
+      {
+        'id': '3',
+        'name': 'Bob Johnson',
+        'department': 'Operations',
+        'pin_set': false,
+        'pin': null,
+      },
+      {
+        'id': '4',
+        'name': 'Alice Wilson',
+        'department': 'Customer Service',
+        'pin_set': true,
+        'pin': '9876',
+      },
+      {
+        'id': '5',
+        'name': 'Charlie Brown',
+        'department': 'Supervision',
+        'pin_set': true,
+        'pin': '4321',
+      },
+      {
+        'id': '6',
+        'name': 'Diana Prince',
+        'department': 'Security',
+        'pin_set': false,
+        'pin': null,
+      },
+      {
+        'id': '7',
+        'name': 'Frank Miller',
+        'department': 'Maintenance',
+        'pin_set': true,
+        'pin': '1111',
+      },
+      {
+        'id': '8',
+        'name': 'Grace Kelly',
+        'department': 'Sales',
+        'pin_set': true,
+        'pin': '2222',
+      },
+    ];
+  }
+
+
+  // Alternative async version if needed
+  // Future<List<Attendant>> getAttendantsAsync() async {
+  //   // Simulate network delay
+  //   await Future.delayed(Duration(milliseconds: 500));
+  //   return getAttendants();
+  // }
+}
+
+// Attendant model class (if you don't have it already)
+class Attendant {
+  final String id;
+  final String name;
+  final String email;
+  final String role;
+  final bool isActive;
+  final DateTime joinedDate;
+
+  Attendant({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.role,
+    required this.isActive,
+    required this.joinedDate,
+  });
+
+  // Convert to Map for JSON serialization
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'role': role,
+      'isActive': isActive,
+      'joinedDate': joinedDate.toIso8601String(),
+    };
+  }
+
+  // Create from Map for JSON deserialization
+  factory Attendant.fromMap(Map<String, dynamic> map) {
+    return Attendant(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+      role: map['role'] ?? '',
+      isActive: map['isActive'] ?? false,
+      joinedDate: DateTime.parse(map['joinedDate']),
+    );
   }
 }

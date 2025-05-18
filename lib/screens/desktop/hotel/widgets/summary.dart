@@ -48,8 +48,7 @@ class RoomSummary extends StatefulWidget {
 }
 
 class _RoomSummaryState extends State<RoomSummary> {
-  // DateTime? _checkInDate;
-  // DateTime? _checkOutDate;
+  // Existing variables
   String? _bookingType = "Checked-in";
   String? _paymentType;
   int _duration = 0;
@@ -57,7 +56,16 @@ class _RoomSummaryState extends State<RoomSummary> {
   double subtotal = 0.0;
   bool _isFolioChecked = false;
   List<String> customers = [];
+  double change = 0.0;
+  List<String> tables = [];
 
+  // Add payment form variables
+  String _paymentStatus = 'Paid';
+  bool _isCustomName = false;
+  String? _selectedCustomer;
+  String? _selectedTable;
+
+  // Existing controllers
   final TextEditingController _folioNameController = TextEditingController();
   final TextEditingController _folioAddressController = TextEditingController();
   final TextEditingController _folioAmountController = TextEditingController();
@@ -65,17 +73,68 @@ class _RoomSummaryState extends State<RoomSummary> {
   final TextEditingController _folioReceivedAmountController =
       TextEditingController();
 
+  // Add payment form controllers
+  final TextEditingController _customerNameController = TextEditingController();
+  final TextEditingController _customerPhoneController =
+      TextEditingController();
+  final TextEditingController _receivedAmountController =
+      TextEditingController();
+  final TextEditingController _partialAmountController =
+      TextEditingController();
+  final TextEditingController _tableNameController = TextEditingController();
+
   // Additional DateTime variables for folio dates
   DateTime? _folioArrivalDate;
   DateTime? _folioDepartureDate;
 
-// Method to select folio dates
+  @override
+  void initState() {
+    super.initState();
+    _customerNameController.text = "Walk-in Customer";
+    _customerPhoneController.text = "Enter phone number";
+    _tableNameController.text = "Select a table";
+    _loadCustomers();
+    _loadTables();
+  }
+
+  // Add these methods from PaymentForm
+  void _loadCustomers() async {
+    try {
+      var response = await widget.systemProvider.getCustomers();
+      if (mounted) {
+        setState(() {
+          customers = response
+              .map((customer) => customer['attributes']['name'] as String)
+              .toList();
+        });
+      }
+    } catch (e) {
+      print('Error fetching customers: $e');
+    }
+  }
+
+  void _loadTables() async {
+    try {
+      var response = await widget.systemProvider.getTables();
+      if (mounted) {
+        setState(() {
+          tables = response
+              .map((table) => table['attributes']['name'] as String)
+              .toList();
+        });
+      }
+    } catch (e) {
+      print('Error fetching tables: $e');
+    }
+  }
+
+  // Existing methods...
   void _selectFolioDate(BuildContext context, bool isArrival) async {
     DateTime currentDate = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: currentDate,
-      firstDate: currentDate, // Disable past dates
+      firstDate: currentDate,
       lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
@@ -93,75 +152,29 @@ class _RoomSummaryState extends State<RoomSummary> {
     }
   }
 
-  // Calculate duration in days
   void _calculateDuration() {
     if (widget.checkInDate != null && widget.checkOutDate != null) {
       setState(() {
         _duration = widget.checkOutDate!.difference(widget.checkInDate!).inDays;
-        _duration = _duration > 0 ? _duration : 0; // Prevent negative duration
+        _duration = _duration > 0 ? _duration : 0;
         _calculateTotalAmount();
       });
     }
   }
 
   void _onRoomDataChanged() {
-    // Recalculate total amount based on updated room price
     _calculateTotalAmount();
     _calculateDuration();
   }
 
-  // Calculate total amount based on duration and room price
   void _calculateTotalAmount() {
     final roomPrice = widget.room?['room_type']?['fare'] ?? 0;
     setState(() {
       _totalAmount =
           (_duration * double.parse(roomPrice.toString())).toDouble();
+      subtotal = _totalAmount; // Update subtotal for payment calculations
     });
   }
-
-  void _resetInputs() {
-    setState(() {
-      // Reset date fields
-      // _checkInDate = null;
-      // _checkOutDate = null;
-      _bookingType = "Checked-in"; // Reset to default value
-      _paymentType = null; // Reset to null or default value
-      _isFolioChecked = false;
-
-      // Reset controllers
-      _folioNameController.clear();
-      _folioAddressController.clear();
-      _folioAmountController.clear();
-
-      // Reset calculations
-      _duration = 0;
-      _totalAmount = 0.0;
-    });
-  }
-
-  // Select a date
-  // void _selectDate(BuildContext context, bool isCheckIn) async {
-  //   DateTime currentDate = DateTime.now();
-  //   DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: currentDate,
-  //     firstDate: currentDate, // Disable past dates
-  //     lastDate: DateTime(2100),
-  //   );
-  //   if (pickedDate != null) {
-  //     setState(() {
-  //       if (isCheckIn) {
-  //         _checkInDate = pickedDate;
-  //         if (_checkOutDate != null && _checkOutDate!.isBefore(_checkInDate!)) {
-  //           _checkOutDate = _checkInDate;
-  //         }
-  //       } else {
-  //         _checkOutDate = pickedDate;
-  //       }
-  //       _calculateDuration();
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +187,7 @@ class _RoomSummaryState extends State<RoomSummary> {
     _calculateDuration();
 
     return Container(
-      width: widget.mediaQuery.width * 0.3, // Adjust width based on screen size
+      width: widget.mediaQuery.width * 0.3,
       constraints: BoxConstraints(
         maxHeight: widget.mediaQuery.height * 0.96,
       ),
@@ -198,46 +211,6 @@ class _RoomSummaryState extends State<RoomSummary> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Check-in and Check-out
-                        // Row(
-                        //   children: [
-                        //     Expanded(
-                        //       child: GestureDetector(
-                        //         onTap: () => _selectDate(context, true),
-                        //         child: TextField(
-                        //           controller: TextEditingController(
-                        //             text: widget.checkInDate != null
-                        //                 ? "${widget.checkInDate!.year}-${widget.checkInDate!.month.toString().padLeft(2, '0')}-${widget.checkInDate!.day.toString().padLeft(2, '0')}"
-                        //                 : '',
-                        //           ),
-                        //           enabled: false,
-                        //           decoration: const InputDecoration(
-                        //             labelText: "Check-in Date",
-                        //             suffixIcon: Icon(Icons.calendar_today),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     const SizedBox(width: 10),
-                        //     Expanded(
-                        //       child: GestureDetector(
-                        //         onTap: () => _selectDate(context, false),
-                        //         child: TextField(
-                        //           controller: TextEditingController(
-                        //             text: widget.checkOutDate != null
-                        //                 ? "${widget.checkOutDate!.year}-${widget.checkOutDate!.month.toString().padLeft(2, '0')}-${widget.checkOutDate!.day.toString().padLeft(2, '0')}"
-                        //                 : '',
-                        //           ),
-                        //           enabled: false,
-                        //           decoration: const InputDecoration(
-                        //             labelText: "Check-out Date",
-                        //             suffixIcon: Icon(Icons.calendar_today),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
                         const SizedBox(height: 10),
 
                         // Booking Type
@@ -298,60 +271,190 @@ class _RoomSummaryState extends State<RoomSummary> {
                             labelText: "Payment Type",
                           ),
                         ),
-
                         const SizedBox(height: 10),
 
+                        // Payment Status
+                        DropdownButtonFormField<String>(
+                          value: _paymentStatus,
+                          items: const [
+                            DropdownMenuItem(
+                              value: "Paid",
+                              child: Text("Paid"),
+                            ),
+                            DropdownMenuItem(
+                              value: "Unpaid",
+                              child: Text("Unpaid"),
+                            ),
+                            DropdownMenuItem(
+                              value: "Partial",
+                              child: Text("Partial"),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _paymentStatus = value!;
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Payment Status",
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Room Information Display
                         Text(
                           "Check-in Date: ${widget.checkInDate!.toIso8601String().replaceRange(10, 24, "")}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-
-                        SizedBox(
-                          height: 1.h,
-                        ),
-
+                        SizedBox(height: 1.h),
                         Text(
                           "Check-out Date: ${widget.checkOutDate!.toIso8601String().replaceRange(10, 24, "")}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-
-                        SizedBox(
-                          height: 1.h,
-                        ),
-
+                        SizedBox(height: 1.h),
                         Text(
-                          "Nights: ${_duration}",
+                          "Nights: $_duration",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-
-                        SizedBox(
-                          height: 1.h,
-                        ),
-
+                        SizedBox(height: 1.h),
                         Text(
                           "Room type: ${widget.room!['room_type']['name']}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-
-                        SizedBox(
-                          height: 1.h,
-                        ),
-
+                        SizedBox(height: 1.h),
                         Text(
                           "Room number: ${widget.room!['room_number']}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-
-                        SizedBox(
-                          height: 1.h,
-                        ),
-
+                        SizedBox(height: 1.h),
                         Text(
                           "Price per Room/Night: ${widget.room!['room_type']['fare']}",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
+                        const SizedBox(height: 20),
 
+                        // Customer Information Section
+                        Text(
+                          "Customer Information",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 10),
+
+                        // Customer Name Toggle
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Custom Customer Name: ",
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Switch(
+                              activeColor: Colors.grey,
+                              inactiveThumbColor: Colors.grey,
+                              inactiveTrackColor: Colors.grey[300],
+                              value: _isCustomName,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isCustomName = value;
+                                  if (!_isCustomName) {
+                                    _customerNameController.text =
+                                        _selectedCustomer ?? "Walk-in Customer";
+                                  } else {
+                                    _customerNameController.clear();
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Customer Name Field/Dropdown
+                        _isCustomName
+                            ? TextField(
+                                controller: _customerNameController,
+                                decoration: const InputDecoration(
+                                  labelText: "Enter Customer Name",
+                                ),
+                              )
+                            : DropdownButtonFormField<String>(
+                                value: _selectedCustomer,
+                                hint: Text(_customerNameController.text),
+                                items: customers.map<DropdownMenuItem<String>>(
+                                    (String customer) {
+                                  return DropdownMenuItem<String>(
+                                    value: customer,
+                                    child: Text(customer),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newCustomer) {
+                                  setState(() {
+                                    _selectedCustomer = newCustomer;
+                                    _customerNameController.text =
+                                        newCustomer ?? "Walk-in Customer";
+                                  });
+                                },
+                                decoration: const InputDecoration(
+                                  labelText: "Select Customer",
+                                ),
+                              ),
+                        const SizedBox(height: 10),
+
+                        // Customer Phone (only show if custom name is enabled)
+                        if (_isCustomName)
+                          TextField(
+                            controller: _customerPhoneController,
+                            keyboardType: TextInputType.phone,
+                            decoration: const InputDecoration(
+                              labelText: "Enter Customer Phone Number",
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+
+                        // Amount to Pay (Read-only)
+                        TextField(
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            labelText:
+                                "Amount to Pay ${Money.format(_totalAmount)}",
+                            hintText: Money.format(_totalAmount),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Received Amount (only if payment status is not Unpaid)
+                        if (_paymentStatus != 'Unpaid')
+                          TextField(
+                            controller: _receivedAmountController,
+                            decoration: const InputDecoration(
+                                labelText: "Received Amount"),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              double receivedAmount =
+                                  double.tryParse(value) ?? 0.0;
+                              setState(() {
+                                change = receivedAmount - _totalAmount;
+                              });
+                            },
+                          ),
+                        const SizedBox(height: 10),
+
+                        // Partial Amount (only if payment status is Partial)
+                        if (_paymentStatus == 'Partial')
+                          TextField(
+                            controller: _partialAmountController,
+                            decoration: const InputDecoration(
+                                labelText: "Partial Amount"),
+                            keyboardType: TextInputType.number,
+                          ),
+                        const SizedBox(height: 10),
+
+                        // Change Return (only show if there's change)
+                        if (change != 0.0)
+                          Text(
+                            "Change Return: ${Money.format(change)}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        const SizedBox(height: 20),
 
                         // Folio Section
                         Row(
@@ -390,13 +493,6 @@ class _RoomSummaryState extends State<RoomSummary> {
                               labelText: "Folio Amount",
                             ),
                           ),
-                          TextField(
-                            controller: _folioPhoneController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: "Phone no.",
-                            ),
-                          ),
                           // TextField(
                           //   controller: _folioPhoneController,
                           //   keyboardType: TextInputType.number,
@@ -404,14 +500,28 @@ class _RoomSummaryState extends State<RoomSummary> {
                           //     labelText: "Phone no.",
                           //   ),
                           // ),
-                          Text('Amount to Pay ${Money.format(subtotal)}'),
-                          TextField(
-                            controller: _folioReceivedAmountController,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: "Received Amount",
-                            ),
-                          ),
+                          // TextField(
+                          //   readOnly: true,
+                          //   decoration: InputDecoration(
+                          //     labelText:
+                          //         "Amount to Pay ${Money.format(subtotal)}",
+                          //     hintText: Money.format(subtotal),
+                          //   ),
+                          // ),
+                          // TextField(
+                          //   controller: _folioReceivedAmountController,
+                          //   keyboardType: TextInputType.number,
+                          //   decoration: const InputDecoration(
+                          //     labelText: "Received Amount",
+                          //   ),
+                          //   onChanged: (value) {
+                          //     double receivedAmount =
+                          //         double.tryParse(value) ?? 0.0;
+                          //     setState(() {
+                          //       change = receivedAmount - subtotal;
+                          //     });
+                          //   },
+                          // ),
                           const SizedBox(height: 10),
                           Row(children: [
                             Expanded(
@@ -431,7 +541,7 @@ class _RoomSummaryState extends State<RoomSummary> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: GestureDetector(
                                 onTap: () => _selectFolioDate(context, false),
@@ -473,24 +583,20 @@ class _RoomSummaryState extends State<RoomSummary> {
           ),
           const SizedBox(height: 10),
 
-          // Book Now Button
+          // Book Now Button (Updated to handle direct submission)
           CustomButton(
             label: "Book Now",
             icon: MdiIcons.cash,
             color: Colors.deepPurple,
             onTap: () {
-              // Booking logic
-              if (_totalAmount > 0) {
-                if (_paymentType != null) {
-                  _showPaymentDialog(context, _totalAmount);
-                  print("Room ==>> ${widget.room?['attributes']?['name']}");
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Select a payment type to continue'),
-                    ),
-                  );
-                }
+              if (_totalAmount > 0 && _paymentType != null) {
+                _handleDirectBooking();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Select a payment type to continue'),
+                  ),
+                );
               }
             },
           ),
@@ -499,139 +605,132 @@ class _RoomSummaryState extends State<RoomSummary> {
     );
   }
 
-  // Retrieve the receipt transaction details using the provided transaction ID.
+  // New method to handle direct booking without dialog
+  void _handleDirectBooking() async {
+    // Create payment data from form fields
+    double receivedAmount =
+        double.tryParse(_receivedAmountController.text) ?? 0.0;
+    Map<String, dynamic> paymentData = {
+      'customerName': _customerNameController.text,
+      'customerPhoneNumber': _customerPhoneController.text,
+      'subtotal': _totalAmount,
+      'receivedAmount': receivedAmount,
+      'paymentType': _paymentType ?? '',
+      'paymentStatus': _paymentStatus,
+      'change': change,
+      'partialAmount': _paymentStatus == 'Partial'
+          ? double.tryParse(_partialAmountController.text) ?? 0.0
+          : null,
+      'table': '', // Not applicable for hotel booking
+      'registerId': widget.registerInfo['id'],
+    };
+
+    try {
+      // Create folio data
+      Map folio = {
+        "customerName": _folioNameController.text,
+        "customerAddress": _folioAddressController.text,
+        "amount": _folioAmountController.text,
+        "arrival": _folioArrivalDate.toString(),
+        "departure": _folioDepartureDate.toString(),
+      };
+
+      String? txnID = generateRandomString(12);
+
+      BookingX booking = BookingX(
+        id: 0,
+        uid: widget.user.id.toString(),
+        perNight: (widget.room?['room_type']?['fare'].toString())!,
+        checkin: widget.checkInDate!.toIso8601String(),
+        checkout: widget.checkOutDate!.toIso8601String(),
+        amount: _totalAmount,
+        roomId: (widget.room?['id'].toString())!,
+        folio: json.encode(folio),
+        trx: txnID,
+        bookingOption: _bookingType!,
+        duration: _duration.toString(),
+        userId: widget.user.id.toString(),
+        roomName: widget.room?['room_number'],
+        others: jsonEncode(paymentData),
+        amountPayable: _totalAmount,
+        paymentType: _paymentType,
+        folioId: widget.registerInfo['id'],
+        createdAt: widget.checkInDate!..toIso8601String(),
+        companyId: widget.user.company!.id.toString(),
+        checkinTime: DateFormat('hh:mm:ss').format(DateTime.now()),
+        searchDate: searchDate(DateTime.now()),
+        status: true,
+      );
+
+      final value = await Provider.of<CartProvider>(context, listen: false)
+          .checkoutBooking(context, _totalAmount, paymentData, booking);
+
+      if (value['status'] == true) {
+        // Update room values
+        paymentData['name'] = paymentData['customerName'];
+        paymentData['phone'] = paymentData['customerPhoneNumber'];
+        Map<List<String>, dynamic> updates = {
+          ["attributes", "status"]:
+              booking.bookingOption == 'Checked-in' ? 2 : 3,
+          ["attributes", "color"]: getStatusColor(label: booking.bookingOption),
+          ["is_booked"]: booking.bookingOption == 'Checked-in' ? 1 : 0,
+          ["is_reserved"]: booking.bookingOption == 'Reserved' ? 1 : 0,
+          ["bookings"]: {"trxID": booking.trx},
+          ["customer"]: paymentData
+        };
+
+        await SystemRepo(online: false, refresh: false)
+            .updateRoomData(widget.rooms, booking.roomId, widget.user, updates);
+
+        // Add folio if checked
+        if (_isFolioChecked && folio.keys.isNotEmpty) {
+          await GeneralRepo().openFolio(
+              module: "HOTEL",
+              trackID: booking.trx,
+              data: folio,
+              amountPayable: booking.amountPayable);
+        }
+
+        // Get and show receipt
+        var response = await getReceiptTxn(txnID);
+        if (response.isNotEmpty && context.mounted) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => PrintScreenDialog(
+                    user: widget.user,
+                    transactionData: response,
+                  )));
+        }
+      } else {
+        // Show error dialog
+        Dialogs.alertDialog(
+          context,
+          "Payment Failed",
+          "Something went wrong during the transaction. Please try again.",
+          "OK",
+          "",
+          [],
+        );
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      Dialogs.alertDialog(
+        context,
+        "Error",
+        "An unexpected error occurred: ${e.toString()}",
+        "OK",
+        "",
+        [],
+      );
+    }
+  }
+
+  // Keep existing methods...
   Future<Map<String, dynamic>> getReceiptTxn(String txnID) async {
     return await systemProvider.getHotelReceiptTxn(txnID);
   }
 
-  // Retrieve the booking transaction details using the provided transaction ID.
   Future<Map<String, dynamic>> getLastBookingRoom(String roomID) async {
     return await systemProvider.getLastBookingRoom(roomID);
-  }
-
-  // Method to show the payment dialog
-  void _showPaymentDialog(BuildContext context, double subtotal) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return PaymentForm(
-          isInvoice: false,
-          data: {},
-          app: 'hotel',
-          systemProvider: systemProvider,
-          subtotal: subtotal,
-          onSubmit: (paymentData) async {
-            paymentData['registerId'] = widget.registerInfo['id'];
-
-            Map folio = {
-              "customerName": _folioNameController.text,
-              "customerAddress": _folioAddressController.text,
-              "amount": _folioAmountController.text,
-              "arrival": _folioArrivalDate.toString(),
-              "departure": _folioDepartureDate.toString(),
-            };
-
-            String? txnID = generateRandomString(12);
-            print("============== id ==================");
-            print(widget.registerInfo);
-
-            print(widget.registerInfo['id']);
-
-            BookingX booking = BookingX(
-              id: 0,
-              uid: widget.user.id.toString(),
-              perNight: (widget.room?['room_type']?['fare'].toString())!,
-              checkin: widget.checkInDate!.toIso8601String(),
-              checkout: widget.checkOutDate!.toIso8601String(),
-              amount: _totalAmount,
-              roomId: (widget.room?['id'].toString())!,
-              folio: json.encode(folio),
-              trx: txnID,
-              bookingOption: _bookingType!,
-              duration: _duration.toString(),
-              userId: widget.user.id.toString(),
-              roomName: widget.room?['room_number'],
-              others: jsonEncode(paymentData),
-              amountPayable: _totalAmount,
-              paymentType: _paymentType,
-              folioId: widget.registerInfo['id'],
-              createdAt: widget.checkInDate!..toIso8601String(),
-              companyId: widget.user.company!.id.toString(),
-              checkinTime: DateFormat('hh:mm:ss').format(DateTime.now()),
-              searchDate: searchDate(DateTime.now()),
-              status: true,
-            );
-            print("============ booking data =============");
-            print(booking.toMap());
-            print("============ process booking =============");
-            try {
-              final value =
-                  await Provider.of<CartProvider>(context, listen: false)
-                      .checkoutBooking(context, subtotal, paymentData, booking);
-
-              print("Got here too");
-              if (value['status'] == true) {
-                // update room values
-                paymentData['name'] = paymentData['customerName'];
-                paymentData['phone'] = paymentData['customerPhone'];
-                Map<List<String>, dynamic> updates = {
-                  ["attributes", "status"]:
-                      booking.bookingOption == 'Checked-in' ? 2 : 3,
-                  ["attributes", "color"]:
-                      getStatusColor(label: booking.bookingOption),
-                  ["is_booked"]: booking.bookingOption == 'Checked-in' ? 1 : 0,
-                  ["is_reserved"]: booking.bookingOption == 'Reserved' ? 1 : 0,
-                  ["bookings"]: {"trxID": booking.trx},
-                  ["customer"]: paymentData
-                };
-                await SystemRepo(online: false, refresh: false).updateRoomData(
-                    widget.rooms, booking.roomId, widget.user, updates);
-
-                // add folio
-                if (_isFolioChecked && folio.keys.isNotEmpty) {
-                  await GeneralRepo().openFolio(
-                      module: "HOTEL",
-                      trackID: booking.trx,
-                      data: folio,
-                      amountPayable: booking.amountPayable);
-                }
-
-                var response = await getReceiptTxn(txnID);
-                print("Response ===>>> $response");
-                if (response.isNotEmpty && context.mounted) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => PrintScreenDialog(
-                            user: widget.user,
-                            transactionData: response,
-                          )));
-                }
-              } else {
-                // Show error dialog or message
-                Dialogs.alertDialog(
-                  context,
-                  "Payment Failed",
-                  "Something went wrong during the transaction. Please try again.",
-                  "OK",
-                  "",
-                  [],
-                );
-              }
-            } catch (e) {
-              // Handle exceptions and show an error message.
-              debugPrint(e.toString());
-              Dialogs.alertDialog(
-                context,
-                "Error",
-                "An unexpected error occurred: ${e.toString()}",
-                "OK",
-                "",
-                [],
-              );
-            }
-          },
-        );
-      },
-    );
   }
 
   final List<Map<String, dynamic>> statusOptions = [
@@ -650,7 +749,25 @@ class _RoomSummaryState extends State<RoomSummary> {
         return status['color'];
       }
     }
+    return null;
+  }
 
-    return null; // Return null if no match is found
+  @override
+  void dispose() {
+    // Dispose existing controllers
+    _folioNameController.dispose();
+    _folioAddressController.dispose();
+    _folioAmountController.dispose();
+    _folioPhoneController.dispose();
+    _folioReceivedAmountController.dispose();
+
+    // Dispose new controllers
+    _customerNameController.dispose();
+    _customerPhoneController.dispose();
+    _receivedAmountController.dispose();
+    _partialAmountController.dispose();
+    _tableNameController.dispose();
+
+    super.dispose();
   }
 }

@@ -15,8 +15,7 @@ class SideNavigation extends StatefulWidget {
 
 class _SideNavigationState extends State<SideNavigation> {
   UserDetails user = Provider.of<UserProvider>(Navigation.getContext()).user;
-  var token = Provider.of<AuthProvider>(Navigation.getContext(), listen: false)
-      .loggedInToken;
+  var token = Provider.of<AuthProvider>(Navigation.getContext(), listen: false).loggedInToken;
   final padding = EdgeInsets.symmetric(horizontal: 20);
   @override
   Widget build(BuildContext context) {

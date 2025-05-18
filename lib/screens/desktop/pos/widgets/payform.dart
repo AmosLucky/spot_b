@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:provider/provider.dart';
+import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/money.dart';
+import 'package:spotstock_inventory/common/provider/attendant_model.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/widgets/attendant_pin.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
 
 class PaymentForm extends StatefulWidget {
   final String app;
@@ -14,9 +20,9 @@ class PaymentForm extends StatefulWidget {
       {super.key,
       required this.onSubmit,
       required this.subtotal,
-        required this.app,
-        required this.data,
-        required this.isInvoice,
+      required this.app,
+      required this.data,
+      required this.isInvoice,
       required this.systemProvider});
 
   @override
@@ -24,6 +30,8 @@ class PaymentForm extends StatefulWidget {
 }
 
 class _PaymentFormState extends State<PaymentForm> {
+  AttendantModel? _selectedAttendant;
+  bool _attendantVerified = false;
   List<String> customers = [];
   List<String> tables = [];
   final TextEditingController customerNameController = TextEditingController();
@@ -43,11 +51,13 @@ class _PaymentFormState extends State<PaymentForm> {
   @override
   void initState() {
     super.initState();
-    isCustomName = widget.data['customerName'] != null ? true :  false;
-    customerNameController.text = widget.data['customerName'] ?? "Walk-in Customer";
+    isCustomName = widget.data['customerName'] != null ? true : false;
+    customerNameController.text =
+        widget.data['customerName'] ?? "Walk-in Customer";
     tableNameController.text = widget.data['table'] ?? "Select a table";
     print("Table ==>> ${widget.data['table']}");
-    customerPhoneController.text = widget.data['customerPhoneNumber'] ?? "Enter phone number";
+    customerPhoneController.text =
+        widget.data['customerPhoneNumber'] ?? "Enter phone number";
     _loadCustomers();
     _loadTables();
   }
@@ -94,6 +104,65 @@ class _PaymentFormState extends State<PaymentForm> {
     }
   }
 
+  void _selectAttendant() {
+    showDialog(
+      context: context,
+      builder: (context) => ChangeNotifierProvider(
+        create: (_) => AttendantProvider(),
+        child: SelectAttendantDialog(
+          systemProvider: widget.systemProvider,
+          onAttendantSelected: (attendant) {
+            setState(() {
+              _selectedAttendant = attendant;
+              _attendantVerified = false; // Reset verification status
+            });
+
+            // If attendant has PIN, prompt for it
+            if (attendant.hasPinSet) {
+              _promptForPin(attendant);
+            } else {
+              // No PIN required, mark as verified
+              setState(() {
+                _attendantVerified = true;
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  void _promptForPin(AttendantModel attendant) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => ChangeNotifierProvider(
+        create: (_) => AttendantProvider(),
+        child: AttendantPinDialog(
+          attendant: attendant,
+          onPinVerified: (verified) {
+            setState(() {
+              _attendantVerified = verified;
+              if (!verified) {
+                _selectedAttendant =
+                    null; // Clear selection if PIN verification failed
+              }
+            });
+
+            if (verified) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Welcome, ${attendant.name}!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -101,7 +170,67 @@ class _PaymentFormState extends State<PaymentForm> {
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('Attendant'),
+            Gap(3),
+            GestureDetector(
+              child: Container(
+                height: 40,
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                    color: ColorsRes.grey,
+                  ),
+                  color: _selectedAttendant != null && _attendantVerified
+                      ? Colors.green.shade50
+                      : Colors.white,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(
+                      _selectedAttendant != null && _attendantVerified
+                          ? Icons.check_circle
+                          : Icons.person,
+                      color: _selectedAttendant != null && _attendantVerified
+                          ? Colors.green
+                          : ColorsRes.grey,
+                      size: 20,
+                    ),
+                    Text(
+                      _selectedAttendant != null
+                          ? '${_selectedAttendant!.name} ${_attendantVerified ? '(Verified)' : '(Not Verified)'}'
+                          : 'Select Attendant',
+                      style: TextStyle(
+                        color: _selectedAttendant != null && _attendantVerified
+                            ? Colors.green.shade700
+                            : Colors.black,
+                        fontWeight:
+                            _selectedAttendant != null && _attendantVerified
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                      ),
+                    ),
+                    TextButton(
+                        onPressed: () {},
+                        child: Text(
+                            _selectedAttendant != null && _attendantVerified
+                                ? 'Change'
+                                : '')),
+                    TextButton(
+                        onPressed: () {},
+                        child: Text(
+                            _selectedAttendant != null && _attendantVerified
+                                ? 'Edit'
+                                : '')),
+                  ],
+                ),
+              ),
+              onTap: _selectAttendant,
+            ),
+            Gap(10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -155,31 +284,32 @@ class _PaymentFormState extends State<PaymentForm> {
                   ),
             isCustomName
                 ? TextField(
-              controller: customerPhoneController,
-              keyboardType: TextInputType.numberWithOptions(),
-              decoration:
-              const InputDecoration(labelText: "Enter Customer Phone number",),
-            ) : SizedBox(),
+                    controller: customerPhoneController,
+                    keyboardType: TextInputType.numberWithOptions(),
+                    decoration: const InputDecoration(
+                      labelText: "Enter Customer Phone number",
+                    ),
+                  )
+                : SizedBox(),
             const SizedBox(height: 10),
-            if(widget.app == 'pos') DropdownButton<String>(
-              isExpanded: true,
-              value: selectedTable,
-              hint: Text(tableNameController.text),
-              items: tables
-                  .map<DropdownMenuItem<String>>((String customer) {
-                return DropdownMenuItem<String>(
-                  value: customer,
-                  child: Text(customer),
-                );
-              }).toList(),
-              onChanged: (String? newTable) {
-                setState(() {
-                  selectedTable = newTable;
-                  tableNameController.text =
-                      newTable ?? "Select a table";
-                });
-              },
-            ),
+            if (widget.app == 'pos')
+              DropdownButton<String>(
+                isExpanded: true,
+                value: selectedTable,
+                hint: Text(tableNameController.text),
+                items: tables.map<DropdownMenuItem<String>>((String customer) {
+                  return DropdownMenuItem<String>(
+                    value: customer,
+                    child: Text(customer),
+                  );
+                }).toList(),
+                onChanged: (String? newTable) {
+                  setState(() {
+                    selectedTable = newTable;
+                    tableNameController.text = newTable ?? "Select a table";
+                  });
+                },
+              ),
             const SizedBox(height: 10),
             TextField(
               readOnly: true,
@@ -201,49 +331,51 @@ class _PaymentFormState extends State<PaymentForm> {
               },
             ),
             const SizedBox(height: 10),
-            if(widget.app == 'pos') Row(
-              children: [
-                const Text("Payment Type: ",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                DropdownButton<String>(
-                  value: paymentType,
-                  items: <String>['Cash', 'Transfer', 'POS']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      paymentType = newValue!;
-                    });
-                  },
-                ),
-              ],
-            ),
+            if (widget.app == 'pos')
+              Row(
+                children: [
+                  const Text("Payment Type: ",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  DropdownButton<String>(
+                    value: paymentType,
+                    items: <String>['Cash', 'Transfer', 'POS']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        paymentType = newValue!;
+                      });
+                    },
+                  ),
+                ],
+              ),
             const SizedBox(height: 10),
-            if(widget.app == 'pos') Row(
-              children: [
-                const Text("Payment Status: ",
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                DropdownButton<String>(
-                  value: paymentStatus,
-                  items: <String>['Paid', 'Unpaid', 'Partial']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      paymentStatus = newValue!;
-                    });
-                  },
-                ),
-              ],
-            ),
+            if (widget.app == 'pos')
+              Row(
+                children: [
+                  const Text("Payment Status: ",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  DropdownButton<String>(
+                    value: paymentStatus,
+                    items: <String>['Paid', 'Unpaid', 'Partial']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        paymentStatus = newValue!;
+                      });
+                    },
+                  ),
+                ],
+              ),
             if (paymentStatus == 'Partial')
               TextField(
                 controller: partialAmountController,

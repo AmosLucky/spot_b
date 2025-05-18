@@ -42,7 +42,7 @@ class _BodyState extends State<Body> {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   List _products = [];
-  List warehouseData = [];
+  List <dynamic> warehouseData = [];
   List _filterProducts = [];
   List _dataProducts = [];
   bool _searching = false;
@@ -55,6 +55,7 @@ class _BodyState extends State<Body> {
   int? tappedIndex;
   bool loadingProduct = false;
   String selectedCategory = '';
+  bool isLoadingWarehouses = false;
   Map<String, dynamic>?  selectedBranch;
 
   final List<Map<String, dynamic>> branches = [
@@ -88,27 +89,54 @@ class _BodyState extends State<Body> {
     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
   }
 
-  Future<void> readProducts() async {
-    setState(() {
-      loadingProduct = true;
-    });
-    final data = await widget.systemProvider.getProducts(1);
-    final wareData = await widget.systemProvider.getWarehouse().then((value) async {
-      log("Warehouse dataa ==>> $value");
+Future<void> readProducts() async {
+  setState(() {
+    loadingProduct = true;
+  });
+  
+  try {
+    // Load warehouse data first
+    warehouseData = await widget.systemProvider.getWarehouse();
+    log("Warehouse data ==>> $warehouseData");
+
+    // Check if we have warehouse data
+    if (warehouseData.isNotEmpty) {
+      // Use first warehouse or selected branch
+      final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+      
+      // Fetch products for this warehouse
+      await systemProvider.fetchProducts(true, true, warehouseId);
+      
+      // Get products
+      final data = await widget.systemProvider.getProducts(1);
+      
       setState(() {
-        warehouseData = value;
+        _products = data;
+        _dataProducts = data;
+        loadingProduct = false;
       });
-      await systemProvider.fetchProducts(true, true, warehouseData[0]['id']);
-    });
+      
+      log("Product data ==>> $data");
+      _filterByCategories();
+    } else {
+      setState(() {
+        loadingProduct = false;
+      });
+      // Handle no warehouses case
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No warehouses available')),
+      );
+    }
+  } catch (e) {
     setState(() {
-      _products = data;
-      _dataProducts = data;
       loadingProduct = false;
     });
-    log("Product data ==>> $data");
-    log("Warehouse dathggjhb ==>> $warehouseData");
-    _filterByCategories();
+    log("Error loading products: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error loading products')),
+    );
   }
+}
 
   Future<List<dynamic>> getProducts() async {
     return await widget.systemProvider.getProducts(0);
@@ -195,45 +223,53 @@ class _BodyState extends State<Body> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header Section for Search Bar and Barcode Scanner
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 3.0, horizontal: 16.0),
-                        child: HeaderSection(
-                          systemProvider: widget.systemProvider,
-                          mediaQuery: widget.mediaQuery,
-                          user: widget.user,
-                          controller: _barcodeController,
-                          onChanged: (value) {
-                            _searchProducts(value);
-                          },
-                          onClearButtonPressed: () {
-                            _barcodeController.clear();
-                            setState(() {
-                              _productSearchResult = _products;
-                              _foundProducts = _productSearchResult;
-                            });
-                          },
-                          onPressedScan: barcodeScan,
-                          items: warehouseData,
-                          selectedBranch: selectedBranch,
-                          onBranchSelected: (value) async {
-                            setState(() {
-                              loadingProduct = true;
-                            });
-                            setState(() {
-                              selectedBranch = value!;
-                            });
-                            await systemProvider.fetchProducts(true, true, selectedBranch?['id']);
-                            var data = await widget.systemProvider.getProducts(1);
-                            setState(() {
-                              _products = data;
-                              _dataProducts = data;
-                              loadingProduct = false;
-                            });
-                          },
-                          hint: selectedBranch == null ? "${warehouseData[0]['attributes']['name'] ?? "Select Branch"}" : selectedBranch?['attributes']['name'], // Handle scan button press
-                        ),
-                      ),
+                     Padding(
+  padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 16.0),
+  child: HeaderSection(
+    systemProvider: widget.systemProvider,
+    mediaQuery: widget.mediaQuery,
+    user: widget.user,
+    controller: _barcodeController,
+    onChanged: (value) => _searchProducts(value),
+    onClearButtonPressed: () {
+      _barcodeController.clear();
+      setState(() {
+        _productSearchResult = _products;
+        _foundProducts = _productSearchResult;
+      });
+    },
+    onPressedScan: barcodeScan,
+    items: warehouseData,
+    selectedBranch: selectedBranch,
+    onBranchSelected: (value) async {
+      if (value == null) return;
+      
+      setState(() {
+        loadingProduct = true;
+        selectedBranch = value;
+      });
+      
+      try {
+        await systemProvider.fetchProducts(true, true, value['id']);
+        final data = await widget.systemProvider.getProducts(1);
+        setState(() {
+          _products = data;
+          _dataProducts = data;
+          loadingProduct = false;
+        });
+      } catch (e) {
+        setState(() {
+          loadingProduct = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading products for branch')),
+        );
+      }
+    },
+    hint: selectedBranch?['attributes']['name'] ?? 
+          (warehouseData.isNotEmpty ? warehouseData[0]['attributes']['name'] : "Select Branch"),
+  ),
+),
 
                       Row(
                         children: [
