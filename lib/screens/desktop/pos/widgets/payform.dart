@@ -32,6 +32,7 @@ class PaymentForm extends StatefulWidget {
 class _PaymentFormState extends State<PaymentForm> {
   AttendantModel? _selectedAttendant;
   bool _attendantVerified = false;
+  late AttendantProvider _attendantProvider;
   List<String> customers = [];
   List<String> tables = [];
   final TextEditingController customerNameController = TextEditingController();
@@ -60,6 +61,8 @@ class _PaymentFormState extends State<PaymentForm> {
         widget.data['customerPhoneNumber'] ?? "Enter phone number";
     _loadCustomers();
     _loadTables();
+    _attendantProvider = AttendantProvider();
+    _attendantProvider.loadAttendants(widget.systemProvider);
   }
 
   void _loadCustomers() async {
@@ -107,21 +110,19 @@ class _PaymentFormState extends State<PaymentForm> {
   void _selectAttendant() {
     showDialog(
       context: context,
-      builder: (context) => ChangeNotifierProvider(
-        create: (_) => AttendantProvider(),
+      builder: (context) => ChangeNotifierProvider.value(
+        value: _attendantProvider, // Use existing provider
         child: SelectAttendantDialog(
           systemProvider: widget.systemProvider,
           onAttendantSelected: (attendant) {
             setState(() {
               _selectedAttendant = attendant;
-              _attendantVerified = false; // Reset verification status
+              _attendantVerified = false;
             });
 
-            // If attendant has PIN, prompt for it
             if (attendant.hasPinSet) {
               _promptForPin(attendant);
             } else {
-              // No PIN required, mark as verified
               setState(() {
                 _attendantVerified = true;
               });
@@ -427,6 +428,7 @@ class _PaymentFormState extends State<PaymentForm> {
 
   @override
   void dispose() {
+    _attendantProvider.dispose();
     customerNameController.dispose();
     receivedAmountController.dispose();
     partialAmountController.dispose();

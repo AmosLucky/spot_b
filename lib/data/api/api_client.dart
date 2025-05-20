@@ -1,11 +1,12 @@
 class ApiClient {
   String imageUrl = "https://test.spotstockinventory.com/";
   //String baseUri = "https://test.spotstockinventory.com/api/";
-  String baseUri = "https://staging.spotstockinventory.com/api/";
+  // String baseUri = "https://staging.spotstockinventory.com/api/";
+  String baseUri = "https://app.spotstockinventory.com/api/";
   String baseUrl;
 
-  //ApiClient() : baseUrl = "https://test.spotstockinventory.com/api/";
-  ApiClient() : baseUrl = "https://staging.spotstockinventory.com/api/";
+  ApiClient() : baseUrl = "https://app.spotstockinventory.com/api/";
+  // ApiClient() : baseUrl = "https://staging.spotstockinventory.com/api/";
 
   String appUrl = "https://test.spotstockinventory.com";
 

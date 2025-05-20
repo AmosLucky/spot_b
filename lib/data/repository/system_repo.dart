@@ -879,6 +879,14 @@ class SystemRepo extends ApiClient {
     final productStockOut = products.isNotEmpty
         ? systemRecords('products', 'instock', products[0].value)
         : 0;
+    final productsOutOfStock = products.isNotEmpty
+        ? systemRecords('products', 'outstock', products[0].value)
+        : 0;
+
+    final totalInventoryQty = products.isNotEmpty
+        ? systemRecords('products', 'totalstock', products[0].value)
+        : 0;
+
     final syncedOrders = products.isNotEmpty
         ? systemRecords('synced', 'orders', products[0].value)
         : 0;
@@ -901,6 +909,8 @@ class SystemRepo extends ApiClient {
       'monthlyHotelSales': monthlyHotelSales,
       'lifetimeHotelSales': lifetimeHotelSales,
       // 'hotelReservationCount': hotelReservationCount ?? 0,
+      'productsOutOfStock': productsOutOfStock ?? 0,
+      'totalInventoryQty': totalInventoryQty ?? 0,
       'customerCount': customerCount ?? 0,
       'productStockOut': productStockOut ?? 0,
       'syncedOrders': syncedOrders ?? 0,
@@ -962,10 +972,11 @@ class SystemRepo extends ApiClient {
       } else if (format == 'outstock') {
         var totalProducts = 0;
         for (var i in data) {
-          var items = i['attributes']['in_stock'] as int;
+          // var items = i['attributes']['in_stock'] as int;
           // var innerData = items['data'] as List;
           if (i['attributes']['in_stock'] == 0) {
-            totalProducts += items;
+            // totalProducts += items;
+            totalProducts++;
           }
         }
         result = totalProducts;
@@ -994,9 +1005,87 @@ class SystemRepo extends ApiClient {
       if (format == 'count') {
         result = data.length;
       }
-    } else if (format == 'outstock') {}
+    } else if (format == 'outstock') {
+      result = data.length;
+    }
     return result;
   }
+
+  // static int systemRecords(String type, String format, String records) {
+  //   var result = 0;
+  //   try {
+  //     var json = jsonDecode(records);
+
+  //     // Handle API response structure - check if the JSON has a 'data' property
+  //     var data = json['data'] != null ? json['data'] as List : json as List;
+
+  //     if (type == 'products') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       } else if (format == 'instock') {
+  //         // Count number of products that have stock > 0
+  //         int inStockCount = 0;
+  //         for (var i in data) {
+  //           var stock = i['attributes']['in_stock'];
+  //           if (stock > 0) {
+  //             inStockCount++;
+  //           }
+  //         }
+  //         result = inStockCount;
+  //       } else if (format == 'outstock') {
+  //         // Count products with stock == 0
+  //         int outOfStockCount = 0;
+  //         for (var i in data) {
+  //           if (i['attributes']['in_stock'] == 0) {
+  //             outOfStockCount++;
+  //           }
+  //         }
+  //         result = outOfStockCount;
+  //       } else if (format == 'totalstock') {
+  //         // Sum all in_stock values for total inventory quantity
+  //         num totalStock = 0;
+  //         for (var i in data) {
+  //           var stockAmount = i['attributes']['in_stock'];
+  //           if (stockAmount > 0) {
+  //             totalStock += stockAmount;
+  //           }
+  //         }
+  //         result = totalStock.toInt();
+  //       }
+  //     } else if (type == 'warehouses') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'categories') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'customers') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'hotel_categories') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'hotel_amenities') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'hotel_rooms') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'synced') {
+  //       // Existing logic for synced orders
+  //       // Implementation depends on your app's requirements
+  //     }
+  //   } catch (e) {
+  //     print('Error in systemRecords: $e');
+  //   }
+
+  //   return result;
+  // }
 
   Future<List<dynamic>> getCustomers() async {
     UserDetails user =
@@ -1978,5 +2067,37 @@ class SystemRepo extends ApiClient {
     );
     invoiceBox.put(newInvoice);
     return {'status': true, 'reference': txnID};
+  }
+
+  Future<Response> fetchStaffsAPI({bool refresh = false}) async {
+    return await _fetchData('staffs?page[size]=0', refresh: refresh);
+  }
+
+  Future<List<dynamic>> getStaffs() async {
+    try {
+      UserDetails user =
+          Provider.of<UserProvider>(Navigation.getContext(), listen: false)
+              .user;
+
+      final store = await DatabaseEngine.instance.getStore();
+      final staffBox = store.box<StoreX>();
+
+      final staffRecord = staffBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("staffs")))
+          .build()
+          .findFirst();
+
+      if (staffRecord != null) {
+        final List<dynamic> staffs = jsonDecode(staffRecord.value);
+        return staffs;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      print("Error retrieving staffs: $error");
+      return [];
+    }
   }
 }
