@@ -77,7 +77,6 @@ class _HeaderState extends State<Header> {
             ),
         firstDate: DateTime(2020),
         lastDate: DateTime(2101),
-        
         builder: (context, child) {
           return Theme(
               data: Theme.of(context).copyWith(
@@ -90,8 +89,7 @@ class _HeaderState extends State<Header> {
                 ),
               ),
               child: child!);
-        }
-        );
+        });
     if (pickedDateRange != null && pickedDateRange != _selectedDateRange) {
       setState(() {
         _selectedDateRange = pickedDateRange;
