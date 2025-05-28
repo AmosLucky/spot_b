@@ -17,6 +17,7 @@ import 'package:spotstock_inventory/common/provider/general_provider.dart';
 import 'package:spotstock_inventory/common/provider/maintenance_provider.dart';
 import 'package:spotstock_inventory/common/provider/markroomfor_maintenance_provider.dart';
 import 'package:spotstock_inventory/common/provider/preference_settings_provider.dart';
+import 'package:spotstock_inventory/common/provider/sales_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
@@ -129,6 +130,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
           ChangeNotifierProvider(create: (_) => AttendantProvider()),
+          ChangeNotifierProvider(create: (_) => SalesProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(
           create: (_) =>

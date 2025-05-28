@@ -297,6 +297,7 @@ class _BodyState extends State<Body> {
                                           return TransactionTile(
                                             transactionId: syncItem.trxId,
                                             amount: syncItem.amount,
+                                            // status: syncItem.status,
                                             customer: syncItem.customerName,
                                             createdAt: syncItem.createdAt,
                                             isSynced: syncItem.sync == 1,
@@ -304,14 +305,15 @@ class _BodyState extends State<Body> {
                                                 syncItem.paymentMethod,
                                             onPrint: () {
                                               Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          PrintScreenDialog(
-                                                            user: widget.user,
-                                                            transactionData:
-                                                                syncItem
-                                                                    .toMap(),
-                                                          )));
+                                                MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      PrintScreenDialog(
+                                                    user: widget.user,
+                                                    transactionData:
+                                                        syncItem.toMap(),
+                                                  ),
+                                                ),
+                                              );
                                             },
                                             onSync: () {},
                                           );

@@ -23,7 +23,6 @@ class Header extends StatefulWidget {
 }
 
 class _HeaderState extends State<Header> {
-
   // @override
   // void initState() {
   //   getData();
@@ -31,7 +30,7 @@ class _HeaderState extends State<Header> {
   //   super.initState();
   // }
 
-    void initState() {
+  void initState() {
     super.initState();
     // Delay the data fetch until after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -39,10 +38,11 @@ class _HeaderState extends State<Header> {
     });
   }
 
- Future  <void> getData() async {
+  Future<void> getData() async {
     await Provider.of<SystemProvider>(context, listen: false)
         .forcefulRefresh(true);
   }
+
   @override
   Widget build(BuildContext context) {
     // Format today's date
@@ -326,26 +326,28 @@ class _HeaderState extends State<Header> {
 
                   // Open register with the entered cash amount
                   var response = await SystemRepo(refresh: false, online: false)
-                      .openRegister(module: module, amount: amountController.text);
+                      .openRegister(
+                          module: module, amount: amountController.text);
 
                   if (response['status'] == true) {
-                    if(module == 'INVENTORY') {
+                    if (module == 'INVENTORY') {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                            return EcosystemDesktop(
-                              systemProvider: widget.systemProvider,
-                              user: widget.user,
-                            );
-                          }));
+                        return EcosystemDesktop(
+                          systemProvider: widget.systemProvider,
+                          user: widget.user,
+                        );
+                      }));
                     } else if (module == 'HOTEL') {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                            return FrontDeskDesktop(
-                              systemProvider: widget.systemProvider,
-                              user: widget.user,
-                            );
-                          }));
-                    };
+                        return FrontDeskDesktop(
+                          systemProvider: widget.systemProvider,
+                          user: widget.user,
+                        );
+                      }));
+                    }
+                    ;
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

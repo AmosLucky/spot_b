@@ -404,7 +404,7 @@ class _BodyState extends State<Body> {
                                                 //     ? downloadReport()
                                                 //     : downloadHotelReport();
                                               },
-                                              child:  Text(
+                                              child: Text(
                                                 'Download',
                                                 style: TextStyle(
                                                   fontSize: 15,

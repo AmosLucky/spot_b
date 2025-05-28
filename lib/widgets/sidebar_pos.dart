@@ -10,6 +10,8 @@ import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/sales_screen_desktop.dart';
+import 'package:spotstock_inventory/screens/desktop/sales/widgets/sale_report_desktop.dart';
+import 'package:spotstock_inventory/screens/desktop/sales/widgets/sales_report.dart';
 
 class SideBarPos extends StatelessWidget {
   final UserDetails user;
@@ -84,6 +86,14 @@ class SideBarPos extends StatelessWidget {
                     onTap: () => _navigateToPage(
                       context,
                       const SalesDesktop(),
+                    ),
+                  ),
+                  SidebarItem(
+                    title: "Sales Report",
+                    icon: MdiIcons.information,
+                    onTap: () => _navigateToPage(
+                      context,
+                      const SalesReportDesktop(),
                     ),
                   ),
                   SidebarItem(

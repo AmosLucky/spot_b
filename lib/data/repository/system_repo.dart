@@ -297,6 +297,7 @@ class SystemRepo extends ApiClient {
     return await _fetchData('hotel/bookings/history', refresh: refresh);
   }
 
+
   Future<Response> fetchAvailableRooms(
       {bool refresh = false,
       required String roomTypeId,
@@ -364,6 +365,44 @@ class SystemRepo extends ApiClient {
       rethrow;
     }
   }
+  // Future<MaintenanceRoomResponse> fetchSalesReport(
+  //     {bool refresh = false}) async {
+  //   try {
+  //     final response =
+  //         await _fetchData('sales', refresh: refresh);
+
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.data);
+  //       final responseModel = MaintenanceRoomResponse.fromJson(data);
+
+  //       // Save to local storage
+  //       await _saveMaintenanceRooms(responseModel.rooms.data);
+  //       print('Maintenance Room ======>>>>>> $response');
+  //       return responseModel;
+  //     }
+  //     throw Exception('Failed to load maintenance rooms');
+  //   } catch (e) {
+  //     // Fallback to local data
+  //     final localRooms = await _getLocalMaintenanceRooms();
+  //     if (localRooms.isNotEmpty) {
+  //       return MaintenanceRoomResponse(
+  //         rooms: MaintenanceRoomData(
+  //           currentPage: 1,
+  //           data: localRooms,
+  //           links: PaginationLinks(),
+  //         ),
+  //         roomTypes: [],
+  //         stats: MaintenanceStats(
+  //           totalRooms: localRooms.length,
+  //           maintenanceRooms:
+  //               localRooms.where((r) => r.status == 'dirty').length,
+  //           maintenancePercentage: 0,
+  //         ),
+  //       );
+  //     }
+  //     rethrow;
+  //   }
+  // }
 
   Future<Response> makeRoomAvailable(int roomId) async {
     String token = await getToken();
@@ -415,7 +454,7 @@ class SystemRepo extends ApiClient {
       box.put(room);
     }
   }
-
+// Save maintenance room
   Future<void> _saveMaintenanceRooms(List<MaintenanceRoom> rooms) async {
     final store = await DatabaseEngine.instance.getStore();
     final box = store.box<MaintenanceRoom>();

@@ -92,7 +92,7 @@ class SystemProvider with ChangeNotifier {
     fetchProducts(true, isConnected, null
         // _connectionStatus
         );
-        await fetchStaffs(true, isConnected);
+    await fetchStaffs(true, isConnected);
 
     print("Fetching Data");
     fetchTables(true, isConnected);
@@ -1250,155 +1250,155 @@ class SystemProvider with ChangeNotifier {
   // }
 
   Future<bool> fetchStaffs(bool refresh, bool connectionStatus) async {
-  UserDetails user =
-      Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-  try {
-    if (connectionStatus) {
-      _responseState = ResponseState.loading;
-      notifyListeners();
-
-      Response response =
-          await SystemRepo(refresh: refresh, online: connectionStatus)
-              .fetchStaffsAPI();
-      print("============= system Repo Result Staffs ===============");
-
-      if (response.statusCode == 200) {
-        final staffData = response.data["data"];
-
-        StoreX staffs = StoreX(
-          name: "staffs",
-          value: jsonEncode(staffData),
-          billerId: user.id.toString(),
-          companyId: user.company!.id.toString(),
-          lastUpdated: DateTime.now().toIso8601String(),
-        );
-
-        final store = await DatabaseEngine.instance.getStore();
-        final staffBox = store.box<StoreX>();
-
-        final existingStaff = staffBox
-            .query(StoreX_.billerId
-                .equals(user.id.toString())
-                .and(StoreX_.name.equals("staffs")))
-            .build()
-            .findFirst();
-
-        if (existingStaff != null) {
-          staffs.id = existingStaff.id;
-          staffBox.put(staffs);
-          print('Staff record updated.');
-        } else {
-          staffBox.put(staffs);
-          print('New staff record inserted.');
-        }
-
-        _responseState = ResponseState.done;
-        notifyListeners();
-        return true;
-      } else {
-        print('Request failed with status: ${response.statusCode}.');
-      }
-    }
-
-    _responseState = ResponseState.error;
-    notifyListeners();
-    return false;
-  } catch (error) {
-    _responseState = ResponseState.error;
-    notifyListeners();
-    print(error);
-    return false;
-  }
-}
-
-Future<List<dynamic>> getStaffs() async {
-  print('🔍 [DEBUG] getStaffs() called');
-  
-  try {
-    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-    print('🔍 [DEBUG] User ID: ${user.id}');
-    
-    final store = await DatabaseEngine.instance.getStore();
-    final staffBox = store.box<StoreX>();
-    
-    final staffRecord = staffBox
-        .query(StoreX_.billerId
-            .equals(user.id.toString())
-            .and(StoreX_.name.equals("staffs")))
-        .build()
-        .findFirst();
-    
-    if (staffRecord != null) {
-      print('🔍 [DEBUG] Found staff record in database');
-      print('🔍 [DEBUG] Staff record value: ${staffRecord.value}');
-      
-      final List<dynamic> staffs = jsonDecode(staffRecord.value);
-      print('🔍 [DEBUG] Decoded staffs: ${staffs.length} items');
-      return staffs;
-    } else {
-      print('⚠️ [WARNING] No staff record found in database');
-      print('🔍 [DEBUG] Trying to fetch from API...');
-      
-      // Try to fetch from API if no local data
-      bool connectionStatus = await InternetUtils.isConnected();
+    UserDetails user =
+        Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    try {
       if (connectionStatus) {
-        print('🔍 [DEBUG] Internet available, fetching staffs...');
-        await fetchStaffs(true, connectionStatus);
-        
-        // Try again to get from local storage
-        final staffRecordRetry = staffBox
-            .query(StoreX_.billerId
-                .equals(user.id.toString())
-                .and(StoreX_.name.equals("staffs")))
-            .build()
-            .findFirst();
-            
-        if (staffRecordRetry != null) {
-          print('🔍 [DEBUG] Found staff record after API fetch');
-          final List<dynamic> staffs = jsonDecode(staffRecordRetry.value);
-          return staffs;
+        _responseState = ResponseState.loading;
+        notifyListeners();
+
+        Response response =
+            await SystemRepo(refresh: refresh, online: connectionStatus)
+                .fetchStaffsAPI();
+        print("============= system Repo Result Staffs ===============");
+
+        if (response.statusCode == 200) {
+          final staffData = response.data["data"];
+
+          StoreX staffs = StoreX(
+            name: "staffs",
+            value: jsonEncode(staffData),
+            billerId: user.id.toString(),
+            companyId: user.company!.id.toString(),
+            lastUpdated: DateTime.now().toIso8601String(),
+          );
+
+          final store = await DatabaseEngine.instance.getStore();
+          final staffBox = store.box<StoreX>();
+
+          final existingStaff = staffBox
+              .query(StoreX_.billerId
+                  .equals(user.id.toString())
+                  .and(StoreX_.name.equals("staffs")))
+              .build()
+              .findFirst();
+
+          if (existingStaff != null) {
+            staffs.id = existingStaff.id;
+            staffBox.put(staffs);
+            print('Staff record updated.');
+          } else {
+            staffBox.put(staffs);
+            print('New staff record inserted.');
+          }
+
+          _responseState = ResponseState.done;
+          notifyListeners();
+          return true;
+        } else {
+          print('Request failed with status: ${response.statusCode}.');
         }
       }
-      
+
+      _responseState = ResponseState.error;
+      notifyListeners();
+      return false;
+    } catch (error) {
+      _responseState = ResponseState.error;
+      notifyListeners();
+      print(error);
+      return false;
+    }
+  }
+
+  Future<List<dynamic>> getStaffs() async {
+    print('🔍 [DEBUG] getStaffs() called');
+
+    try {
+      UserDetails user =
+          Provider.of<UserProvider>(Navigation.getContext(), listen: false)
+              .user;
+      print('🔍 [DEBUG] User ID: ${user.id}');
+
+      final store = await DatabaseEngine.instance.getStore();
+      final staffBox = store.box<StoreX>();
+
+      final staffRecord = staffBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("staffs")))
+          .build()
+          .findFirst();
+
+      if (staffRecord != null) {
+        print('🔍 [DEBUG] Found staff record in database');
+        print('🔍 [DEBUG] Staff record value: ${staffRecord.value}');
+
+        final List<dynamic> staffs = jsonDecode(staffRecord.value);
+        print('🔍 [DEBUG] Decoded staffs: ${staffs.length} items');
+        return staffs;
+      } else {
+        print('⚠️ [WARNING] No staff record found in database');
+        print('🔍 [DEBUG] Trying to fetch from API...');
+
+        // Try to fetch from API if no local data
+        bool connectionStatus = await InternetUtils.isConnected();
+        if (connectionStatus) {
+          print('🔍 [DEBUG] Internet available, fetching staffs...');
+          await fetchStaffs(true, connectionStatus);
+
+          // Try again to get from local storage
+          final staffRecordRetry = staffBox
+              .query(StoreX_.billerId
+                  .equals(user.id.toString())
+                  .and(StoreX_.name.equals("staffs")))
+              .build()
+              .findFirst();
+
+          if (staffRecordRetry != null) {
+            print('🔍 [DEBUG] Found staff record after API fetch');
+            final List<dynamic> staffs = jsonDecode(staffRecordRetry.value);
+            return staffs;
+          }
+        }
+
+        return [];
+      }
+    } catch (error) {
+      print("❌ [ERROR] getStaffs failed: $error");
+      print("❌ [ERROR] Stack trace: ${StackTrace.current}");
       return [];
     }
-  } catch (error) {
-    print("❌ [ERROR] getStaffs failed: $error");
-    print("❌ [ERROR] Stack trace: ${StackTrace.current}");
-    return [];
   }
-}
 
+  Future<List<Map<String, dynamic>>> getAttendants() async {
+    print('🔍 [DEBUG] getAttendants() called');
 
-Future<List<Map<String, dynamic>>> getAttendants() async {
-  print('🔍 [DEBUG] getAttendants() called');
-  
-  try {
-    var response = await getStaffs();
-    print('🔍 [DEBUG] getStaffs() returned: ${response.length} items');
-    print('🔍 [DEBUG] Raw staff data: $response');
-    
-    // Convert to the format expected by AttendantModel
-    var converted = response.map<Map<String, dynamic>>((staff) {
-      print('🔍 [DEBUG] Converting staff: $staff');
-      return {
-        'id': staff['id'].toString(),
-        'name': staff['name'] ?? '',
-        'department': staff['department'] ?? '',
-        'pin_set': staff['pin_set'] ?? false,
-        'pin': staff['pin'],
-      };
-    }).toList();
-    
-    print('🔍 [DEBUG] Converted attendants: $converted');
-    return converted;
-  } catch (error) {
-    print('❌ [ERROR] getAttendants failed: $error');
-    print('❌ [ERROR] Stack trace: ${StackTrace.current}');
-    return [];
+    try {
+      var response = await getStaffs();
+      print('🔍 [DEBUG] getStaffs() returned: ${response.length} items');
+      print('🔍 [DEBUG] Raw staff data: $response');
+
+      // Convert to the format expected by AttendantModel
+      var converted = response.map<Map<String, dynamic>>((staff) {
+        print('🔍 [DEBUG] Converting staff: $staff');
+        return {
+          'id': staff['id'].toString(),
+          'name': staff['name'] ?? '',
+          'department': staff['department'] ?? '',
+          'pin_set': staff['pin_set'] ?? false,
+          'pin': staff['pin'],
+        };
+      }).toList();
+
+      print('🔍 [DEBUG] Converted attendants: $converted');
+      return converted;
+    } catch (error) {
+      print('❌ [ERROR] getAttendants failed: $error');
+      print('❌ [ERROR] Stack trace: ${StackTrace.current}');
+      return [];
+    }
   }
-}
-
 }
 
 // Attendant model class (if you don't have it already)
