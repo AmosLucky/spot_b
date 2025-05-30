@@ -15,5 +15,11 @@ key.properties
 **/*.keystore
 **/*.jks
 
+.packages
+.pub-cache/
+.pub/
+android/app/build/
+ios/build/
+
 # FVM Version Cache
 .fvm/
