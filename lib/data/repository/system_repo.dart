@@ -11,6 +11,7 @@ import 'package:spotstock_inventory/common/helpers/datetime.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/maintenance_model.dart';
+import 'package:spotstock_inventory/data/models/sales_models.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
@@ -296,6 +297,233 @@ class SystemRepo extends ApiClient {
   Future<Response> fetchBookingHistory({bool refresh = false}) async {
     return await _fetchData('hotel/bookings/history', refresh: refresh);
   }
+  // Hotel  booking history
+  // Fetch Sales with filters and pagination
+   // Fetch Sales with filters and pagination
+   Future<SalesResponse> fetchSales({
+    bool refresh = false,
+    int page = 1,
+    String? startDate,
+    String? endDate,
+    String? warehouse,
+    String? customer,
+    String? attendant,
+    String? search,
+    String? type,
+  }) async {
+    try {
+      // Build query parameters
+      final queryParams = <String, String>{
+        'page': page.toString(),
+      };
+
+      if (startDate != null) queryParams['start_date'] = startDate;
+      if (endDate != null) queryParams['end_date'] = endDate;
+      if (warehouse != null) queryParams['warehouse'] = warehouse;
+      if (customer != null) queryParams['customer'] = customer;
+      if (attendant != null) queryParams['attendant'] = attendant;
+      if (search != null) queryParams['search'] = search;
+      if (type != null) queryParams['type'] = type;
+
+      // Build endpoint with query parameters
+      String endpoint = 'sales';
+      if (queryParams.isNotEmpty) {
+        final queryString = queryParams.entries
+            .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+            .join('&');
+        endpoint = 'sales?$queryString';
+      }
+
+      final response = await _fetchData(endpoint, refresh: refresh);
+      
+      if (response.statusCode == 200) {
+        try {
+          // Add debugging for JSON structure
+          print('Raw response data type: ${response.data.runtimeType}');
+          print('Raw response data: ${response.data}');
+          
+          dynamic jsonData;
+          if (response.data is String) {
+            jsonData = json.decode(response.data);
+          } else {
+            jsonData = response.data; // Already parsed
+          }
+          
+          print('Parsed JSON data type: ${jsonData.runtimeType}');
+          print('Parsed JSON keys: ${jsonData is Map ? jsonData.keys : 'Not a map'}');
+          
+          final responseModel = SalesResponse.fromJson(jsonData as Map<String, dynamic>);
+          
+          // Save to local storage
+          await _saveSales(responseModel.data);
+          print('Sales ======>>>>>> Success: ${responseModel.data.length} sales loaded');
+          return responseModel;
+        } catch (parseError) {
+          print('JSON parsing error: $parseError');
+          print('Response data: ${response.data}');
+          rethrow;
+        }
+      }
+      throw Exception('Failed to load sales: HTTP ${response.statusCode}');
+    } catch (e) {
+      print('Error in fetchSales: $e');
+      // Fallback to local data
+      final localSales = await _getLocalSales(
+        page: page,
+        startDate: startDate,
+        endDate: endDate,
+        warehouse: warehouse,
+        customer: customer,
+        attendant: attendant,
+        search: search,
+        type: type,
+      );
+      
+      if (localSales.isNotEmpty) {
+        print('Using local sales data: ${localSales.length} sales');
+        return SalesResponse(
+          data: localSales,
+          meta: PaginationMeta(
+            currentPage: page,
+            from: 1,
+            lastPage: 1,
+            perPage: localSales.length,
+            to: localSales.length,
+            total: localSales.length,
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
+
+  // Save sales to local storage using your DatabaseEngine
+  Future<void> _saveSales(List<Sale> sales) async {
+    try {
+      for (final sale in sales) {
+        // Save sale entity using your DatabaseEngine
+        final saleEntity = SaleEntity.fromSale(sale);
+        final savedSaleId = await dbHelper.insert<SaleEntity>(saleEntity);
+
+        // Save sale items
+        for (final saleItem in sale.saleItems) {
+          final saleItemEntity = SaleItemEntity.fromSaleItem(saleItem, savedSaleId);
+          await dbHelper.insert<SaleItemEntity>(saleItemEntity);
+        }
+      }
+    } catch (e) {
+      print('Error saving sales to local storage: $e');
+    }
+  }
+
+  // Get sales from local storage with filtering using your DatabaseEngine
+  Future<List<Sale>> _getLocalSales({
+    int page = 1,
+    String? startDate,
+    String? endDate,
+    String? warehouse,
+    String? customer,
+    String? attendant,
+    String? search,
+    String? type,
+  }) async {
+    try {
+      final store = await dbHelper.getStore();
+      final saleBox = store.box<SaleEntity>();
+      final saleItemBox = store.box<SaleItemEntity>();
+      
+      // Build the condition following your pattern
+      Condition<SaleEntity>? condition;
+
+      // Start with a base condition (always true if no filters)
+      condition = SaleEntity_.id.greaterThan(0); // Base condition
+
+      // Apply filters by chaining with .and()
+      if (startDate != null) {
+        final start = DateTime.parse(startDate);
+        condition = condition.and(SaleEntity_.date.greaterOrEqual(start.millisecondsSinceEpoch));
+      }
+
+      if (endDate != null) {
+        final end = DateTime.parse(endDate);
+        condition = condition.and(SaleEntity_.date.lessOrEqual(end.millisecondsSinceEpoch));
+      }
+
+      if (warehouse != null && warehouse != 'All Warehouses') {
+        condition = condition.and(SaleEntity_.warehouseName.equals(warehouse));
+      }
+
+      if (customer != null && customer != 'All Customers') {
+        condition = condition.and(SaleEntity_.customerName.equals(customer));
+      }
+
+      if (search != null && search.isNotEmpty) {
+        condition = condition.and(SaleEntity_.referenceCode.contains(search));
+      }
+
+      if (type != null && type != 'All Types') {
+        condition = condition.and(SaleEntity_.type.equals(type));
+      }
+
+      // Build and execute query following your pattern
+      final query = saleBox.query(condition).build();
+      final saleEntities = query.find();
+      query.close();
+
+      // Convert entities to models and load sale items
+      final sales = <Sale>[];
+      for (final saleEntity in saleEntities) {
+        // Get sale items for this sale using your pattern
+        final saleItemQuery = saleItemBox.query(SaleItemEntity_.saleEntityId.equals(saleEntity.id)).build();
+        final saleItemEntities = saleItemQuery.find();
+        saleItemQuery.close();
+
+        // Convert to Sale model
+        final sale = saleEntity.toSale();
+        sale.saleItems.clear();
+        sale.saleItems.addAll(saleItemEntities.map((item) => item.toSaleItem()));
+        
+        sales.add(sale);
+      }
+
+      // Apply pagination
+      final perPage = 10;
+      final startIndex = (page - 1) * perPage;
+      final endIndex = startIndex + perPage;
+      
+      if (startIndex >= sales.length) return [];
+      
+      return sales.sublist(
+        startIndex,
+        endIndex > sales.length ? sales.length : endIndex,
+      );
+    } catch (e) {
+      print('Error getting local sales: $e');
+      return [];
+    }
+  }
+
+  // Clear all local sales data using your DatabaseEngine
+  Future<void> clearLocalSales() async {
+    try {
+      final store = await dbHelper.getStore();
+      final saleBox = store.box<SaleEntity>();
+      final saleItemBox = store.box<SaleItemEntity>();
+      saleBox.removeAll();
+      saleItemBox.removeAll();
+    } catch (e) {
+      print('Error clearing local sales: $e');
+    }
+  }
+
+  // Get local sales count using your DatabaseEngine
+  Future<int> getLocalSalesCount() async {
+    return await dbHelper.count<SaleEntity>();
+  }
+
+
+
+
 
 
   Future<Response> fetchAvailableRooms(
@@ -365,44 +593,45 @@ class SystemRepo extends ApiClient {
       rethrow;
     }
   }
-  // Future<MaintenanceRoomResponse> fetchSalesReport(
-  //     {bool refresh = false}) async {
-  //   try {
-  //     final response =
-  //         await _fetchData('sales', refresh: refresh);
 
-  //     if (response.statusCode == 200) {
-  //       final data = json.decode(response.data);
-  //       final responseModel = MaintenanceRoomResponse.fromJson(data);
+  Future<MaintenanceRoomResponse> fetchSalesReport(
+      {bool refresh = false}) async {
+    try {
+      final response =
+          await _fetchData('sales', refresh: refresh);
 
-  //       // Save to local storage
-  //       await _saveMaintenanceRooms(responseModel.rooms.data);
-  //       print('Maintenance Room ======>>>>>> $response');
-  //       return responseModel;
-  //     }
-  //     throw Exception('Failed to load maintenance rooms');
-  //   } catch (e) {
-  //     // Fallback to local data
-  //     final localRooms = await _getLocalMaintenanceRooms();
-  //     if (localRooms.isNotEmpty) {
-  //       return MaintenanceRoomResponse(
-  //         rooms: MaintenanceRoomData(
-  //           currentPage: 1,
-  //           data: localRooms,
-  //           links: PaginationLinks(),
-  //         ),
-  //         roomTypes: [],
-  //         stats: MaintenanceStats(
-  //           totalRooms: localRooms.length,
-  //           maintenanceRooms:
-  //               localRooms.where((r) => r.status == 'dirty').length,
-  //           maintenancePercentage: 0,
-  //         ),
-  //       );
-  //     }
-  //     rethrow;
-  //   }
-  // }
+      if (response.statusCode == 200) {
+        final data = json.decode(response.data);
+        final responseModel = MaintenanceRoomResponse.fromJson(data);
+
+        // Save to local storage
+        await _saveMaintenanceRooms(responseModel.rooms.data);
+        print('Maintenance Room ======>>>>>> $response');
+        return responseModel;
+      }
+      throw Exception('Failed to load maintenance rooms');
+    } catch (e) {
+      // Fallback to local data
+      final localRooms = await _getLocalMaintenanceRooms();
+      if (localRooms.isNotEmpty) {
+        return MaintenanceRoomResponse(
+          rooms: MaintenanceRoomData(
+            currentPage: 1,
+            data: localRooms,
+            links: PaginationLinks(),
+          ),
+          roomTypes: [],
+          stats: MaintenanceStats(
+            totalRooms: localRooms.length,
+            maintenanceRooms:
+                localRooms.where((r) => r.status == 'dirty').length,
+            maintenancePercentage: 0,
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
 
   Future<Response> makeRoomAvailable(int roomId) async {
     String token = await getToken();

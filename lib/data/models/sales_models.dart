@@ -1,5 +1,12 @@
 
 // models/sale_models.dart
+
+// models/sale_models.dart
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+
 class Sale {
   final int id;
   final String type;
@@ -23,7 +30,7 @@ class Sale {
   final int status;
   final int paymentStatus;
   final String referenceCode;
-  final List<SaleItem> saleItems;
+  List<SaleItem> saleItems;
   final DateTime createdAt;
   final String barcodeUrl;
   final int isOffline;
@@ -60,48 +67,82 @@ class Sale {
   });
 
   factory Sale.fromJson(Map<String, dynamic> json) {
-    final attributes = json['attributes'];
-    return Sale(
-      id: json['id'],
-      type: json['type'],
-      date: DateTime.parse(attributes['date']),
-      isReturn: attributes['is_return'],
-      customerId: attributes['customer_id'],
-      customerName: attributes['customer_name'],
-      warehouseId: attributes['warehouse_id'],
-      warehouseName: attributes['warehouse_name'],
-      taxRate: (attributes['tax_rate'] ?? 0).toDouble(),
-      taxAmount: (attributes['tax_amount'] ?? 0).toDouble(),
-      discount: (attributes['discount'] ?? 0).toDouble(),
-      shipping: (attributes['shipping'] ?? 0).toDouble(),
-      grandTotal: (attributes['grand_total'] ?? 0).toDouble(),
-      receivedAmount: attributes['received_amount']?.toDouble(),
-      paidAmount: (attributes['paid_amount'] ?? 0).toDouble(),
-      partialAmount: double.parse(attributes['partial_amount'] ?? '0'),
-      dueAmount: (attributes['due_amount'] ?? 0).toDouble(),
-      paymentType: attributes['payment_type'],
-      note: attributes['note'],
-      status: attributes['status'],
-      paymentStatus: attributes['payment_status'],
-      referenceCode: attributes['reference_code'],
-      saleItems: (attributes['sale_items'] as List)
-          .map((item) => SaleItem.fromJson(item))
-          .toList(),
-      createdAt: DateTime.parse(attributes['created_at']),
-      barcodeUrl: attributes['barcode_url'],
-      isOffline: attributes['is_offline'],
-      offlineCustomerName: attributes['offline_customer_name'],
-    );
+    try {
+      final attributes = json['attributes'] as Map<String, dynamic>;
+      return Sale(
+        id: json['id'] as int,
+        type: json['type'] as String,
+        date: DateTime.parse(attributes['date'] as String),
+        isReturn: attributes['is_return'] as int,
+        customerId: attributes['customer_id'] as int,
+        customerName: attributes['customer_name'] as String? ?? '',
+        warehouseId: attributes['warehouse_id'] as int,
+        warehouseName: attributes['warehouse_name'] as String? ?? '',
+        taxRate: _parseDouble(attributes['tax_rate']),
+        taxAmount: _parseDouble(attributes['tax_amount']),
+        discount: _parseDouble(attributes['discount']),
+        shipping: _parseDouble(attributes['shipping']),
+        grandTotal: _parseDouble(attributes['grand_total']),
+        receivedAmount: attributes['received_amount'] != null 
+            ? _parseDouble(attributes['received_amount']) 
+            : null,
+        paidAmount: _parseDouble(attributes['paid_amount']),
+        partialAmount: _parseDouble(attributes['partial_amount']),
+        dueAmount: _parseDouble(attributes['due_amount']),
+        paymentType: attributes['payment_type'] as int,
+        note: attributes['note'] as String?,
+        status: attributes['status'] as int,
+        paymentStatus: attributes['payment_status'] as int,
+        referenceCode: attributes['reference_code'] as String? ?? '',
+        saleItems: (attributes['sale_items'] as List<dynamic>? ?? [])
+            .map((item) => SaleItem.fromJson(item as Map<String, dynamic>))
+            .toList(),
+        createdAt: DateTime.parse(attributes['created_at'] as String),
+        barcodeUrl: attributes['barcode_url'] as String? ?? '',
+        isOffline: attributes['is_offline'] as int,
+        offlineCustomerName: attributes['offline_customer_name'] as String?,
+      );
+    } catch (e) {
+      print('Error parsing Sale from JSON: $e');
+      print('JSON data: $json');
+      rethrow;
+    }
+  }
+
+  // Helper method to safely parse doubles
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value) ?? 0.0;
+    }
+    return 0.0;
   }
 
   String get paymentStatusText {
     switch (paymentStatus) {
       case 1:
         return 'Paid';
-      case 0:
+      case 2:
         return 'Unpaid';
+      case 3:
+        return 'Partially Paid';
       default:
-        return 'Partial';
+        return 'Unknown';
+    }
+  }
+
+  Color get paymentStatusColor {
+    switch (paymentStatus) {
+      case 1:
+        return Colors.green;
+      case 2:
+        return Colors.red;
+      case 3:
+        return Colors.orange;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -159,26 +200,43 @@ class SaleItem {
   });
 
   factory SaleItem.fromJson(Map<String, dynamic> json) {
-    return SaleItem(
-      id: json['id'],
-      saleId: json['sale_id'],
-      productId: json['product_id'],
-      tableId: json['table_id'],
-      productPrice: (json['product_price'] ?? 0).toDouble(),
-      netUnitPrice: (json['net_unit_price'] ?? 0).toDouble(),
-      taxType: json['tax_type'],
-      taxValue: json['tax_value']?.toDouble(),
-      taxAmount: (json['tax_amount'] ?? 0).toDouble(),
-      discountType: json['discount_type'],
-      discountValue: (json['discount_value'] ?? 0).toDouble(),
-      discountAmount: (json['discount_amount'] ?? 0).toDouble(),
-      saleUnit: SaleUnit.fromJson(json['sale_unit']),
-      quantity: json['quantity'],
-      subTotal: (json['sub_total'] ?? 0).toDouble(),
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      companyId: json['company_id'],
-    );
+    try {
+      return SaleItem(
+        id: json['id'] as int,
+        saleId: json['sale_id'] as int,
+        productId: json['product_id'] as int,
+        tableId: json['table_id'] as int?,
+        productPrice: _parseDouble(json['product_price']),
+        netUnitPrice: _parseDouble(json['net_unit_price']),
+        taxType: json['tax_type'] as int,
+        taxValue: json['tax_value'] != null ? _parseDouble(json['tax_value']) : null,
+        taxAmount: _parseDouble(json['tax_amount']),
+        discountType: json['discount_type'] as int,
+        discountValue: _parseDouble(json['discount_value']),
+        discountAmount: _parseDouble(json['discount_amount']),
+        saleUnit: SaleUnit.fromJson(json['sale_unit'] as Map<String, dynamic>),
+        quantity: json['quantity'] as int,
+        subTotal: _parseDouble(json['sub_total']),
+        createdAt: DateTime.parse(json['created_at'] as String),
+        updatedAt: DateTime.parse(json['updated_at'] as String),
+        companyId: json['company_id'] as int?,
+      );
+    } catch (e) {
+      print('Error parsing SaleItem from JSON: $e');
+      print('JSON data: $json');
+      rethrow;
+    }
+  }
+
+  // Helper method to safely parse doubles
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      return double.tryParse(value) ?? 0.0;
+    }
+    return 0.0;
   }
 }
 
@@ -202,15 +260,21 @@ class SaleUnit {
   });
 
   factory SaleUnit.fromJson(Map<String, dynamic> json) {
-    return SaleUnit(
-      id: json['id'],
-      name: json['name'],
-      shortName: json['short_name'],
-      baseUnit: json['base_unit'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-      companyId: json['company_id'],
-    );
+    try {
+      return SaleUnit(
+        id: json['id'] as int,
+        name: json['name'] as String? ?? '',
+        shortName: json['short_name'] as String? ?? '',
+        baseUnit: json['base_unit'] as int,
+        createdAt: DateTime.parse(json['created_at'] as String),
+        updatedAt: DateTime.parse(json['updated_at'] as String),
+        companyId: json['company_id'] as int,
+      );
+    } catch (e) {
+      print('Error parsing SaleUnit from JSON: $e');
+      print('JSON data: $json');
+      rethrow;
+    }
   }
 }
 
@@ -224,10 +288,20 @@ class SalesResponse {
   });
 
   factory SalesResponse.fromJson(Map<String, dynamic> json) {
-    return SalesResponse(
-      data: (json['data'] as List).map((sale) => Sale.fromJson(sale)).toList(),
-      meta: PaginationMeta.fromJson(json['meta']),
-    );
+    try {
+      return SalesResponse(
+        data: (json['data'] as List<dynamic>? ?? [])
+            .map((sale) => Sale.fromJson(sale as Map<String, dynamic>))
+            .toList(),
+        meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>? ?? {}),
+      );
+    } catch (e) {
+      print('Error parsing SalesResponse from JSON: $e');
+      print('JSON keys: ${json.keys}');
+      print('Data type: ${json['data']?.runtimeType}');
+      print('Meta type: ${json['meta']?.runtimeType}');
+      rethrow;
+    }
   }
 }
 
@@ -249,13 +323,27 @@ class PaginationMeta {
   });
 
   factory PaginationMeta.fromJson(Map<String, dynamic> json) {
-    return PaginationMeta(
-      currentPage: json['current_page'],
-      from: json['from'],
-      lastPage: json['last_page'],
-      perPage: json['per_page'],
-      to: json['to'],
-      total: json['total'],
-    );
+    try {
+      return PaginationMeta(
+        currentPage: json['current_page'] as int? ?? 1,
+        from: json['from'] as int? ?? 1,
+        lastPage: json['last_page'] as int? ?? 1,
+        perPage: json['per_page'] as int? ?? 10,
+        to: json['to'] as int? ?? 1,
+        total: json['total'] as int? ?? 0,
+      );
+    } catch (e) {
+      print('Error parsing PaginationMeta from JSON: $e');
+      print('JSON data: $json');
+      // Return default values if parsing fails
+      return PaginationMeta(
+        currentPage: 1,
+        from: 1,
+        lastPage: 1,
+        perPage: 10,
+        to: 1,
+        total: 0,
+      );
+    }
   }
 }

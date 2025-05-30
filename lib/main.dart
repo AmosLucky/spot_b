@@ -129,8 +129,10 @@ class _MyAppState extends State<MyApp> {
 
     return MultiProvider(
       providers: [
-          ChangeNotifierProvider(create: (_) => AttendantProvider()),
-          ChangeNotifierProvider(create: (_) => SalesProvider()),
+        ChangeNotifierProvider(create: (_) => AttendantProvider()),
+        ChangeNotifierProvider(
+            create: (_) =>
+                SalesProvider(SystemRepo(refresh: false, online: true))),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(
           create: (_) =>

@@ -2,8 +2,11 @@
 // providers/sales_provider.dart
 import 'package:flutter/material.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
+import 'package:spotstock_inventory/data/repository/system_repo.dart';
 
 class SalesProvider with ChangeNotifier {
+  final SystemRepo _systemRepo;
+  
   List<Sale> _sales = [];
   PaginationMeta? _meta;
   bool _isLoading = false;
@@ -18,6 +21,8 @@ class SalesProvider with ChangeNotifier {
   String? _selectedType;
   String? _searchQuery;
   int _currentPage = 1;
+
+  SalesProvider(this._systemRepo);
 
   // Getters
   List<Sale> get sales => _sales;
@@ -97,33 +102,52 @@ class SalesProvider with ChangeNotifier {
     _error = null;
     notifyListeners();
 
-    // try {
-    //   final response = await SalesService.fetchSales(
-    //     page: _currentPage,
-    //     startDate: _startDate,
-    //     endDate: _endDate,
-    //     warehouse: _selectedWarehouse,
-    //     customer: _selectedCustomer,
-    //     attendant: _selectedAttendant,
-    //     search: _searchQuery,
-    //     type: _selectedType,
-    //   );
+    try {
+      final response = await _systemRepo.fetchSales(
+        refresh: refresh,
+        page: _currentPage,
+        startDate: _startDate,
+        endDate: _endDate,
+        warehouse: _selectedWarehouse,
+        customer: _selectedCustomer,
+        attendant: _selectedAttendant,
+        search: _searchQuery,
+        type: _selectedType,
+      );
 
-    //   _sales = response.data;
-    //   _meta = response.meta;
-    //   _error = null;
-    // } catch (e) {
-    //   _error = e.toString();
-    //   _sales = [];
-    //   _meta = null;
-    // } finally {
-    //   _isLoading = false;
-    //   notifyListeners();
-    // }
+      _sales = response.data;
+      _meta = response.meta;
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+      _sales = [];
+      _meta = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   // Apply filters and fetch data
   Future<void> applyFilters() async {
     await fetchSales(refresh: true);
+  }
+
+  // Clear local sales data
+  Future<void> clearLocalData() async {
+    try {
+      await _systemRepo.clearLocalSales();
+      _sales = [];
+      _meta = null;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  // Get local sales count
+  Future<int> getLocalSalesCount() async {
+    return await _systemRepo.getLocalSalesCount();
   }
 }
