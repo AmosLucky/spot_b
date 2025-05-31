@@ -43,9 +43,9 @@ class _BodyState extends State<Body> {
 
   List _products = [];
   List warehouseData = [];
-  List _filterProducts = [];
+  final List _filterProducts = [];
   List _dataProducts = [];
-  bool _searching = false;
+  final bool _searching = false;
   bool _isInvoiceOpen = false;
   Map _registerInfo = {};
   List categoryData = [];
@@ -141,7 +141,7 @@ class _BodyState extends State<Body> {
     if (status.isGranted) {
       //Scan QR code
       String? barcode = ""; //await scanner.scan();
-      if (barcode == null || barcode == "-1") {
+      if (barcode == "-1") {
         setState(() {
           barcode = '';
         });

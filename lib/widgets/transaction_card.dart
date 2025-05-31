@@ -8,12 +8,12 @@ class TransactionCard extends StatelessWidget {
   final bool isMobile;
 
   const TransactionCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.titleColor,
     required this.stats,
     required this.isMobile,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +69,12 @@ class TransactionCard extends StatelessWidget {
           height: 6,
         ),
         Text(
-          "${title}",
+          "$title",
           style: const TextStyle(
               color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         Text(
-          "${desc}",
+          "$desc",
           style: TextStyle(
               fontSize: 12, color: grayColor, fontWeight: FontWeight.bold),
         ),

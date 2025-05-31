@@ -145,7 +145,7 @@ class SideBarInventory extends StatelessWidget {
 class SidebarItem extends StatelessWidget {
   final String title;
   final VoidCallback? onTap;
-  const SidebarItem({required this.title, this.onTap});
+  const SidebarItem({super.key, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {

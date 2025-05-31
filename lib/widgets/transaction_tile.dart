@@ -13,7 +13,7 @@ class TransactionTile extends StatelessWidget {
   final VoidCallback onSync; // Callback for sync action
 
   const TransactionTile({
-    Key? key,
+    super.key,
     required this.transactionId,
     required this.customer,
     required this.amount,
@@ -22,7 +22,7 @@ class TransactionTile extends StatelessWidget {
     required this.paymentMethod, // Include payment method in the constructor
     required this.onPrint, // Accept print callback
     required this.onSync, // Accept sync callback
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

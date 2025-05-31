@@ -8,12 +8,12 @@ class PreferenceSettingsHelper {
   static const dailyNotification = 'daily_notification';
 
   Future<bool> get isDailyNotificationActive async {
-    final prefs = await sharedPreferences;
+    final prefs = sharedPreferences;
     return prefs.getBool(dailyNotification) ?? false;
   }
 
   void setDailyNotification(bool value) async {
-    final prefs = await sharedPreferences;
+    final prefs = sharedPreferences;
     prefs.setBool(dailyNotification, value);
   }
 
@@ -22,12 +22,12 @@ class PreferenceSettingsHelper {
 
   // for theme adjustment
   Future<bool> get isDarkTheme async {
-    final prefs = await sharedPreferences;
+    final prefs = sharedPreferences;
     return prefs.getBool(darkTheme) ?? false;
   }
 
   void setDarkTheme(bool value) async {
-    final prefs = await sharedPreferences;
+    final prefs = sharedPreferences;
     prefs.setBool(darkTheme, value);
   }
 }

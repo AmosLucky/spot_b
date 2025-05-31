@@ -118,7 +118,7 @@ Future<Uint8List> generateSamplePdf(
                         (item.price.toStringAsFixed(2)),
                         ((item.price * item.quantity).toStringAsFixed(2))
                       ];
-                    }).toList(),
+                    }),
                   ],
                   cellAlignment: pw.Alignment.centerLeft,
                   cellPadding: pw.EdgeInsets.symmetric(horizontal: 0, vertical: 2),

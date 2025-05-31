@@ -483,7 +483,7 @@ class SystemProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           final categoryData = response.data["data"];
 
-          StoreX hotel_categories = StoreX(
+          StoreX hotelCategories = StoreX(
             name: "hotel_categories",
             value: jsonEncode(
                 categoryData), // Encode the entire categoryData into JSON
@@ -505,14 +505,14 @@ class SystemProvider with ChangeNotifier {
 
           if (existingCategory != null) {
             // Record exists, update it
-            hotel_categories.id =
+            hotelCategories.id =
                 existingCategory.id; // Ensure it has the same ID for updating
             categoryBox
-                .put(hotel_categories); // This will update the existing record
+                .put(hotelCategories); // This will update the existing record
             print('Hotel Category record updated.');
           } else {
             // No record exists, insert new
-            categoryBox.put(hotel_categories); // This will insert a new record
+            categoryBox.put(hotelCategories); // This will insert a new record
             print('New Hotel category record inserted.');
           }
 
@@ -552,7 +552,7 @@ class SystemProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           final categoryData = response.data["data"];
 
-          StoreX hotel_amenities = StoreX(
+          StoreX hotelAmenities = StoreX(
             name: "hotel_amenities",
             value: jsonEncode(
                 categoryData), // Encode the entire categoryData into JSON
@@ -574,14 +574,14 @@ class SystemProvider with ChangeNotifier {
 
           if (existingCategory != null) {
             // Record exists, update it
-            hotel_amenities.id =
+            hotelAmenities.id =
                 existingCategory.id; // Ensure it has the same ID for updating
             categoryBox
-                .put(hotel_amenities); // This will update the existing record
+                .put(hotelAmenities); // This will update the existing record
             print('Hotel Amenity record updated.');
           } else {
             // No record exists, insert new
-            categoryBox.put(hotel_amenities); // This will insert a new record
+            categoryBox.put(hotelAmenities); // This will insert a new record
             print('New Hotel amenity record inserted.');
           }
 
@@ -620,7 +620,7 @@ class SystemProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           final categoryData = response.data["data"];
 
-          StoreX hotel_rooms = StoreX(
+          StoreX hotelRooms = StoreX(
             name: "hotel_rooms",
             value: jsonEncode(
                 categoryData), // Encode the entire categoryData into JSON
@@ -642,14 +642,14 @@ class SystemProvider with ChangeNotifier {
 
           if (existingCategory != null) {
             // Record exists, update it
-            hotel_rooms.id =
+            hotelRooms.id =
                 existingCategory.id; // Ensure it has the same ID for updating
             categoryBox
-                .put(hotel_rooms); // This will update the existing record
+                .put(hotelRooms); // This will update the existing record
             print('Hotel Room record updated.');
           } else {
             // No record exists, insert new
-            categoryBox.put(hotel_rooms); // This will insert a new record
+            categoryBox.put(hotelRooms); // This will insert a new record
             print('New Hotel room record inserted.');
           }
 
@@ -690,7 +690,7 @@ class SystemProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           final categoryData = response.data["data"];
 
-          StoreX hotel_reservations = StoreX(
+          StoreX hotelReservations = StoreX(
             name: "hotel_reservations",
             value: jsonEncode(
                 categoryData), // Encode the entire categoryData into JSON
@@ -712,15 +712,15 @@ class SystemProvider with ChangeNotifier {
 
           if (existingCategory != null) {
             // Record exists, update it
-            hotel_reservations.id =
+            hotelReservations.id =
                 existingCategory.id; // Ensure it has the same ID for updating
             categoryBox.put(
-                hotel_reservations); // This will update the existing record
+                hotelReservations); // This will update the existing record
             print('Hotel Reservations record updated.');
           } else {
             // No record exists, insert new
             categoryBox
-                .put(hotel_reservations); // This will insert a new record
+                .put(hotelReservations); // This will insert a new record
             print('New Hotel reservation record inserted.');
           }
 
@@ -755,7 +755,7 @@ class SystemProvider with ChangeNotifier {
         Response response =
             await SystemRepo(refresh: refresh, online: connectionStatus)
                 .fetchProductsAPI(id: warehouseId);
-        print("Response ==>> ${response}");
+        print("Response ==>> $response");
         print("============= system Repo Result Product ===============");
 
         if (response.statusCode == 200) {
@@ -828,7 +828,7 @@ class SystemProvider with ChangeNotifier {
     try {
       var response = await SystemRepo(refresh: false, online: false).fetchRoomTypes();
       _roomTypesItems = response.data['data'];
-      print("Fetched room data ${response}");
+      print("Fetched room data $response");
       return response.data;
     } catch (error) {
       return [];

@@ -7,7 +7,7 @@ class HomeCard extends StatelessWidget {
   final String title;
   final String value;
 
-  const HomeCard({required this.title, required this.value});
+  const HomeCard({super.key, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {

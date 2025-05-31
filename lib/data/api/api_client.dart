@@ -20,7 +20,7 @@ class ApiClient {
       };
     }
     return {
-      "Authorization": "Bearer " + "BadToken",
+      "Authorization": "Bearer " "BadToken",
     };
   }
 }

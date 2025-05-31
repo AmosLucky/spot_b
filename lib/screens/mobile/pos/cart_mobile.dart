@@ -137,7 +137,7 @@ class _CartMobileState extends State<CartMobile> {
                     child: Container(
                                    // height: screenSize.height,
                                     //width: double.infinity,
-                                    child: cart.items.length == 0
+                                    child: cart.items.isEmpty
                       ? Center(child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -183,7 +183,7 @@ class _CartMobileState extends State<CartMobile> {
                             fit: BoxFit.cover,
                             placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator()),
-                            imageUrl: "${imageUrl}",
+                            imageUrl: imageUrl,
                           ),
                           subtitle:
                           Row(
@@ -228,7 +228,7 @@ class _CartMobileState extends State<CartMobile> {
                                   _editQuantity(
                                     context,
                                     index,
-                                    cartItem.quantity!,
+                                    cartItem.quantity,
                                   );
                                 },
                                 child: Text(

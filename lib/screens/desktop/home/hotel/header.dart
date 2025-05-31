@@ -251,7 +251,7 @@ class Header extends StatelessWidget {
   // Method to show the POS dialog with validation
   void _showPOSDialog(BuildContext context, String module) {
     final TextEditingController amountController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -259,7 +259,7 @@ class Header extends StatelessWidget {
         return AlertDialog(
           title: Text("$module Register"),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize:
                   MainAxisSize.min, // Set column height based on content
@@ -293,7 +293,7 @@ class Header extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 // Validate the form before proceeding
-                if (_formKey.currentState?.validate() ?? false) {
+                if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(); // Close the dialog
 
                   // Open register with the entered cash amount
@@ -339,7 +339,7 @@ class Header extends StatelessWidget {
   // Method to show the POS dialog with validation
   void _showPOSSDialog(BuildContext context, String module) {
     final TextEditingController amountController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -347,7 +347,7 @@ class Header extends StatelessWidget {
         return AlertDialog(
           title: Text("$module Register"),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize:
               MainAxisSize.min, // Set column height based on content
@@ -380,7 +380,7 @@ class Header extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 // Validate the form before proceeding
-                if (_formKey.currentState?.validate() ?? false) {
+                if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(); // Close the dialog
 
                   // Open register with the entered cash amount
@@ -404,7 +404,7 @@ class Header extends StatelessWidget {
                               user: user,
                             );
                           }));
-                    };
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

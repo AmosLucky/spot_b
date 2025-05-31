@@ -10,7 +10,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 
 import '../../../../data/models/userdetails.dart';
-import '../list_printers.dart';
 import '../print_invoices.dart';
 import '../printusb.dart';
 

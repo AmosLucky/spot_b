@@ -81,12 +81,12 @@ class AuthProvider extends ChangeNotifier {
 
   // for user authentication
   Future<String> get isLoggedInToken async {
-    final prefs = await sharedPreferences;
+    final prefs = sharedPreferences;
     return prefs.getString(loggedInToken) ?? "";
   }
 
   void setLoggedIn(String value) async {
-    final prefs = await sharedPreferences;
+    final prefs = sharedPreferences;
     prefs.setString(loggedInToken, value);
   }
 }

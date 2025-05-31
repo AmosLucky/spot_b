@@ -52,18 +52,24 @@ class DateTimeHelper {
 
   static String timeAgo(DateTime d) {
     Duration diff = DateTime.now().difference(d);
-    if (diff.inDays > 365)
+    if (diff.inDays > 365) {
       return "${(diff.inDays / 365).floor()} ${(diff.inDays / 365).floor() == 1 ? "y" : "yrs"} ago";
-    if (diff.inDays > 30)
+    }
+    if (diff.inDays > 30) {
       return "${(diff.inDays / 30).floor()} ${(diff.inDays / 30).floor() == 1 ? "m" : "ms"} ago";
-    if (diff.inDays > 7)
+    }
+    if (diff.inDays > 7) {
       return "${(diff.inDays / 7).floor()} ${(diff.inDays / 7).floor() == 1 ? "wk" : "wks"} ago";
-    if (diff.inDays > 0)
+    }
+    if (diff.inDays > 0) {
       return "${diff.inDays} ${diff.inDays == 1 ? "d" : "ds"} ago";
-    if (diff.inHours > 0)
+    }
+    if (diff.inHours > 0) {
       return "${diff.inHours} ${diff.inHours == 1 ? "hr" : "hrs"} ago";
-    if (diff.inMinutes > 0)
+    }
+    if (diff.inMinutes > 0) {
       return "${diff.inMinutes} ${diff.inMinutes == 1 ? "m" : "mins"} ago";
+    }
     return "just now";
   }
 

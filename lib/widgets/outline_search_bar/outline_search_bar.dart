@@ -159,7 +159,7 @@ class OutlineSearchBar extends StatefulWidget {
   final FocusNode? focusNode;
 
   const OutlineSearchBar({
-    Key? key,
+    super.key,
     this.textEditingController,
     this.keyboardType = TextInputType.text,
     this.textInputAction = TextInputAction.search,
@@ -202,8 +202,7 @@ class OutlineSearchBar extends StatefulWidget {
   })  : assert(borderWidth >= 0.0),
         assert(elevation >= 0.0),
         assert(cursorWidth >= 0.0),
-        assert(debounceDelay >= 0),
-        super(key: key);
+        assert(debounceDelay >= 0);
 
   @override
   _OutlineSearchBarState createState() => _OutlineSearchBarState();

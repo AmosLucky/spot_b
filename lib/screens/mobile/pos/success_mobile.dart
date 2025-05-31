@@ -75,7 +75,7 @@ class _SuccessMobileState extends State<SuccessMobile> {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10.0))),
                         child: SelectableText(
-                          "${widget.txnID}",
+                          widget.txnID,
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -136,7 +136,7 @@ class _SuccessMobileState extends State<SuccessMobile> {
                             onTap: () {
                               Navigator.pushReplacement(
                                   context,
-                                  new MaterialPageRoute(
+                                  MaterialPageRoute(
                                     builder: (BuildContext context) =>
                                         HomeScreenMobile(),
                                   ));
@@ -171,6 +171,11 @@ MaterialButton viewMoreButtons(String title, VoidCallback fun) {
     onPressed: fun,
     textColor: Colors.white,
     color: const Color(0xffFFAC38),
+    height: 55,
+    minWidth: 700,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20), topRight: Radius.circular(20))),
     child: SizedBox(
       width: double.infinity,
       child: Text(
@@ -178,11 +183,6 @@ MaterialButton viewMoreButtons(String title, VoidCallback fun) {
         textAlign: TextAlign.left,
       ),
     ),
-    height: 55,
-    minWidth: 700,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20), topRight: Radius.circular(20))),
   );
 }
 
@@ -203,7 +203,7 @@ showPowerBottomSheet(BuildContext context) => showModalBottomSheet(
           child: Column(
             children: <Widget>[
               viewMoreButtons(
-                  "Close Transaction", () => {Navigator.pop(context)}),
+                  "Close Transaction", () {Navigator.pop(context);}),
               SizedBox(height: 10),
               listItemContainer("Date of Transaction", "17th April, 2019"),
               listItemContainer("Transaction References", "KED12435353636"),
@@ -219,6 +219,9 @@ Widget listItemContainer(String title, String value) => Container(
       margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       padding: EdgeInsets.symmetric(vertical: 10.0),
       width: double.infinity,
+      decoration: BoxDecoration(
+          border: Border(
+              bottom: BorderSide(width: 1.0, color: Color(0xffC4C4C4)))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -238,7 +241,4 @@ Widget listItemContainer(String title, String value) => Container(
           SizedBox(height: 5),
         ],
       ),
-      decoration: BoxDecoration(
-          border: new Border(
-              bottom: new BorderSide(width: 1.0, color: Color(0xffC4C4C4)))),
     );

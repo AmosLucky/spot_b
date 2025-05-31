@@ -42,7 +42,7 @@ class _BodyState extends State<Body> {
   List? hotelReportData;
   List? registerData;
   int? registerIndex;
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   // Callback function to handle the date range selection from the Header
   void _handleDateRangeSelection(DateTimeRange selectedDateRange) {

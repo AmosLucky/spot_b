@@ -44,10 +44,10 @@ class _BodyState extends State<Body> {
 
   List _rooms = [];
   List _hotelCategories = [];
-  List _filterRooms = [];
+  final List _filterRooms = [];
   List _dataRooms = [];
-  bool _searching = false;
-  bool _isInvoiceOpen = false;
+  final bool _searching = false;
+  final bool _isInvoiceOpen = false;
   Map _registerInfo = {};
   Map<String, dynamic> selectedRoom = {};
   String btnAction = "book_now";
@@ -144,7 +144,7 @@ class _BodyState extends State<Body> {
     print("---------------- rooms types -------------");
     print(response);
     //systemProvider.roomTypesItems;
-    print("room result ==>> ${response}");
+    print("room result ==>> $response");
     setState(() {
       roomResult = response;
       searchingRooms = false;
@@ -213,7 +213,7 @@ class _BodyState extends State<Body> {
                     maxHeight:
                     MediaQuery.of(context).size.height, // Set max height
                   ),
-                  child: Container(
+                  child: SizedBox(
                     width: 200, // Fixed width for sidebar
                     child: SideBarHotel(
                       vertical: 20,
@@ -371,7 +371,7 @@ class _BodyState extends State<Body> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
+                          SizedBox(
                             width: 30.w,
                             height: 5.h,
                             child: !searchingRooms ? ElevatedButton(

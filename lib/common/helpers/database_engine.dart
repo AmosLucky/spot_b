@@ -1,4 +1,3 @@
-import 'package:objectbox/objectbox.dart';
 import 'package:spotstock_inventory/objectbox.g.dart'; // Ensure this file is generated correctly
 
 class DatabaseEngine {

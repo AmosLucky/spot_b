@@ -292,7 +292,7 @@ class _PrintScreenDialogState extends State<PrintScreenDialog> {
     Item item = Item(widget.transactionData['roomName'], int.parse(widget.transactionData['duration']), double.parse(widget.transactionData['perNight']));
     hotelItems.add(item);
 
-    print("Hotel item ==>> ${hotelItems}");
+    print("Hotel item ==>> $hotelItems");
 
     // // Parse the items
     // for (var itemData in itemsData) {

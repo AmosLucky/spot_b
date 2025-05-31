@@ -6,9 +6,9 @@ import 'widgets.dart';
 class FormLabelFieldWidget extends StatelessWidget {
   final String label;
   const FormLabelFieldWidget({
-    Key? key,
+    super.key,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

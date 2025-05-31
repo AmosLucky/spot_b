@@ -4,8 +4,7 @@ import 'package:spotstock_inventory/common/common.dart';
 class DatabaseCheckScreen extends StatefulWidget {
   final Function onRetry; // Accept a retry function as a parameter
 
-  const DatabaseCheckScreen({required this.onRetry, Key? key})
-      : super(key: key);
+  const DatabaseCheckScreen({required this.onRetry, super.key});
 
   @override
   _DatabaseCheckScreenState createState() => _DatabaseCheckScreenState();

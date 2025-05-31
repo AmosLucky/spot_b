@@ -7,7 +7,7 @@ class SlideDialog extends StatefulWidget {
   final Color? backgroundColor;
   final Color pillColor;
 
-  SlideDialog({
+  const SlideDialog({super.key, 
     required this.child,
     required this.pillColor,
     required this.backgroundColor,
@@ -38,9 +38,9 @@ class SlideDialog extends StatefulWidget {
           child: Opacity(
             opacity: animation1.value,
             child: SlideDialog(
-              child: child,
               pillColor: pillColor ?? Colors.white,
               backgroundColor: backgroundColor ?? Colors.black,
+              child: child,
             ),
           ),
         );
@@ -73,7 +73,7 @@ class _SlideDialogState extends State<SlideDialog> {
         removeBottom: true,
         context: context,
         child: Center(
-          child: Container(
+          child: SizedBox(
             width: deviceWidth,
             height: deviceHeight / 1.0,
             child: Material(
@@ -81,6 +81,12 @@ class _SlideDialogState extends State<SlideDialog> {
                   Theme.of(context).dialogBackgroundColor,
               elevation: 24.0,
               type: MaterialType.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
+              ),
               child: Column(
                 children: <Widget>[
                   PillGesture(
@@ -91,12 +97,6 @@ class _SlideDialogState extends State<SlideDialog> {
                   ),
                   widget.child,
                 ],
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
               ),
             ),
           ),

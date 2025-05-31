@@ -44,7 +44,7 @@ class _BodyState extends State<Body> {
                     maxHeight:
                         MediaQuery.of(context).size.height, // Set max height
                   ),
-                  child: Container(
+                  child: SizedBox(
                     width: 200, // Fixed width for sidebar
                     child: SideBarInventory(
                         vertical: 20,

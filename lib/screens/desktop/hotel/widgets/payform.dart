@@ -38,10 +38,10 @@ class _PaymentFormState extends State<PaymentForm> {
   }
 
   void _loadCustomers() async {
-    var _customers = await getCustomers();
+    var customers = await getCustomers();
     if (mounted) {
       setState(() {
-        customers = _customers;
+        customers = customers;
       });
     }
   }

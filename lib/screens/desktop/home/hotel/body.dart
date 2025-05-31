@@ -24,7 +24,7 @@ class _BodyState extends State<Body> {
   @override
   List _rooms = [];
   List _hotelCategories = [];
-  List _filterRooms = [];
+  final List _filterRooms = [];
   List _dataRooms = [];
   List? _foundProducts = [];
   List? stations = [];
@@ -88,6 +88,7 @@ class _BodyState extends State<Body> {
     super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -104,7 +105,7 @@ class _BodyState extends State<Body> {
                     maxHeight:
                         MediaQuery.of(context).size.height, // Set max height
                   ),
-                  child: Container(
+                  child: SizedBox(
                     width: 200, // Fixed width for sidebar
                     child: SideBarHotel(
                       vertical: 20,

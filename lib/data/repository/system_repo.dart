@@ -84,7 +84,7 @@ class SystemRepo extends ApiClient {
   }
 
   // Perform GET request with caching and token authorization
-  Future<Response> _fetchRoomTypes(String endpoint, {bool refresh = false}) async {
+  Future<Response> _fetchRoomTypes(String endpoint) async {
     String token = await getToken(); // Get token using the helper method
 
     print("Fetching: $baseUri$endpoint");
@@ -164,7 +164,7 @@ class SystemRepo extends ApiClient {
   }
 
   Future<Response> fetchAvailableRooms({bool refresh = false, required String roomTypeId, required noOfAdult, required noOfChildren, required startDate, required endDate, required noOfRooms}) async {
-    return await _fetchData('hotel/book-rooms/room-search?room_type_id=${roomTypeId}&adult=${noOfAdult}&children=${noOfChildren}&date=${startDate}-${endDate}&rooms=${noOfRooms}', refresh: refresh);
+    return await _fetchData('hotel/book-rooms/room-search?room_type_id=$roomTypeId&adult=$noOfAdult&children=$noOfChildren&date=$startDate-$endDate&rooms=$noOfRooms', refresh: refresh);
   }
 
   // Fetch Products
@@ -200,7 +200,7 @@ class SystemRepo extends ApiClient {
     var yesterdayDate = DateTimeHelper.currentDate(1); // Yesterday's date
 
     // Fetch sales data (sum amounts)
-    final salesToday = await orderBox
+    final salesToday = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(todayDate)))
@@ -208,7 +208,7 @@ class SystemRepo extends ApiClient {
         .property(Orders_.amount)
         .sum();
 
-    final salesYesterday = await orderBox
+    final salesYesterday = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(yesterdayDate)))
@@ -216,7 +216,7 @@ class SystemRepo extends ApiClient {
         .property(Orders_.amount)
         .sum();
 
-    final salesWeekly = await orderBox
+    final salesWeekly = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -226,7 +226,7 @@ class SystemRepo extends ApiClient {
         .property(Orders_.amount)
         .sum();
 
-    final salesLastweek = await orderBox
+    final salesLastweek = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -237,7 +237,7 @@ class SystemRepo extends ApiClient {
         .property(Orders_.amount)
         .sum();
 
-    final salesMonthly = await orderBox
+    final salesMonthly = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -248,7 +248,7 @@ class SystemRepo extends ApiClient {
         .property(Orders_.amount)
         .sum();
 
-    final salesLastmonth = await orderBox
+    final salesLastmonth = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -259,24 +259,24 @@ class SystemRepo extends ApiClient {
         .property(Orders_.amount)
         .sum();
 
-    final salesLifetime = await orderBox
+    final salesLifetime = orderBox
         .query(Orders_.billerId.equals(user.id))
         .build()
         .property(Orders_.amount)
         .sum();
 
     // Fetch order counts (sync/unsync)
-    final ordersAllSync = await orderBox
+    final ordersAllSync = orderBox
         .query(Orders_.billerId.equals(user.id).and(Orders_.sync.equals(1)))
         .build()
         .count();
 
-    final ordersUnsync = await orderBox
+    final ordersUnsync = orderBox
         .query(Orders_.billerId.equals(user.id).and(Orders_.sync.equals(0)))
         .build()
         .count();
 
-    final weeklyAllSync = await orderBox
+    final weeklyAllSync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(1))
@@ -286,7 +286,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final weeklyUnsync = await orderBox
+    final weeklyUnsync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(0))
@@ -296,7 +296,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final lastweekAllSync = await orderBox
+    final lastweekAllSync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(1))
@@ -307,7 +307,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final lastweekUnsync = await orderBox
+    final lastweekUnsync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(0))
@@ -318,7 +318,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final monthlyAllSync = await orderBox
+    final monthlyAllSync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(1))
@@ -329,7 +329,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final monthlyUnsync = await orderBox
+    final monthlyUnsync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(0))
@@ -340,7 +340,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final lastmonthAllSync = await orderBox
+    final lastmonthAllSync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(1))
@@ -351,7 +351,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final lastmonthUnsync = await orderBox
+    final lastmonthUnsync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.sync.equals(0))
@@ -362,7 +362,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final ordersYesterdaySync = await orderBox
+    final ordersYesterdaySync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(yesterdayDate))
@@ -370,7 +370,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final ordersYesterdayUnsync = await orderBox
+    final ordersYesterdayUnsync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(yesterdayDate))
@@ -378,7 +378,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final ordersTodaySync = await orderBox
+    final ordersTodaySync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(todayDate))
@@ -386,7 +386,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final ordersTodayUnsync = await orderBox
+    final ordersTodayUnsync = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(todayDate))
@@ -395,14 +395,14 @@ class SystemRepo extends ApiClient {
         .count();
 
     // Counts
-    final todayCount = await orderBox
+    final todayCount = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(todayDate)))
         .build()
         .count();
 
-    final yesterdayCount = await orderBox
+    final yesterdayCount = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.searchDate.equals(yesterdayDate)))
@@ -410,9 +410,9 @@ class SystemRepo extends ApiClient {
         .count();
 
     final overallCount =
-        await orderBox.query(Orders_.billerId.equals(user.id)).build().count();
+        orderBox.query(Orders_.billerId.equals(user.id)).build().count();
 
-    final weeklyCount = await orderBox
+    final weeklyCount = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -421,7 +421,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final lastweekCount = await orderBox
+    final lastweekCount = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -431,7 +431,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final monthlyCount = await orderBox
+    final monthlyCount = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -441,7 +441,7 @@ class SystemRepo extends ApiClient {
         .build()
         .count();
 
-    final lastmonthCount = await orderBox
+    final lastmonthCount = orderBox
         .query(Orders_.billerId
             .equals(user.id)
             .and(Orders_.createdAt
@@ -452,35 +452,35 @@ class SystemRepo extends ApiClient {
         .count();
 
     // get statistics for hotel
-    final totalCheckedIn = await bookingBox
+    final totalCheckedIn = bookingBox
         .query(BookingX_.userId
             .equals(user.id.toString())
             .and(BookingX_.bookingOption.equals('Checked-in')))
         .build()
         .count();
 
-    final totalCheckedOut = await bookingBox
+    final totalCheckedOut = bookingBox
         .query(BookingX_.userId
             .equals(user.id.toString())
             .and(BookingX_.bookingOption.equals('Checked-out')))
         .build()
         .count();
 
-    final totalReserved = await bookingBox
+    final totalReserved = bookingBox
         .query(BookingX_.userId
         .equals(user.id.toString())
         .and(BookingX_.bookingOption.equals('Reserved')))
         .build()
         .count();
 
-    final totalAvailable = await bookingBox
+    final totalAvailable = bookingBox
         .query(BookingX_.userId
         .equals(user.id.toString())
         .and(BookingX_.bookingOption.equals('Reserved')))
         .build()
         .count();
 
-    final todayHotelSales = await bookingBox
+    final todayHotelSales = bookingBox
         .query(BookingX_.userId
             .equals(user.id.toString())
             .and(BookingX_.searchDate.equals(todayDate)))
@@ -488,7 +488,7 @@ class SystemRepo extends ApiClient {
         .property(BookingX_.amount)
         .sum();
 
-    final yesterdayHotelSales = await bookingBox
+    final yesterdayHotelSales = bookingBox
         .query(BookingX_.userId
             .equals(user.id.toString())
             .and(BookingX_.searchDate.equals(yesterdayDate)))
@@ -496,7 +496,7 @@ class SystemRepo extends ApiClient {
         .property(BookingX_.amount)
         .sum();
 
-    final weeklyHotelSales = await bookingBox
+    final weeklyHotelSales = bookingBox
         .query(BookingX_.userId
             .equals(user.id.toString())
             .and(BookingX_.createdAt
@@ -507,7 +507,7 @@ class SystemRepo extends ApiClient {
         .property(BookingX_.amount)
         .sum();
 
-    final lastWeekHotelSales = await bookingBox
+    final lastWeekHotelSales = bookingBox
         .query(BookingX_.userId
             .equals(user.id.toString())
             .and(BookingX_.createdAt
@@ -518,7 +518,7 @@ class SystemRepo extends ApiClient {
         .property(BookingX_.amount)
         .sum();
 
-    final monthlyHotelSales = await bookingBox
+    final monthlyHotelSales = bookingBox
         .query(BookingX_.userId
             .equals(user.id.toString())
             .and(BookingX_.createdAt
@@ -529,28 +529,28 @@ class SystemRepo extends ApiClient {
         .property(BookingX_.amount)
         .sum();
 
-    final lifetimeHotelSales = await bookingBox
+    final lifetimeHotelSales = bookingBox
         .query(BookingX_.userId.equals(user.id.toString()))
         .build()
         .property(BookingX_.amount)
         .sum();
 
     // Products, Warehouses, and Categories
-    final products = await storeBox
+    final products = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('products')))
         .build()
         .find();
 
-    final warehouses = await storeBox
+    final warehouses = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('warehouses')))
         .build()
         .find();
 
-    final categories = await storeBox
+    final categories = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('categories')))
@@ -559,7 +559,7 @@ class SystemRepo extends ApiClient {
     print("------------------------------");
     //print(categories[0]);
 
-    final hotel_categories = await storeBox
+    final hotelCategories = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('hotel_categories')))
@@ -568,7 +568,7 @@ class SystemRepo extends ApiClient {
     print("--------------hotel category----------------");
     //print(hotel_categories[0]);
 
-    final hotel_amenities = await storeBox
+    final hotelAmenities = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('hotel_amenities')))
@@ -577,7 +577,7 @@ class SystemRepo extends ApiClient {
     print("------------------------------");
     //print(hotel_amenities[0]);
 
-    final hotel_rooms = await storeBox
+    final hotelRooms = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('hotel_rooms')))
@@ -595,7 +595,7 @@ class SystemRepo extends ApiClient {
     // print("------------------------------");
     // print(hotel_reservations[0]);
 
-    final customers = await storeBox
+    final customers = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('customers')))
@@ -613,14 +613,14 @@ class SystemRepo extends ApiClient {
     final categoryCount = categories.isNotEmpty
         ? systemRecords('categories', 'count', categories[0].value)
         : 0;
-    final hotelCategoryCount = hotel_categories.isNotEmpty
-        ? systemRecords('hotel_categories', 'count', hotel_categories[0].value)
+    final hotelCategoryCount = hotelCategories.isNotEmpty
+        ? systemRecords('hotel_categories', 'count', hotelCategories[0].value)
         : 0;
-    final hotelAmenityCount = hotel_amenities.isNotEmpty
-        ? systemRecords('hotel_amenities', 'count', hotel_amenities[0].value)
+    final hotelAmenityCount = hotelAmenities.isNotEmpty
+        ? systemRecords('hotel_amenities', 'count', hotelAmenities[0].value)
         : 0;
-    final hotelRoomCount = hotel_rooms.isNotEmpty
-        ? systemRecords('hotel_rooms', 'count', hotel_rooms[0].value)
+    final hotelRoomCount = hotelRooms.isNotEmpty
+        ? systemRecords('hotel_rooms', 'count', hotelRooms[0].value)
         : 0;
     // final hotelReservationCount = hotel_reservations.isNotEmpty
     //     ? systemRecords(
@@ -757,7 +757,7 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final customers = await storeBox
+    final customers = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('customers')))
@@ -774,7 +774,7 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final categories = await storeBox
+    final categories = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('categories')))
@@ -791,7 +791,7 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final tables = await storeBox
+    final tables = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('tables')))
@@ -808,15 +808,15 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final hotel_categories = await storeBox
+    final hotelCategories = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('hotel_categories')))
         .build()
         .findFirst();
     print("=========== hotel categories ============");
-    print(hotel_categories!.value);
-    return jsonDecode(hotel_categories.value) ?? [];
+    print(hotelCategories!.value);
+    return jsonDecode(hotelCategories.value) ?? [];
   }
 
   Future<List<dynamic>> getHotelAmenities() async {
@@ -825,15 +825,15 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final hotel_amenities = await storeBox
+    final hotelAmenities = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('hotel_amenities')))
         .build()
         .findFirst();
     print("=========== hotel amenities ============");
-    print(hotel_amenities!.value);
-    return jsonDecode(hotel_amenities.value) ?? [];
+    print(hotelAmenities!.value);
+    return jsonDecode(hotelAmenities.value) ?? [];
   }
 
   Future<List<dynamic>> getHotelRooms() async {
@@ -842,15 +842,15 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final hotel_rooms = await storeBox
+    final hotelRooms = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('hotel_rooms')))
         .build()
         .findFirst();
     print("=========== hotel rooms ============");
-    print(hotel_rooms!.value);
-    return jsonDecode(hotel_rooms.value) ?? [];
+    print(hotelRooms!.value);
+    return jsonDecode(hotelRooms.value) ?? [];
   }
 
   Future<List<dynamic>> getHotelReservations() async {
@@ -859,15 +859,15 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final hotel_reservations = await storeBox
+    final hotelReservations = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('hotel_reservations')))
         .build()
         .findFirst();
     print("=========== hotel reservations ============");
-    print(hotel_reservations!.value);
-    return jsonDecode(hotel_reservations.value) ?? [];
+    print(hotelReservations!.value);
+    return jsonDecode(hotelReservations.value) ?? [];
   }
 
   Future<List<dynamic>> getProducts(int id) async {
@@ -876,7 +876,7 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final storeBox = store.box<StoreX>();
-    final products = await storeBox
+    final products = storeBox
         .query(StoreX_.billerId
             .equals(user.id.toString())
             .and(StoreX_.name.equals('products')))
@@ -892,7 +892,7 @@ class SystemRepo extends ApiClient {
     final store = await DatabaseEngine.instance.getStore();
 
     final warehouseBox = store.box<StoreX>();
-    final warehouses = await warehouseBox
+    final warehouses = warehouseBox
         .query(StoreX_.billerId
         .equals(user.id.toString())
         .and(StoreX_.name.equals('warehouses')))
@@ -912,7 +912,7 @@ class SystemRepo extends ApiClient {
       final store = await DatabaseEngine.instance.getStore();
       final storeBox = store.box<StoreX>();
 
-      final printers = await storeBox
+      final printers = storeBox
           .query(StoreX_.billerId
               .equals(user.id.toString())
               .and(StoreX_.name.equals('printers')))
@@ -1454,7 +1454,7 @@ class SystemRepo extends ApiClient {
         log("response ==> ${response.statusCode}");
         var jsonData = json.decode(response.body);
         if (response.statusCode == 200) {
-          print("dataaaa ==> ${unsyncedOrders}");
+          print("dataaaa ==> $unsyncedOrders");
           for (var itemData in unsyncedOrders) {
             print("sync data ==> $itemData");
             itemData.sync = 1;

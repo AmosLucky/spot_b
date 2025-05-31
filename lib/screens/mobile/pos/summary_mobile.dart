@@ -43,10 +43,10 @@ class _SummaryMobileState extends State<SummaryMobile> {
             ),
             actions: [],
           ),
-          body: Container(
+          body: SizedBox(
             height: screenSize.height,
             width: double.infinity,
-            child: value.items.length == 0
+            child: value.items.isEmpty
                 ? const SizedBox()
                 : ListView.builder(
                     shrinkWrap: true,

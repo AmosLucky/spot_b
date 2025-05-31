@@ -171,7 +171,7 @@ class SideBarPos extends StatelessWidget {
   // Method to show the POS dialog with validation
   void _showPOSDialog(BuildContext context, {required bool isClosing}) {
     final TextEditingController amountController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -179,7 +179,7 @@ class SideBarPos extends StatelessWidget {
         return AlertDialog(
           title: Text(isClosing ? "Close POS Register" : "Open POS Register"),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -217,7 +217,7 @@ class SideBarPos extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () async {
-                if (_formKey.currentState?.validate() ?? false) {
+                if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(); // Close dialog
 
                   if (isClosing) {
@@ -294,7 +294,7 @@ class SidebarItem extends StatelessWidget {
   final VoidCallback? onTap;
   final IconData icon; // Add an icon property
   final Color tileColor; // Add a tile color property
-  const SidebarItem({
+  const SidebarItem({super.key, 
     required this.title,
     this.onTap,
     required this.icon,

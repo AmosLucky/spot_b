@@ -272,7 +272,7 @@ class _HeaderState extends State<Header> {
   // Method to show the POS dialog with validation
   void _showPOSDialog(BuildContext context, String module) {
     final TextEditingController amountController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -280,7 +280,7 @@ class _HeaderState extends State<Header> {
         return AlertDialog(
           title: Text("$module Register"),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize:
                   MainAxisSize.min, // Set column height based on content
@@ -313,7 +313,7 @@ class _HeaderState extends State<Header> {
             TextButton(
               onPressed: () async {
                 // Validate the form before proceeding
-                if (_formKey.currentState?.validate() ?? false) {
+                if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(); // Close the dialog
 
                   // Open register with the entered cash amount
@@ -337,7 +337,7 @@ class _HeaderState extends State<Header> {
                               user: widget.user,
                             );
                           }));
-                    };
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

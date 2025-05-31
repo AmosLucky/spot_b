@@ -6,7 +6,7 @@ import '../../data/models/userdetails.dart';
 final box = GetStorage();
 
 class UserProvider with ChangeNotifier {
-  UserDetails _user = new UserDetails(
+  UserDetails _user = UserDetails(
       id: 0,
       firstName: '',
       lastName: '',

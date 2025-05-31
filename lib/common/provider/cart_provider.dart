@@ -4,7 +4,6 @@ import 'package:spotstock_inventory/data/models/cart.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
 import 'package:spotstock_inventory/screens/mobile/pos/summary_mobile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'system_provider.dart';
 

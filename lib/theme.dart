@@ -9,12 +9,12 @@ ThemeData theme() {
     textTheme: textTheme(),
     // inputDecorationTheme: inputDecorationTheme(),
     checkboxTheme: CheckboxThemeData(
-      checkColor: MaterialStateProperty.all(Colors.white),
-      fillColor: MaterialStateProperty.all(ColorsRes.appcolor),
+      checkColor: WidgetStateProperty.all(Colors.white),
+      fillColor: WidgetStateProperty.all(ColorsRes.appcolor),
     ),
     radioTheme: RadioThemeData(
         fillColor:
-            MaterialStateColor.resolveWith((states) => ColorsRes.appcolor)),
+            WidgetStateColor.resolveWith((states) => ColorsRes.appcolor)),
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 }

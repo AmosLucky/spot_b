@@ -43,7 +43,7 @@ void showPrinterSelectionDialog(
             ),
             actions: <Widget>[
               TextButton(
-                child: Text(btnText != null ? '$btnText' : 'Print Now'),
+                child: Text(btnText != null ? btnText : 'Print Now'),
                 onPressed: () {
                   if (selectedPrinter != null) {
                     // Save selected printer and close the dialog

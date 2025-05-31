@@ -6,7 +6,7 @@ class PillGesture extends StatelessWidget {
   final GestureDragEndCallback onVerticalDragEnd;
   final Color? pillColor;
 
-  PillGesture({
+  const PillGesture({super.key, 
     required this.onVerticalDragStart,
     required this.onVerticalDragUpdate,
     required this.onVerticalDragEnd,
@@ -20,7 +20,7 @@ class PillGesture extends StatelessWidget {
       onVerticalDragStart: onVerticalDragStart,
       onVerticalDragUpdate: onVerticalDragUpdate,
       onVerticalDragEnd: onVerticalDragEnd,
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         child: Column(
           children: <Widget>[

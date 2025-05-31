@@ -37,11 +37,12 @@ class PrintMobileScreenDialog extends StatefulWidget {
 class _PrintScreenDialogState extends State<PrintMobileScreenDialog> {
   @override
 
-  int _counter = 0;
+  final int _counter = 0;
   File? _imageFile;
 
 //Create an instance of ScreenshotController
   ScreenshotController screenshotController = ScreenshotController();
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: <Widget>[
@@ -260,7 +261,7 @@ class _PrintScreenDialogState extends State<PrintMobileScreenDialog> {
 
     // Print the receipt
     for (var item in items) {
-      print('${item.name} (x${item.quantity}): \N${item.price}');
+      print('${item.name} (x${item.quantity}): N${item.price}');
     }
     print('Thank you for your purchase!');
     var transData = {"txnData": widget.transactionData, "others": othersData};
@@ -586,8 +587,7 @@ class _PrintScreenDialogState extends State<PrintMobileScreenDialog> {
             : await getApplicationDocumentsDirectory();
         String tempPath = appDir!.path;
         String fileName =
-            DateTime.now().microsecondsSinceEpoch.toString()
-                + "TransactionReceipt(Trustbanc)" + ".jpeg";
+            "${DateTime.now().microsecondsSinceEpoch}TransactionReceipt(Trustbanc).jpeg";
         file = File('$tempPath/$fileName');
         if (!await file.exists()) {
           await file.create();
@@ -596,7 +596,7 @@ class _PrintScreenDialogState extends State<PrintMobileScreenDialog> {
 
         print(file.path);
         final box = context.findRenderObject() as RenderBox?;
-        final result = await Share.shareXFiles([XFile(file!.path)],
+        final result = await Share.shareXFiles([XFile(file.path)],
             sharePositionOrigin: Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2));
         if (result.status == ShareResultStatus.success) {
           debugPrint('Thank you for sharing the receipt!');

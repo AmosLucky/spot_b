@@ -15,9 +15,9 @@ import '../common/provider/user_provider.dart';
 
 class CartCounter extends StatelessWidget {
   const CartCounter({
-    Key? key,
+    super.key,
     this.count,
-  }) : super(key: key);
+  });
 
   final String? count;
   @override
@@ -36,15 +36,14 @@ class CartCounter extends StatelessWidget {
 
 class CartItem extends StatelessWidget {
   const CartItem(
-      {Key? key,
+      {super.key,
       required this.screenSize,
       required this.cartProvider,
       required this.product,
       required this.trackID,
       required this.quantity,
       required this.amount,
-      required this.del})
-      : super(key: key);
+      required this.del});
 
   final Size screenSize;
   final Map product;
@@ -182,11 +181,11 @@ class AppBarButton extends StatelessWidget {
   final VoidCallback? onPressed;
 
   const AppBarButton({
-    Key? key,
+    super.key,
     required this.icon,
     this.iconSize,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -210,34 +209,34 @@ class AppBarButton extends StatelessWidget {
 
 // ignore: must_be_immutable
 class ExpandableText extends StatefulWidget {
-  ExpandableText(this.text);
+  ExpandableText(this.text, {super.key});
 
   final String text;
   bool isExpanded = false;
 
   @override
-  _ExpandableTextState createState() => new _ExpandableTextState();
+  _ExpandableTextState createState() => _ExpandableTextState();
 }
 
 class _ExpandableTextState extends State<ExpandableText>
     with TickerProviderStateMixin<ExpandableText> {
   @override
   Widget build(BuildContext context) {
-    return new Column(children: <Widget>[
-      new AnimatedSize(
+    return Column(children: <Widget>[
+      AnimatedSize(
           duration: const Duration(milliseconds: 500),
-          child: new ConstrainedBox(
+          child: ConstrainedBox(
               constraints: widget.isExpanded
-                  ? new BoxConstraints()
-                  : new BoxConstraints(maxHeight: 50.0),
-              child: new Text(
+                  ? BoxConstraints()
+                  : BoxConstraints(maxHeight: 50.0),
+              child: Text(
                 widget.text,
                 softWrap: true,
                 overflow: TextOverflow.fade,
               ))),
       widget.isExpanded
-          ? new ConstrainedBox(constraints: new BoxConstraints())
-          : new GestureDetector(
+          ? ConstrainedBox(constraints: BoxConstraints())
+          : GestureDetector(
               child: const Text(
                 'show more...',
                 style: TextStyle(color: Color(0xff36abe0)),
@@ -253,17 +252,17 @@ class CustomTabBar extends StatelessWidget {
   final Function(int) onTap;
 
   const CustomTabBar({
-    Key? key,
+    super.key,
     required this.icons,
     required this.selectedIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return PreferredSize(
         preferredSize: Size(double.infinity, 15),
-        child: new TabBar(
+        child: TabBar(
           labelPadding: EdgeInsets.only(right: 10.0),
           indicatorPadding: EdgeInsets.zero,
           labelStyle: TextStyle(color: primaryColor, fontSize: 12.0),
@@ -364,23 +363,23 @@ Widget showImgSkeleton(BuildContext context,
 
 doDate(date) {
   // var now = new DateTime.now();
-  var formatter = new DateFormat('dd-MM-yyyy');
+  var formatter = DateFormat('dd-MM-yyyy');
   String formattedTime = DateFormat('kk:mm:a').format(date);
   String formattedDate = formatter.format(date);
-  return "${formattedDate} ${formattedTime}";
+  return "$formattedDate $formattedTime";
 }
 
 searchDate(date) {
   // var now = new DateTime.now();
-  var formatter = new DateFormat('dd-MM-yyyy');
+  var formatter = DateFormat('dd-MM-yyyy');
   String formattedDate = formatter.format(date);
   return formattedDate;
 }
 
 String generateRandomString(int len) {
   var r = Random();
-  const _chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+  return List.generate(len, (index) => chars[r.nextInt(chars.length)]).join();
 }
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
