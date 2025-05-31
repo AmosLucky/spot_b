@@ -27,13 +27,13 @@
     },
     {
       "name": "archive",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/archive-3.6.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/archive-4.0.7",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "args",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/args-2.6.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/args-2.7.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -45,61 +45,61 @@
     },
     {
       "name": "audioplayers",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers-6.1.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers-6.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "audioplayers_android",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_android-5.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_android-5.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "audioplayers_darwin",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_darwin-6.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_darwin-6.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "audioplayers_linux",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_linux-4.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_linux-4.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "audioplayers_platform_interface",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_platform_interface-7.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_platform_interface-7.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "audioplayers_web",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_web-5.0.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_web-5.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "audioplayers_windows",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_windows-4.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_windows-4.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "barcode",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/barcode-2.2.8",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/barcode-2.2.9",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "bidi",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/bidi-2.0.12",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/bidi-2.0.13",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "bluetooth_print_plus",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/bluetooth_print_plus-2.4.5",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/bluetooth_print_plus-2.4.6",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -111,39 +111,39 @@
     },
     {
       "name": "build",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build-2.4.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build-2.4.2",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.6"
     },
     {
       "name": "build_config",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_config-1.1.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_config-1.1.2",
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "3.6"
     },
     {
       "name": "build_daemon",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_daemon-4.0.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_daemon-4.0.4",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.6"
     },
     {
       "name": "build_resolvers",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_resolvers-2.4.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_resolvers-2.4.4",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.6"
     },
     {
       "name": "build_runner",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.13",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.4.15",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.6"
     },
     {
       "name": "build_runner_core",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner_core-7.3.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner_core-8.0.0",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.6"
     },
     {
       "name": "built_collection",
@@ -153,7 +153,7 @@
     },
     {
       "name": "built_value",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.9.3",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.10.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -194,6 +194,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "cli_config",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/cli_config-0.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "cli_util",
       "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/cli_util-0.4.2",
       "packageUri": "lib/",
@@ -219,7 +225,7 @@
     },
     {
       "name": "connectivity_plus",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/connectivity_plus-6.1.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/connectivity_plus-6.1.4",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -237,7 +243,7 @@
     },
     {
       "name": "coverage",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/coverage-1.11.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/coverage-1.14.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -267,13 +273,13 @@
     },
     {
       "name": "dart_style",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/dart_style-2.3.7",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/dart_style-2.3.8",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "data_table_2",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/data_table_2-2.5.18",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/data_table_2-2.6.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -285,7 +291,7 @@
     },
     {
       "name": "device_info_plus",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/device_info_plus-11.2.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/device_info_plus-11.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -297,7 +303,7 @@
     },
     {
       "name": "dio",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/dio-5.7.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/dio-5.8.0+1",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
@@ -315,7 +321,7 @@
     },
     {
       "name": "dio_web_adapter",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/dio_web_adapter-2.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/dio_web_adapter-2.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -369,7 +375,7 @@
     },
     {
       "name": "flutter_fast_forms",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_fast_forms-18.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_fast_forms-18.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -393,9 +399,9 @@
     },
     {
       "name": "flutter_plugin_android_lifecycle",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.26",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.28",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.6"
     },
     {
       "name": "flutter_scanner_devxhub",
@@ -423,7 +429,7 @@
     },
     {
       "name": "get",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/get-4.6.6",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/get-4.7.2",
       "packageUri": "lib/",
       "languageVersion": "2.15"
     },
@@ -465,13 +471,13 @@
     },
     {
       "name": "html",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/html-0.15.5",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/html-0.15.6",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "http",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.3.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -483,15 +489,15 @@
     },
     {
       "name": "http_parser",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/http_parser-4.0.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/http_parser-4.1.2",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.4"
     },
     {
       "name": "image",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.3.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.5.4",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "3.0"
     },
     {
       "name": "input_quantity",
@@ -513,9 +519,9 @@
     },
     {
       "name": "js",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.6.7",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.7.1",
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "3.1"
     },
     {
       "name": "json_annotation",
@@ -543,9 +549,9 @@
     },
     {
       "name": "lints",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/lints-5.0.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/lints-5.1.1",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.6"
     },
     {
       "name": "logging",
@@ -555,9 +561,9 @@
     },
     {
       "name": "lottie",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/lottie-3.2.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/lottie-3.3.1",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.6"
     },
     {
       "name": "macros",
@@ -615,19 +621,19 @@
     },
     {
       "name": "objectbox",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/objectbox-4.0.3",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/objectbox-4.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
     {
       "name": "objectbox_flutter_libs",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/objectbox_flutter_libs-4.0.3",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/objectbox_flutter_libs-4.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
     {
       "name": "objectbox_generator",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/objectbox_generator-4.0.3",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/objectbox_generator-4.1.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
@@ -639,7 +645,7 @@
     },
     {
       "name": "package_config",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/package_config-2.1.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/package_config-2.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -663,9 +669,9 @@
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.15",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.17",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.6"
     },
     {
       "name": "path_provider_foundation",
@@ -693,7 +699,7 @@
     },
     {
       "name": "pdf",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/pdf-3.11.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/pdf-3.11.3",
       "packageUri": "lib/",
       "languageVersion": "2.19"
     },
@@ -705,21 +711,21 @@
     },
     {
       "name": "permission_handler",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-11.3.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-11.4.0",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_android",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-12.0.13",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-12.1.0",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_apple",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_apple-9.4.5",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_apple-9.4.7",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "2.18"
     },
     {
       "name": "permission_handler_html",
@@ -729,9 +735,9 @@
     },
     {
       "name": "permission_handler_platform_interface",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_platform_interface-4.2.3",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_platform_interface-4.3.0",
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_windows",
@@ -770,28 +776,34 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "posix",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/posix-6.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "printing",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/printing-5.13.4",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/printing-5.14.2",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "provider",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/provider-6.1.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/provider-6.1.5",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "pub_semver",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/pub_semver-2.1.5",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/pub_semver-2.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
       "name": "pubspec_parse",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/pubspec_parse-1.4.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/pubspec_parse-1.5.0",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.6"
     },
     {
       "name": "qr",
@@ -831,15 +843,15 @@
     },
     {
       "name": "shared_preferences",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences-2.4.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences-2.5.3",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
       "name": "shared_preferences_android",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_android-2.4.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_android-2.4.10",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.6"
     },
     {
       "name": "shared_preferences_foundation",
@@ -861,7 +873,7 @@
     },
     {
       "name": "shared_preferences_web",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_web-2.4.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_web-2.4.3",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -873,9 +885,9 @@
     },
     {
       "name": "shelf",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shelf-1.4.1",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/shelf-1.4.2",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.4"
     },
     {
       "name": "shelf_packages_handler",
@@ -897,7 +909,7 @@
     },
     {
       "name": "simple_text_field",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/simple_text_field-3.2.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/simple_text_field-3.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.17"
     },
@@ -981,7 +993,7 @@
     },
     {
       "name": "sqlite3",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/sqlite3-2.7.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/sqlite3-2.7.6",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -1071,9 +1083,9 @@
     },
     {
       "name": "url_launcher_web",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_web-2.3.3",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_web-2.4.1",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.6"
     },
     {
       "name": "url_launcher_windows",
@@ -1107,19 +1119,19 @@
     },
     {
       "name": "web",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/web-1.1.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/web-1.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
       "name": "web_socket",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket-0.1.6",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket-1.0.1",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.4"
     },
     {
       "name": "web_socket_channel",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-3.0.2",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/web_socket_channel-3.0.3",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -1131,7 +1143,7 @@
     },
     {
       "name": "win32",
-      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.10.0",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.10.1",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -1166,7 +1178,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2025-05-30T14:04:54.969613Z",
+  "generated": "2025-05-31T13:35:55.611424Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///C:/Users/IFEANYI/flutter-extract/flutter",
