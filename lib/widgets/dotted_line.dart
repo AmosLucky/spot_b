@@ -5,10 +5,10 @@ class DottedLine extends StatelessWidget {
   final Color color;
 
   const DottedLine({
-    Key? key,
+    super.key,
     this.height = 1.0,
     this.color = Colors.black,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

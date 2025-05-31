@@ -15,14 +15,16 @@ import 'package:spotstock_inventory/widgets/responsive.dart';
 import '../../common/helpers/user_preferences.dart';
 
 class SplashScreenMobile extends StatefulWidget {
+  const SplashScreenMobile({super.key});
+
   @override
   _SplashScreenMobileState createState() => _SplashScreenMobileState();
 }
 
 class _SplashScreenMobileState extends State<SplashScreenMobile> {
   startTime() async {
-    var _duration = const Duration(seconds: 5);
-    return Timer(_duration, navigationPage);
+    var duration = const Duration(seconds: 5);
+    return Timer(duration, navigationPage);
   }
 
   void navigationPage() async {

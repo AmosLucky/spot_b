@@ -161,7 +161,7 @@ class SideBarHotel extends StatelessWidget {
 
   void _showHotelDialog(BuildContext context, {required bool isClosing}) {
     final TextEditingController amountController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -169,7 +169,7 @@ class SideBarHotel extends StatelessWidget {
         return AlertDialog(
           title: Text(isClosing ? "Close HOTEL Register" : "Open HOTEL Register"),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -207,7 +207,7 @@ class SideBarHotel extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () async {
-                if (_formKey.currentState?.validate() ?? false) {
+                if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(); // Close dialog
 
                   if (isClosing) {
@@ -282,7 +282,7 @@ class SideBarHotel extends StatelessWidget {
 class SidebarItem extends StatelessWidget {
   final String title;
   final VoidCallback? onTap;
-  const SidebarItem({required this.title, this.onTap});
+  const SidebarItem({super.key, required this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {

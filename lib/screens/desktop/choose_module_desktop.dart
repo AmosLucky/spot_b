@@ -5,8 +5,10 @@ import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dar
 import 'home/hotel_screen_desktop.dart';
 
 class ChooseModuleDesktop extends StatefulWidget {
+  const ChooseModuleDesktop({super.key});
+
   @override
-  _ChooseModuleDesktopState createState() => new _ChooseModuleDesktopState();
+  _ChooseModuleDesktopState createState() => _ChooseModuleDesktopState();
 }
 
 class _ChooseModuleDesktopState extends State<ChooseModuleDesktop> {

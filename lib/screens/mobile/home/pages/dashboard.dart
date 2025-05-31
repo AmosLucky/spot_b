@@ -86,7 +86,7 @@ class _DashboardMobileScreenState extends State<DashboardMobileScreen> {
 
   void _showPOSDialog(BuildContext context, SystemProvider systemProvider) {
     final TextEditingController amountController = TextEditingController();
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -94,7 +94,7 @@ class _DashboardMobileScreenState extends State<DashboardMobileScreen> {
         return AlertDialog(
           title: const Text("POS Register"),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize:
                   MainAxisSize.min, // Set column height based on content
@@ -127,7 +127,7 @@ class _DashboardMobileScreenState extends State<DashboardMobileScreen> {
             TextButton(
               onPressed: () async {
                 // Validate the form before proceeding
-                if (_formKey.currentState?.validate() ?? false) {
+                if (formKey.currentState?.validate() ?? false) {
                   Navigator.of(context).pop(); // Close the dialog
                   // Open register with the entered cash amount
                   var response = await SystemRepo(refresh: false, online: false)
@@ -442,7 +442,7 @@ class _DashboardMobileScreenState extends State<DashboardMobileScreen> {
                       isMobile: widget.isMobile ?? true,
                     ),
                     TransactionCard(
-                      title: "Yesterday\'s Transactions",
+                      title: "Yesterday's Transactions",
                       titleColor: primaryColor,
                       stats: {
                         'sales': Money.format(

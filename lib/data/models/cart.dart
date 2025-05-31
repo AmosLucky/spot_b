@@ -22,12 +22,12 @@ class CartModel {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['product'] = product;
-    _data['trackID'] = trackID;
-    _data['totalAmount'] = totalAmount;
-    _data['quantity'] = quantity;
-    return _data;
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['product'] = product;
+    data['trackID'] = trackID;
+    data['totalAmount'] = totalAmount;
+    data['quantity'] = quantity;
+    return data;
   }
 }

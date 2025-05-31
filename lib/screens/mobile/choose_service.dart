@@ -65,11 +65,10 @@ class ServiceBox extends StatelessWidget {
   final SystemProvider systemProvider;
   final bool isMobile;
   const ServiceBox(
-      {Key? key,
+      {super.key,
       required this.service,
       required this.systemProvider,
-      required this.isMobile})
-      : super(key: key);
+      required this.isMobile});
 
   @override
   Widget build(BuildContext context) {

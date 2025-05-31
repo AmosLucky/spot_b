@@ -150,7 +150,7 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
         iconSize: 50,
         fontSize: 20,);
 
-    if (barcode == null || barcode == '-1') {
+    if (barcode == '-1') {
       print('nothing return.');
       setState(() {
         barcode = '';
@@ -158,7 +158,7 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
       Dialogs.alertDialog(
           context, "Warning", "Nothing was found!", "cancel", "save", []);
     } else {
-      _barcodeController!.text = barcode!;
+      _barcodeController!.text = barcode;
     }
   }
 

@@ -11,7 +11,7 @@ class DashboardCard extends StatelessWidget {
   final double cardWidth;
 
   const DashboardCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.value,
     required this.subtitle,
@@ -20,7 +20,7 @@ class DashboardCard extends StatelessWidget {
     this.cardHeight = 200,
     this.cardWidth = 0.42,
     required this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class DashboardCard extends StatelessWidget {
       elevation: 10,
       shadowColor: Colors.black38,
       borderRadius: BorderRadius.circular(30.0),
-      child: Container(
+      child: SizedBox(
         height: cardHeight,
         width: MediaQuery.of(context).size.width * cardWidth,
         child: Card(

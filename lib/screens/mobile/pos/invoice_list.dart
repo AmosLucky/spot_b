@@ -120,6 +120,7 @@ class _InvoiceListState extends State<InvoiceListMobile> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             InkWell(
+              onTap: widget.closeInvoice,
               child: const Text(
                 "Close",
                 style: TextStyle(
@@ -127,7 +128,6 @@ class _InvoiceListState extends State<InvoiceListMobile> {
                     color: Colors.red,
                     fontWeight: FontWeight.normal),
               ),
-              onTap: widget.closeInvoice,
             )
           ]),
           const SizedBox(height: 5),

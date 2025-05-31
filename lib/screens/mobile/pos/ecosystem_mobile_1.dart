@@ -60,7 +60,7 @@ class _EcosystemMobileScreenState extends State<EcosystemMobileScreen> {
     await Permission.camera.request();
     //String? barcode = await scanner.scan();
     String? barcode = ""; //await scanner.scan();
-    if (barcode == null || barcode == "-1") {
+    if (barcode == "-1") {
       setState(() {
         barcode = null;
       });

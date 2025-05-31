@@ -8,11 +8,10 @@ class SecondaryBottomSheet extends StatefulWidget {
   final bool displayClose;
 
   const SecondaryBottomSheet(
-      {Key? key,
+      {super.key,
         required this.child,
         required this.height,
-        this.displayClose = true})
-      : super(key: key);
+        this.displayClose = true});
 
   @override
   State<SecondaryBottomSheet> createState() => _SecondaryBottomSheetState();

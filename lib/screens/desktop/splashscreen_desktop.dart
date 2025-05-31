@@ -12,14 +12,16 @@ import '../mobile/home/home_screen_mobile.dart';
 import 'home/home_screen_desktop.dart';
 
 class SplashScreenDesktop extends StatefulWidget {
+  const SplashScreenDesktop({super.key});
+
   @override
-  _SplashScreenDesktopState createState() => new _SplashScreenDesktopState();
+  _SplashScreenDesktopState createState() => _SplashScreenDesktopState();
 }
 
 class _SplashScreenDesktopState extends State<SplashScreenDesktop> {
   startTime() async {
-    var _duration = const Duration(seconds: 5);
-    return Timer(_duration, navigationPage);
+    var duration = const Duration(seconds: 5);
+    return Timer(duration, navigationPage);
   }
 
   @override
@@ -50,7 +52,7 @@ class _SplashScreenDesktopState extends State<SplashScreenDesktop> {
       UserDetails? user = (await userPreferences.getUser());
 
       if (user != null) {
-        Provider.of<UserProvider>(context, listen: false).setUser(user!);
+        Provider.of<UserProvider>(context, listen: false).setUser(user);
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return const HomeScreenDesktop();
         }));

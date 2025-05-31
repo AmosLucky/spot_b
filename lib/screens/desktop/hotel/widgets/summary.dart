@@ -310,7 +310,7 @@ class _RoomSummaryState extends State<RoomSummary> {
                         SizedBox(height: 1.h,),
 
                         Text(
-                          "Nights: ${_duration}",
+                          "Nights: $_duration",
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
 

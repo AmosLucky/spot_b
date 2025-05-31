@@ -154,6 +154,9 @@ Widget listItemContainer(String title, String value) => Container(
       margin: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       width: double.infinity,
+      decoration: const BoxDecoration(
+          color: whiteColor,
+          border: Border(bottom: BorderSide(width: 1.0, color: whiteColor))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -171,7 +174,4 @@ Widget listItemContainer(String title, String value) => Container(
           const SizedBox(height: 5),
         ],
       ),
-      decoration: const BoxDecoration(
-          color: whiteColor,
-          border: Border(bottom: BorderSide(width: 1.0, color: whiteColor))),
     );

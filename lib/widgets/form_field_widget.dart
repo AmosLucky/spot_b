@@ -19,7 +19,7 @@ class FormFieldWidget extends StatelessWidget {
   final String? Function(String?)? onSubmitted;
 
   const FormFieldWidget({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.controller,
     required this.darkTheme,
@@ -33,7 +33,7 @@ class FormFieldWidget extends StatelessWidget {
     this.onPressSufixobscureTextIcon,
     this.textInputAction = TextInputAction.next,
     this.textInputType = TextInputType.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

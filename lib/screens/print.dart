@@ -369,7 +369,7 @@ class _PrintReceiptState extends State<PrintReceipt> {
       var data = jsonDecode(widget.data["items"]);
       var otherData = jsonDecode(widget.data["others"]);
       String tableId = widget.data["tableId"].toString() ;
-      log("Ok ==>> ${tableId}");
+      log("Ok ==>> $tableId");
       await printSampleDocument(
           widget.data['amount'],
           items,

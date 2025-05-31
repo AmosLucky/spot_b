@@ -296,7 +296,7 @@ class _OrderSummaryState extends State<OrderSummary> {
                                   _editQuantity(
                                     context,
                                     index,
-                                    cartItem.quantity!,
+                                    cartItem.quantity,
                                   );
                                 },
                                 child: Text(

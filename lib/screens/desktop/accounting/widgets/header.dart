@@ -119,7 +119,7 @@ class _HeaderState extends State<Header> {
                       setState(() {
                         _selectedDateRange = value['date'];
                       });
-                      print("date range ==>> ${_selectedDateRange}");
+                      print("date range ==>> $_selectedDateRange");
                       widget.onDateRangeSelected(
                           _selectedDateRange!); // Pass the selected date range to parent
                     }

@@ -1,4 +1,3 @@
-import './routes.dart';
 import 'package:flutter/widgets.dart';
 
 Map<String, WidgetBuilder> routesApp = {

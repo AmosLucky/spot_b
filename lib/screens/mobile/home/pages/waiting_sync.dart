@@ -54,7 +54,7 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
   void updateValue() async {
     await getUnSyncTransactions(systemProvider);
     setState(() {
-      _productSearchResult = transactionData!;
+      _productSearchResult = transactionData;
       _foundProducts = _productSearchResult;
     });
   }
@@ -155,7 +155,7 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
                     suffixIcon: GestureDetector(onTap: () {
                       searchTextController.clear();
                       setState(() {
-                        _productSearchResult = transactionData!;
+                        _productSearchResult = transactionData;
                         _foundProducts = _productSearchResult;
                       });
                     }, child: Icon(Icons.cancel, color: Colors.deepPurple,),),
@@ -231,12 +231,12 @@ class _WaitingMobileScreenState extends State<WaitingMobileScreen> {
     if(searchTextController.text.isEmpty) {
       // If the search field is empty or only contains white-space
       setState(() {
-        _productSearchResult = transactionData!;
+        _productSearchResult = transactionData;
         _foundProducts = _productSearchResult;
       });
     } else {
       setState(() {
-        _productSearchResult = transactionData!.where((beneficiary) {
+        _productSearchResult = transactionData.where((beneficiary) {
           return beneficiary.trxId.toLowerCase().contains(searchTextController.text.toLowerCase());
         }).toList();
         _foundProducts = _productSearchResult;

@@ -52,7 +52,12 @@ dependencies:
   flutter_scanner_devxhub: ^1.0.3
   chip_list: ^3.1.0
 
-    
+# Force specific versions to resolve compatibility issues
+dependency_overrides:
+  # simple_text_field: 3.1.0  # Use older version compatible with Flutter 3.27.1
+  # You can also try these versions if 3.1.0 doesn't work:
+  simple_text_field: 3.0.0
+  # simple_text_field: 2.1.0
 
 dev_dependencies:
   flutter_test:

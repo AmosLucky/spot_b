@@ -3,9 +3,7 @@ import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
 
 class Header extends StatefulWidget {
   final UserDetails user;

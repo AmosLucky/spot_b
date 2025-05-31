@@ -20,12 +20,11 @@ class CartSummaryWidget extends StatefulWidget {
   final UserDetails user;
 
   const CartSummaryWidget(
-      {Key? key,
+      {super.key,
       required this.registerInfo,
       this.isMobile = true,
       required this.systemProvider,
-      required this.user})
-      : super(key: key);
+      required this.user});
 
   @override
   State<CartSummaryWidget> createState() => _CartSummaryWidgetState();

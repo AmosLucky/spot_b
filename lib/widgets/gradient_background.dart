@@ -10,7 +10,7 @@ class GradientBackground extends StatelessWidget {
   final List<Color> gradientColors;
 
   const GradientBackground({
-    Key? key,
+    super.key,
     required this.body,
     required this.width,
     required this.height,
@@ -21,7 +21,7 @@ class GradientBackground extends StatelessWidget {
       Color(0xFFF2FCFE),
       Color(0xFFFAF1FE),
     ],
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

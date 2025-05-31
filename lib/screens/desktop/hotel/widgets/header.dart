@@ -3,7 +3,6 @@ import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/widgets/custom_dropdown.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../home/hotel_screen_desktop.dart';

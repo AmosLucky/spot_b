@@ -1,7 +1,6 @@
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
-import 'package:spotstock_inventory/widgets/outline_search_bar/outline_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 

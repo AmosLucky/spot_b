@@ -47,19 +47,19 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
   }
 
   void _loadCustomers() async {
-    var _customers = await getCustomers();
+    var customers = await getCustomers();
     if (mounted) {
       setState(() {
-        customers = _customers;
+        customers = customers;
       });
     }
   }
 
   void _loadTables() async {
-    var _tables = await getTables();
+    var tables = await getTables();
     if (mounted) {
       setState(() {
-        tables = _tables;
+        tables = tables;
       });
     }
   }

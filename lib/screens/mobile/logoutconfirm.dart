@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'login_mobile.dart';
 
 class LogoutConfirmationScreen extends StatelessWidget {
-  const LogoutConfirmationScreen({Key? key}) : super(key: key);
+  const LogoutConfirmationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -7,7 +7,6 @@ ThemeData lightTheme = ThemeData.light().copyWith(
     onPrimary: blackColor,
     secondary: primaryColor,
   ),
-  useMaterial3: true,
   appBarTheme: const AppBarTheme(
     elevation: 0,
   ),
@@ -22,9 +21,9 @@ ThemeData lightTheme = ThemeData.light().copyWith(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
-      elevation: MaterialStateProperty.all(0),
-      backgroundColor: MaterialStateProperty.all(primaryColor),
-      foregroundColor: MaterialStateProperty.all(primaryColor),
+      elevation: WidgetStateProperty.all(0),
+      backgroundColor: WidgetStateProperty.all(primaryColor),
+      foregroundColor: WidgetStateProperty.all(primaryColor),
     ),
   ),
   // inputDecorationTheme: InputDecorationTheme(
@@ -57,7 +56,6 @@ ThemeData darkTheme = ThemeData.dark().copyWith(
     onPrimary: whiteColor,
     // secondary: primaryColor,
   ),
-  useMaterial3: true,
   appBarTheme: const AppBarTheme(
     elevation: 0,
   ),
@@ -72,9 +70,9 @@ ThemeData darkTheme = ThemeData.dark().copyWith(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
-      elevation: MaterialStateProperty.all(0),
-      backgroundColor: MaterialStateProperty.all(primaryColor),
-      foregroundColor: MaterialStateProperty.all(primaryColor),
+      elevation: WidgetStateProperty.all(0),
+      backgroundColor: WidgetStateProperty.all(primaryColor),
+      foregroundColor: WidgetStateProperty.all(primaryColor),
     ),
   ),
   // inputDecorationTheme: InputDecorationTheme(
@@ -95,8 +93,8 @@ ThemeData darkTheme = ThemeData.dark().copyWith(
   //   ),
   // ),
   switchTheme: SwitchThemeData(
-    thumbColor: MaterialStateProperty.all(Colors.blue[800]),
-    trackColor: MaterialStateProperty.all(Colors.blue[800]),
-    overlayColor: MaterialStateProperty.all(grayColor),
+    thumbColor: WidgetStateProperty.all(Colors.blue[800]),
+    trackColor: WidgetStateProperty.all(Colors.blue[800]),
+    overlayColor: WidgetStateProperty.all(grayColor),
   ),
 );

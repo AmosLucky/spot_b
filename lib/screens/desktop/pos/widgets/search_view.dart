@@ -62,7 +62,7 @@ class SearchView extends StatelessWidget {
         builder: (context, value, child) => InkWell(
               onTap: () {
                 print("Selected index === $index");
-                print("Product tapped: ${product}");
+                print("Product tapped: $product");
                 if (product['stock']['quantity'] == 0) {
                   Dialogs.alertDialog(context, "Warning",
                       "Product is out of stock!", "cancel", "save", []);

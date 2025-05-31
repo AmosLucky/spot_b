@@ -18,9 +18,9 @@ class Money {
 
   static String format(num price, {bool symbol = false}) {
     Locale locale = Localizations.localeOf(Navigation.getContext());
-    final _fcFull = NumberFormat.simpleCurrency(
+    final fcFull = NumberFormat.simpleCurrency(
         locale: Platform.localeName, name: 'NGN', decimalDigits: 2);
-    return symbol ? _fcFull.format(price) : '₦${_fc.format(price)}';
+    return symbol ? fcFull.format(price) : '₦${_fc.format(price)}';
   }
 
   static num unformat(String money) {

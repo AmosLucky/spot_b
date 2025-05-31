@@ -79,19 +79,19 @@ class ColorsRes {
   static const Color chatbg = Color(0xffE1F4FD);
   static const Color unreadnotification = Color(0xffe7f6fd);
 
-  static const MaterialColor appcolor_material = const MaterialColor(
+  static const MaterialColor appcolor_material = MaterialColor(
     0xFF014bad,
-    const <int, Color>{
-      50: const Color(0xFF014bad),
-      100: const Color(0xFF014bad),
-      200: const Color(0xFF014bad),
-      300: const Color(0xFF014bad),
-      400: const Color(0xFF014bad),
-      500: const Color(0xFF014bad),
-      600: const Color(0xFF014bad),
-      700: const Color(0xFF014bad),
-      800: const Color(0xFF014bad),
-      900: const Color(0xFF014bad),
+    <int, Color>{
+      50: Color(0xFF014bad),
+      100: Color(0xFF014bad),
+      200: Color(0xFF014bad),
+      300: Color(0xFF014bad),
+      400: Color(0xFF014bad),
+      500: Color(0xFF014bad),
+      600: Color(0xFF014bad),
+      700: Color(0xFF014bad),
+      800: Color(0xFF014bad),
+      900: Color(0xFF014bad),
     },
   );
 
@@ -103,12 +103,12 @@ class ColorsRes {
         return Dialog(
           child: Container(
             padding: EdgeInsets.all(20),
-            child: new Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                new CircularProgressIndicator(),
+                CircularProgressIndicator(),
                 SizedBox(width: 20),
-                new Text('Please, wait'),
+                Text('Please, wait'),
               ],
             ),
           ),

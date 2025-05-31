@@ -15,9 +15,9 @@ class AccesorFormFiled extends InheritedWidget {
   final double? padding;
 
   const AccesorFormFiled({
-    Key? key,
+    super.key,
     required this.hintText,
-    required Widget child,
+    required super.child,
     required this.controller,
     required this.darkTheme,
     this.validator,
@@ -29,7 +29,7 @@ class AccesorFormFiled extends InheritedWidget {
     this.onPressSufixobscureTextIcon,
     this.textInputAction = TextInputAction.next,
     this.textInputType = TextInputType.text,
-  }) : super(key: key, child: child);
+  });
 
   static AccesorFormFiled? of(BuildContext context) {
     return (context.dependOnInheritedWidgetOfExactType<AccesorFormFiled>());

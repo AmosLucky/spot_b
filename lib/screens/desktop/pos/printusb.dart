@@ -341,8 +341,8 @@ class HotelItem {
 
 extension on List<int> {
   Pointer<Uint8> toNativeInt8() {
-    final ptr = calloc<Uint8>(this.length);
-    final nativeList = ptr.asTypedList(this.length);
+    final ptr = calloc<Uint8>(length);
+    final nativeList = ptr.asTypedList(length);
     nativeList.setAll(0, this);
     return ptr;
   }

@@ -28,7 +28,7 @@ class PrimaryTextField extends StatefulWidget {
   final Color? fillColor;
   final Function(String)? onFieldSubmitted;
   const PrimaryTextField(
-      {Key? key,
+      {super.key,
         this.controller,
         this.inputFormatters,
         this.onFieldSubmitted,
@@ -45,8 +45,7 @@ class PrimaryTextField extends StatefulWidget {
         required this.hintText,
         required this.title,
         this.obscure = false,
-        this.enabled, this.maxLines = 1, this.counter = '', this.enableInteractiveSelection, this.focusNode, this.fillColor = const Color(0xffFCFDFC)})
-      : super(key: key);
+        this.enabled, this.maxLines = 1, this.counter = '', this.enableInteractiveSelection, this.focusNode, this.fillColor = const Color(0xffFCFDFC)});
 
   @override
   State<PrimaryTextField> createState() => _PrimaryTextFieldState();

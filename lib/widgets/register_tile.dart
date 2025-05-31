@@ -12,14 +12,14 @@ class RegisterTile extends StatelessWidget {
   final VoidCallback onClose;
 
   const RegisterTile({
-    Key? key,
+    super.key,
     required this.openingAmt,
     required this.closingAmt,
     required this.createdAt,
     required this.isClosed,
     required this.onView,
     required this.onClose,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

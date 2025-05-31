@@ -20,7 +20,7 @@ class _SideNavigationState extends State<SideNavigation> {
   final padding = EdgeInsets.symmetric(horizontal: 20);
   @override
   Widget build(BuildContext context) {
-    final name = "${user.firstName}";
+    final name = user.firstName;
     final email = user.email;
     final urlImage = user.company!.logo;
 

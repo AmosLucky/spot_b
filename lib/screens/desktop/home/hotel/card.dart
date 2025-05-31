@@ -8,7 +8,7 @@ class HomeCard extends StatelessWidget {
   final String value;
   final void Function()? onPressed;
 
-  const HomeCard({required this.title, required this.value, this.onPressed});
+  const HomeCard({super.key, required this.title, required this.value, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
