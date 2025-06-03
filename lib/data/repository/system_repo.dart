@@ -397,6 +397,114 @@ class SystemRepo extends ApiClient {
     }
   }
 
+Future<List<Sale>> getLocalSales({
+  int page = 1,
+  String? startDate,
+  String? endDate,
+  String? warehouse,
+  String? customer,
+  String? attendant,
+  String? search,
+  String? type,
+}) async {
+  try {
+    print('🔍 Getting local sales with filters: page=$page');
+    
+    final store = await dbHelper.getStore();
+    final saleBox = store.box<SaleEntity>();
+    final saleItemBox = store.box<SaleItemEntity>();
+    
+    // Build the condition
+    Condition<SaleEntity>? condition = SaleEntity_.id.greaterThan(0);
+
+    // Apply filters
+    if (startDate != null && startDate.isNotEmpty) {
+      try {
+        final start = DateTime.parse(startDate);
+        condition = condition.and(SaleEntity_.date.greaterOrEqual(start.millisecondsSinceEpoch));
+      } catch (e) {
+        print('❌ Invalid start date format: $startDate');
+      }
+    }
+
+    if (endDate != null && endDate.isNotEmpty) {
+      try {
+        final end = DateTime.parse(endDate);
+        condition = condition!.and(SaleEntity_.date.lessOrEqual(end.millisecondsSinceEpoch));
+      } catch (e) {
+        print('❌ Invalid end date format: $endDate');
+      }
+    }
+
+    if (warehouse != null && warehouse.isNotEmpty && warehouse != 'All Warehouses') {
+      condition = condition!.and(SaleEntity_.warehouseName.equals(warehouse));
+    }
+
+    if (customer != null && customer.isNotEmpty && customer != 'All Customers') {
+      condition = condition!.and(SaleEntity_.customerName.equals(customer));
+    }
+
+    if (search != null && search.isNotEmpty) {
+      condition = condition!.and(SaleEntity_.referenceCode.contains(search));
+    }
+
+    if (type != null && type.isNotEmpty && type != 'All Types') {
+      condition = condition!.and(SaleEntity_.type.equals(type));
+    }
+
+    // Build and execute query
+    final query = saleBox.query(condition)
+        .order(SaleEntity_.createdAt, flags: Order.descending)
+        .build();
+    final allSaleEntities = query.find();
+    query.close();
+
+    print('📊 Total local sales found: ${allSaleEntities.length}');
+
+    // Apply pagination
+    final perPage = 10;
+    final startIndex = (page - 1) * perPage;
+    final endIndex = startIndex + perPage;
+    
+    if (startIndex >= allSaleEntities.length) {
+      return [];
+    }
+    
+    final paginatedSaleEntities = allSaleEntities.sublist(
+      startIndex,
+      endIndex > allSaleEntities.length ? allSaleEntities.length : endIndex,
+    );
+
+    // Convert entities to models and load sale items
+    final sales = <Sale>[];
+    for (final saleEntity in paginatedSaleEntities) {
+      try {
+        // Get sale items for this sale
+        final saleItemQuery = saleItemBox
+            .query(SaleItemEntity_.saleEntityId.equals(saleEntity.id))
+            .build();
+        final saleItemEntities = saleItemQuery.find();
+        saleItemQuery.close();
+
+        // Convert to Sale model
+        final sale = saleEntity.toSale();
+        sale.saleItems.clear();
+        sale.saleItems.addAll(saleItemEntities.map((item) => item.toSaleItem()));
+        
+        sales.add(sale);
+      } catch (e) {
+        print('❌ Error converting sale entity ${saleEntity.id}: $e');
+      }
+    }
+
+    print('✅ Successfully converted ${sales.length} sales from local storage');
+    return sales;
+    
+  } catch (e) {
+    print('❌ Error in getLocalSales: $e');
+    return [];
+  }
+}
   // Save sales to local storage using your DatabaseEngine
   Future<void> _saveSales(List<Sale> sales) async {
     try {

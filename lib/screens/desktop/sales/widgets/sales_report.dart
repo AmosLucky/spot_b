@@ -6,8 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/provider/sales_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
+import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/screens/desktop/sales/print/print_sales.dart';
 import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 
 class DesktopSalesReportScreen extends StatefulWidget {
@@ -36,7 +38,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SalesProvider>().fetchSales(refresh: true);
+      context.read<SalesProvider>().fetchSales(refresh: false);
     });
   }
 
@@ -77,6 +79,33 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const SizedBox(height: 10),
+                          if (provider.isOffline)
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(8),
+                              color: Colors.orange[100],
+                              child: Row(
+                                children: [
+                                  Icon(Icons.wifi_off,
+                                      color: Colors.orange[800], size: 16),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'You are offline - showing cached data',
+                                    style: TextStyle(
+                                        color: Colors.orange[800],
+                                        fontSize: 12),
+                                  ),
+                                  const Spacer(),
+                                  TextButton(
+                                    onPressed: () =>
+                                        provider.fetchSales(refresh: true),
+                                    child: Text('Retry',
+                                        style: TextStyle(
+                                            color: Colors.orange[800])),
+                                  ),
+                                ],
+                              ),
+                            ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -123,17 +152,18 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                     icon: const Icon(Icons.refresh),
                                     tooltip: 'Refresh Data',
                                   ),
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      // Implement Excel export
-                                    },
-                                    icon: const Icon(Icons.file_download),
-                                    label: const Text('Download'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF6B46C1),
-                                      foregroundColor: Colors.white,
-                                    ),
-                                  ),
+                                  // ElevatedButton.icon(
+                                  //   onPressed: () {
+                                  //     // Implement Excel export
+                                  //   },
+                                  //   icon: const Icon(Icons.file_download),
+                                  //   label: const Text('Download'),
+                                  //   style: ElevatedButton.styleFrom(
+                                  //     backgroundColor: const Color(0xFF6B46C1),
+                                  //     foregroundColor: Colors.white,
+                                  //   ),
+                                  // ),
+                                  _buildDownloadButton(provider),
                                 ],
                               ),
                             ],
@@ -184,11 +214,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                 : value),
                                       ),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
+                                    Gap(10),
                                     Expanded(
                                       child: _buildDropdown(
                                         'Warehouse',
@@ -204,7 +230,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                 : value),
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    Gap(10),
                                     Expanded(
                                       child: _buildDropdown(
                                         'Customer',
@@ -222,6 +248,13 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                 : value),
                                       ),
                                     ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: _buildDropdown(
@@ -238,11 +271,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                 : value),
                                       ),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
+                                    Gap(10),
                                     Container(
                                       width: 500,
                                       decoration: BoxDecoration(
@@ -264,7 +293,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                 value.isEmpty ? null : value),
                                       ),
                                     ),
-                                    const Spacer(),
+                                    Gap(10),
                                     const SizedBox(width: 10),
                                     ElevatedButton(
                                       onPressed: provider.resetFilters,
@@ -290,6 +319,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 10),
                               ],
                             ),
                           ),
@@ -864,7 +894,88 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // if (sale.paymentStatusText.toLowerCase() == 'paid')
+                    InkWell(
+                      onTap: () async {
+                        // Print individual sale receipt using SalesPrintService
+                        try {
+                          // Get user details from your provider/state management
+                          // Replace this with your actual way of getting user details
+                          final user =
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .user;
+                          // OR however you access user details in your app
+                          // final user = context.read<UserProvider>().user;
+
+                          // Show loading indicator
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => const AlertDialog(
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(width: 16),
+                                  Text('Printing receipt...'),
+                                ],
+                              ),
+                            ),
+                          );
+
+                          // Print the individual sale receipt
+                          await SalesPrintService()
+                              .printSingleSaleReceipt(sale, user);
+
+                          // Close loading dialog
+                          if (Navigator.canPop(context)) {
+                            Navigator.of(context).pop();
+                          }
+
+                          // Show success message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Receipt printed successfully!'),
+                              backgroundColor: Colors.green,
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        } catch (e) {
+                          // Close loading dialog if open
+                          if (Navigator.canPop(context)) {
+                            Navigator.of(context).pop();
+                          }
+
+                          // Show error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error printing receipt: $e'),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 4),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.print, size: 16, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'Print Receipt',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
@@ -874,7 +985,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       ),
                       child: Text(
                         sale.paymentStatusText,
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -925,11 +1037,11 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             ),
                             Text(
                               'Customer ID: ${sale.customerId ?? "N/A"}',
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             ),
                             Text(
                               'Sold from: ${sale.warehouseName}',
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             ),
                           ],
                         ),
@@ -943,25 +1055,25 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Attendant Information',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: Colors.grey,
                                   fontSize: 15),
                             ),
-                            const SizedBox(height: 8),
-                            const Text(
+                            SizedBox(height: 8),
+                            Text(
                               'Staff', // You can replace with actual attendant name
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
                             ),
-                            const Text(
+                            Text(
                               'Attendant ID: N/A',
                               style: TextStyle(fontSize: 12),
                             ),
@@ -1025,7 +1137,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 // Items list
                 Expanded(
                   child: ListView.builder(
-                    physics: BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     itemCount: sale.saleItems.length,
                     itemBuilder: (context, index) {
                       final item = sale.saleItems[index];
@@ -1056,7 +1168,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                               ),
                             ),
                             Expanded(flex: 2, child: Text('${item.quantity}')),
-                            Expanded(
+                            const Expanded(
                                 flex: 2,
                                 child: Text(
                                   'btl',
@@ -1066,13 +1178,13 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                 flex: 2,
                                 child: Text(
                                   '₦${NumberFormat('#,##0').format(item.productPrice)}',
-                                  style: TextStyle(fontSize: 12),
+                                  style: const TextStyle(fontSize: 12),
                                 )),
                             Expanded(
                                 flex: 2,
                                 child: Text(
                                   '₦${NumberFormat('#,##0').format(item.subTotal)}',
-                                  style: TextStyle(fontSize: 12),
+                                  style: const TextStyle(fontSize: 12),
                                 )),
                           ],
                         ),
@@ -1182,23 +1294,23 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 Center(
                   child: Row(
                     children: [
-                      Text(
+                      const Text(
                         'Thank you for your business! For any questions, please contact our support team.',
                         style: TextStyle(color: Colors.grey, fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
-                      Gap(10),
+                      const SizedBox(width: 10), // Replaced Gap with SizedBox
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
                         },
                         child: Container(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
                                 color: Colors.red,
                                 borderRadius: BorderRadius.circular(5)),
-                            child: Text(
+                            child: const Text(
                               'Exit',
                               style: TextStyle(color: Colors.white),
                             )),
@@ -1477,5 +1589,66 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     // Mock response
     await Future.delayed(const Duration(seconds: 1));
     return {'success': true, 'message': 'Payment recorded successfully'};
+  }
+
+  Widget _buildDownloadButton(SalesProvider provider) {
+    return PopupMenuButton<String>(
+      onSelected: (value) async {
+        switch (value) {
+          case 'current':
+            await SalesPrintService.printCurrentPageSales(
+              context,
+              provider.sales,
+              widget.user,
+            );
+            break;
+          case 'all':
+            await SalesPrintService.downloadAndPrintAllSales(
+              context: context,
+              provider: provider,
+              user: widget.user,
+            );
+            break;
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'current',
+          child: Row(
+            children: [
+              Icon(Icons.file_download, size: 16),
+              SizedBox(width: 8),
+              Text('Download Current Page'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'all',
+          child: Row(
+            children: [
+              Icon(Icons.cloud_download, size: 16),
+              SizedBox(width: 8),
+              Text('Download All Sales'),
+            ],
+          ),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF6B46C1),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.file_download, color: Colors.white, size: 16),
+            SizedBox(width: 8),
+            Text('Download', style: TextStyle(color: Colors.white)),
+            Icon(Icons.arrow_drop_down, color: Colors.white, size: 16),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -129,6 +129,7 @@ class SystemProvider with ChangeNotifier {
     // fetchStockAlerts(true, connectionResult);
     _responseState = ResponseState.done;
     _dataFetched = false;
+    
   }
 
   void checkConnection(bool value) {

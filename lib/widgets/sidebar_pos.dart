@@ -80,14 +80,14 @@ class SideBarPos extends StatelessWidget {
                     title: "Calculator",
                     icon: MdiIcons.calculator,
                   ),
-                  SidebarItem(
-                    title: "Sales",
-                    icon: MdiIcons.information,
-                    onTap: () => _navigateToPage(
-                      context,
-                      const SalesDesktop(),
-                    ),
-                  ),
+                  // SidebarItem(
+                  //   title: "Sales",
+                  //   icon: MdiIcons.information,
+                  //   onTap: () => _navigateToPage(
+                  //     context,
+                  //     const SalesDesktop(),
+                  //   ),
+                  // ),
                   SidebarItem(
                     title: "Sales Report",
                     icon: MdiIcons.information,
