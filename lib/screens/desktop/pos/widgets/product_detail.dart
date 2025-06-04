@@ -10,6 +10,8 @@ class ProductDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final price = (product['product_price'] as num?)?.toDouble() ?? 0.0;
+    Money.format(price);
     // Check if the 'images' field exists and is a Map
     // if (product['images'] is Map) {
     //   // Check if the 'imageUrls' field exists and is a List
@@ -120,7 +122,7 @@ class ProductDetails extends StatelessWidget {
                 ),
               ),
               Text(
-                Money.format(product['product_price']),
+                "$price",
                 overflow: TextOverflow.fade,
                 style: const TextStyle(
                   fontSize: 16.0,

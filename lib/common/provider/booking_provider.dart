@@ -176,3 +176,76 @@
 //     notifyListeners();
 //   }
 // }
+
+import 'package:flutter/material.dart';
+
+class BookingProvider with ChangeNotifier {
+  String _searchQuery = '';
+  DateTime? _dateFrom;
+  DateTime? _dateTo;
+  String _checkInStatus = 'All Check-in Statuses';
+  String _checkOutStatus = 'All Check-out Statuses';
+  String _paymentStatus = 'All Payment Statuses';
+  String _allActivePending = 'All';
+  String _status = 'All Statuses';
+  String _viewMode = 'Grid';
+  int _itemsPerPage = 15;
+
+  // Getters
+  String get searchQuery => _searchQuery;
+  DateTime? get dateFrom => _dateFrom;
+  DateTime? get dateTo => _dateTo;
+  String get checkInStatus => _checkInStatus;
+  String get checkOutStatus => _checkOutStatus;
+  String get paymentStatus => _paymentStatus;
+  String get allActivePending => _allActivePending;
+  String get status => _status;
+  String get viewMode => _viewMode;
+  int get itemsPerPage => _itemsPerPage;
+
+  // Setters
+  void setSearchQuery(String value) {
+    _searchQuery = value;
+    notifyListeners();
+  }
+
+  void setDateFrom(DateTime? date) {
+    _dateFrom = date;
+    notifyListeners();
+  }
+
+  void setDateTo(DateTime? date) {
+    _dateTo = date;
+    notifyListeners();
+  }
+
+  void setCheckInStatus(String value) {
+    _checkInStatus = value;
+    notifyListeners();
+  }
+
+  void setCheckOutStatus(String value) {
+    _checkOutStatus = value;
+    notifyListeners();
+  }
+
+  void setPaymentStatus(String value) {
+    _allActivePending = value;
+    notifyListeners();
+  }
+
+  void setStatus(String value) {
+    _status = value;
+    notifyListeners();
+  }
+
+  void setViewMode(String value) {
+    _viewMode = value;
+    notifyListeners();
+  }
+
+  void setItemsPerPage(int value) {
+    _itemsPerPage = value;
+    notifyListeners();
+  }
+}

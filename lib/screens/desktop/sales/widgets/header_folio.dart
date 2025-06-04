@@ -35,16 +35,29 @@ class _HeaderState extends State<HeaderFolio> {
 
   Future<void> _selectDateRange(BuildContext context) async {
     final DateTimeRange? pickedDateRange = await showDateRangePicker(
-      context: context,
-      saveText: 'Fetch Report',
-      initialDateRange: _selectedDateRange ??
-          DateTimeRange(
-            start: DateTime.now().subtract(const Duration(days: 7)),
-            end: DateTime.now(),
-          ),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-    );
+        context: context,
+        helpText: 'Select Date',
+        saveText: 'Fetch Report',
+        initialDateRange: _selectedDateRange ??
+            DateTimeRange(
+              start: DateTime.now().subtract(const Duration(days: 7)),
+              end: DateTime.now(),
+            ),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2101),
+        builder: (context, child) {
+          return Theme(
+              data: Theme.of(context).copyWith(
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.only(
+                      right: 150,
+                    ), // Adjust spacing
+                  ),
+                ),
+              ),
+              child: child!);
+        });
     if (pickedDateRange != null && pickedDateRange != _selectedDateRange) {
       setState(() {
         _selectedDateRange = pickedDateRange;

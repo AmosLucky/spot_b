@@ -35,7 +35,6 @@ class OrderSummary extends StatefulWidget {
 }
 
 class _OrderSummaryState extends State<OrderSummary> {
-
   List<dynamic> _invoices = [];
   List<dynamic> invoices = [];
 
@@ -58,7 +57,8 @@ class _OrderSummaryState extends State<OrderSummary> {
   // Fetch invoices for the specified register
   Future<List<dynamic>> getInvoices() async {
     try {
-      invoices = await widget.systemProvider.getInvoices(widget.registerInfo['id']);
+      invoices =
+          await widget.systemProvider.getInvoices(widget.registerInfo['id']);
       return await widget.systemProvider.getInvoices(widget.registerInfo['id']);
     } catch (e) {
       print('Error fetching invoices: $e');
@@ -90,66 +90,68 @@ class _OrderSummaryState extends State<OrderSummary> {
       builder: (BuildContext context) {
         return Consumer<CartProvider>(
             builder: (context, cartProvider, child) => PaymentForm(
-              isInvoice: cartProvider.selectedIndex != null ? true : false,
-              data: cartProvider
-                  .selectedIndex != null ?{
-                "customerName": invoices[cartProvider
-                    .selectedIndex!]['customerName'],
-                "customerPhoneNumber": invoices[cartProvider
-                    .selectedIndex!]['customerPhone'],
-                "table": invoices[cartProvider
-                    .selectedIndex!]['tableId']
-              } : {},
-          app: 'pos',
-          systemProvider: widget.systemProvider,
-          subtotal: subtotal,
-          onSubmit: (paymentData) async {
-            paymentData['registerId'] = widget.registerInfo['id'];
+                  isInvoice: cartProvider.selectedIndex != null ? true : false,
+                  data: cartProvider.selectedIndex != null
+                      ? {
+                          "customerName": invoices[cartProvider.selectedIndex!]
+                              ['customerName'],
+                          "customerPhoneNumber":
+                              invoices[cartProvider.selectedIndex!]
+                                  ['customerPhone'],
+                          "table": invoices[cartProvider.selectedIndex!]
+                              ['tableId']
+                        }
+                      : {},
+                  app: 'pos',
+                  systemProvider: widget.systemProvider,
+                  subtotal: subtotal,
+                  onSubmit: (paymentData) async {
+                    paymentData['registerId'] = widget.registerInfo['id'];
 
-            try {
-              final value =
-                  await Provider.of<CartProvider>(context, listen: false)
-                      .checkout(context, subtotal, paymentData);
+                    try {
+                      final value = await Provider.of<CartProvider>(context,
+                              listen: false)
+                          .checkout(context, subtotal, paymentData);
 
-              if (value['status'] == true && value['txnID'] != null) {
-                var response = await getReceiptTxn(value['txnID']);
-                if (response.isNotEmpty && context.mounted) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => PrintScreenDialog(
-                            user: widget.user,
-                            transactionData: response,
-                          )));
-                  // for(var i in _invoices) {
-                  //   if(i['id'] = cart)
-                  // }
-                  await deleteInvoice(cartProvider.selectedInvoiceId);
-                  Provider.of<CartProvider>(context, listen: false)
-                      .deleteIndex();
-                }
-              } else {
-                // Show error dialog or message
-                Dialogs.alertDialog(
-                  context,
-                  "Payment Failed",
-                  "Something went wrong during the transaction. Please try again.",
-                  "OK",
-                  "",
-                  [],
-                );
-              }
-            } catch (e) {
-              // Handle exceptions and show an error message.
-              Dialogs.alertDialog(
-                context,
-                "Error",
-                "An unexpected error occurred: ${e.toString()}",
-                "OK",
-                "",
-                [],
-              );
-            }
-          },
-        ));
+                      if (value['status'] == true && value['txnID'] != null) {
+                        var response = await getReceiptTxn(value['txnID']);
+                        if (response.isNotEmpty && context.mounted) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => PrintScreenDialog(
+                                    user: widget.user,
+                                    transactionData: response,
+                                  )));
+                          // for(var i in _invoices) {
+                          //   if(i['id'] = cart)
+                          // }
+                          await deleteInvoice(cartProvider.selectedInvoiceId);
+                          Provider.of<CartProvider>(context, listen: false)
+                              .deleteIndex();
+                        }
+                      } else {
+                        // Show error dialog or message
+                        Dialogs.alertDialog(
+                          context,
+                          "Payment Failed",
+                          "Something went wrong during the transaction. Please try again.",
+                          "OK",
+                          "",
+                          [],
+                        );
+                      }
+                    } catch (e) {
+                      // Handle exceptions and show an error message.
+                      Dialogs.alertDialog(
+                        context,
+                        "Error",
+                        "An unexpected error occurred: ${e.toString()}",
+                        "OK",
+                        "",
+                        [],
+                      );
+                    }
+                  },
+                ));
       },
     );
   }
@@ -290,7 +292,9 @@ class _OrderSummaryState extends State<OrderSummary> {
                                       cart.decrementQuantity(index);
                                     },
                                   )),
-                              SizedBox(width: 2.w,),
+                              SizedBox(
+                                width: 2.w,
+                              ),
                               GestureDetector(
                                 onTap: () {
                                   _editQuantity(
@@ -305,7 +309,9 @@ class _OrderSummaryState extends State<OrderSummary> {
                                       color: primaryColor, fontSize: 12.sp),
                                 ),
                               ),
-                              SizedBox(width: 2.w,),
+                              SizedBox(
+                                width: 2.w,
+                              ),
                               Container(
                                   width: 40,
                                   height: 40,
@@ -358,42 +364,65 @@ class _OrderSummaryState extends State<OrderSummary> {
                               showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
-
                                     return Consumer<CartProvider>(
-                                        builder: (context, cartProvider, child) => PayFormInvoice(data:
-                                        cartProvider.selectedIndex != null ? {
-                                          "customerName": invoices[cartProvider
-                                              .selectedIndex!]['customerName'],
-                                          "customerPhoneNumber": invoices[cartProvider
-                                              .selectedIndex!]['customerPhone'],
-                                          "table": invoices[cartProvider
-                                              .selectedIndex!]['tableId']
-                                        } : {}, onSubmit: (value) async {
+                                        builder: (context, cartProvider,
+                                                child) =>
+                                            PayFormInvoice(
+                                                data: cartProvider
+                                                            .selectedIndex !=
+                                                        null
+                                                    ? {
+                                                        "customerName": invoices[
+                                                                cartProvider
+                                                                    .selectedIndex!]
+                                                            ['customerName'],
+                                                        "customerPhoneNumber":
+                                                            invoices[cartProvider
+                                                                    .selectedIndex!]
+                                                                [
+                                                                'customerPhone'],
+                                                        "table": invoices[
+                                                                cartProvider
+                                                                    .selectedIndex!]
+                                                            ['tableId']
+                                                      }
+                                                    : {},
+                                                onSubmit: (value) async {
+                                                  var response =
+                                                      await cart.holdInvoice(
+                                                    context,
+                                                    widget.registerInfo['id'],
+                                                    cart.subTotal,
+                                                    value['table'],
+                                                    value['customerName'],
+                                                    value[
+                                                        'customerPhoneNumber'],
+                                                  );
+                                                  for (var i in invoices) {
+                                                    if (i['id'] ==
+                                                        cartProvider
+                                                            .selectedInvoiceId) {
+                                                      print(
+                                                          'ID ==>> ${i['id']}');
+                                                      deleteInvoice(i['id']);
+                                                    }
+                                                    Provider.of<CartProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .deleteIndex();
+                                                  }
 
-                                      var response = await cart.holdInvoice(
-                                        context,
-                                        widget.registerInfo['id'],
-                                        cart.subTotal, value['table'], value['customerName'], value['customerPhoneNumber'],
-                                      );
-                                      for(var i in invoices) {
-                                        if(i['id'] == cartProvider.selectedInvoiceId) {
-                                          print('ID ==>> ${i['id']}');
-                                          deleteInvoice(i['id']);
-                                        }
-                                        Provider.of<CartProvider>(context, listen: false)
-                                            .deleteIndex();
-                                      }
-
-                                      Dialogs.alertDialog(
-                                        context,
-                                        "Success!",
-                                        "Invoice moved to hold. Ref: ${response['reference']}",
-                                        "OK",
-                                        "",
-                                        [],
-                                      );
-                                    },
-                                        systemProvider: widget.systemProvider));
+                                                  Dialogs.alertDialog(
+                                                    context,
+                                                    "Success!",
+                                                    "Invoice moved to hold. Ref: ${response['reference']}",
+                                                    "OK",
+                                                    "",
+                                                    [],
+                                                  );
+                                                },
+                                                systemProvider:
+                                                    widget.systemProvider));
                                   });
                             }
                           })

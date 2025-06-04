@@ -9,26 +9,35 @@ class MyConnectivity {
   static final _instance = MyConnectivity._();
   static MyConnectivity get instance => _instance;
   final _connectivity = Connectivity();
-  final _controller = StreamController.broadcast();
-  Stream get myStream => _controller.stream;
+  final _controller = StreamController<Map<ConnectivityResult, bool>>.broadcast();
+  Stream<Map<ConnectivityResult, bool>> get myStream => _controller.stream;
 
   void initialise() async {
-    List<ConnectivityResult> result = await _connectivity.checkConnectivity();
-    _checkStatus(result as ConnectivityResult);
-    _connectivity.onConnectivityChanged.listen((result) {
-      _checkStatus(result as ConnectivityResult);
+    // Get initial connectivity status
+    List<ConnectivityResult> results = await _connectivity.checkConnectivity();
+    _checkStatus(results);
+
+    // Listen for connectivity changes
+    _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> results) {
+      _checkStatus(results);
     });
   }
 
-  void _checkStatus(ConnectivityResult result) async {
+  void _checkStatus(List<ConnectivityResult> results) async {
     bool isOnline = false;
     try {
-      final result = await InternetAddress.lookup('google.com');
-      isOnline = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      // Only check internet if there's a network type (WiFi/mobile)
+      if (results.isNotEmpty && results.any((result) => result != ConnectivityResult.none)) {
+        final lookup = await InternetAddress.lookup('google.com');
+        isOnline = lookup.isNotEmpty && lookup[0].rawAddress.isNotEmpty;
+      }
     } on SocketException catch (_) {
       isOnline = false;
     }
-    _controller.sink.add({result: isOnline});
+
+    // Emit the first active connection type (or .none if offline)
+    final activeConnection = results.isNotEmpty ? results.first : ConnectivityResult.none;
+    _controller.sink.add({activeConnection: isOnline});
   }
 
   void disposeStream() => _controller.close();

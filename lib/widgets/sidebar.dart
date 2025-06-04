@@ -3,12 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/screens/desktop/accounting/accounting_desktop.dart';
+import 'package:spotstock_inventory/screens/desktop/accounting/widgets/booking%20history.dart';
 import 'package:spotstock_inventory/screens/desktop/catalogue/catalogue_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/home/hotel_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/frontdesk_desktop.dart';
+import 'package:spotstock_inventory/screens/desktop/hotel/widgets/booking_history_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
 import 'package:flutter/material.dart';
+import 'package:spotstock_inventory/screens/desktop/maintenance.dart';
+import 'package:spotstock_inventory/screens/desktop/maintenance_desktop_screen.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/folio_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/sales_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/folio_desktop.dart';
@@ -46,13 +50,13 @@ class SideBarHotel extends StatelessWidget {
           // Sidebar Items
           Expanded(
             child: Container(
-              width: 200, // Fixed width for sidebar
+              width: 300, // Fixed width for sidebar
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius:
                     BorderRadius.circular(16), // Set the border radius
               ),
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
               child: ListView(
                 children: [
                   SidebarItem(
@@ -62,13 +66,24 @@ class SideBarHotel extends StatelessWidget {
                       const HotelScreenDesktop(),
                     ),
                   ),
-                  // SidebarItem(
-                  //   title: "Statistics",
-                  //   onTap: () => _navigateToPage(
-                  //     context,
-                  //     const SalesDesktop(),
-                  //   ),
-                  // ),
+                  SidebarItem(
+                    title: "Booking History",
+                    onTap:
+                        // () {}
+                        () => _navigateToPage(
+                      context,
+                      const BookingHistoryDesktop(),
+                    ),
+                  ),
+                  SidebarItem(
+                    title: "Maintenance",
+                    onTap:
+                        //  () {}
+                        () => _navigateToPage(
+                      context,
+                      MaintenanceDesktop(),
+                    ),
+                  ),
                   SidebarItem(
                     title: "Folio",
                     onTap: () => _navigateToPage(
@@ -167,7 +182,8 @@ class SideBarHotel extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(isClosing ? "Close HOTEL Register" : "Open HOTEL Register"),
+          title:
+              Text(isClosing ? "Close HOTEL Register" : "Open HOTEL Register"),
           content: Form(
             key: formKey,
             child: Column(
@@ -212,14 +228,14 @@ class SideBarHotel extends StatelessWidget {
 
                   if (isClosing) {
                     var response =
-                    await SystemRepo(refresh: false, online: false)
-                        .closeRegister("HOTEL", amountController.text);
+                        await SystemRepo(refresh: false, online: false)
+                            .closeRegister("HOTEL", amountController.text);
 
                     if (response['status'] == true) {
                       Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) {
-                            return const HomeScreenDesktop();
-                          }));
+                        return const HomeScreenDesktop();
+                      }));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Register closed successfully!')),
@@ -233,19 +249,18 @@ class SideBarHotel extends StatelessWidget {
                     }
                   } else {
                     var response =
-                    await SystemRepo(refresh: false, online: false)
-                        .openRegister(
-                        module: 'HOTEL',
-                        amount: amountController.text);
+                        await SystemRepo(refresh: false, online: false)
+                            .openRegister(
+                                module: 'HOTEL', amount: amountController.text);
 
                     if (response['status'] == true) {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                            return FrontDeskDesktop(
-                              systemProvider: systemProvider,
-                              user: user,
-                            );
-                          }));
+                        return FrontDeskDesktop(
+                          systemProvider: systemProvider,
+                          user: user,
+                        );
+                      }));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -287,7 +302,8 @@ class SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(title, style: const TextStyle(color: Colors.black)),
+      title: Text(title,
+          style: const TextStyle(color: Colors.black, fontSize: 15)),
       onTap: onTap,
     );
   }

@@ -41,7 +41,6 @@ class SystemProvider with ChangeNotifier {
   int? _warehouseIds;
   int? get warehouseIds => _warehouseIds;
 
-
   Map<String, dynamic> _dashboardStats = {};
   Map<String, dynamic> get dashboardStats => _dashboardStats;
 
@@ -68,8 +67,8 @@ class SystemProvider with ChangeNotifier {
     print(isConnected);
     _getDashboardFeed();
     fetchWarehouses(true, isConnected
-      // _connectionStatus
-    );
+        // _connectionStatus
+        );
     fetchCategories(true, isConnected // _connectionStatus
         );
     fetchHotelCategories(true, isConnected
@@ -93,6 +92,8 @@ class SystemProvider with ChangeNotifier {
     fetchProducts(true, isConnected, null
         // _connectionStatus
         );
+    await fetchStaffs(true, isConnected);
+
     print("Fetching Data");
     fetchTables(true, isConnected);
     _responseState = ResponseState.done;
@@ -105,6 +106,13 @@ class SystemProvider with ChangeNotifier {
     _responseState = ResponseState.loading;
     _dataFetched = true;
     notifyListeners();
+
+    print(
+        ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Datas Syncinggg');
+    print(
+        ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Datas Syncinggg');
+    print(
+        ':::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Datas Syncinggg');
     await _getDashboardFeed();
     await fetchWarehouses(true, connectionResult);
     await fetchCategories(true, connectionResult);
@@ -117,9 +125,11 @@ class SystemProvider with ChangeNotifier {
     await fetchCustomers(true, connectionResult);
     await fetchProducts(true, connectionResult, null);
     await fetchTables(true, connectionResult);
+    await fetchStaffs(true, connectionResult);
     // fetchStockAlerts(true, connectionResult);
     _responseState = ResponseState.done;
     _dataFetched = false;
+    
   }
 
   void checkConnection(bool value) {
@@ -146,7 +156,7 @@ class SystemProvider with ChangeNotifier {
         if (response.statusCode == 200) {
           final warehouseData = response.data["data"];
 
-          _warehouseIds =  response.data['data'][0]['id'];
+          _warehouseIds = response.data['data'][0]['id'];
           print("warehouse data ==>> $warehouseData");
 
           // Convert the warehouse data into a list of StoreX objects
@@ -743,7 +753,8 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId) async {
+  Future<bool> fetchProducts(
+      bool refresh, bool connectionStatus, int? warehouseId) async {
     print("Fetching products");
     UserDetails user =
         Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
@@ -826,7 +837,8 @@ class SystemProvider with ChangeNotifier {
 
   Future<List<dynamic>> getRoomTypes() async {
     try {
-      var response = await SystemRepo(refresh: false, online: false).fetchRoomTypes();
+      var response =
+          await SystemRepo(refresh: false, online: false).fetchRoomTypes();
       _roomTypesItems = response.data['data'];
       print("Fetched room data $response");
       return response.data;
@@ -836,9 +848,17 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-  Future<Map> getAvailableRooms(String roomTypeId, noOfAdult, noOfChildren, noOfRooms, startDate, endDate) async {
+  Future<Map> getAvailableRooms(String roomTypeId, noOfAdult, noOfChildren,
+      noOfRooms, startDate, endDate) async {
     try {
-      var response = await SystemRepo(refresh: false, online: false).fetchAvailableRooms(roomTypeId: roomTypeId, noOfAdult: noOfAdult, noOfChildren: noOfChildren, startDate: startDate, endDate: endDate, noOfRooms: noOfRooms);
+      var response = await SystemRepo(refresh: false, online: false)
+          .fetchAvailableRooms(
+              roomTypeId: roomTypeId,
+              noOfAdult: noOfAdult,
+              noOfChildren: noOfChildren,
+              startDate: startDate,
+              endDate: endDate,
+              noOfRooms: noOfRooms);
 
       if (response.statusCode == 200) {
         _roomResult = response.data;
@@ -934,7 +954,7 @@ class SystemProvider with ChangeNotifier {
   Future<List<dynamic>> getWarehouse() async {
     try {
       var response =
-      await SystemRepo(refresh: false, online: false).getWarehouses();
+          await SystemRepo(refresh: false, online: false).getWarehouses();
       return response;
     } catch (error) {
       return [];
@@ -1144,14 +1164,283 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> syncAllTransactions(UserDetails user,) async {
+//   Future<List<Map<String, dynamic>>> getAttendants() async {
+//   try {
+//     final response = await get('attendants'); // Adjust endpoint as needed
+//     return List<Map<String, dynamic>>.from(response['data'] ?? []);
+//   } catch (e) {
+//     print('Error fetching attendants: $e');
+//     return [];
+//   }
+// }
+
+  Future<Map<String, dynamic>> syncAllTransactions(
+    UserDetails user,
+  ) async {
     try {
-      var response = await SystemRepo(refresh: false, online: false)
-          .syncAllTransactions(user,);
+      var response =
+          await SystemRepo(refresh: false, online: false).syncAllTransactions(
+        user,
+      );
       return response;
     } catch (error) {
       return {};
       // throw (error);
     }
   }
+  // Temporary dummy data method - returns Map data matching AttendantModel
+  // List<Map<String, dynamic>> getAttendants() {
+  //   return [
+  //     {
+  //       'id': '1',
+  //       'name': 'John Doe',
+  //       'department': 'Administration',
+  //       'pin_set': true,
+  //       'pin': '1234',
+  //     },
+  //     {
+  //       'id': '2',
+  //       'name': 'Jane Smith',
+  //       'department': 'Management',
+  //       'pin_set': true,
+  //       'pin': '5678',
+  //     },
+  //     {
+  //       'id': '3',
+  //       'name': 'Bob Johnson',
+  //       'department': 'Operations',
+  //       'pin_set': false,
+  //       'pin': null,
+  //     },
+  //     {
+  //       'id': '4',
+  //       'name': 'Alice Wilson',
+  //       'department': 'Customer Service',
+  //       'pin_set': true,
+  //       'pin': '9876',
+  //     },
+  //     {
+  //       'id': '5',
+  //       'name': 'Charlie Brown',
+  //       'department': 'Supervision',
+  //       'pin_set': true,
+  //       'pin': '4321',
+  //     },
+  //     {
+  //       'id': '6',
+  //       'name': 'Diana Prince',
+  //       'department': 'Security',
+  //       'pin_set': false,
+  //       'pin': null,
+  //     },
+  //     {
+  //       'id': '7',
+  //       'name': 'Frank Miller',
+  //       'department': 'Maintenance',
+  //       'pin_set': true,
+  //       'pin': '1111',
+  //     },
+  //     {
+  //       'id': '8',
+  //       'name': 'Grace Kelly',
+  //       'department': 'Sales',
+  //       'pin_set': true,
+  //       'pin': '2222',
+  //     },
+  //   ];
+  // }
+
+  Future<bool> fetchStaffs(bool refresh, bool connectionStatus) async {
+    UserDetails user =
+        Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    try {
+      if (connectionStatus) {
+        _responseState = ResponseState.loading;
+        notifyListeners();
+
+        Response response =
+            await SystemRepo(refresh: refresh, online: connectionStatus)
+                .fetchStaffsAPI();
+        print("============= system Repo Result Staffs ===============");
+
+        if (response.statusCode == 200) {
+          final staffData = response.data["data"];
+
+          StoreX staffs = StoreX(
+            name: "staffs",
+            value: jsonEncode(staffData),
+            billerId: user.id.toString(),
+            companyId: user.company!.id.toString(),
+            lastUpdated: DateTime.now().toIso8601String(),
+          );
+
+          final store = await DatabaseEngine.instance.getStore();
+          final staffBox = store.box<StoreX>();
+
+          final existingStaff = staffBox
+              .query(StoreX_.billerId
+                  .equals(user.id.toString())
+                  .and(StoreX_.name.equals("staffs")))
+              .build()
+              .findFirst();
+
+          if (existingStaff != null) {
+            staffs.id = existingStaff.id;
+            staffBox.put(staffs);
+            print('Staff record updated.');
+          } else {
+            staffBox.put(staffs);
+            print('New staff record inserted.');
+          }
+
+          _responseState = ResponseState.done;
+          notifyListeners();
+          return true;
+        } else {
+          print('Request failed with status: ${response.statusCode}.');
+        }
+      }
+
+      _responseState = ResponseState.error;
+      notifyListeners();
+      return false;
+    } catch (error) {
+      _responseState = ResponseState.error;
+      notifyListeners();
+      print(error);
+      return false;
+    }
+  }
+
+  Future<List<dynamic>> getStaffs() async {
+    print('🔍 [DEBUG] getStaffs() called');
+
+    try {
+      UserDetails user =
+          Provider.of<UserProvider>(Navigation.getContext(), listen: false)
+              .user;
+      print('🔍 [DEBUG] User ID: ${user.id}');
+
+      final store = await DatabaseEngine.instance.getStore();
+      final staffBox = store.box<StoreX>();
+
+      final staffRecord = staffBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("staffs")))
+          .build()
+          .findFirst();
+
+      if (staffRecord != null) {
+        print('🔍 [DEBUG] Found staff record in database');
+        print('🔍 [DEBUG] Staff record value: ${staffRecord.value}');
+
+        final List<dynamic> staffs = jsonDecode(staffRecord.value);
+        print('🔍 [DEBUG] Decoded staffs: ${staffs.length} items');
+        return staffs;
+      } else {
+        print('⚠️ [WARNING] No staff record found in database');
+        print('🔍 [DEBUG] Trying to fetch from API...');
+
+        // Try to fetch from API if no local data
+        bool connectionStatus = await InternetUtils.isConnected();
+        if (connectionStatus) {
+          print('🔍 [DEBUG] Internet available, fetching staffs...');
+          await fetchStaffs(true, connectionStatus);
+
+          // Try again to get from local storage
+          final staffRecordRetry = staffBox
+              .query(StoreX_.billerId
+                  .equals(user.id.toString())
+                  .and(StoreX_.name.equals("staffs")))
+              .build()
+              .findFirst();
+
+          if (staffRecordRetry != null) {
+            print('🔍 [DEBUG] Found staff record after API fetch');
+            final List<dynamic> staffs = jsonDecode(staffRecordRetry.value);
+            return staffs;
+          }
+        }
+
+        return [];
+      }
+    } catch (error) {
+      print("❌ [ERROR] getStaffs failed: $error");
+      print("❌ [ERROR] Stack trace: ${StackTrace.current}");
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAttendants() async {
+    print('🔍 [DEBUG] getAttendants() called');
+
+    try {
+      var response = await getStaffs();
+      print('🔍 [DEBUG] getStaffs() returned: ${response.length} items');
+      print('🔍 [DEBUG] Raw staff data: $response');
+
+      // Convert to the format expected by AttendantModel
+      var converted = response.map<Map<String, dynamic>>((staff) {
+        print('🔍 [DEBUG] Converting staff: $staff');
+        return {
+          'id': staff['id'].toString(),
+          'name': staff['name'] ?? '',
+          'department': staff['department'] ?? '',
+          'pin_set': staff['pin_set'] ?? false,
+          'pin': staff['pin'],
+        };
+      }).toList();
+
+      print('🔍 [DEBUG] Converted attendants: $converted');
+      return converted;
+    } catch (error) {
+      print('❌ [ERROR] getAttendants failed: $error');
+      print('❌ [ERROR] Stack trace: ${StackTrace.current}');
+      return [];
+    }
+  }
 }
+
+// Attendant model class (if you don't have it already)
+// class Attendant {
+//   final String id;
+//   final String name;
+//   final String email;
+//   final String role;
+//   final bool isActive;
+//   final DateTime joinedDate;
+
+//   Attendant({
+//     required this.id,
+//     required this.name,
+//     required this.email,
+//     required this.role,
+//     required this.isActive,
+//     required this.joinedDate,
+//   });
+
+//   // Convert to Map for JSON serialization
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'id': id,
+//       'name': name,
+//       'email': email,
+//       'role': role,
+//       'isActive': isActive,
+//       'joinedDate': joinedDate.toIso8601String(),
+//     };
+//   }
+
+//   // Create from Map for JSON deserialization
+//   factory Attendant.fromMap(Map<String, dynamic> map) {
+//     return Attendant(
+//       id: map['id'] ?? '',
+//       name: map['name'] ?? '',
+//       email: map['email'] ?? '',
+//       role: map['role'] ?? '',
+//       isActive: map['isActive'] ?? false,
+//       joinedDate: DateTime.parse(map['joinedDate']),
+//     );
+//   }
+// }

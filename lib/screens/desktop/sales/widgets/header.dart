@@ -4,12 +4,12 @@ import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 
-class Header extends StatefulWidget {
+class SalesHeader extends StatefulWidget {
   final UserDetails user;
   final SystemProvider systemProvider;
   final Function(DateTime) onDateSelected; // Callback to pass selected date
 
-  const Header({
+  const SalesHeader({
     super.key,
     required this.user,
     required this.systemProvider,
@@ -17,10 +17,10 @@ class Header extends StatefulWidget {
   });
 
   @override
-  _HeaderState createState() => _HeaderState();
+  _SalesHeaderState createState() => _SalesHeaderState();
 }
 
-class _HeaderState extends State<Header> {
+class _SalesHeaderState extends State<SalesHeader> {
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {

@@ -428,6 +428,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "gap",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/gap-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "get",
       "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/get-4.7.2",
       "packageUri": "lib/",
@@ -1178,7 +1184,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2025-05-31T23:16:55.964343Z",
+  "generated": "2025-06-04T18:32:29.966610Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///C:/Users/IFEANYI/flutter-extract/flutter",

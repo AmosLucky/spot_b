@@ -100,10 +100,10 @@ class Header extends StatelessWidget {
                     if (isOpen) {
                       _navigateToPage(
                         context,
-                          EcosystemDesktop(
-                            systemProvider: systemProvider,
-                            user: user,
-                          ),
+                        EcosystemDesktop(
+                          systemProvider: systemProvider,
+                          user: user,
+                        ),
                       );
                     } else {
                       // Show POS dialog if register is not open
@@ -278,7 +278,7 @@ class Header extends StatelessWidget {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the cash amount at hand';
                     }
-                    
+
                     if (double.tryParse(value) == null ||
                         double.parse(value) < 0) {
                       return 'Please enter a valid amount greater than 0';
@@ -350,7 +350,7 @@ class Header extends StatelessWidget {
             key: formKey,
             child: Column(
               mainAxisSize:
-              MainAxisSize.min, // Set column height based on content
+                  MainAxisSize.min, // Set column height based on content
               children: [
                 const Text("Open register to start your daily sales!"),
                 const SizedBox(height: 16), // Add spacing
@@ -385,31 +385,33 @@ class Header extends StatelessWidget {
 
                   // Open register with the entered cash amount
                   var response = await SystemRepo(refresh: false, online: false)
-                      .openRegister(module: module, amount: amountController.text);
+                      .openRegister(
+                          module: module, amount: amountController.text);
 
                   if (response['status'] == true) {
-                    if(module == 'INVENTORY') {
+                    if (module == 'INVENTORY') {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                            return EcosystemDesktop(
-                              systemProvider: systemProvider,
-                              user: user,
-                            );
-                          }));
+                        return EcosystemDesktop(
+                          systemProvider: systemProvider,
+                          user: user,
+                        );
+                      }));
                     } else if (module == 'HOTEL') {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                            return FrontDeskDesktop(
-                              systemProvider: systemProvider,
-                              user: user,
-                            );
-                          }));
+                        return FrontDeskDesktop(
+                          systemProvider: systemProvider,
+                          user: user,
+                        );
+                      }));
                     }
+                    ;
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content:
-                        Text('Failed to open register. Please try again.'),
+                            Text('Failed to open register. Please try again.'),
                       ),
                     );
                   }

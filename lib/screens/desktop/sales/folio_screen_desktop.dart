@@ -26,13 +26,15 @@ class FolioScreenDesktop extends StatefulWidget {
 
 class _FolioScreenDesktopState extends State<FolioScreenDesktop> {
   final _searchController = TextEditingController();
-  late FolioDataProvider folioProvider;
+  FolioDataProvider? folioProvider;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
+    });
   }
 
   Future<void> _initializeData() async {
@@ -98,7 +100,7 @@ class _FolioScreenDesktopState extends State<FolioScreenDesktop> {
                                 const SizedBox(height: 20),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.9,
+                                      MediaQuery.of(context).size.height * 0.95,
                                   width:
                                       MediaQuery.of(context).size.width * 0.8,
                                   child: PaginatedDataTable(
