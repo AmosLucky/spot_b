@@ -574,9 +574,361 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "10:176027469693708080",
+      "lastPropertyId": "14:7782010912838847054",
+      "name": "MaintenanceRoom",
+      "properties": [
+        {
+          "id": "1:182428615677928808",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4111040109145990041",
+          "name": "companyId",
+          "type": 6
+        },
+        {
+          "id": "3:3895143759826624092",
+          "name": "roomTypeId",
+          "type": 6
+        },
+        {
+          "id": "4:6503012750186097857",
+          "name": "roomNumber",
+          "type": 9
+        },
+        {
+          "id": "5:833059432210671885",
+          "name": "status",
+          "type": 9
+        },
+        {
+          "id": "6:1637423990479956145",
+          "name": "maintenanceNote",
+          "type": 9
+        },
+        {
+          "id": "7:5326027377037207083",
+          "name": "maintenanceDate",
+          "type": 10
+        },
+        {
+          "id": "8:2963279457228440243",
+          "name": "maintenanceExpectedEndDate",
+          "type": 10
+        },
+        {
+          "id": "9:4338190408811453999",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "10:869967021353957856",
+          "name": "updatedAt",
+          "type": 10
+        },
+        {
+          "id": "11:4183520007493238060",
+          "name": "roomTypeName",
+          "type": 9
+        },
+        {
+          "id": "12:757256816294505260",
+          "name": "roomTypeFare",
+          "type": 8
+        },
+        {
+          "id": "13:5561254452283458293",
+          "name": "roomTypeTotalAdult",
+          "type": 6
+        },
+        {
+          "id": "14:7782010912838847054",
+          "name": "roomTypeTotalChild",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "11:8081494730027905127",
+      "lastPropertyId": "26:3884557465037578857",
+      "name": "SaleEntity",
+      "properties": [
+        {
+          "id": "1:5384765280489227850",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5684303618331351198",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "3:1616392717430720968",
+          "name": "date",
+          "type": 10
+        },
+        {
+          "id": "4:5288724230055531097",
+          "name": "isReturn",
+          "type": 6
+        },
+        {
+          "id": "5:3408558091414542754",
+          "name": "customerId",
+          "type": 6
+        },
+        {
+          "id": "6:7450415229369400227",
+          "name": "customerName",
+          "type": 9
+        },
+        {
+          "id": "7:9096750548671478995",
+          "name": "warehouseId",
+          "type": 6
+        },
+        {
+          "id": "8:3291553633693394809",
+          "name": "warehouseName",
+          "type": 9
+        },
+        {
+          "id": "9:7035933027545368616",
+          "name": "taxRate",
+          "type": 8
+        },
+        {
+          "id": "10:5399114605163219701",
+          "name": "taxAmount",
+          "type": 8
+        },
+        {
+          "id": "11:3560692483588741176",
+          "name": "discount",
+          "type": 8
+        },
+        {
+          "id": "12:5682729727133996816",
+          "name": "shipping",
+          "type": 8
+        },
+        {
+          "id": "13:6681419857050426659",
+          "name": "grandTotal",
+          "type": 8
+        },
+        {
+          "id": "14:2901667354055831934",
+          "name": "receivedAmount",
+          "type": 8
+        },
+        {
+          "id": "15:7872382805884398207",
+          "name": "paidAmount",
+          "type": 8
+        },
+        {
+          "id": "16:6178404636167483725",
+          "name": "partialAmount",
+          "type": 8
+        },
+        {
+          "id": "17:3393997386183370691",
+          "name": "dueAmount",
+          "type": 8
+        },
+        {
+          "id": "18:910347685257291712",
+          "name": "paymentType",
+          "type": 6
+        },
+        {
+          "id": "19:5636795265277642536",
+          "name": "note",
+          "type": 9
+        },
+        {
+          "id": "20:4290800934145347626",
+          "name": "status",
+          "type": 6
+        },
+        {
+          "id": "21:3138566299552924843",
+          "name": "paymentStatus",
+          "type": 6
+        },
+        {
+          "id": "22:8777926555927508156",
+          "name": "referenceCode",
+          "type": 9
+        },
+        {
+          "id": "23:4467200511833145049",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "24:5146346039987440972",
+          "name": "barcodeUrl",
+          "type": 9
+        },
+        {
+          "id": "25:1589563027189958483",
+          "name": "isOffline",
+          "type": 6
+        },
+        {
+          "id": "26:3884557465037578857",
+          "name": "offlineCustomerName",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "12:2304842742082983492",
+      "lastPropertyId": "25:3705200464297192900",
+      "name": "SaleItemEntity",
+      "properties": [
+        {
+          "id": "1:4763831482871596153",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2770773633704497887",
+          "name": "saleEntityId",
+          "type": 6
+        },
+        {
+          "id": "3:6523414877490290607",
+          "name": "originalSaleId",
+          "type": 6
+        },
+        {
+          "id": "4:1306290552237980420",
+          "name": "productId",
+          "type": 6
+        },
+        {
+          "id": "5:6476454294764815766",
+          "name": "tableId",
+          "type": 6
+        },
+        {
+          "id": "6:6028903763618158593",
+          "name": "productPrice",
+          "type": 8
+        },
+        {
+          "id": "7:3025967695941661105",
+          "name": "netUnitPrice",
+          "type": 8
+        },
+        {
+          "id": "8:6491368045567224408",
+          "name": "taxType",
+          "type": 6
+        },
+        {
+          "id": "9:7653147135962168504",
+          "name": "taxValue",
+          "type": 8
+        },
+        {
+          "id": "10:3939375406506639591",
+          "name": "taxAmount",
+          "type": 8
+        },
+        {
+          "id": "11:5984519626177581446",
+          "name": "discountType",
+          "type": 6
+        },
+        {
+          "id": "12:7450948659009528843",
+          "name": "discountValue",
+          "type": 8
+        },
+        {
+          "id": "13:1116510195386316368",
+          "name": "discountAmount",
+          "type": 8
+        },
+        {
+          "id": "14:7819015752412987650",
+          "name": "quantity",
+          "type": 6
+        },
+        {
+          "id": "15:2392725220445762784",
+          "name": "subTotal",
+          "type": 8
+        },
+        {
+          "id": "16:3742014036095943620",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "17:9076705840707132086",
+          "name": "updatedAt",
+          "type": 10
+        },
+        {
+          "id": "18:4307871853757336853",
+          "name": "companyId",
+          "type": 6
+        },
+        {
+          "id": "19:8773070098822499433",
+          "name": "saleUnitId",
+          "type": 6
+        },
+        {
+          "id": "20:8248357029552491089",
+          "name": "saleUnitName",
+          "type": 9
+        },
+        {
+          "id": "21:734541233863552232",
+          "name": "saleUnitShortName",
+          "type": 9
+        },
+        {
+          "id": "22:5155753363363454757",
+          "name": "saleUnitBaseUnit",
+          "type": 6
+        },
+        {
+          "id": "23:4249401775480135518",
+          "name": "saleUnitCreatedAt",
+          "type": 10
+        },
+        {
+          "id": "24:4984154659838661260",
+          "name": "saleUnitUpdatedAt",
+          "type": 10
+        },
+        {
+          "id": "25:3705200464297192900",
+          "name": "saleUnitCompanyId",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "9:2180851869646946073",
+  "lastEntityId": "12:2304842742082983492",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

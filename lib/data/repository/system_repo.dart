@@ -10,6 +10,8 @@ import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/datetime.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
+import 'package:spotstock_inventory/data/models/maintenance_model.dart';
+import 'package:spotstock_inventory/data/models/sales_models.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
@@ -84,7 +86,8 @@ class SystemRepo extends ApiClient {
   }
 
   // Perform GET request with caching and token authorization
-  Future<Response> _fetchRoomTypes(String endpoint) async {
+  Future<Response> _fetchRoomTypes(String endpoint,
+      {bool refresh = false}) async {
     String token = await getToken(); // Get token using the helper method
 
     print("Fetching: $baseUri$endpoint");
@@ -107,6 +110,128 @@ class SystemRepo extends ApiClient {
     } catch (e) {
       print("Error fetching data: $e");
       rethrow;
+    }
+  }
+
+// Mark room as Dirty
+  // Future<Response> markRoomAsDirty({
+  //   required int roomId,
+  //   required String maintenanceNote,
+  //   DateTime? expectedEndDate,
+  // }) async {
+  //   String token = await getToken();
+  //   String endpoint = 'hotel/maintenance/mark-dirty';
+  //   try {
+  //     final response = await dio.post(
+  //       '$baseUri$endpoint', // Verify this endpoint
+  //       data: {
+  //         'room_id': roomId,
+  //         'maintenance_note': maintenanceNote,
+  //         'expected_end_date': expectedEndDate?.toIso8601String().split('T')[0],
+  //       },
+  //       options: Options(
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': 'Bearer $token',
+  //         },
+  //         validateStatus: (status) =>
+  //             status! < 500, // Don't throw for 4xx errors
+  //       ),
+  //     );
+
+  //     if (response.statusCode == 404) {
+  //       throw Exception('Endpoint not found. Please check the API URL');
+  //     }
+
+  //     return response;
+  //   } catch (e) {
+  //     print("Error marking room as dirty: $e");
+  //     rethrow;
+  //   }
+  // }
+
+  Future<Response> markRoomAsDirty({
+    required int roomId,
+    required String maintenanceNote,
+    DateTime? expectedEndDate,
+  }) async {
+    String token = await getToken();
+    String endpoint = 'hotel/maintenance/mark-dirty';
+
+    try {
+      final response = await dio.post(
+        '$baseUri$endpoint',
+        data: {
+          'room_id': roomId,
+          'maintenance_note': maintenanceNote,
+          'expected_end_date': expectedEndDate?.toIso8601String().split('T')[0],
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          validateStatus: (status) => status! < 500,
+        ),
+      );
+
+      // Handle specific error cases
+      if (response.data['success'] == false) {
+        throw Exception(
+            response.data['message'] ?? 'Failed to mark room as dirty');
+      }
+
+      return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message'] ?? e.message);
+      }
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to mark room as dirty: $e');
+    }
+  }
+
+// Mark room as Dirty
+  Future<Response> setRoomForMaintain({
+    required int roomId,
+    required String maintenanceNote,
+    DateTime? expectedEndDate,
+  }) async {
+    String token = await getToken();
+    String endpoint = 'hotel/maintenance/set';
+
+    try {
+      final response = await dio.post(
+        '$baseUri$endpoint',
+        data: {
+          'room_id': roomId,
+          'maintenance_note': maintenanceNote,
+          'expected_end_date': expectedEndDate?.toIso8601String().split('T')[0],
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          validateStatus: (status) => status! < 500,
+        ),
+      );
+
+      // Handle specific error cases
+      if (response.data['success'] == false) {
+        throw Exception(
+            response.data['message'] ?? 'Failed to mark room for maintenance');
+      }
+
+      return response;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message'] ?? e.message);
+      }
+      throw Exception('Network error: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to mark room as dirty: $e');
     }
   }
 
@@ -163,23 +288,518 @@ class SystemRepo extends ApiClient {
     return await _fetchData('hotel/room-types', refresh: refresh);
   }
 
-  Future<Response> fetchAvailableRooms({bool refresh = false, required String roomTypeId, required noOfAdult, required noOfChildren, required startDate, required endDate, required noOfRooms}) async {
-    return await _fetchData('hotel/book-rooms/room-search?room_type_id=$roomTypeId&adult=$noOfAdult&children=$noOfChildren&date=$startDate-$endDate&rooms=$noOfRooms', refresh: refresh);
+  // Hotel mantenance roomtype
+  Future<Response> fetchMaintenanceRoomTypesAPI({bool refresh = false}) async {
+    return await _fetchData('hotel/maintenance/rooms', refresh: refresh);
+  }
+
+  // Hotel  booking history
+  Future<Response> fetchBookingHistory({bool refresh = false}) async {
+    return await _fetchData('hotel/bookings/history', refresh: refresh);
+  }
+  // Hotel  booking history
+  // Fetch Sales with filters and pagination
+   // Fetch Sales with filters and pagination
+   Future<SalesResponse> fetchSales({
+    bool refresh = false,
+    int page = 1,
+    String? startDate,
+    String? endDate,
+    String? warehouse,
+    String? customer,
+    String? attendant,
+    String? search,
+    String? type,
+  }) async {
+    try {
+      // Build query parameters
+      final queryParams = <String, String>{
+        'page': page.toString(),
+      };
+
+      if (startDate != null) queryParams['start_date'] = startDate;
+      if (endDate != null) queryParams['end_date'] = endDate;
+      if (warehouse != null) queryParams['warehouse'] = warehouse;
+      if (customer != null) queryParams['customer'] = customer;
+      if (attendant != null) queryParams['attendant'] = attendant;
+      if (search != null) queryParams['search'] = search;
+      if (type != null) queryParams['type'] = type;
+
+      // Build endpoint with query parameters
+      String endpoint = 'sales';
+      if (queryParams.isNotEmpty) {
+        final queryString = queryParams.entries
+            .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+            .join('&');
+        endpoint = 'sales?$queryString';
+      }
+
+      final response = await _fetchData(endpoint, refresh: refresh);
+      
+      if (response.statusCode == 200) {
+        try {
+          // Add debugging for JSON structure
+          print('Raw response data type: ${response.data.runtimeType}');
+          print('Raw response data: ${response.data}');
+          
+          dynamic jsonData;
+          if (response.data is String) {
+            jsonData = json.decode(response.data);
+          } else {
+            jsonData = response.data; // Already parsed
+          }
+          
+          print('Parsed JSON data type: ${jsonData.runtimeType}');
+          print('Parsed JSON keys: ${jsonData is Map ? jsonData.keys : 'Not a map'}');
+          
+          final responseModel = SalesResponse.fromJson(jsonData as Map<String, dynamic>);
+          
+          // Save to local storage
+          await _saveSales(responseModel.data);
+          print('Sales ======>>>>>> Success: ${responseModel.data.length} sales loaded');
+          return responseModel;
+        } catch (parseError) {
+          print('JSON parsing error: $parseError');
+          print('Response data: ${response.data}');
+          rethrow;
+        }
+      }
+      throw Exception('Failed to load sales: HTTP ${response.statusCode}');
+    } catch (e) {
+      print('Error in fetchSales: $e');
+      // Fallback to local data
+      final localSales = await _getLocalSales(
+        page: page,
+        startDate: startDate,
+        endDate: endDate,
+        warehouse: warehouse,
+        customer: customer,
+        attendant: attendant,
+        search: search,
+        type: type,
+      );
+      
+      if (localSales.isNotEmpty) {
+        print('Using local sales data: ${localSales.length} sales');
+        return SalesResponse(
+          data: localSales,
+          meta: PaginationMeta(
+            currentPage: page,
+            from: 1,
+            lastPage: 1,
+            perPage: localSales.length,
+            to: localSales.length,
+            total: localSales.length,
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
+
+Future<List<Sale>> getLocalSales({
+  int page = 1,
+  String? startDate,
+  String? endDate,
+  String? warehouse,
+  String? customer,
+  String? attendant,
+  String? search,
+  String? type,
+}) async {
+  try {
+    print('🔍 Getting local sales with filters: page=$page');
+    
+    final store = await dbHelper.getStore();
+    final saleBox = store.box<SaleEntity>();
+    final saleItemBox = store.box<SaleItemEntity>();
+    
+    // Build the condition
+    Condition<SaleEntity>? condition = SaleEntity_.id.greaterThan(0);
+
+    // Apply filters
+    if (startDate != null && startDate.isNotEmpty) {
+      try {
+        final start = DateTime.parse(startDate);
+        condition = condition.and(SaleEntity_.date.greaterOrEqual(start.millisecondsSinceEpoch));
+      } catch (e) {
+        print('❌ Invalid start date format: $startDate');
+      }
+    }
+
+    if (endDate != null && endDate.isNotEmpty) {
+      try {
+        final end = DateTime.parse(endDate);
+        condition = condition!.and(SaleEntity_.date.lessOrEqual(end.millisecondsSinceEpoch));
+      } catch (e) {
+        print('❌ Invalid end date format: $endDate');
+      }
+    }
+
+    if (warehouse != null && warehouse.isNotEmpty && warehouse != 'All Warehouses') {
+      condition = condition!.and(SaleEntity_.warehouseName.equals(warehouse));
+    }
+
+    if (customer != null && customer.isNotEmpty && customer != 'All Customers') {
+      condition = condition!.and(SaleEntity_.customerName.equals(customer));
+    }
+
+    if (search != null && search.isNotEmpty) {
+      condition = condition!.and(SaleEntity_.referenceCode.contains(search));
+    }
+
+    if (type != null && type.isNotEmpty && type != 'All Types') {
+      condition = condition!.and(SaleEntity_.type.equals(type));
+    }
+
+    // Build and execute query
+    final query = saleBox.query(condition)
+        .order(SaleEntity_.createdAt, flags: Order.descending)
+        .build();
+    final allSaleEntities = query.find();
+    query.close();
+
+    print('📊 Total local sales found: ${allSaleEntities.length}');
+
+    // Apply pagination
+    final perPage = 10;
+    final startIndex = (page - 1) * perPage;
+    final endIndex = startIndex + perPage;
+    
+    if (startIndex >= allSaleEntities.length) {
+      return [];
+    }
+    
+    final paginatedSaleEntities = allSaleEntities.sublist(
+      startIndex,
+      endIndex > allSaleEntities.length ? allSaleEntities.length : endIndex,
+    );
+
+    // Convert entities to models and load sale items
+    final sales = <Sale>[];
+    for (final saleEntity in paginatedSaleEntities) {
+      try {
+        // Get sale items for this sale
+        final saleItemQuery = saleItemBox
+            .query(SaleItemEntity_.saleEntityId.equals(saleEntity.id))
+            .build();
+        final saleItemEntities = saleItemQuery.find();
+        saleItemQuery.close();
+
+        // Convert to Sale model
+        final sale = saleEntity.toSale();
+        sale.saleItems.clear();
+        sale.saleItems.addAll(saleItemEntities.map((item) => item.toSaleItem()));
+        
+        sales.add(sale);
+      } catch (e) {
+        print('❌ Error converting sale entity ${saleEntity.id}: $e');
+      }
+    }
+
+    print('✅ Successfully converted ${sales.length} sales from local storage');
+    return sales;
+    
+  } catch (e) {
+    print('❌ Error in getLocalSales: $e');
+    return [];
+  }
+}
+  // Save sales to local storage using your DatabaseEngine
+  Future<void> _saveSales(List<Sale> sales) async {
+    try {
+      for (final sale in sales) {
+        // Save sale entity using your DatabaseEngine
+        final saleEntity = SaleEntity.fromSale(sale);
+        final savedSaleId = await dbHelper.insert<SaleEntity>(saleEntity);
+
+        // Save sale items
+        for (final saleItem in sale.saleItems) {
+          final saleItemEntity = SaleItemEntity.fromSaleItem(saleItem, savedSaleId);
+          await dbHelper.insert<SaleItemEntity>(saleItemEntity);
+        }
+      }
+    } catch (e) {
+      print('Error saving sales to local storage: $e');
+    }
+  }
+
+  // Get sales from local storage with filtering using your DatabaseEngine
+  Future<List<Sale>> _getLocalSales({
+    int page = 1,
+    String? startDate,
+    String? endDate,
+    String? warehouse,
+    String? customer,
+    String? attendant,
+    String? search,
+    String? type,
+  }) async {
+    try {
+      final store = await dbHelper.getStore();
+      final saleBox = store.box<SaleEntity>();
+      final saleItemBox = store.box<SaleItemEntity>();
+      
+      // Build the condition following your pattern
+      Condition<SaleEntity>? condition;
+
+      // Start with a base condition (always true if no filters)
+      condition = SaleEntity_.id.greaterThan(0); // Base condition
+
+      // Apply filters by chaining with .and()
+      if (startDate != null) {
+        final start = DateTime.parse(startDate);
+        condition = condition.and(SaleEntity_.date.greaterOrEqual(start.millisecondsSinceEpoch));
+      }
+
+      if (endDate != null) {
+        final end = DateTime.parse(endDate);
+        condition = condition.and(SaleEntity_.date.lessOrEqual(end.millisecondsSinceEpoch));
+      }
+
+      if (warehouse != null && warehouse != 'All Warehouses') {
+        condition = condition.and(SaleEntity_.warehouseName.equals(warehouse));
+      }
+
+      if (customer != null && customer != 'All Customers') {
+        condition = condition.and(SaleEntity_.customerName.equals(customer));
+      }
+
+      if (search != null && search.isNotEmpty) {
+        condition = condition.and(SaleEntity_.referenceCode.contains(search));
+      }
+
+      if (type != null && type != 'All Types') {
+        condition = condition.and(SaleEntity_.type.equals(type));
+      }
+
+      // Build and execute query following your pattern
+      final query = saleBox.query(condition).build();
+      final saleEntities = query.find();
+      query.close();
+
+      // Convert entities to models and load sale items
+      final sales = <Sale>[];
+      for (final saleEntity in saleEntities) {
+        // Get sale items for this sale using your pattern
+        final saleItemQuery = saleItemBox.query(SaleItemEntity_.saleEntityId.equals(saleEntity.id)).build();
+        final saleItemEntities = saleItemQuery.find();
+        saleItemQuery.close();
+
+        // Convert to Sale model
+        final sale = saleEntity.toSale();
+        sale.saleItems.clear();
+        sale.saleItems.addAll(saleItemEntities.map((item) => item.toSaleItem()));
+        
+        sales.add(sale);
+      }
+
+      // Apply pagination
+      final perPage = 10;
+      final startIndex = (page - 1) * perPage;
+      final endIndex = startIndex + perPage;
+      
+      if (startIndex >= sales.length) return [];
+      
+      return sales.sublist(
+        startIndex,
+        endIndex > sales.length ? sales.length : endIndex,
+      );
+    } catch (e) {
+      print('Error getting local sales: $e');
+      return [];
+    }
+  }
+
+  // Clear all local sales data using your DatabaseEngine
+  Future<void> clearLocalSales() async {
+    try {
+      final store = await dbHelper.getStore();
+      final saleBox = store.box<SaleEntity>();
+      final saleItemBox = store.box<SaleItemEntity>();
+      saleBox.removeAll();
+      saleItemBox.removeAll();
+    } catch (e) {
+      print('Error clearing local sales: $e');
+    }
+  }
+
+  // Get local sales count using your DatabaseEngine
+  Future<int> getLocalSalesCount() async {
+    return await dbHelper.count<SaleEntity>();
+  }
+
+
+
+
+
+
+  Future<Response> fetchAvailableRooms(
+      {bool refresh = false,
+      required String roomTypeId,
+      required noOfAdult,
+      required noOfChildren,
+      required startDate,
+      required endDate,
+      required noOfRooms}) async {
+    return await _fetchData(
+        'hotel/book-rooms/room-search?room_type_id=${roomTypeId}&adult=${noOfAdult}&children=${noOfChildren}&date=${startDate}-${endDate}&rooms=${noOfRooms}',
+        refresh: refresh);
   }
 
   // Fetch Products
-  Future<Response> fetchProductsAPI({bool refresh = false, required int? id}) async {
-
+  Future<Response> fetchProductsAPI(
+      {bool refresh = false, required int? id}) async {
     var warehouseId = await systemProvider.getWarehouse();
     print("warehouseid.o == ${warehouseId[0]['id']}");
     print("Fetching product now");
-    return await _fetchData("products?filter[brand_id]=&filter[product_category_id]=&page[size]=0&warehouse_id=${id ?? warehouseId[0]['id']}", refresh: refresh);
+    return await _fetchData(
+        "products?filter[brand_id]=&filter[product_category_id]=&page[size]=0&warehouse_id=${id ?? warehouseId[0]['id']}",
+        refresh: refresh);
   }
 
-  // Future<Response> fetchWarehouseAPI({bool refresh = false}) async {
-  //   print("Fetching product now");
-  //   return await _fetchData('pos-warehouses?page[size]=0', refresh: refresh);
-  // }
+
+
+  Future<MaintenanceRoomResponse> fetchMaintenanceRooms(
+      {bool refresh = false}) async {
+    try {
+      final response =
+          await _fetchData('hotel/maintenance/rooms', refresh: refresh);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.data);
+        final responseModel = MaintenanceRoomResponse.fromJson(data);
+
+        // Save to local storage
+        await _saveMaintenanceRooms(responseModel.rooms.data);
+        print('Maintenance Room ======>>>>>> $response');
+        return responseModel;
+      }
+      throw Exception('Failed to load maintenance rooms');
+    } catch (e) {
+      // Fallback to local data
+      final localRooms = await _getLocalMaintenanceRooms();
+      if (localRooms.isNotEmpty) {
+        return MaintenanceRoomResponse(
+          rooms: MaintenanceRoomData(
+            currentPage: 1,
+            data: localRooms,
+            links: PaginationLinks(),
+          ),
+          roomTypes: [],
+          stats: MaintenanceStats(
+            totalRooms: localRooms.length,
+            maintenanceRooms:
+                localRooms.where((r) => r.status == 'dirty').length,
+            maintenancePercentage: 0,
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<MaintenanceRoomResponse> fetchSalesReport(
+      {bool refresh = false}) async {
+    try {
+      final response =
+          await _fetchData('sales', refresh: refresh);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.data);
+        final responseModel = MaintenanceRoomResponse.fromJson(data);
+
+        // Save to local storage
+        await _saveMaintenanceRooms(responseModel.rooms.data);
+        print('Maintenance Room ======>>>>>> $response');
+        return responseModel;
+      }
+      throw Exception('Failed to load maintenance rooms');
+    } catch (e) {
+      // Fallback to local data
+      final localRooms = await _getLocalMaintenanceRooms();
+      if (localRooms.isNotEmpty) {
+        return MaintenanceRoomResponse(
+          rooms: MaintenanceRoomData(
+            currentPage: 1,
+            data: localRooms,
+            links: PaginationLinks(),
+          ),
+          roomTypes: [],
+          stats: MaintenanceStats(
+            totalRooms: localRooms.length,
+            maintenanceRooms:
+                localRooms.where((r) => r.status == 'dirty').length,
+            maintenancePercentage: 0,
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<Response> makeRoomAvailable(int roomId) async {
+    String token = await getToken();
+    String endpoint = 'hotel/maintenance/make-available';
+
+    try {
+      final response = await dio.post(
+        '$baseUri$endpoint',
+        data: {'room_id': roomId},
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          validateStatus: (status) => status! < 500,
+        ),
+      );
+
+      if (response.statusCode == 404) {
+        throw Exception('Endpoint not found. Please check the API URL');
+      }
+
+      // Update local storage if API call succeeds
+      if (response.statusCode == 200) {
+        await _updateLocalRoomStatus(
+          roomId: roomId,
+          status: 'available',
+        );
+      }
+
+      return response;
+    } catch (e) {
+      print("Error making room available: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> _updateLocalRoomStatus({
+    required int roomId,
+    required String status,
+  }) async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    final room = box.get(roomId);
+
+    if (room != null) {
+      room.status = status;
+      room.updatedAt = DateTime.now();
+      box.put(room);
+    }
+  }
+// Save maintenance room
+  Future<void> _saveMaintenanceRooms(List<MaintenanceRoom> rooms) async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    box.putMany(rooms);
+  }
+
+  Future<List<MaintenanceRoom>> _getLocalMaintenanceRooms() async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    return box.getAll();
+  }
 
   // Fetch Products
   Future<Response> fetchTablesAPI({bool refresh = false}) async {
@@ -468,15 +1088,15 @@ class SystemRepo extends ApiClient {
 
     final totalReserved = bookingBox
         .query(BookingX_.userId
-        .equals(user.id.toString())
-        .and(BookingX_.bookingOption.equals('Reserved')))
+            .equals(user.id.toString())
+            .and(BookingX_.bookingOption.equals('Reserved')))
         .build()
         .count();
 
     final totalAvailable = bookingBox
         .query(BookingX_.userId
-        .equals(user.id.toString())
-        .and(BookingX_.bookingOption.equals('Reserved')))
+            .equals(user.id.toString())
+            .and(BookingX_.bookingOption.equals('Reserved')))
         .build()
         .count();
 
@@ -632,6 +1252,14 @@ class SystemRepo extends ApiClient {
     final productStockOut = products.isNotEmpty
         ? systemRecords('products', 'instock', products[0].value)
         : 0;
+    final productsOutOfStock = products.isNotEmpty
+        ? systemRecords('products', 'outstock', products[0].value)
+        : 0;
+
+    final totalInventoryQty = products.isNotEmpty
+        ? systemRecords('products', 'totalstock', products[0].value)
+        : 0;
+
     final syncedOrders = products.isNotEmpty
         ? systemRecords('synced', 'orders', products[0].value)
         : 0;
@@ -646,7 +1274,7 @@ class SystemRepo extends ApiClient {
       'hotelRoomCount': hotelRoomCount ?? 0,
       'totalCheckedIn': totalCheckedIn,
       'totalCheckedOut': totalCheckedOut,
-      'totalReserved' : totalReserved,
+      'totalReserved': totalReserved,
       'todayHotelSales': todayHotelSales,
       'yesterdayHotelSales': yesterdayHotelSales,
       'weeklyHotelSales': weeklyHotelSales,
@@ -654,6 +1282,8 @@ class SystemRepo extends ApiClient {
       'monthlyHotelSales': monthlyHotelSales,
       'lifetimeHotelSales': lifetimeHotelSales,
       // 'hotelReservationCount': hotelReservationCount ?? 0,
+      'productsOutOfStock': productsOutOfStock ?? 0,
+      'totalInventoryQty': totalInventoryQty ?? 0,
       'customerCount': customerCount ?? 0,
       'productStockOut': productStockOut ?? 0,
       'syncedOrders': syncedOrders ?? 0,
@@ -715,10 +1345,11 @@ class SystemRepo extends ApiClient {
       } else if (format == 'outstock') {
         var totalProducts = 0;
         for (var i in data) {
-          var items = i['attributes']['in_stock'] as int;
+          // var items = i['attributes']['in_stock'] as int;
           // var innerData = items['data'] as List;
           if (i['attributes']['in_stock'] == 0) {
-            totalProducts += items;
+            // totalProducts += items;
+            totalProducts++;
           }
         }
         result = totalProducts;
@@ -747,9 +1378,87 @@ class SystemRepo extends ApiClient {
       if (format == 'count') {
         result = data.length;
       }
-    } else if (format == 'outstock') {}
+    } else if (format == 'outstock') {
+      result = data.length;
+    }
     return result;
   }
+
+  // static int systemRecords(String type, String format, String records) {
+  //   var result = 0;
+  //   try {
+  //     var json = jsonDecode(records);
+
+  //     // Handle API response structure - check if the JSON has a 'data' property
+  //     var data = json['data'] != null ? json['data'] as List : json as List;
+
+  //     if (type == 'products') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       } else if (format == 'instock') {
+  //         // Count number of products that have stock > 0
+  //         int inStockCount = 0;
+  //         for (var i in data) {
+  //           var stock = i['attributes']['in_stock'];
+  //           if (stock > 0) {
+  //             inStockCount++;
+  //           }
+  //         }
+  //         result = inStockCount;
+  //       } else if (format == 'outstock') {
+  //         // Count products with stock == 0
+  //         int outOfStockCount = 0;
+  //         for (var i in data) {
+  //           if (i['attributes']['in_stock'] == 0) {
+  //             outOfStockCount++;
+  //           }
+  //         }
+  //         result = outOfStockCount;
+  //       } else if (format == 'totalstock') {
+  //         // Sum all in_stock values for total inventory quantity
+  //         num totalStock = 0;
+  //         for (var i in data) {
+  //           var stockAmount = i['attributes']['in_stock'];
+  //           if (stockAmount > 0) {
+  //             totalStock += stockAmount;
+  //           }
+  //         }
+  //         result = totalStock.toInt();
+  //       }
+  //     } else if (type == 'warehouses') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'categories') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'customers') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'hotel_categories') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'hotel_amenities') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'hotel_rooms') {
+  //       if (format == 'count') {
+  //         result = data.length;
+  //       }
+  //     } else if (type == 'synced') {
+  //       // Existing logic for synced orders
+  //       // Implementation depends on your app's requirements
+  //     }
+  //   } catch (e) {
+  //     print('Error in systemRecords: $e');
+  //   }
+
+  //   return result;
+  // }
 
   Future<List<dynamic>> getCustomers() async {
     UserDetails user =
@@ -894,8 +1603,8 @@ class SystemRepo extends ApiClient {
     final warehouseBox = store.box<StoreX>();
     final warehouses = warehouseBox
         .query(StoreX_.billerId
-        .equals(user.id.toString())
-        .and(StoreX_.name.equals('warehouses')))
+            .equals(user.id.toString())
+            .and(StoreX_.name.equals('warehouses')))
         .build()
         .findFirst();
     print("=========== warehouses ============");
@@ -1004,6 +1713,22 @@ class SystemRepo extends ApiClient {
       categoryBox.put(hotelRooms);
       print('New Hotel Room record inserted.');
     }
+  }
+
+  // Hotel maintenance
+  Future<void> upsertMaintenanceRooms(List<dynamic> roomsData) async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+
+    final rooms =
+        roomsData.map((json) => MaintenanceRoom.fromJson(json)).toList();
+    box.putMany(rooms);
+  }
+
+  Future<List<MaintenanceRoom>> getLocalMaintenanceRooms() async {
+    final store = await DatabaseEngine.instance.getStore();
+    final box = store.box<MaintenanceRoom>();
+    return box.getAll();
   }
 
   UserDetails? _getCurrentUser() {
@@ -1328,9 +2053,7 @@ class SystemRepo extends ApiClient {
   }
 
   Future<List<Register>> getAllRegisterByDate(
-      {DateTime? startDate,
-      DateTime? endDate,
-      required String app}) async {
+      {DateTime? startDate, DateTime? endDate, required String app}) async {
     UserDetails user =
         Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
     final store = await DatabaseEngine.instance.getStore();
@@ -1384,7 +2107,9 @@ class SystemRepo extends ApiClient {
     return unsyncedTransactions;
   }
 
-  Future<Map<String, dynamic>> syncAllTransactions(UserDetails user,) async {
+  Future<Map<String, dynamic>> syncAllTransactions(
+    UserDetails user,
+  ) async {
     final store = await DatabaseEngine.instance.getStore();
 
     final orderBox = store.box<Orders>();
@@ -1393,91 +2118,93 @@ class SystemRepo extends ApiClient {
         .build()
         .find();
 
-      print("Syncing started");
-      print("Unsyc order length ${unsyncedOrders.length}");
-      List data = unsyncedOrders.map((d) {
-        print(d.items);
-        var aa = jsonDecode(d.items);
-        //print("Warehouse ==>> ${aa[0]['product']['stock']['warehouse_id']}");
-        return {
-          "company": {
-            "id": user.id,
-            "first_name": user.firstName,
-            "last_name": user.lastName,
-            "dob": '',
-            "salary_date": ''
-          },
-          "customer_id": null,
-          "date": d.createdAt.toIso8601String(),
-          "discount": 0,
-          "grand_total": d.amount.toString(),
-          "hold_ref_no": "",
-          "note": "",
-          "payment_status": d.status,
-          "payment_type": d.paymentMethod,
-          "received_amount": int.parse(d.amount.toString().replaceAll('.0', '')),
-          "sale_items": jsonDecode(d.items).map((e) => ({
-              "product_id": e['product']['stock']['product_id'],
-              "quantity": e['quantity'],
-              "product_price": e['totalAmount'].toString(),
-            "discount_type": 1,
-            "discount_value": 0,
-            "tax_value": 0,
-            "tax_type": 1
-          })
-          ).toList(),
-          "shipping": 0,
-          "status": d.status,
-          "tax_rate": 0,
-          "warehouse_id": aa[0]['product']['stock']['warehouse_id'],
-          "is_offline": 1, //0 for NO, 1 for YES
-          "offline_customer_name": d.customerName
-        };
-      }).toList();
+    print("Syncing started");
+    print("Unsyc order length ${unsyncedOrders.length}");
+    List data = unsyncedOrders.map((d) {
+      print(d.items);
+      var aa = jsonDecode(d.items);
+      //print("Warehouse ==>> ${aa[0]['product']['stock']['warehouse_id']}");
+      return {
+        "company": {
+          "id": user.id,
+          "first_name": user.firstName,
+          "last_name": user.lastName,
+          "dob": '',
+          "salary_date": ''
+        },
+        "customer_id": null,
+        "date": d.createdAt.toIso8601String(),
+        "discount": 0,
+        "grand_total": d.amount.toString(),
+        "hold_ref_no": "",
+        "note": "",
+        "payment_status": d.status,
+        "payment_type": d.paymentMethod,
+        "received_amount": int.parse(d.amount.toString().replaceAll('.0', '')),
+        "sale_items": jsonDecode(d.items)
+            .map((e) => ({
+                  "product_id": e['product']['stock']['product_id'],
+                  "quantity": e['quantity'],
+                  "product_price": e['totalAmount'].toString(),
+                  "discount_type": 1,
+                  "discount_value": 0,
+                  "tax_value": 0,
+                  "tax_type": 1
+                }))
+            .toList(),
+        "shipping": 0,
+        "status": d.status,
+        "tax_rate": 0,
+        "warehouse_id": aa[0]['product']['stock']['warehouse_id'],
+        "is_offline": 1, //0 for NO, 1 for YES
+        "offline_customer_name": d.customerName
+      };
+    }).toList();
 
-      print("data ==>> $data");
+    print("dataaaaaaaaa ==>> $data");
 
-      //print("Order items ==>> ${order.items}");
-      try {
-        var response = await http.post(
-          Uri.parse('${baseUrl}bulk-sync-sales'),
+    //print("Order items ==>> ${order.items}");
+    try {
+      var response = await http.post(Uri.parse('${baseUrl}bulk-sync-sales'),
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': "Bearer ${user.token}"
           },
-          body: jsonEncode(data)
-        );
+          body: jsonEncode(data));
 
-        print("Syncing");
-        log("response body ==> ${response.body}");
-        log("response ==> ${response.statusCode}");
-        var jsonData = json.decode(response.body);
-        if (response.statusCode == 200) {
-          print("dataaaa ==> $unsyncedOrders");
-          for (var itemData in unsyncedOrders) {
-            print("sync data ==> $itemData");
-            itemData.sync = 1;
-            orderBox.put(itemData);// Update the order
-          }
-          // var syncValue = unsyncedOrders.map((d) => ({
-          //   if(jsonDecode(d.items) != []) {
-          //     print("sync data ==> $d");
-          //     d.sync = 1;
-          //     orderBox.put(d);// Update the order
-          //   }
-          // }));
-          return {'status': true, 'message': jsonData['message']};
-        } else {
-          return {'status': false, 'message': jsonData['message']};
+      print("Syncing....>>>>>>>>>>>>>>>>>>>");
+      log("response body ==> ${response.body}");
+      log("response ==> ${response.statusCode}");
+      var jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        print(
+            '=========================================================================================');
+        print(
+            "dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa........>>>>>>>>>>> ==> ${unsyncedOrders}");
+        for (var itemData in unsyncedOrders) {
+          print("sync data......... .....>>>>>>> ==> $itemData");
+          itemData.sync = 1;
+          orderBox.put(itemData); // Update the order
         }
-      } catch (e) {
-        debugPrint("Sync error$e");
-        return {
-          'status': false,
-          'message': 'Internet connection error!',
-        };
+        // var syncValue = unsyncedOrders.map((d) => ({
+        //   if(jsonDecode(d.items) != []) {
+        //     print("sync data ==> $d");
+        //     d.sync = 1;
+        //     orderBox.put(d);// Update the order
+        //   }
+        // }));
+        return {'status': true, 'message': jsonData['message']};
+      } else {
+        return {'status': false, 'message': jsonData['message']};
       }
+    } catch (e) {
+      debugPrint("Sync error$e");
+      return {
+        'status': false,
+        'message': 'Internet connection error!',
+      };
+    }
 
     return {};
   }
@@ -1691,7 +2418,8 @@ class SystemRepo extends ApiClient {
     };
   }
 
-  Future<Map<String, dynamic>> holdInvoice(total, registerId, data, table, customerName, customerPhone) async {
+  Future<Map<String, dynamic>> holdInvoice(
+      total, registerId, data, table, customerName, customerPhone) async {
     UserDetails user =
         Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
     var txnID = generateRandomString(12);
@@ -1713,4 +2441,42 @@ class SystemRepo extends ApiClient {
     invoiceBox.put(newInvoice);
     return {'status': true, 'reference': txnID};
   }
+
+  Future<Response> fetchStaffsAPI({bool refresh = false}) async {
+    return await _fetchData('staffs?page[size]=0', refresh: refresh);
+  }
+
+  Future<List<dynamic>> getStaffs() async {
+    try {
+      UserDetails user =
+          Provider.of<UserProvider>(Navigation.getContext(), listen: false)
+              .user;
+
+      final store = await DatabaseEngine.instance.getStore();
+      final staffBox = store.box<StoreX>();
+
+      final staffRecord = staffBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("staffs")))
+          .build()
+          .findFirst();
+
+      if (staffRecord != null) {
+        final List<dynamic> staffs = jsonDecode(staffRecord.value);
+        return staffs;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      print("Error retrieving staffs: $error");
+      return [];
+    }
+  }
 }
+
+
+  // Future<Response> fetchWarehouseAPI({bool refresh = false}) async {
+  //   print("Fetching product now");
+  //   return await _fetchData('pos-warehouses?page[size]=0', refresh: refresh);
+  // }

@@ -17,3 +17,10 @@ key.properties
 
 # FVM Version Cache
 .fvm/
+
+.flutter-plugins
+.flutter-plugins-dependencies
+android/.gradle/
+android/local.properties
+**/Flutter/Generated.xcconfig
+**/Flutter/flutter_export_environment.sh

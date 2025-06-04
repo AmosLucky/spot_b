@@ -51,7 +51,7 @@ class SalesReportWidget extends StatelessWidget {
                     //print("Sales Report data ==> ${sale.}");
                     return TransactionTile(
                       transactionId: sale.trxId,
-                      amount: sale.amount,
+                      amount: sale.status.toDouble(),
                       customer: sale.customerName,
                       createdAt: sale.createdAt,
                       isSynced: sale.sync == 1,

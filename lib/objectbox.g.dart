@@ -590,6 +590,358 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(10, 176027469693708080),
+      name: 'MaintenanceRoom',
+      lastPropertyId: const obx_int.IdUid(14, 7782010912838847054),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 182428615677928808),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 4111040109145990041),
+            name: 'companyId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 3895143759826624092),
+            name: 'roomTypeId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 6503012750186097857),
+            name: 'roomNumber',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 833059432210671885),
+            name: 'status',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 1637423990479956145),
+            name: 'maintenanceNote',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 5326027377037207083),
+            name: 'maintenanceDate',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 2963279457228440243),
+            name: 'maintenanceExpectedEndDate',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 4338190408811453999),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 869967021353957856),
+            name: 'updatedAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 4183520007493238060),
+            name: 'roomTypeName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(12, 757256816294505260),
+            name: 'roomTypeFare',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(13, 5561254452283458293),
+            name: 'roomTypeTotalAdult',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(14, 7782010912838847054),
+            name: 'roomTypeTotalChild',
+            type: 6,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(11, 8081494730027905127),
+      name: 'SaleEntity',
+      lastPropertyId: const obx_int.IdUid(26, 3884557465037578857),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 5384765280489227850),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 5684303618331351198),
+            name: 'type',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 1616392717430720968),
+            name: 'date',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 5288724230055531097),
+            name: 'isReturn',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3408558091414542754),
+            name: 'customerId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 7450415229369400227),
+            name: 'customerName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 9096750548671478995),
+            name: 'warehouseId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 3291553633693394809),
+            name: 'warehouseName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 7035933027545368616),
+            name: 'taxRate',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 5399114605163219701),
+            name: 'taxAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 3560692483588741176),
+            name: 'discount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(12, 5682729727133996816),
+            name: 'shipping',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(13, 6681419857050426659),
+            name: 'grandTotal',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(14, 2901667354055831934),
+            name: 'receivedAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(15, 7872382805884398207),
+            name: 'paidAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(16, 6178404636167483725),
+            name: 'partialAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(17, 3393997386183370691),
+            name: 'dueAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(18, 910347685257291712),
+            name: 'paymentType',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(19, 5636795265277642536),
+            name: 'note',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(20, 4290800934145347626),
+            name: 'status',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(21, 3138566299552924843),
+            name: 'paymentStatus',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(22, 8777926555927508156),
+            name: 'referenceCode',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(23, 4467200511833145049),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(24, 5146346039987440972),
+            name: 'barcodeUrl',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(25, 1589563027189958483),
+            name: 'isOffline',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(26, 3884557465037578857),
+            name: 'offlineCustomerName',
+            type: 9,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(12, 2304842742082983492),
+      name: 'SaleItemEntity',
+      lastPropertyId: const obx_int.IdUid(25, 3705200464297192900),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 4763831482871596153),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 2770773633704497887),
+            name: 'saleEntityId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 6523414877490290607),
+            name: 'originalSaleId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 1306290552237980420),
+            name: 'productId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 6476454294764815766),
+            name: 'tableId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 6028903763618158593),
+            name: 'productPrice',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 3025967695941661105),
+            name: 'netUnitPrice',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 6491368045567224408),
+            name: 'taxType',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 7653147135962168504),
+            name: 'taxValue',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 3939375406506639591),
+            name: 'taxAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 5984519626177581446),
+            name: 'discountType',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(12, 7450948659009528843),
+            name: 'discountValue',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(13, 1116510195386316368),
+            name: 'discountAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(14, 7819015752412987650),
+            name: 'quantity',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(15, 2392725220445762784),
+            name: 'subTotal',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(16, 3742014036095943620),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(17, 9076705840707132086),
+            name: 'updatedAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(18, 4307871853757336853),
+            name: 'companyId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(19, 8773070098822499433),
+            name: 'saleUnitId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(20, 8248357029552491089),
+            name: 'saleUnitName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(21, 734541233863552232),
+            name: 'saleUnitShortName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(22, 5155753363363454757),
+            name: 'saleUnitBaseUnit',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(23, 4249401775480135518),
+            name: 'saleUnitCreatedAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(24, 4984154659838661260),
+            name: 'saleUnitUpdatedAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(25, 3705200464297192900),
+            name: 'saleUnitCompanyId',
+            type: 6,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -628,7 +980,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(9, 2180851869646946073),
+      lastEntityId: const obx_int.IdUid(12, 2304842742082983492),
       lastIndexId: const obx_int.IdUid(0, 0),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -1338,6 +1690,362 @@ obx_int.ModelDefinition getObjectBoxModel() {
               searchDate: searchDateParam);
 
           return object;
+        }),
+    MaintenanceRoom: obx_int.EntityDefinition<MaintenanceRoom>(
+        model: _entities[8],
+        toOneRelations: (MaintenanceRoom object) => [],
+        toManyRelations: (MaintenanceRoom object) => {},
+        getId: (MaintenanceRoom object) => object.id,
+        setId: (MaintenanceRoom object, int id) {
+          object.id = id;
+        },
+        objectToFB: (MaintenanceRoom object, fb.Builder fbb) {
+          final roomNumberOffset = fbb.writeString(object.roomNumber);
+          final statusOffset = fbb.writeString(object.status);
+          final maintenanceNoteOffset = object.maintenanceNote == null
+              ? null
+              : fbb.writeString(object.maintenanceNote!);
+          final roomTypeNameOffset = fbb.writeString(object.roomTypeName);
+          fbb.startTable(15);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.companyId);
+          fbb.addInt64(2, object.roomTypeId);
+          fbb.addOffset(3, roomNumberOffset);
+          fbb.addOffset(4, statusOffset);
+          fbb.addOffset(5, maintenanceNoteOffset);
+          fbb.addInt64(6, object.maintenanceDate?.millisecondsSinceEpoch);
+          fbb.addInt64(
+              7, object.maintenanceExpectedEndDate?.millisecondsSinceEpoch);
+          fbb.addInt64(8, object.createdAt.millisecondsSinceEpoch);
+          fbb.addInt64(9, object.updatedAt.millisecondsSinceEpoch);
+          fbb.addOffset(10, roomTypeNameOffset);
+          fbb.addFloat64(11, object.roomTypeFare);
+          fbb.addInt64(12, object.roomTypeTotalAdult);
+          fbb.addInt64(13, object.roomTypeTotalChild);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final maintenanceDateValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 16);
+          final maintenanceExpectedEndDateValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 18);
+          final companyIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final roomTypeIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final roomNumberParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 10, '');
+          final statusParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 12, '');
+          final maintenanceNoteParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 14);
+          final maintenanceDateParam = maintenanceDateValue == null
+              ? null
+              : DateTime.fromMillisecondsSinceEpoch(maintenanceDateValue);
+          final maintenanceExpectedEndDateParam =
+              maintenanceExpectedEndDateValue == null
+                  ? null
+                  : DateTime.fromMillisecondsSinceEpoch(
+                      maintenanceExpectedEndDateValue);
+          final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0));
+          final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 22, 0));
+          final roomTypeNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 24, '');
+          final roomTypeFareParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 26, 0);
+          final roomTypeTotalAdultParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 28, 0);
+          final roomTypeTotalChildParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 30, 0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final object = MaintenanceRoom(
+              companyId: companyIdParam,
+              roomTypeId: roomTypeIdParam,
+              roomNumber: roomNumberParam,
+              status: statusParam,
+              maintenanceNote: maintenanceNoteParam,
+              maintenanceDate: maintenanceDateParam,
+              maintenanceExpectedEndDate: maintenanceExpectedEndDateParam,
+              createdAt: createdAtParam,
+              updatedAt: updatedAtParam,
+              roomTypeName: roomTypeNameParam,
+              roomTypeFare: roomTypeFareParam,
+              roomTypeTotalAdult: roomTypeTotalAdultParam,
+              roomTypeTotalChild: roomTypeTotalChildParam,
+              id: idParam);
+
+          return object;
+        }),
+    SaleEntity: obx_int.EntityDefinition<SaleEntity>(
+        model: _entities[9],
+        toOneRelations: (SaleEntity object) => [],
+        toManyRelations: (SaleEntity object) => {},
+        getId: (SaleEntity object) => object.id,
+        setId: (SaleEntity object, int id) {
+          object.id = id;
+        },
+        objectToFB: (SaleEntity object, fb.Builder fbb) {
+          final typeOffset = fbb.writeString(object.type);
+          final customerNameOffset = fbb.writeString(object.customerName);
+          final warehouseNameOffset = fbb.writeString(object.warehouseName);
+          final noteOffset =
+              object.note == null ? null : fbb.writeString(object.note!);
+          final referenceCodeOffset = fbb.writeString(object.referenceCode);
+          final barcodeUrlOffset = fbb.writeString(object.barcodeUrl);
+          final offlineCustomerNameOffset = object.offlineCustomerName == null
+              ? null
+              : fbb.writeString(object.offlineCustomerName!);
+          fbb.startTable(27);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, typeOffset);
+          fbb.addInt64(2, object.date.millisecondsSinceEpoch);
+          fbb.addInt64(3, object.isReturn);
+          fbb.addInt64(4, object.customerId);
+          fbb.addOffset(5, customerNameOffset);
+          fbb.addInt64(6, object.warehouseId);
+          fbb.addOffset(7, warehouseNameOffset);
+          fbb.addFloat64(8, object.taxRate);
+          fbb.addFloat64(9, object.taxAmount);
+          fbb.addFloat64(10, object.discount);
+          fbb.addFloat64(11, object.shipping);
+          fbb.addFloat64(12, object.grandTotal);
+          fbb.addFloat64(13, object.receivedAmount);
+          fbb.addFloat64(14, object.paidAmount);
+          fbb.addFloat64(15, object.partialAmount);
+          fbb.addFloat64(16, object.dueAmount);
+          fbb.addInt64(17, object.paymentType);
+          fbb.addOffset(18, noteOffset);
+          fbb.addInt64(19, object.status);
+          fbb.addInt64(20, object.paymentStatus);
+          fbb.addOffset(21, referenceCodeOffset);
+          fbb.addInt64(22, object.createdAt.millisecondsSinceEpoch);
+          fbb.addOffset(23, barcodeUrlOffset);
+          fbb.addInt64(24, object.isOffline);
+          fbb.addOffset(25, offlineCustomerNameOffset);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final typeParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 6, '');
+          final dateParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0));
+          final isReturnParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
+          final customerIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
+          final customerNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 14, '');
+          final warehouseIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0);
+          final warehouseNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 18, '');
+          final taxRateParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 20, 0);
+          final taxAmountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 22, 0);
+          final discountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 24, 0);
+          final shippingParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 26, 0);
+          final grandTotalParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 28, 0);
+          final receivedAmountParam = const fb.Float64Reader()
+              .vTableGetNullable(buffer, rootOffset, 30);
+          final paidAmountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 32, 0);
+          final partialAmountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 34, 0);
+          final dueAmountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 36, 0);
+          final paymentTypeParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 38, 0);
+          final noteParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGetNullable(buffer, rootOffset, 40);
+          final statusParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 42, 0);
+          final paymentStatusParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 44, 0);
+          final referenceCodeParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 46, '');
+          final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 48, 0));
+          final barcodeUrlParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 50, '');
+          final isOfflineParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 52, 0);
+          final offlineCustomerNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 54);
+          final object = SaleEntity(
+              id: idParam,
+              type: typeParam,
+              date: dateParam,
+              isReturn: isReturnParam,
+              customerId: customerIdParam,
+              customerName: customerNameParam,
+              warehouseId: warehouseIdParam,
+              warehouseName: warehouseNameParam,
+              taxRate: taxRateParam,
+              taxAmount: taxAmountParam,
+              discount: discountParam,
+              shipping: shippingParam,
+              grandTotal: grandTotalParam,
+              receivedAmount: receivedAmountParam,
+              paidAmount: paidAmountParam,
+              partialAmount: partialAmountParam,
+              dueAmount: dueAmountParam,
+              paymentType: paymentTypeParam,
+              note: noteParam,
+              status: statusParam,
+              paymentStatus: paymentStatusParam,
+              referenceCode: referenceCodeParam,
+              createdAt: createdAtParam,
+              barcodeUrl: barcodeUrlParam,
+              isOffline: isOfflineParam,
+              offlineCustomerName: offlineCustomerNameParam);
+
+          return object;
+        }),
+    SaleItemEntity: obx_int.EntityDefinition<SaleItemEntity>(
+        model: _entities[10],
+        toOneRelations: (SaleItemEntity object) => [],
+        toManyRelations: (SaleItemEntity object) => {},
+        getId: (SaleItemEntity object) => object.id,
+        setId: (SaleItemEntity object, int id) {
+          object.id = id;
+        },
+        objectToFB: (SaleItemEntity object, fb.Builder fbb) {
+          final saleUnitNameOffset = fbb.writeString(object.saleUnitName);
+          final saleUnitShortNameOffset =
+              fbb.writeString(object.saleUnitShortName);
+          fbb.startTable(26);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.saleEntityId);
+          fbb.addInt64(2, object.originalSaleId);
+          fbb.addInt64(3, object.productId);
+          fbb.addInt64(4, object.tableId);
+          fbb.addFloat64(5, object.productPrice);
+          fbb.addFloat64(6, object.netUnitPrice);
+          fbb.addInt64(7, object.taxType);
+          fbb.addFloat64(8, object.taxValue);
+          fbb.addFloat64(9, object.taxAmount);
+          fbb.addInt64(10, object.discountType);
+          fbb.addFloat64(11, object.discountValue);
+          fbb.addFloat64(12, object.discountAmount);
+          fbb.addInt64(13, object.quantity);
+          fbb.addFloat64(14, object.subTotal);
+          fbb.addInt64(15, object.createdAt.millisecondsSinceEpoch);
+          fbb.addInt64(16, object.updatedAt.millisecondsSinceEpoch);
+          fbb.addInt64(17, object.companyId);
+          fbb.addInt64(18, object.saleUnitId);
+          fbb.addOffset(19, saleUnitNameOffset);
+          fbb.addOffset(20, saleUnitShortNameOffset);
+          fbb.addInt64(21, object.saleUnitBaseUnit);
+          fbb.addInt64(22, object.saleUnitCreatedAt.millisecondsSinceEpoch);
+          fbb.addInt64(23, object.saleUnitUpdatedAt.millisecondsSinceEpoch);
+          fbb.addInt64(24, object.saleUnitCompanyId);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final saleEntityIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final originalSaleIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          final productIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 10, 0);
+          final tableIdParam =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 12);
+          final productPriceParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 14, 0);
+          final netUnitPriceParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 16, 0);
+          final taxTypeParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0);
+          final taxValueParam = const fb.Float64Reader()
+              .vTableGetNullable(buffer, rootOffset, 20);
+          final taxAmountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 22, 0);
+          final discountTypeParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0);
+          final discountValueParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 26, 0);
+          final discountAmountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 28, 0);
+          final quantityParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 30, 0);
+          final subTotalParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 32, 0);
+          final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 34, 0));
+          final updatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 36, 0));
+          final companyIdParam =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 38);
+          final saleUnitIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 40, 0);
+          final saleUnitNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 42, '');
+          final saleUnitShortNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 44, '');
+          final saleUnitBaseUnitParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 46, 0);
+          final saleUnitCreatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 48, 0));
+          final saleUnitUpdatedAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 50, 0));
+          final saleUnitCompanyIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 52, 0);
+          final object = SaleItemEntity(
+              id: idParam,
+              saleEntityId: saleEntityIdParam,
+              originalSaleId: originalSaleIdParam,
+              productId: productIdParam,
+              tableId: tableIdParam,
+              productPrice: productPriceParam,
+              netUnitPrice: netUnitPriceParam,
+              taxType: taxTypeParam,
+              taxValue: taxValueParam,
+              taxAmount: taxAmountParam,
+              discountType: discountTypeParam,
+              discountValue: discountValueParam,
+              discountAmount: discountAmountParam,
+              quantity: quantityParam,
+              subTotal: subTotalParam,
+              createdAt: createdAtParam,
+              updatedAt: updatedAtParam,
+              companyId: companyIdParam,
+              saleUnitId: saleUnitIdParam,
+              saleUnitName: saleUnitNameParam,
+              saleUnitShortName: saleUnitShortNameParam,
+              saleUnitBaseUnit: saleUnitBaseUnitParam,
+              saleUnitCreatedAt: saleUnitCreatedAtParam,
+              saleUnitUpdatedAt: saleUnitUpdatedAtParam,
+              saleUnitCompanyId: saleUnitCompanyIdParam);
+
+          return object;
         })
   };
 
@@ -1765,4 +2473,273 @@ class FolioX_ {
   /// See [FolioX.searchDate].
   static final searchDate =
       obx.QueryStringProperty<FolioX>(_entities[7].properties[18]);
+}
+
+/// [MaintenanceRoom] entity fields to define ObjectBox queries.
+class MaintenanceRoom_ {
+  /// See [MaintenanceRoom.id].
+  static final id =
+      obx.QueryIntegerProperty<MaintenanceRoom>(_entities[8].properties[0]);
+
+  /// See [MaintenanceRoom.companyId].
+  static final companyId =
+      obx.QueryIntegerProperty<MaintenanceRoom>(_entities[8].properties[1]);
+
+  /// See [MaintenanceRoom.roomTypeId].
+  static final roomTypeId =
+      obx.QueryIntegerProperty<MaintenanceRoom>(_entities[8].properties[2]);
+
+  /// See [MaintenanceRoom.roomNumber].
+  static final roomNumber =
+      obx.QueryStringProperty<MaintenanceRoom>(_entities[8].properties[3]);
+
+  /// See [MaintenanceRoom.status].
+  static final status =
+      obx.QueryStringProperty<MaintenanceRoom>(_entities[8].properties[4]);
+
+  /// See [MaintenanceRoom.maintenanceNote].
+  static final maintenanceNote =
+      obx.QueryStringProperty<MaintenanceRoom>(_entities[8].properties[5]);
+
+  /// See [MaintenanceRoom.maintenanceDate].
+  static final maintenanceDate =
+      obx.QueryDateProperty<MaintenanceRoom>(_entities[8].properties[6]);
+
+  /// See [MaintenanceRoom.maintenanceExpectedEndDate].
+  static final maintenanceExpectedEndDate =
+      obx.QueryDateProperty<MaintenanceRoom>(_entities[8].properties[7]);
+
+  /// See [MaintenanceRoom.createdAt].
+  static final createdAt =
+      obx.QueryDateProperty<MaintenanceRoom>(_entities[8].properties[8]);
+
+  /// See [MaintenanceRoom.updatedAt].
+  static final updatedAt =
+      obx.QueryDateProperty<MaintenanceRoom>(_entities[8].properties[9]);
+
+  /// See [MaintenanceRoom.roomTypeName].
+  static final roomTypeName =
+      obx.QueryStringProperty<MaintenanceRoom>(_entities[8].properties[10]);
+
+  /// See [MaintenanceRoom.roomTypeFare].
+  static final roomTypeFare =
+      obx.QueryDoubleProperty<MaintenanceRoom>(_entities[8].properties[11]);
+
+  /// See [MaintenanceRoom.roomTypeTotalAdult].
+  static final roomTypeTotalAdult =
+      obx.QueryIntegerProperty<MaintenanceRoom>(_entities[8].properties[12]);
+
+  /// See [MaintenanceRoom.roomTypeTotalChild].
+  static final roomTypeTotalChild =
+      obx.QueryIntegerProperty<MaintenanceRoom>(_entities[8].properties[13]);
+}
+
+/// [SaleEntity] entity fields to define ObjectBox queries.
+class SaleEntity_ {
+  /// See [SaleEntity.id].
+  static final id =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[0]);
+
+  /// See [SaleEntity.type].
+  static final type =
+      obx.QueryStringProperty<SaleEntity>(_entities[9].properties[1]);
+
+  /// See [SaleEntity.date].
+  static final date =
+      obx.QueryDateProperty<SaleEntity>(_entities[9].properties[2]);
+
+  /// See [SaleEntity.isReturn].
+  static final isReturn =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[3]);
+
+  /// See [SaleEntity.customerId].
+  static final customerId =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[4]);
+
+  /// See [SaleEntity.customerName].
+  static final customerName =
+      obx.QueryStringProperty<SaleEntity>(_entities[9].properties[5]);
+
+  /// See [SaleEntity.warehouseId].
+  static final warehouseId =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[6]);
+
+  /// See [SaleEntity.warehouseName].
+  static final warehouseName =
+      obx.QueryStringProperty<SaleEntity>(_entities[9].properties[7]);
+
+  /// See [SaleEntity.taxRate].
+  static final taxRate =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[8]);
+
+  /// See [SaleEntity.taxAmount].
+  static final taxAmount =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[9]);
+
+  /// See [SaleEntity.discount].
+  static final discount =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[10]);
+
+  /// See [SaleEntity.shipping].
+  static final shipping =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[11]);
+
+  /// See [SaleEntity.grandTotal].
+  static final grandTotal =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[12]);
+
+  /// See [SaleEntity.receivedAmount].
+  static final receivedAmount =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[13]);
+
+  /// See [SaleEntity.paidAmount].
+  static final paidAmount =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[14]);
+
+  /// See [SaleEntity.partialAmount].
+  static final partialAmount =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[15]);
+
+  /// See [SaleEntity.dueAmount].
+  static final dueAmount =
+      obx.QueryDoubleProperty<SaleEntity>(_entities[9].properties[16]);
+
+  /// See [SaleEntity.paymentType].
+  static final paymentType =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[17]);
+
+  /// See [SaleEntity.note].
+  static final note =
+      obx.QueryStringProperty<SaleEntity>(_entities[9].properties[18]);
+
+  /// See [SaleEntity.status].
+  static final status =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[19]);
+
+  /// See [SaleEntity.paymentStatus].
+  static final paymentStatus =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[20]);
+
+  /// See [SaleEntity.referenceCode].
+  static final referenceCode =
+      obx.QueryStringProperty<SaleEntity>(_entities[9].properties[21]);
+
+  /// See [SaleEntity.createdAt].
+  static final createdAt =
+      obx.QueryDateProperty<SaleEntity>(_entities[9].properties[22]);
+
+  /// See [SaleEntity.barcodeUrl].
+  static final barcodeUrl =
+      obx.QueryStringProperty<SaleEntity>(_entities[9].properties[23]);
+
+  /// See [SaleEntity.isOffline].
+  static final isOffline =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[24]);
+
+  /// See [SaleEntity.offlineCustomerName].
+  static final offlineCustomerName =
+      obx.QueryStringProperty<SaleEntity>(_entities[9].properties[25]);
+}
+
+/// [SaleItemEntity] entity fields to define ObjectBox queries.
+class SaleItemEntity_ {
+  /// See [SaleItemEntity.id].
+  static final id =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[0]);
+
+  /// See [SaleItemEntity.saleEntityId].
+  static final saleEntityId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[1]);
+
+  /// See [SaleItemEntity.originalSaleId].
+  static final originalSaleId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[2]);
+
+  /// See [SaleItemEntity.productId].
+  static final productId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[3]);
+
+  /// See [SaleItemEntity.tableId].
+  static final tableId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[4]);
+
+  /// See [SaleItemEntity.productPrice].
+  static final productPrice =
+      obx.QueryDoubleProperty<SaleItemEntity>(_entities[10].properties[5]);
+
+  /// See [SaleItemEntity.netUnitPrice].
+  static final netUnitPrice =
+      obx.QueryDoubleProperty<SaleItemEntity>(_entities[10].properties[6]);
+
+  /// See [SaleItemEntity.taxType].
+  static final taxType =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[7]);
+
+  /// See [SaleItemEntity.taxValue].
+  static final taxValue =
+      obx.QueryDoubleProperty<SaleItemEntity>(_entities[10].properties[8]);
+
+  /// See [SaleItemEntity.taxAmount].
+  static final taxAmount =
+      obx.QueryDoubleProperty<SaleItemEntity>(_entities[10].properties[9]);
+
+  /// See [SaleItemEntity.discountType].
+  static final discountType =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[10]);
+
+  /// See [SaleItemEntity.discountValue].
+  static final discountValue =
+      obx.QueryDoubleProperty<SaleItemEntity>(_entities[10].properties[11]);
+
+  /// See [SaleItemEntity.discountAmount].
+  static final discountAmount =
+      obx.QueryDoubleProperty<SaleItemEntity>(_entities[10].properties[12]);
+
+  /// See [SaleItemEntity.quantity].
+  static final quantity =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[13]);
+
+  /// See [SaleItemEntity.subTotal].
+  static final subTotal =
+      obx.QueryDoubleProperty<SaleItemEntity>(_entities[10].properties[14]);
+
+  /// See [SaleItemEntity.createdAt].
+  static final createdAt =
+      obx.QueryDateProperty<SaleItemEntity>(_entities[10].properties[15]);
+
+  /// See [SaleItemEntity.updatedAt].
+  static final updatedAt =
+      obx.QueryDateProperty<SaleItemEntity>(_entities[10].properties[16]);
+
+  /// See [SaleItemEntity.companyId].
+  static final companyId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[17]);
+
+  /// See [SaleItemEntity.saleUnitId].
+  static final saleUnitId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[18]);
+
+  /// See [SaleItemEntity.saleUnitName].
+  static final saleUnitName =
+      obx.QueryStringProperty<SaleItemEntity>(_entities[10].properties[19]);
+
+  /// See [SaleItemEntity.saleUnitShortName].
+  static final saleUnitShortName =
+      obx.QueryStringProperty<SaleItemEntity>(_entities[10].properties[20]);
+
+  /// See [SaleItemEntity.saleUnitBaseUnit].
+  static final saleUnitBaseUnit =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[21]);
+
+  /// See [SaleItemEntity.saleUnitCreatedAt].
+  static final saleUnitCreatedAt =
+      obx.QueryDateProperty<SaleItemEntity>(_entities[10].properties[22]);
+
+  /// See [SaleItemEntity.saleUnitUpdatedAt].
+  static final saleUnitUpdatedAt =
+      obx.QueryDateProperty<SaleItemEntity>(_entities[10].properties[23]);
+
+  /// See [SaleItemEntity.saleUnitCompanyId].
+  static final saleUnitCompanyId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[24]);
 }

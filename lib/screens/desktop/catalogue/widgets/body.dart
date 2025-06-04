@@ -91,10 +91,15 @@ class _BodyState extends State<Body> {
                                   title: "In Stock",
                                   value:
                                       "${widget.systemProvider.dashboardStats['productStockOut'] ?? '0'}"),
+                              // Test dommy data
                               HomeCard(
-                                  title: "Out of Stock",
+                                  title: "Out of stock",
                                   value:
-                                      "${widget.systemProvider.dashboardStats['warehouseCount'] ?? '0'}"),
+                                      "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}"),
+                              // HomeCard(
+                              //     title: "Out of Stock",
+                              //     value:
+                              //         "${widget.systemProvider.dashboardStats['warehouseCount'] ?? '0'}"),
                               HomeCard(
                                   title: "Categories",
                                   value:

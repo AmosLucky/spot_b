@@ -25,8 +25,7 @@ Future<Uint8List> generateSamplePdf(
     String companyAddress,
     String? customerName,
     String? customerPhone,
-    String? tableId
-    ) async {
+    String? tableId) async {
   final pdf = pw.Document(); // Create a new PDF document.
 
   pdf.addPage(
@@ -46,8 +45,7 @@ Future<Uint8List> generateSamplePdf(
                 ),
 
                 pw.Center(
-                  child: pw.Text(companyName,
-                      style: pw.TextStyle(fontSize: 8)),
+                  child: pw.Text(companyName, style: pw.TextStyle(fontSize: 8)),
                 ),
 
                 pw.Center(
@@ -73,7 +71,7 @@ Future<Uint8List> generateSamplePdf(
                 // // Customer and Date
                 branch != ''
                     ? pw.Text('Branch:  $branch',
-                    style: pw.TextStyle(fontSize: 8))
+                        style: pw.TextStyle(fontSize: 8))
                     : pw.SizedBox(),
                 // pw.Text('Customer:  $customerName',
                 //     style: pw.TextStyle(fontSize: 8)),
@@ -81,12 +79,18 @@ Future<Uint8List> generateSamplePdf(
                 //     style: pw.TextStyle(fontSize: 8)),
                 pw.Text('Invoice no:  $invoiceReference',
                     style: pw.TextStyle(fontSize: 8)),
-                pw.Text('Customer:  ${customerName ?? ''}', style: pw.TextStyle(fontSize: 8)),
-                pw.Text('Customer Phone:  ${customerPhone ?? ''}', style: pw.TextStyle(fontSize: 8)),
-                pw.Text('Table:  ${tableId ?? ''}', style: pw.TextStyle(fontSize: 8)),
-                pw.Text('Sold By:  $staffName', style: pw.TextStyle(fontSize: 8)),
-                pw.Text('Date:  $updateDate', style: pw.TextStyle(fontSize: 8,)),
-
+                pw.Text('Customer:  ${customerName ?? ''}',
+                    style: pw.TextStyle(fontSize: 8)),
+                pw.Text('Customer Phone:  ${customerPhone ?? ''}',
+                    style: pw.TextStyle(fontSize: 8)),
+                pw.Text('Table:  ${tableId ?? ''}',
+                    style: pw.TextStyle(fontSize: 8)),
+                pw.Text('Sold By:  $staffName',
+                    style: pw.TextStyle(fontSize: 8)),
+                pw.Text('Date:  $updateDate',
+                    style: pw.TextStyle(
+                      fontSize: 8,
+                    )),
 
                 pw.SizedBox(height: 2),
 
@@ -113,8 +117,12 @@ Future<Uint8List> generateSamplePdf(
                     }),
                   ],
                   cellAlignment: pw.Alignment.centerLeft,
-                  cellPadding: pw.EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-                  headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold,),
+                  cellPadding:
+                      pw.EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+                  headerStyle: pw.TextStyle(
+                    fontSize: 8,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                   //headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
                 ),
 
@@ -185,7 +193,7 @@ Future<Uint8List> generateSamplePdf(
                 pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
-                      pw.Text('Change:', style: pw.TextStyle(fontSize: 8)),
+                      pw.Text('Balance:', style: pw.TextStyle(fontSize: 8)),
                       //pw.SizedBox(width: 25),
                       pw.Text('NGN$change',
                           style: pw.TextStyle(
@@ -226,8 +234,7 @@ Future<void> printInvoiceDocument(
     String companyAddress,
     String customerName,
     String customerPhone,
-    String tableId
-    ) async {
+    String tableId) async {
   await Printing.layoutPdf(
     onLayout: (format) async => await generateSamplePdf(
         format,
@@ -241,12 +248,11 @@ Future<void> printInvoiceDocument(
         createdAt,
         invoiceReference,
         updateDate,
-      branch,
-      companyName,
-      companyAddress,
-      customerName,
-      customerPhone,
-      tableId
-    ),
+        branch,
+        companyName,
+        companyAddress,
+        customerName,
+        customerPhone,
+        tableId),
   );
 }
