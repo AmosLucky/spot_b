@@ -375,7 +375,7 @@ class _BodyState extends State<Body> {
                                     crossAxisCount: 4,
                                     crossAxisSpacing: 16,
                                     mainAxisSpacing: 16,
-                                    childAspectRatio: 0.8, // Adjusted for new card
+                                    childAspectRatio: 0.8,
                                   ),
                                   itemBuilder: (context, index) {
                                     var product =
@@ -525,7 +525,7 @@ class CustomProductCard extends StatelessWidget {
     final name = product['name'] ?? 'Unknown Product';
 
     return Container(
-      width: 25.w, // Adjusted to fit 4 cards per row
+      width: 25.w,
       margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -543,7 +543,7 @@ class CustomProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 15.h, // Adjusted height for better fit
+            height: 15.h,
             width: double.infinity,
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.only(
@@ -617,14 +617,17 @@ class CustomProductCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                Tooltip(
+                  message: name,
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
