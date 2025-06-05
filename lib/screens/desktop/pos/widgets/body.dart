@@ -1,669 +1,23 @@
-import 'dart:developer';
-
-import 'package:audioplayers/audioplayers.dart';
-import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:spotstock_inventory/common/provider/cart_provider.dart';
-import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
-import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
-import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
-import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
-import 'package:spotstock_inventory/widgets/custom_widgets.dart';
-import 'package:spotstock_inventory/widgets/dialogs.dart';
-import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
-import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-import 'header.dart';
-import 'invoices.dart';
-import 'search_view.dart';
-
-class Body extends StatefulWidget {
-  final UserDetails user;
-  final SystemProvider systemProvider;
-  final Size mediaQuery;
-
-  const Body({
-    super.key,
-    required this.user,
-    required this.systemProvider,
-    required this.mediaQuery,
-  });
-
-  @override
-  State<Body> createState() => _BodyState();
-}
-
-class _BodyState extends State<Body> {
-  late TextEditingController _barcodeController;
-  final AudioPlayer _audioPlayer = AudioPlayer();
-
-  List _products = [];
-  List<dynamic> warehouseData = [];
-  List _filterProducts = [];
-  List _dataProducts = [];
-  final bool _searching = false;
-  bool _isInvoiceOpen = false;
-  Map _registerInfo = {};
-  List categoryData = [];
-  List _productSearchResult = [];
-  List _categoryResult = [];
-  List? _foundProducts;
-  int? tappedIndex;
-  bool loadingProduct = false;
-  String selectedCategory = '';
-  bool isLoadingWarehouses = false;
-  Map<String, dynamic>? selectedBranch;
-
-  final List<Map<String, dynamic>> branches = [
-    {"label": "Branch 1", "id": "15"},
-    {"label": "sdfd", "id": "27"}
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _barcodeController = TextEditingController();
-    readCategories();
-    readProducts();
-    readRegisterInfo();
-    _filterByCategories();
-    _productSearchResult = _products;
-    _categoryResult = _products;
-    _foundProducts = _productSearchResult;
-  }
-
-  @override
-  void dispose() {
-    _barcodeController.dispose();
-    _audioPlayer.dispose();
-    super.dispose();
-  }
-
-  Future<void> playSound() async {
-    await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
-  }
-
-  Future<void> readProducts() async {
-    setState(() {
-      loadingProduct = true;
-    });
-
-    try {
-      warehouseData = await widget.systemProvider.getWarehouse();
-      log("Warehouse data ==>> $warehouseData");
-
-      if (warehouseData.isNotEmpty) {
-        final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
-        await systemProvider.fetchProducts(true, true, warehouseId);
-        final data = await widget.systemProvider.getProducts(1);
-
-        setState(() {
-          _products = data;
-          _dataProducts = data;
-          loadingProduct = false;
-        });
-
-        log("Product data ==>> $data");
-        _filterByCategories();
-      } else {
-        setState(() {
-          loadingProduct = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No warehouses available')),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        loadingProduct = false;
-      });
-      log("Error loading products: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading products')),
-      );
-    }
-  }
-
-  Future<List<dynamic>> getProducts() async {
-    return await widget.systemProvider.getProducts(0);
-  }
-
-  Future<void> readRegisterInfo() async {
-    final data = await widget.systemProvider.getCurrentRegister();
-    print("---------current open register ----------");
-    print(data);
-    setState(() {
-      _registerInfo = data;
-    });
-  }
-
-  Future<void> readCategories() async {
-    final data = await widget.systemProvider.getCategories();
-    print("---------current open register ----------");
-    print(data);
-    setState(() {
-      categoryData = data;
-    });
-  }
-
-  Future barcodeScan() async {
-    var status = await Permission.camera.status;
-    if (!status.isGranted) {
-      status = await Permission.camera.request();
-    }
-
-    if (status.isGranted) {
-      String? barcode = "";
-      if (barcode == "-1") {
-        setState(() {
-          barcode = '';
-        });
-        Dialogs.alertDialog(
-            context, "Warning", "Nothing was found!", "cancel", "save", []);
-      } else {
-        setState(() {
-          _barcodeController.text = barcode!;
-        });
-      }
-    } else {
-      Dialogs.alertDialog(
-          context, "Error", "Camera permission denied!", "cancel", "save", []);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: widget.mediaQuery.height,
-                  ),
-                  child: SideBarPos(
-                      vertical: 10,
-                      horizontal: 5,
-                      user: widget.user,
-                      mediaQuery: widget.mediaQuery,
-                      systemProvider: widget.systemProvider,
-                      openInvoice: () {
-                        print("------------- open invoice -----------");
-                        setState(() {
-                          if (_registerInfo.isNotEmpty) {
-                            _isInvoiceOpen = !_isInvoiceOpen;
-                          }
-                        });
-                      }),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 3.0, horizontal: 16.0),
-                        child: HeaderSection(
-                          systemProvider: widget.systemProvider,
-                          mediaQuery: widget.mediaQuery,
-                          user: widget.user,
-                          controller: _barcodeController,
-                          onChanged: (value) => _searchProducts(value),
-                          onClearButtonPressed: () {
-                            _barcodeController.clear();
-                            setState(() {
-                              _productSearchResult = _products;
-                              _foundProducts = _productSearchResult;
-                            });
-                          },
-                          onPressedScan: barcodeScan,
-                          items: warehouseData,
-                          selectedBranch: selectedBranch,
-                          onBranchSelected: (value) async {
-                            if (value == null) return;
-
-                            setState(() {
-                              loadingProduct = true;
-                              selectedBranch = value;
-                            });
-
-                            try {
-                              await systemProvider.fetchProducts(
-                                  true, true, value['id']);
-                              final data =
-                                  await widget.systemProvider.getProducts(1);
-                              setState(() {
-                                _products = data;
-                                _dataProducts = data;
-                                loadingProduct = false;
-                              });
-                            } catch (e) {
-                              setState(() {
-                                loadingProduct = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content:
-                                        Text('Error loading products for branch')),
-                              );
-                            }
-                          },
-                          hint: selectedBranch?['attributes']['name'] ??
-                              (warehouseData.isNotEmpty
-                                  ? warehouseData[0]['attributes']['name']
-                                  : "Select Branch"),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedCategory = '';
-                              });
-                              print(selectedCategory);
-                              _filterByCategories();
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              decoration: BoxDecoration(
-                                  color: selectedCategory == ''
-                                      ? Colors.purple
-                                      : Colors.grey.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Text(
-                                "All",
-                                style: TextStyle(
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: selectedCategory == ''
-                                        ? Colors.white
-                                        : Colors.black),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 1.w),
-                          Expanded(
-                            child: SizedBox(
-                              height: 12.h,
-                              width: MediaQuery.of(context).size.width,
-                              child: GridView.count(
-                                  shrinkWrap: false,
-                                  crossAxisCount: 2,
-                                  physics: const ClampingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 20,
-                                  childAspectRatio: 0.4,
-                                  padding: EdgeInsets.zero,
-                                  children: categoryData.isEmpty
-                                      ? [SizedBox()]
-                                      : categoryData
-                                          .map((cat) => GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selectedCategory =
-                                                        cat['attributes']['name'];
-                                                  });
-                                                  print(selectedCategory);
-                                                  _filterByCategories();
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 10, vertical: 5),
-                                                  decoration: BoxDecoration(
-                                                    color: selectedCategory ==
-                                                            cat['attributes']
-                                                                ['name']
-                                                        ? Colors.purple
-                                                        : Colors.grey
-                                                            .withOpacity(0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(10),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      cat['attributes']['name'],
-                                                      style: TextStyle(
-                                                        fontSize: 10.sp,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: selectedCategory ==
-                                                                cat['attributes']
-                                                                    ['name']
-                                                            ? Colors.white
-                                                            : Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ))
-                                          .toSet()
-                                          .toList()),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 1.h),
-                      SearchView(
-                        tapInvoiceOpen: () {
-                          setState(() {
-                            _isInvoiceOpen = !_isInvoiceOpen;
-                          });
-                        },
-                        dataProducts: _foundProducts!,
-                        getProducts: getProducts,
-                        barcodeController: _barcodeController,
-                        mediaQuery: widget.mediaQuery,
-                        playSound: () => playSound(),
-                      ),
-                      _barcodeController.text.isEmpty && !loadingProduct
-                          ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: SizedBox(
-                                height: widget.mediaQuery.height - 50,
-                                child: GridView.builder(
-                                  itemCount: _foundProducts!.length,
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4,
-                                    crossAxisSpacing: 16,
-                                    mainAxisSpacing: 16,
-                                    childAspectRatio: 0.8,
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    var product =
-                                        _foundProducts![index]['attributes'];
-                                    return Consumer<CartProvider>(
-                                      builder: (context, value, child) =>
-                                          InkWell(
-                                        onTap: () {
-                                          print("tapped");
-                                          tappedIndex = index;
-                                          print("Selected index === $index");
-                                          if (product['stock']['quantity'] == 0) {
-                                            Dialogs.alertDialog(
-                                                context,
-                                                "Warning",
-                                                "Product is out of stock!",
-                                                "cancel",
-                                                "save",
-                                                []);
-                                          } else {
-                                            if (_isInvoiceOpen) {
-                                              setState(() {
-                                                _isInvoiceOpen = !_isInvoiceOpen;
-                                              });
-                                            }
-                                            value.add(
-                                                product,
-                                                index,
-                                                generateRandomString(12),
-                                                product['product_price'],
-                                                1,
-                                                product['product_code']);
-                                            playSound();
-                                          }
-                                        },
-                                        child: CustomProductCard(product: product),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.only(top: 30),
-                              child: Center(child: CircularProgressIndicator()),
-                            ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: _isInvoiceOpen && _registerInfo.isNotEmpty
-                      ? InvoiceList(
-                          products: _products,
-                          mediaQuery: widget.mediaQuery,
-                          systemProvider: widget.systemProvider,
-                          registerInfo: _registerInfo,
-                          user: widget.user,
-                          closeInvoice: () {
-                            print("------------- close invoice -----------");
-                            setState(() {
-                              if (_registerInfo.isNotEmpty) {
-                                _isInvoiceOpen = !_isInvoiceOpen;
-                              }
-                            });
-                          })
-                      : OrderSummary(
-                          products: _products,
-                          mediaQuery: widget.mediaQuery,
-                          registerInfo: _registerInfo,
-                          systemProvider: widget.systemProvider,
-                          user: widget.user,
-                        ),
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _searchProducts(String? value) {
-    print("Onchanged called");
-    setState(() {
-      selectedCategory = '';
-    });
-    if (_barcodeController.text.isEmpty) {
-      setState(() {
-        _productSearchResult = _products;
-        _foundProducts = _productSearchResult;
-      });
-    } else {
-      setState(() {
-        if (_barcodeController.text.contains(RegExp('[a-zA-Z]'))) {
-          _productSearchResult = _products.where((beneficiary) {
-            return beneficiary['attributes']['name']
-                .toLowerCase()
-                .contains(_barcodeController.text.toLowerCase());
-          }).toList();
-          _foundProducts = _productSearchResult;
-        } else {
-          _productSearchResult = _products.where((beneficiary) {
-            return beneficiary['attributes']['product_code']
-                .toLowerCase()
-                .contains(_barcodeController.text.toLowerCase());
-          }).toList();
-          _foundProducts = _productSearchResult;
-        }
-      });
-      debugPrint(_foundProducts.toString());
-    }
-    debugPrint(_foundProducts.toString());
-  }
-
-  void _filterByCategories() {
-    print("Filter by category");
-    if (selectedCategory == '') {
-      setState(() {
-        _categoryResult = _products;
-        _foundProducts = _categoryResult;
-      });
-    } else {
-      setState(() {
-        _categoryResult = _products.where((beneficiary) {
-          return beneficiary['attributes']['product_category_name']
-              .toLowerCase()
-              .contains(selectedCategory.toLowerCase());
-        }).toList();
-        _foundProducts = _categoryResult;
-      });
-    }
-    debugPrint(_foundProducts.toString());
-  }
-}
-
-class CustomProductCard extends StatelessWidget {
-  final Map product;
-
-  const CustomProductCard({Key? key, required this.product}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final price = (product['product_price'] as num?)?.toDouble() ?? 0.0;
-    final quantity = product['stock']['quantity'] ?? 0;
-    final name = product['name'] ?? 'Unknown Product';
-
-    return Container(
-      width: 25.w,
-      margin: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 15.h,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.grey[200]!,
-                          Colors.grey[100]!,
-                        ],
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.inventory,
-                      size: 40,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 12,
-                    right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: quantity == 0 ? Colors.red : const Color(0xFF2196F3),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        quantity == 0 ? 'Out of stock' : 'Qty: $quantity',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '₦${price.toStringAsFixed(0)}',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2196F3),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Tooltip(
-                  message: name,
-                  child: Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-
-
-
 // import 'dart:developer';
 
 // import 'package:audioplayers/audioplayers.dart';
+// import 'package:provider/provider.dart';
 // import 'package:responsive_sizer/responsive_sizer.dart';
-// //import 'package:qrscan/qrscan.dart' as scanner;
 // import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/data/models/userdetails.dart';
 // import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
-// import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
+// // import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
 // import 'package:spotstock_inventory/widgets/custom_widgets.dart';
 // import 'package:spotstock_inventory/widgets/dialogs.dart';
 // import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 // import 'package:flutter/material.dart';
 // import 'package:permission_handler/permission_handler.dart';
-// import 'package:provider/provider.dart';
-// //import 'package:qrscan/qrscan.dart' as scanner;
 
 // import 'header.dart';
 // import 'invoices.dart';
-// import 'search_view.dart'; // Import the HeaderSection widget
+// import 'search_view.dart';
 
 // class Body extends StatefulWidget {
 //   final UserDetails user;
@@ -686,7 +40,7 @@ class CustomProductCard extends StatelessWidget {
 //   final AudioPlayer _audioPlayer = AudioPlayer();
 
 //   List _products = [];
-//   List <dynamic> warehouseData = [];
+//   List<dynamic> warehouseData = [];
 //   List _filterProducts = [];
 //   List _dataProducts = [];
 //   final bool _searching = false;
@@ -700,11 +54,11 @@ class CustomProductCard extends StatelessWidget {
 //   bool loadingProduct = false;
 //   String selectedCategory = '';
 //   bool isLoadingWarehouses = false;
-//   Map<String, dynamic>?  selectedBranch;
+//   Map<String, dynamic>? selectedBranch;
 
 //   final List<Map<String, dynamic>> branches = [
-//     {"label" : "Branch 1", "id" : "15"},
-//     {"label" : "sdfd", "id" : "27"}
+//     {"label": "Branch 1", "id": "15"},
+//     {"label": "sdfd", "id": "27"}
 //   ];
 
 //   @override
@@ -718,69 +72,59 @@ class CustomProductCard extends StatelessWidget {
 //     _productSearchResult = _products;
 //     _categoryResult = _products;
 //     _foundProducts = _productSearchResult;
-//     //_filterByCategories();
 //   }
 
 //   @override
 //   void dispose() {
 //     _barcodeController.dispose();
-//     _audioPlayer.dispose(); // Dispose of the audio player
+//     _audioPlayer.dispose();
 //     super.dispose();
 //   }
 
 //   Future<void> playSound() async {
-//     // Play the audio file from assets
 //     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
 //   }
 
-// Future<void> readProducts() async {
-//   setState(() {
-//     loadingProduct = true;
-//   });
-  
-//   try {
-//     // Load warehouse data first
-//     warehouseData = await widget.systemProvider.getWarehouse();
-//     log("Warehouse data ==>> $warehouseData");
+//   Future<void> readProducts() async {
+//     setState(() {
+//       loadingProduct = true;
+//     });
 
-//     // Check if we have warehouse data
-//     if (warehouseData.isNotEmpty) {
-//       // Use first warehouse or selected branch
-//       final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
-      
-//       // Fetch products for this warehouse
-//       await systemProvider.fetchProducts(true, true, warehouseId);
-      
-//       // Get products
-//       final data = await widget.systemProvider.getProducts(1);
-      
+//     try {
+//       warehouseData = await widget.systemProvider.getWarehouse();
+//       log("Warehouse data ==>> $warehouseData");
+
+//       if (warehouseData.isNotEmpty) {
+//         final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+//         await systemProvider.fetchProducts(true, true, warehouseId);
+//         final data = await widget.systemProvider.getProducts(1);
+
+//         setState(() {
+//           _products = data;
+//           _dataProducts = data;
+//           loadingProduct = false;
+//         });
+
+//         log("Product data ==>> $data");
+//         _filterByCategories();
+//       } else {
+//         setState(() {
+//           loadingProduct = false;
+//         });
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('No warehouses available')),
+//         );
+//       }
+//     } catch (e) {
 //       setState(() {
-//         _products = data;
-//         _dataProducts = data;
 //         loadingProduct = false;
 //       });
-      
-//       log("Product data ==>> $data");
-//       _filterByCategories();
-//     } else {
-//       setState(() {
-//         loadingProduct = false;
-//       });
-//       // Handle no warehouses case
+//       log("Error loading products: $e");
 //       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('No warehouses available')),
+//         SnackBar(content: Text('Error loading products')),
 //       );
 //     }
-//   } catch (e) {
-//     setState(() {
-//       loadingProduct = false;
-//     });
-//     log("Error loading products: $e");
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text('Error loading products')),
-//     );
 //   }
-// }
 
 //   Future<List<dynamic>> getProducts() async {
 //     return await widget.systemProvider.getProducts(0);
@@ -811,8 +155,7 @@ class CustomProductCard extends StatelessWidget {
 //     }
 
 //     if (status.isGranted) {
-//       //Scan QR code
-//       String? barcode = ""; //await scanner.scan();
+//       String? barcode = "";
 //       if (barcode == "-1") {
 //         setState(() {
 //           barcode = '';
@@ -840,10 +183,9 @@ class CustomProductCard extends StatelessWidget {
 //             Row(
 //               crossAxisAlignment: CrossAxisAlignment.start,
 //               children: [
-//                 // Sidebar Navigation with fixed width
 //                 ConstrainedBox(
 //                   constraints: BoxConstraints(
-//                     maxHeight: widget.mediaQuery.height, // Set max height
+//                     maxHeight: widget.mediaQuery.height,
 //                   ),
 //                   child: SideBarPos(
 //                       vertical: 10,
@@ -860,88 +202,94 @@ class CustomProductCard extends StatelessWidget {
 //                         });
 //                       }),
 //                 ),
-
-//                 // Dashboard Content Area
 //                 Expanded(
 //                   child: Column(
 //                     crossAxisAlignment: CrossAxisAlignment.start,
 //                     children: [
-//                       // Header Section for Search Bar and Barcode Scanner
-//                      Padding(
-//   padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 16.0),
-//   child: HeaderSection(
-//     systemProvider: widget.systemProvider,
-//     mediaQuery: widget.mediaQuery,
-//     user: widget.user,
-//     controller: _barcodeController,
-//     onChanged: (value) => _searchProducts(value),
-//     onClearButtonPressed: () {
-//       _barcodeController.clear();
-//       setState(() {
-//         _productSearchResult = _products;
-//         _foundProducts = _productSearchResult;
-//       });
-//     },
-//     onPressedScan: barcodeScan,
-//     items: warehouseData,
-//     selectedBranch: selectedBranch,
-//     onBranchSelected: (value) async {
-//       if (value == null) return;
-      
-//       setState(() {
-//         loadingProduct = true;
-//         selectedBranch = value;
-//       });
-      
-//       try {
-//         await systemProvider.fetchProducts(true, true, value['id']);
-//         final data = await widget.systemProvider.getProducts(1);
-//         setState(() {
-//           _products = data;
-//           _dataProducts = data;
-//           loadingProduct = false;
-//         });
-//       } catch (e) {
-//         setState(() {
-//           loadingProduct = false;
-//         });
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text('Error loading products for branch')),
-//         );
-//       }
-//     },
-//     hint: selectedBranch?['attributes']['name'] ?? 
-//           (warehouseData.isNotEmpty ? warehouseData[0]['attributes']['name'] : "Select Branch"),
-//   ),
-// ),
+//                       Padding(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 3.0, horizontal: 16.0),
+//                         child: HeaderSection(
+//                           systemProvider: widget.systemProvider,
+//                           mediaQuery: widget.mediaQuery,
+//                           user: widget.user,
+//                           controller: _barcodeController,
+//                           onChanged: (value) => _searchProducts(value),
+//                           onClearButtonPressed: () {
+//                             _barcodeController.clear();
+//                             setState(() {
+//                               _productSearchResult = _products;
+//                               _foundProducts = _productSearchResult;
+//                             });
+//                           },
+//                           onPressedScan: barcodeScan,
+//                           items: warehouseData,
+//                           selectedBranch: selectedBranch,
+//                           onBranchSelected: (value) async {
+//                             if (value == null) return;
 
+//                             setState(() {
+//                               loadingProduct = true;
+//                               selectedBranch = value;
+//                             });
+
+//                             try {
+//                               await systemProvider.fetchProducts(
+//                                   true, true, value['id']);
+//                               final data =
+//                                   await widget.systemProvider.getProducts(1);
+//                               setState(() {
+//                                 _products = data;
+//                                 _dataProducts = data;
+//                                 loadingProduct = false;
+//                               });
+//                             } catch (e) {
+//                               setState(() {
+//                                 loadingProduct = false;
+//                               });
+//                               ScaffoldMessenger.of(context).showSnackBar(
+//                                 SnackBar(
+//                                     content:
+//                                         Text('Error loading products for branch')),
+//                               );
+//                             }
+//                           },
+//                           hint: selectedBranch?['attributes']['name'] ??
+//                               (warehouseData.isNotEmpty
+//                                   ? warehouseData[0]['attributes']['name']
+//                                   : "Select Branch"),
+//                         ),
+//                       ),
 //                       Row(
 //                         children: [
-
 //                           GestureDetector(
 //                             onTap: () {
 //                               setState(() {
 //                                 selectedCategory = '';
 //                               });
 //                               print(selectedCategory);
-//                               _filterByCategories(); 
+//                               _filterByCategories();
 //                             },
 //                             child: Container(
-//                               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//                               padding: EdgeInsets.symmetric(
+//                                   horizontal: 20, vertical: 10),
 //                               decoration: BoxDecoration(
-//                                   color: selectedCategory == '' ? Colors.purple : Colors.grey.withOpacity(0.1),
-//                                   borderRadius: BorderRadius.circular(10)
+//                                   color: selectedCategory == ''
+//                                       ? Colors.purple
+//                                       : Colors.grey.withOpacity(0.1),
+//                                   borderRadius: BorderRadius.circular(10)),
+//                               child: Text(
+//                                 "All",
+//                                 style: TextStyle(
+//                                     fontSize: 10.sp,
+//                                     fontWeight: FontWeight.w500,
+//                                     color: selectedCategory == ''
+//                                         ? Colors.white
+//                                         : Colors.black),
 //                               ),
-//                               child: Text("All", style: TextStyle(
-//                                   fontSize: 10.sp,
-//                                   fontWeight: FontWeight.w500,
-//                                   color: selectedCategory == '' ? Colors.white : Colors.black
-//                               ),),
 //                             ),
 //                           ),
-
-//                           SizedBox(width: 1.w,),
-
+//                           SizedBox(width: 1.w),
 //                           Expanded(
 //                             child: SizedBox(
 //                               height: 12.h,
@@ -955,51 +303,66 @@ class CustomProductCard extends StatelessWidget {
 //                                   mainAxisSpacing: 20,
 //                                   childAspectRatio: 0.4,
 //                                   padding: EdgeInsets.zero,
-//                                   children:  categoryData.isEmpty ? [SizedBox()] : categoryData.map((cat) =>  GestureDetector(
-//                                     onTap: () {
-//                                       setState(() {
-//                                         selectedCategory = cat['attributes']['name'];
-//                                       });
-//                                       print(selectedCategory);
-//                                       _filterByCategories();
-//                                     },
-//                                     child: Container(
-//                                       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-//                                       decoration: BoxDecoration(
-//                                         color: selectedCategory == cat['attributes']['name'] ? Colors.purple : Colors.grey.withOpacity(0.1),
-//                                         borderRadius: BorderRadius.circular(10)
-//                                       ),
-//                                         child: Center(
-//                                           child: Text(cat['attributes']['name'], style: TextStyle(
-//                                             fontSize: 10.sp,
-//                                             fontWeight: FontWeight.w500,
-//                                             color: selectedCategory == cat['attributes']['name'] ? Colors.white : Colors.black
-//                                           ),),
-//                                         ),
-//                                       ),
-//                                   )).toSet().toList()),
+//                                   children: categoryData.isEmpty
+//                                       ? [SizedBox()]
+//                                       : categoryData
+//                                           .map((cat) => GestureDetector(
+//                                                 onTap: () {
+//                                                   setState(() {
+//                                                     selectedCategory =
+//                                                         cat['attributes']['name'];
+//                                                   });
+//                                                   print(selectedCategory);
+//                                                   _filterByCategories();
+//                                                 },
+//                                                 child: Container(
+//                                                   padding: EdgeInsets.symmetric(
+//                                                       horizontal: 10, vertical: 5),
+//                                                   decoration: BoxDecoration(
+//                                                     color: selectedCategory ==
+//                                                             cat['attributes']
+//                                                                 ['name']
+//                                                         ? Colors.purple
+//                                                         : Colors.grey
+//                                                             .withOpacity(0.1),
+//                                                     borderRadius:
+//                                                         BorderRadius.circular(10),
+//                                                   ),
+//                                                   child: Center(
+//                                                     child: Text(
+//                                                       cat['attributes']['name'],
+//                                                       style: TextStyle(
+//                                                         fontSize: 10.sp,
+//                                                         fontWeight: FontWeight.w500,
+//                                                         color: selectedCategory ==
+//                                                                 cat['attributes']
+//                                                                     ['name']
+//                                                             ? Colors.white
+//                                                             : Colors.black,
+//                                                       ),
+//                                                     ),
+//                                                   ),
+//                                                 ),
+//                                               ))
+//                                           .toSet()
+//                                           .toList()),
 //                             ),
 //                           ),
 //                         ],
 //                       ),
-
-//                       SizedBox(height: 1.h,),
-
-//                       // search
-//                     SearchView(
+//                       SizedBox(height: 1.h),
+//                       SearchView(
 //                         tapInvoiceOpen: () {
 //                           setState(() {
 //                             _isInvoiceOpen = !_isInvoiceOpen;
 //                           });
 //                         },
-//                         dataProducts: _foundProducts!, // Pass filtered products or original data
+//                         dataProducts: _foundProducts!,
 //                         getProducts: getProducts,
 //                         barcodeController: _barcodeController,
 //                         mediaQuery: widget.mediaQuery,
 //                         playSound: () => playSound(),
 //                       ),
-
-//                       // Main Dashboard Content Area
 //                       _barcodeController.text.isEmpty && !loadingProduct
 //                           ? Padding(
 //                               padding: const EdgeInsets.all(16.0),
@@ -1012,11 +375,11 @@ class CustomProductCard extends StatelessWidget {
 //                                     crossAxisCount: 4,
 //                                     crossAxisSpacing: 16,
 //                                     mainAxisSpacing: 16,
-//                                     childAspectRatio: 1.5,
+//                                     childAspectRatio: 0.8,
 //                                   ),
 //                                   itemBuilder: (context, index) {
 //                                     var product =
-//                                     _foundProducts![index]['attributes'];
+//                                         _foundProducts![index]['attributes'];
 //                                     return Consumer<CartProvider>(
 //                                       builder: (context, value, child) =>
 //                                           InkWell(
@@ -1024,19 +387,18 @@ class CustomProductCard extends StatelessWidget {
 //                                           print("tapped");
 //                                           tappedIndex = index;
 //                                           print("Selected index === $index");
-//                                           if (product['stock']['quantity'] ==
-//                                               0) {
+//                                           if (product['stock']['quantity'] == 0) {
 //                                             Dialogs.alertDialog(
 //                                                 context,
 //                                                 "Warning",
 //                                                 "Product is out of stock!",
 //                                                 "cancel",
-//                                                 "save", []);
+//                                                 "save",
+//                                                 []);
 //                                           } else {
 //                                             if (_isInvoiceOpen) {
 //                                               setState(() {
-//                                                 _isInvoiceOpen =
-//                                                     !_isInvoiceOpen;
+//                                                 _isInvoiceOpen = !_isInvoiceOpen;
 //                                               });
 //                                             }
 //                                             value.add(
@@ -1046,25 +408,23 @@ class CustomProductCard extends StatelessWidget {
 //                                                 product['product_price'],
 //                                                 1,
 //                                                 product['product_code']);
-//                                             playSound(); // Play sound when product is added
+//                                             playSound();
 //                                           }
 //                                         },
-//                                         child: ProductDetails(product: product),
+//                                         child: CustomProductCard(product: product),
 //                                       ),
 //                                     );
 //                                   },
 //                                 ),
 //                               ),
 //                             )
-//                           :  Padding(
-//                             padding: const EdgeInsets.only(top: 30),
-//                             child: Center(child: CircularProgressIndicator()),
-//                           ) ,
+//                           : Padding(
+//                               padding: const EdgeInsets.only(top: 30),
+//                               child: Center(child: CircularProgressIndicator()),
+//                             ),
 //                     ],
 //                   ),
 //                 ),
-
-//                 // Right Column: Order Summary
 //                 Padding(
 //                   padding:
 //                       const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -1105,7 +465,6 @@ class CustomProductCard extends StatelessWidget {
 //       selectedCategory = '';
 //     });
 //     if (_barcodeController.text.isEmpty) {
-//       // If the search field is empty or only contains white-space
 //       setState(() {
 //         _productSearchResult = _products;
 //         _foundProducts = _productSearchResult;
@@ -1128,7 +487,7 @@ class CustomProductCard extends StatelessWidget {
 //           _foundProducts = _productSearchResult;
 //         }
 //       });
-//       //debugPrint(_foundProducts.toString());
+//       debugPrint(_foundProducts.toString());
 //     }
 //     debugPrint(_foundProducts.toString());
 //   }
@@ -1136,7 +495,6 @@ class CustomProductCard extends StatelessWidget {
 //   void _filterByCategories() {
 //     print("Filter by category");
 //     if (selectedCategory == '') {
-//       // If the search field is empty or only contains white-space
 //       setState(() {
 //         _categoryResult = _products;
 //         _foundProducts = _categoryResult;
@@ -1144,14 +502,656 @@ class CustomProductCard extends StatelessWidget {
 //     } else {
 //       setState(() {
 //         _categoryResult = _products.where((beneficiary) {
-//             return beneficiary['attributes']['product_category_name']
-//                 .toLowerCase()
-//                 .contains(selectedCategory.toLowerCase());
-//           }).toList();
-//           _foundProducts = _categoryResult;
+//           return beneficiary['attributes']['product_category_name']
+//               .toLowerCase()
+//               .contains(selectedCategory.toLowerCase());
+//         }).toList();
+//         _foundProducts = _categoryResult;
 //       });
-//       //debugPrint(_foundProducts.toString());
 //     }
 //     debugPrint(_foundProducts.toString());
 //   }
 // }
+
+// class CustomProductCard extends StatelessWidget {
+//   final Map product;
+
+//   const CustomProductCard({Key? key, required this.product}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final price = (product['product_price'] as num?)?.toDouble() ?? 0.0;
+//     final quantity = product['stock']['quantity'] ?? 0;
+//     final name = product['name'] ?? 'Unknown Product';
+
+//     return Container(
+//       width: 25.w,
+//       margin: const EdgeInsets.all(8),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(12),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.grey.withOpacity(0.2),
+//             spreadRadius: 2,
+//             blurRadius: 8,
+//             offset: const Offset(0, 4),
+//           ),
+//         ],
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Container(
+//             height: 15.h,
+//             width: double.infinity,
+//             decoration: const BoxDecoration(
+//               borderRadius: BorderRadius.only(
+//                 topLeft: Radius.circular(12),
+//                 topRight: Radius.circular(12),
+//               ),
+//             ),
+//             child: ClipRRect(
+//               borderRadius: const BorderRadius.only(
+//                 topLeft: Radius.circular(12),
+//                 topRight: Radius.circular(12),
+//               ),
+//               child: Stack(
+//                 children: [
+//                   Container(
+//                     width: double.infinity,
+//                     height: double.infinity,
+//                     decoration: BoxDecoration(
+//                       gradient: LinearGradient(
+//                         begin: Alignment.topCenter,
+//                         end: Alignment.bottomCenter,
+//                         colors: [
+//                           Colors.grey[200]!,
+//                           Colors.grey[100]!,
+//                         ],
+//                       ),
+//                     ),
+//                     child: const Icon(
+//                       Icons.inventory,
+//                       size: 40,
+//                       color: Colors.grey,
+//                     ),
+//                   ),
+//                   Positioned(
+//                     bottom: 12,
+//                     right: 12,
+//                     child: Container(
+//                       padding: const EdgeInsets.symmetric(
+//                         horizontal: 12,
+//                         vertical: 8,
+//                       ),
+//                       decoration: BoxDecoration(
+//                         color: quantity == 0 ? Colors.red : const Color(0xFF2196F3),
+//                         borderRadius: BorderRadius.circular(6),
+//                       ),
+//                       child: Text(
+//                         quantity == 0 ? 'Out of stock' : 'Qty: $quantity',
+//                         style: const TextStyle(
+//                           color: Colors.white,
+//                           fontSize: 12,
+//                           fontWeight: FontWeight.w500,
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           Padding(
+//             padding: const EdgeInsets.all(12),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   '₦${price.toStringAsFixed(0)}',
+//                   style: const TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                     color: Color(0xFF2196F3),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 8),
+//                 Tooltip(
+//                   message: name,
+//                   child: Text(
+//                     name,
+//                     style: const TextStyle(
+//                       fontSize: 16,
+//                       fontWeight: FontWeight.w600,
+//                       color: Colors.black87,
+//                     ),
+//                     overflow: TextOverflow.ellipsis,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+
+import 'dart:developer';
+
+import 'package:audioplayers/audioplayers.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+//import 'package:qrscan/qrscan.dart' as scanner;
+import 'package:spotstock_inventory/common/provider/cart_provider.dart';
+import 'package:spotstock_inventory/common/provider/system_provider.dart';
+import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
+import 'package:spotstock_inventory/widgets/custom_widgets.dart';
+import 'package:spotstock_inventory/widgets/dialogs.dart';
+import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+//import 'package:qrscan/qrscan.dart' as scanner;
+
+import 'header.dart';
+import 'invoices.dart';
+import 'search_view.dart'; // Import the HeaderSection widget
+
+class Body extends StatefulWidget {
+  final UserDetails user;
+  final SystemProvider systemProvider;
+  final Size mediaQuery;
+
+  const Body({
+    super.key,
+    required this.user,
+    required this.systemProvider,
+    required this.mediaQuery,
+  });
+
+  @override
+  State<Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
+  late TextEditingController _barcodeController;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  List _products = [];
+  List <dynamic> warehouseData = [];
+  List _filterProducts = [];
+  List _dataProducts = [];
+  final bool _searching = false;
+  bool _isInvoiceOpen = false;
+  Map _registerInfo = {};
+  List categoryData = [];
+  List _productSearchResult = [];
+  List _categoryResult = [];
+  List? _foundProducts;
+  int? tappedIndex;
+  bool loadingProduct = false;
+  String selectedCategory = '';
+  bool isLoadingWarehouses = false;
+  Map<String, dynamic>?  selectedBranch;
+
+  final List<Map<String, dynamic>> branches = [
+    {"label" : "Branch 1", "id" : "15"},
+    {"label" : "sdfd", "id" : "27"}
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _barcodeController = TextEditingController();
+    readCategories();
+    readProducts();
+    readRegisterInfo();
+    _filterByCategories();
+    _productSearchResult = _products;
+    _categoryResult = _products;
+    _foundProducts = _productSearchResult;
+    //_filterByCategories();
+  }
+
+  @override
+  void dispose() {
+    _barcodeController.dispose();
+    _audioPlayer.dispose(); // Dispose of the audio player
+    super.dispose();
+  }
+
+  Future<void> playSound() async {
+    // Play the audio file from assets
+    await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
+  }
+
+Future<void> readProducts() async {
+  setState(() {
+    loadingProduct = true;
+  });
+  
+  try {
+    // Load warehouse data first
+    warehouseData = await widget.systemProvider.getWarehouse();
+    log("Warehouse data ==>> $warehouseData");
+
+    // Check if we have warehouse data
+    if (warehouseData.isNotEmpty) {
+      // Use first warehouse or selected branch
+      final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+      
+      // Fetch products for this warehouse
+      await systemProvider.fetchProducts(true, true, warehouseId);
+      
+      // Get products
+      final data = await widget.systemProvider.getProducts(1);
+      
+      setState(() {
+        _products = data;
+        _dataProducts = data;
+        loadingProduct = false;
+      });
+      
+      log("Product data ==>> $data");
+      _filterByCategories();
+    } else {
+      setState(() {
+        loadingProduct = false;
+      });
+      // Handle no warehouses case
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No warehouses available')),
+      );
+    }
+  } catch (e) {
+    setState(() {
+      loadingProduct = false;
+    });
+    log("Error loading products: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error loading products')),
+    );
+  }
+}
+
+  Future<List<dynamic>> getProducts() async {
+    return await widget.systemProvider.getProducts(0);
+  }
+
+  Future<void> readRegisterInfo() async {
+    final data = await widget.systemProvider.getCurrentRegister();
+    print("---------current open register ----------");
+    print(data);
+    setState(() {
+      _registerInfo = data;
+    });
+  }
+
+  Future<void> readCategories() async {
+    final data = await widget.systemProvider.getCategories();
+    print("---------current open register ----------");
+    print(data);
+    setState(() {
+      categoryData = data;
+    });
+  }
+
+  Future barcodeScan() async {
+    var status = await Permission.camera.status;
+    if (!status.isGranted) {
+      status = await Permission.camera.request();
+    }
+
+    if (status.isGranted) {
+      //Scan QR code
+      String? barcode = ""; //await scanner.scan();
+      if (barcode == "-1") {
+        setState(() {
+          barcode = '';
+        });
+        Dialogs.alertDialog(
+            context, "Warning", "Nothing was found!", "cancel", "save", []);
+      } else {
+        setState(() {
+          _barcodeController.text = barcode!;
+        });
+      }
+    } else {
+      Dialogs.alertDialog(
+          context, "Error", "Camera permission denied!", "cancel", "save", []);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Sidebar Navigation with fixed width
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: widget.mediaQuery.height, // Set max height
+                  ),
+                  child: SideBarPos(
+                      vertical: 10,
+                      horizontal: 5,
+                      user: widget.user,
+                      mediaQuery: widget.mediaQuery,
+                      systemProvider: widget.systemProvider,
+                      openInvoice: () {
+                        print("------------- open invoice -----------");
+                        setState(() {
+                          if (_registerInfo.isNotEmpty) {
+                            _isInvoiceOpen = !_isInvoiceOpen;
+                          }
+                        });
+                      }),
+                ),
+
+                // Dashboard Content Area
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header Section for Search Bar and Barcode Scanner
+                     Padding(
+  padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 16.0),
+  child: HeaderSection(
+    systemProvider: widget.systemProvider,
+    mediaQuery: widget.mediaQuery,
+    user: widget.user,
+    controller: _barcodeController,
+    onChanged: (value) => _searchProducts(value),
+    onClearButtonPressed: () {
+      _barcodeController.clear();
+      setState(() {
+        _productSearchResult = _products;
+        _foundProducts = _productSearchResult;
+      });
+    },
+    onPressedScan: barcodeScan,
+    items: warehouseData,
+    selectedBranch: selectedBranch,
+    onBranchSelected: (value) async {
+      if (value == null) return;
+      
+      setState(() {
+        loadingProduct = true;
+        selectedBranch = value;
+      });
+      
+      try {
+        await systemProvider.fetchProducts(true, true, value['id']);
+        final data = await widget.systemProvider.getProducts(1);
+        setState(() {
+          _products = data;
+          _dataProducts = data;
+          loadingProduct = false;
+        });
+      } catch (e) {
+        setState(() {
+          loadingProduct = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading products for branch')),
+        );
+      }
+    },
+    hint: selectedBranch?['attributes']['name'] ?? 
+          (warehouseData.isNotEmpty ? warehouseData[0]['attributes']['name'] : "Select Branch"),
+  ),
+),
+
+                      Row(
+                        children: [
+
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedCategory = '';
+                              });
+                              print(selectedCategory);
+                              _filterByCategories(); 
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              decoration: BoxDecoration(
+                                  color: selectedCategory == '' ? Colors.purple : Colors.grey.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: Text("All", style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: selectedCategory == '' ? Colors.white : Colors.black
+                              ),),
+                            ),
+                          ),
+
+                          SizedBox(width: 1.w,),
+
+                          Expanded(
+                            child: SizedBox(
+                              height: 12.h,
+                              width: MediaQuery.of(context).size.width,
+                              child: GridView.count(
+                                  shrinkWrap: false,
+                                  crossAxisCount: 2,
+                                  physics: const ClampingScrollPhysics(),
+                                  scrollDirection: Axis.horizontal,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 20,
+                                  childAspectRatio: 0.4,
+                                  padding: EdgeInsets.zero,
+                                  children:  categoryData.isEmpty ? [SizedBox()] : categoryData.map((cat) =>  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedCategory = cat['attributes']['name'];
+                                      });
+                                      print(selectedCategory);
+                                      _filterByCategories();
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: selectedCategory == cat['attributes']['name'] ? Colors.purple : Colors.grey.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
+                                        child: Center(
+                                          child: Text(cat['attributes']['name'], style: TextStyle(
+                                            fontSize: 10.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: selectedCategory == cat['attributes']['name'] ? Colors.white : Colors.black
+                                          ),),
+                                        ),
+                                      ),
+                                  )).toSet().toList()),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 1.h,),
+
+                      // search
+                    SearchView(
+                        tapInvoiceOpen: () {
+                          setState(() {
+                            _isInvoiceOpen = !_isInvoiceOpen;
+                          });
+                        },
+                        dataProducts: _foundProducts!, // Pass filtered products or original data
+                        getProducts: getProducts,
+                        barcodeController: _barcodeController,
+                        mediaQuery: widget.mediaQuery,
+                        playSound: () => playSound(),
+                      ),
+
+                      // Main Dashboard Content Area
+                      _barcodeController.text.isEmpty && !loadingProduct
+                          ? Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: SizedBox(
+                                height: widget.mediaQuery.height - 50,
+                                child: GridView.builder(
+                                  itemCount: _foundProducts!.length,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 4,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                    childAspectRatio: 1.5,
+                                  ),
+                                  itemBuilder: (context, index) {
+                                    var product =
+                                    _foundProducts![index]['attributes'];
+                                    return Consumer<CartProvider>(
+                                      builder: (context, value, child) =>
+                                          InkWell(
+                                        onTap: () {
+                                          print("tapped");
+                                          tappedIndex = index;
+                                          print("Selected index === $index");
+                                          if (product['stock']['quantity'] ==
+                                              0) {
+                                            Dialogs.alertDialog(
+                                                context,
+                                                "Warning",
+                                                "Product is out of stock!",
+                                                "cancel",
+                                                "save", []);
+                                          } else {
+                                            if (_isInvoiceOpen) {
+                                              setState(() {
+                                                _isInvoiceOpen =
+                                                    !_isInvoiceOpen;
+                                              });
+                                            }
+                                            value.add(
+                                                product,
+                                                index,
+                                                generateRandomString(12),
+                                                product['product_price'],
+                                                1,
+                                                product['product_code']);
+                                            playSound(); // Play sound when product is added
+                                          }
+                                        },
+                                        child: ProductDetails(product: product),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                          :  Padding(
+                            padding: const EdgeInsets.only(top: 30),
+                            child: Center(child: CircularProgressIndicator()),
+                          ) ,
+                    ],
+                  ),
+                ),
+
+                // Right Column: Order Summary
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  child: _isInvoiceOpen && _registerInfo.isNotEmpty
+                      ? InvoiceList(
+                          products: _products,
+                          mediaQuery: widget.mediaQuery,
+                          systemProvider: widget.systemProvider,
+                          registerInfo: _registerInfo,
+                          user: widget.user,
+                          closeInvoice: () {
+                            print("------------- close invoice -----------");
+                            setState(() {
+                              if (_registerInfo.isNotEmpty) {
+                                _isInvoiceOpen = !_isInvoiceOpen;
+                              }
+                            });
+                          })
+                      : OrderSummary(
+                          products: _products,
+                          mediaQuery: widget.mediaQuery,
+                          registerInfo: _registerInfo,
+                          systemProvider: widget.systemProvider,
+                          user: widget.user,
+                        ),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _searchProducts(String? value) {
+    print("Onchanged called");
+    setState(() {
+      selectedCategory = '';
+    });
+    if (_barcodeController.text.isEmpty) {
+      // If the search field is empty or only contains white-space
+      setState(() {
+        _productSearchResult = _products;
+        _foundProducts = _productSearchResult;
+      });
+    } else {
+      setState(() {
+        if (_barcodeController.text.contains(RegExp('[a-zA-Z]'))) {
+          _productSearchResult = _products.where((beneficiary) {
+            return beneficiary['attributes']['name']
+                .toLowerCase()
+                .contains(_barcodeController.text.toLowerCase());
+          }).toList();
+          _foundProducts = _productSearchResult;
+        } else {
+          _productSearchResult = _products.where((beneficiary) {
+            return beneficiary['attributes']['product_code']
+                .toLowerCase()
+                .contains(_barcodeController.text.toLowerCase());
+          }).toList();
+          _foundProducts = _productSearchResult;
+        }
+      });
+      //debugPrint(_foundProducts.toString());
+    }
+    debugPrint(_foundProducts.toString());
+  }
+
+  void _filterByCategories() {
+    print("Filter by category");
+    if (selectedCategory == '') {
+      // If the search field is empty or only contains white-space
+      setState(() {
+        _categoryResult = _products;
+        _foundProducts = _categoryResult;
+      });
+    } else {
+      setState(() {
+        _categoryResult = _products.where((beneficiary) {
+            return beneficiary['attributes']['product_category_name']
+                .toLowerCase()
+                .contains(selectedCategory.toLowerCase());
+          }).toList();
+          _foundProducts = _categoryResult;
+      });
+      //debugPrint(_foundProducts.toString());
+    }
+    debugPrint(_foundProducts.toString());
+  }
+}
