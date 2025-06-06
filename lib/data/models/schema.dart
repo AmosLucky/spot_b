@@ -561,6 +561,7 @@ class MaintenanceRoom {
 class SaleEntity {
   @Id()
   int id = 0;
+  int originalId;
 
   String type;
   DateTime date;
@@ -590,6 +591,7 @@ class SaleEntity {
 
   SaleEntity({
     this.id = 0,
+    required this.originalId,
     required this.type,
     required this.date,
     required this.isReturn,
@@ -620,7 +622,9 @@ class SaleEntity {
   // Convert from API model to ObjectBox entity
   factory SaleEntity.fromSale(Sale sale) {
     return SaleEntity(
-      id: sale.id,
+      // id: sale.id,
+      id: 0,
+      originalId: sale.id,
       type: sale.type,
       date: sale.date,
       isReturn: sale.isReturn,
@@ -652,7 +656,8 @@ class SaleEntity {
   // Convert to API model
   Sale toSale() {
     return Sale(
-      id: id,
+      // id: id,
+      id: originalId,
       type: type,
       date: date,
       isReturn: isReturn,
@@ -674,7 +679,8 @@ class SaleEntity {
       status: status,
       paymentStatus: paymentStatus,
       referenceCode: referenceCode,
-      saleItems: [], // Will be populated separately
+      // saleItems: [], // Will be populated separately
+      saleItems: [], // Populated later in getLocalSales
       createdAt: createdAt,
       barcodeUrl: barcodeUrl,
       isOffline: isOffline,
@@ -719,8 +725,11 @@ class SaleEntity {
 class SaleItemEntity {
   @Id()
   int id = 0;
+  int originalId; // Store API's SaleItem.id
 
-  int saleEntityId; // Reference to parent sale
+  // int saleEntityId; // Reference to parent sale
+  // int originalSaleId; // Original sale ID from API
+  int saleEntityId; // Reference to parent SaleEntity's ObjectBox ID
   int originalSaleId; // Original sale ID from API
   int productId;
   int? tableId;
@@ -749,6 +758,7 @@ class SaleItemEntity {
 
   SaleItemEntity({
     this.id = 0,
+    required this.originalId,
     required this.saleEntityId,
     required this.originalSaleId,
     required this.productId,
@@ -777,7 +787,9 @@ class SaleItemEntity {
 
   factory SaleItemEntity.fromSaleItem(SaleItem saleItem, int saleEntityId) {
     return SaleItemEntity(
-      id: saleItem.id,
+      // id: saleItem.id,
+      id: 0, // Let ObjectBox assign ID
+      originalId: saleItem.id,
       saleEntityId: saleEntityId,
       originalSaleId: saleItem.saleId,
       productId: saleItem.productId,
@@ -807,7 +819,8 @@ class SaleItemEntity {
 
   SaleItem toSaleItem() {
     return SaleItem(
-      id: id,
+      // id: id,
+      id: originalId, // Use API's ID for SaleItem
       saleId: originalSaleId,
       productId: productId,
       tableId: tableId,

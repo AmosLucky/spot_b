@@ -52,6 +52,7 @@ dependencies:
   flutter_scanner_devxhub: ^1.0.3
   chip_list: ^3.1.0
   gap: ^3.0.1
+  retry: ^3.1.2
 
 # Force specific versions to resolve compatibility issues
 dependency_overrides:

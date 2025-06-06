@@ -673,7 +673,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(11, 8081494730027905127),
       name: 'SaleEntity',
-      lastPropertyId: const obx_int.IdUid(26, 3884557465037578857),
+      lastPropertyId: const obx_int.IdUid(27, 5556198196467676607),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -805,6 +805,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(26, 3884557465037578857),
             name: 'offlineCustomerName',
             type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(27, 5556198196467676607),
+            name: 'originalId',
+            type: 6,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -812,7 +817,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(12, 2304842742082983492),
       name: 'SaleItemEntity',
-      lastPropertyId: const obx_int.IdUid(25, 3705200464297192900),
+      lastPropertyId: const obx_int.IdUid(26, 4162533439320236088),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -938,6 +943,11 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(25, 3705200464297192900),
             name: 'saleUnitCompanyId',
+            type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(26, 4162533439320236088),
+            name: 'originalId',
             type: 6,
             flags: 0)
       ],
@@ -1803,7 +1813,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final offlineCustomerNameOffset = object.offlineCustomerName == null
               ? null
               : fbb.writeString(object.offlineCustomerName!);
-          fbb.startTable(27);
+          fbb.startTable(28);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, typeOffset);
           fbb.addInt64(2, object.date.millisecondsSinceEpoch);
@@ -1830,6 +1840,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addOffset(23, barcodeUrlOffset);
           fbb.addInt64(24, object.isOffline);
           fbb.addOffset(25, offlineCustomerNameOffset);
+          fbb.addInt64(26, object.originalId);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -1838,6 +1849,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final rootOffset = buffer.derefObject(0);
           final idParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final originalIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 56, 0);
           final typeParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 6, '');
           final dateParam = DateTime.fromMillisecondsSinceEpoch(
@@ -1894,6 +1907,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
                   .vTableGetNullable(buffer, rootOffset, 54);
           final object = SaleEntity(
               id: idParam,
+              originalId: originalIdParam,
               type: typeParam,
               date: dateParam,
               isReturn: isReturnParam,
@@ -1934,7 +1948,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final saleUnitNameOffset = fbb.writeString(object.saleUnitName);
           final saleUnitShortNameOffset =
               fbb.writeString(object.saleUnitShortName);
-          fbb.startTable(26);
+          fbb.startTable(27);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.saleEntityId);
           fbb.addInt64(2, object.originalSaleId);
@@ -1960,6 +1974,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(22, object.saleUnitCreatedAt.millisecondsSinceEpoch);
           fbb.addInt64(23, object.saleUnitUpdatedAt.millisecondsSinceEpoch);
           fbb.addInt64(24, object.saleUnitCompanyId);
+          fbb.addInt64(25, object.originalId);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -1968,6 +1983,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final rootOffset = buffer.derefObject(0);
           final idParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final originalIdParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 54, 0);
           final saleEntityIdParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0);
           final originalSaleIdParam =
@@ -2020,6 +2037,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 52, 0);
           final object = SaleItemEntity(
               id: idParam,
+              originalId: originalIdParam,
               saleEntityId: saleEntityIdParam,
               originalSaleId: originalSaleIdParam,
               productId: productIdParam,
@@ -2639,6 +2657,10 @@ class SaleEntity_ {
   /// See [SaleEntity.offlineCustomerName].
   static final offlineCustomerName =
       obx.QueryStringProperty<SaleEntity>(_entities[9].properties[25]);
+
+  /// See [SaleEntity.originalId].
+  static final originalId =
+      obx.QueryIntegerProperty<SaleEntity>(_entities[9].properties[26]);
 }
 
 /// [SaleItemEntity] entity fields to define ObjectBox queries.
@@ -2742,4 +2764,8 @@ class SaleItemEntity_ {
   /// See [SaleItemEntity.saleUnitCompanyId].
   static final saleUnitCompanyId =
       obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[24]);
+
+  /// See [SaleItemEntity.originalId].
+  static final originalId =
+      obx.QueryIntegerProperty<SaleItemEntity>(_entities[10].properties[25]);
 }

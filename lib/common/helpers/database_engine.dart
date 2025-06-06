@@ -18,13 +18,25 @@ class DatabaseEngine {
   }
 
   // Getter to access the store
+  // Future<Store> getStore() async {
+  //   if (_store == null) {
+  //     throw Exception(
+  //         'Store is not initialized. Call DatabaseEngine.create() first.');
+  //   }
+  //   return _store!;
+  // }
+
   Future<Store> getStore() async {
-    if (_store == null) {
-      throw Exception(
-          'Store is not initialized. Call DatabaseEngine.create() first.');
+  if (_store == null) {
+    try {
+      _store = await openStore();
+    } catch (e) {
+      print('❌ Error initializing ObjectBox store: $e');
+      throw Exception('Failed to initialize database');
     }
-    return _store!;
   }
+  return _store!;
+}
 
   // General CRUD operations
 

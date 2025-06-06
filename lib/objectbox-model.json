@@ -656,7 +656,7 @@
     },
     {
       "id": "11:8081494730027905127",
-      "lastPropertyId": "26:3884557465037578857",
+      "lastPropertyId": "27:5556198196467676607",
       "name": "SaleEntity",
       "properties": [
         {
@@ -789,13 +789,18 @@
           "id": "26:3884557465037578857",
           "name": "offlineCustomerName",
           "type": 9
+        },
+        {
+          "id": "27:5556198196467676607",
+          "name": "originalId",
+          "type": 6
         }
       ],
       "relations": []
     },
     {
       "id": "12:2304842742082983492",
-      "lastPropertyId": "25:3705200464297192900",
+      "lastPropertyId": "26:4162533439320236088",
       "name": "SaleItemEntity",
       "properties": [
         {
@@ -922,6 +927,11 @@
         {
           "id": "25:3705200464297192900",
           "name": "saleUnitCompanyId",
+          "type": 6
+        },
+        {
+          "id": "26:4162533439320236088",
+          "name": "originalId",
           "type": 6
         }
       ],

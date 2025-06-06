@@ -502,16 +502,41 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                             ? Center(
                                                 child: Text(
                                                     'Error: ${provider.error}'))
-                                            : ListView.builder(
-                                                itemCount:
-                                                    provider.sales.length,
-                                                itemBuilder: (context, index) {
-                                                  final sale =
-                                                      provider.sales[index];
-                                                  return _buildSaleRow(sale);
-                                                },
-                                              ),
+                                            : provider.sales.isEmpty &&
+                                                    provider.isOffline
+                                                ? Center(
+                                                    child: Text(
+                                                        'No cached sales data available'))
+                                                : ListView.builder(
+                                                    itemCount:
+                                                        provider.sales.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final sale =
+                                                          provider.sales[index];
+                                                      return _buildSaleRow(
+                                                          sale);
+                                                    },
+                                                  ),
                                   ),
+                                  // Expanded(
+                                  //   child: provider.isLoading
+                                  //       ? const Center(
+                                  //           child: CircularProgressIndicator())
+                                  //       : provider.error != null
+                                  //           ? Center(
+                                  //               child: Text(
+                                  //                   'Error: ${provider.error}'))
+                                  //           : ListView.builder(
+                                  //               itemCount:
+                                  //                   provider.sales.length,
+                                  //               itemBuilder: (context, index) {
+                                  //                 final sale =
+                                  //                     provider.sales[index];
+                                  //                 return _buildSaleRow(sale);
+                                  //               },
+                                  //             ),
+                                  // ),
 
                                   // Pagination
                                   if (provider.meta != null)

@@ -97,42 +97,6 @@ bool get isOffline => _isOffline;
     notifyListeners();
   }
 
-  // Fetch sales data
-  
-  // Future<void> fetchSales({bool refresh = false}) async {
-  //   if (refresh) {
-  //     _currentPage = 1;
-  //   }
-
-  //   _isLoading = true;
-  //   _error = null;
-  //   notifyListeners();
-
-  //   try {
-  //     final response = await _systemRepo.fetchSales(
-  //       refresh: refresh,
-  //       page: _currentPage,
-  //       startDate: _startDate,
-  //       endDate: _endDate,
-  //       warehouse: _selectedWarehouse,
-  //       customer: _selectedCustomer,
-  //       attendant: _selectedAttendant,
-  //       search: _searchQuery,
-  //       type: _selectedType,
-  //     );
-
-  //     _sales = response.data;
-  //     _meta = response.meta;
-  //     _error = null;
-  //   } catch (e) {
-  //     _error = e.toString();
-  //     _sales = [];
-  //     _meta = null;
-  //   } finally {
-  //     _isLoading = false;
-  //     notifyListeners();
-  //   }
-  // }
 Future<void> fetchSales({bool refresh = false}) async {
   if (refresh) {
     _currentPage = 1;
@@ -224,17 +188,30 @@ Future<void> fetchSales({bool refresh = false}) async {
   }
 
   // Clear local sales data
-  Future<void> clearLocalData() async {
-    try {
-      await _systemRepo.clearLocalSales();
-      _sales = [];
-      _meta = null;
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
+Future<void> clearLocalData() async {
+  try {
+    await _systemRepo.clearLocalSales();
+    _sales = [];
+    _meta = null;
+    print('✅ Local sales data cleared');
+    notifyListeners();
+  } catch (e) {
+    print('❌ Error clearing local data: $e');
+    _error = e.toString();
+    notifyListeners();
   }
+}
+  // Future<void> clearLocalData() async {
+  //   try {
+  //     await _systemRepo.clearLocalSales();
+  //     _sales = [];
+  //     _meta = null;
+  //     notifyListeners();
+  //   } catch (e) {
+  //     _error = e.toString();
+  //     notifyListeners();
+  //   }
+  // }
 
   // Get local sales count
   Future<int> getLocalSalesCount() async {
@@ -312,3 +289,41 @@ Future<SalesResponse> _buildLocalSalesResponse() async {
 }
 
 }
+
+
+  // Fetch sales data
+  
+  // Future<void> fetchSales({bool refresh = false}) async {
+  //   if (refresh) {
+  //     _currentPage = 1;
+  //   }
+
+  //   _isLoading = true;
+  //   _error = null;
+  //   notifyListeners();
+
+  //   try {
+  //     final response = await _systemRepo.fetchSales(
+  //       refresh: refresh,
+  //       page: _currentPage,
+  //       startDate: _startDate,
+  //       endDate: _endDate,
+  //       warehouse: _selectedWarehouse,
+  //       customer: _selectedCustomer,
+  //       attendant: _selectedAttendant,
+  //       search: _searchQuery,
+  //       type: _selectedType,
+  //     );
+
+  //     _sales = response.data;
+  //     _meta = response.meta;
+  //     _error = null;
+  //   } catch (e) {
+  //     _error = e.toString();
+  //     _sales = [];
+  //     _meta = null;
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
