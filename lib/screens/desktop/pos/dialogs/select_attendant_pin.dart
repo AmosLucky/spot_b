@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
-
 import '../../model/select_attendant_model.dart';
-// import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_model.dart';
 
 class SelectAttendantPinDialog extends StatefulWidget {
   final SelectAttendantModel attendant;
@@ -20,53 +18,76 @@ class SelectAttendantPinDialog extends StatefulWidget {
 }
 
 class _SelectAttendantPinDialogState extends State<SelectAttendantPinDialog> {
-  final TextEditingController _pinController = TextEditingController();
-  bool _isPinIncorrect = false;
+  final TextEditingController _phoneController = TextEditingController();
+  bool _isVerifying = false;
+  String? _errorMessage;
+
+  void _verifyPhone() {
+    setState(() {
+      _isVerifying = true;
+      _errorMessage = null;
+    });
+
+    final inputPhone = _phoneController.text.trim();
+    final isValid = inputPhone == widget.attendant.phone && widget.attendant.hasPinSet;
+
+    setState(() {
+      _isVerifying = false;
+      if (!isValid) {
+        _errorMessage = inputPhone != widget.attendant.phone
+            ? 'Invalid PIN (phone number does not match)'
+            : 'Attendant has no PIN set';
+      }
+    });
+
+    widget.onPinVerified(isValid);
+    if (isValid) {
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   void dispose() {
-    _pinController.dispose();
+    _phoneController.dispose();
     super.dispose();
-  }
-
-  void _verifyPin() {
-    final enteredPin = _pinController.text;
-    final isVerified = enteredPin == widget.attendant.pin;
-    
-    if (isVerified) {
-      widget.onPinVerified(true);
-      Navigator.of(context).pop();
-    } else {
-      setState(() {
-        _isPinIncorrect = true;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Verify PIN for ${widget.attendant.fullName}'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _pinController,
-            decoration: InputDecoration(
-              labelText: 'Enter PIN',
-              errorText: _isPinIncorrect ? 'Incorrect PIN' : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
+      title: Text('Verify Attendant: ${widget.attendant.fullName}'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Enter PIN (Your Phone Number)'),
+            Gap(10),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                hintText: 'Enter your phone number as PIN',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: BorderSide(color: ColorsRes.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: BorderSide(color: ColorsRes.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Colors.blue),
+                ),
+                errorText: _errorMessage,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               ),
             ),
-            keyboardType: TextInputType.number,
-            obscureText: true,
-          ),
-          Gap(10),
-        ],
+          ],
+        ),
       ),
       actions: [
-//  highlighter
         TextButton(
           onPressed: () {
             widget.onPinVerified(false);
@@ -75,8 +96,14 @@ class _SelectAttendantPinDialogState extends State<SelectAttendantPinDialog> {
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: _verifyPin,
-          child: const Text('Verify'),
+          onPressed: _isVerifying ? null : _verifyPhone,
+          child: _isVerifying
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Verify'),
         ),
       ],
     );
@@ -84,14 +111,13 @@ class _SelectAttendantPinDialogState extends State<SelectAttendantPinDialog> {
 }
 
 
+
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
-// // import 'package:provider/provider.dart';
-// // import 'package:spotstock_inventory/common/helpers/colors_res.dart';
-// // import 'package:spotstock_inventory/common/provider/attendant_model.dart';
+// import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 
 // import '../../model/select_attendant_model.dart';
-// // import 'package:spotstock_inventory/common/provider/attendant_provider.dart';
+// // import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_model.dart';
 
 // class SelectAttendantPinDialog extends StatefulWidget {
 //   final SelectAttendantModel attendant;
@@ -154,6 +180,7 @@ class _SelectAttendantPinDialogState extends State<SelectAttendantPinDialog> {
 //         ],
 //       ),
 //       actions: [
+// //  highlighter
 //         TextButton(
 //           onPressed: () {
 //             widget.onPinVerified(false);

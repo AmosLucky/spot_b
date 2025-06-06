@@ -4,11 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/screens/desktop/pos/widgets/attendant_pin.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
-// import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_model.dart';
 import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
-
 import '../../model/select_attendant_model.dart';
 import '../dialogs/select_attendant_pin.dart';
 
@@ -59,7 +56,7 @@ class _PaymentFormState extends State<PaymentForm> {
     isCustomName = widget.data['customerName'] != null;
     customerNameController.text = widget.data['customerName'] ?? "Walk-in Customer";
     tableNameController.text = widget.data['table'] ?? "Select a table";
-    customerPhoneController.text = widget.data['customerPhoneNumber'] ?? "Enter phone number";
+    customerPhoneController.text = widget.data['customerPhoneNumber'] ?? "";
     _loadCustomers();
     _loadTables();
     _selectAttendantProvider = Provider.of<SelectAttendantProvider>(context, listen: false);
@@ -108,14 +105,7 @@ class _PaymentFormState extends State<PaymentForm> {
               _attendantVerified = false;
               _selectAttendantProvider.selectAttendant(attendant);
             });
-
-            if (attendant.hasPinSet) {
-              _promptForPin(attendant);
-            } else {
-              setState(() {
-                _attendantVerified = true;
-              });
-            }
+            _promptForPin(attendant);
           },
           previouslySelectedAttendant: _selectedAttendant,
         ),
@@ -416,16 +406,19 @@ class _PaymentFormState extends State<PaymentForm> {
 
 
 
-
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
 // import 'package:provider/provider.dart';
 // import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 // import 'package:spotstock_inventory/common/money.dart';
-// import 'package:spotstock_inventory/common/provider/attendant_model.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/attendant_pin.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
+// // import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_model.dart';
+// import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
+
+// import '../../model/select_attendant_model.dart';
+// import '../dialogs/select_attendant_pin.dart';
 
 // class PaymentForm extends StatefulWidget {
 //   final String app;
@@ -435,31 +428,31 @@ class _PaymentFormState extends State<PaymentForm> {
 //   bool isInvoice;
 //   final Function(Map<String, dynamic>) onSubmit;
 
-//   PaymentForm(
-//       {super.key,
-//       required this.onSubmit,
-//       required this.subtotal,
-//       required this.app,
-//       required this.data,
-//       required this.isInvoice,
-//       required this.systemProvider});
+//   PaymentForm({
+//     super.key,
+//     required this.onSubmit,
+//     required this.subtotal,
+//     required this.app,
+//     required this.data,
+//     required this.isInvoice,
+//     required this.systemProvider,
+//   });
 
 //   @override
 //   State<PaymentForm> createState() => _PaymentFormState();
 // }
 
 // class _PaymentFormState extends State<PaymentForm> {
-//   AttendantModel? _selectedAttendant;
+//   SelectAttendantModel? _selectedAttendant;
 //   bool _attendantVerified = false;
-//   late AttendantProvider _attendantProvider;
+//   late SelectAttendantProvider _selectAttendantProvider;
 //   List<String> customers = [];
 //   List<String> tables = [];
 //   final TextEditingController customerNameController = TextEditingController();
-//   final TextEditingController receivedAmountController =
-//       TextEditingController();
+//   final TextEditingController receivedAmountController = TextEditingController();
 //   final TextEditingController partialAmountController = TextEditingController();
-//   final tableNameController = TextEditingController();
-//   final customerPhoneController = TextEditingController();
+//   final TextEditingController tableNameController = TextEditingController();
+//   final TextEditingController customerPhoneController = TextEditingController();
 
 //   String paymentType = 'Cash';
 //   String paymentStatus = 'Paid';
@@ -471,58 +464,43 @@ class _PaymentFormState extends State<PaymentForm> {
 //   @override
 //   void initState() {
 //     super.initState();
-//     isCustomName = widget.data['customerName'] != null ? true : false;
-//     customerNameController.text =
-//         widget.data['customerName'] ?? "Walk-in Customer";
+//     isCustomName = widget.data['customerName'] != null;
+//     customerNameController.text = widget.data['customerName'] ?? "Walk-in Customer";
 //     tableNameController.text = widget.data['table'] ?? "Select a table";
-//     print("Table ==>> ${widget.data['table']}");
-//     customerPhoneController.text =
-//         widget.data['customerPhoneNumber'] ?? "Enter phone number";
+//     customerPhoneController.text = widget.data['customerPhoneNumber'] ?? "Enter phone number";
 //     _loadCustomers();
 //     _loadTables();
-//     _attendantProvider = AttendantProvider();
-//     _attendantProvider.loadAttendants(widget.systemProvider);
+//     _selectAttendantProvider = Provider.of<SelectAttendantProvider>(context, listen: false);
+//     _selectAttendantProvider.loadAttendants();
 //   }
 
 //   void _loadCustomers() async {
-//     var customers = await getCustomers();
-//     if (mounted) {
-//       setState(() {
-//         customers = customers;
-//       });
+//     try {
+//       var customers = await widget.systemProvider.getCustomers();
+//       if (mounted) {
+//         setState(() {
+//           this.customers = customers
+//               .map((customer) => customer['attributes']['name'] as String)
+//               .toList();
+//         });
+//       }
+//     } catch (e) {
+//       print('Error fetching customers: $e');
 //     }
 //   }
 
 //   void _loadTables() async {
-//     var tables = await getTables();
-//     if (mounted) {
-//       setState(() {
-//         tables = tables;
-//       });
-//     }
-//   }
-
-//   Future<List<String>> getCustomers() async {
 //     try {
-//       var response = await widget.systemProvider.getCustomers();
-//       return response
-//           .map((customer) => customer['attributes']['name'] as String)
-//           .toList();
+//       var tables = await widget.systemProvider.getTables();
+//       if (mounted) {
+//         setState(() {
+//           this.tables = tables
+//               .map((customer) => customer['attributes']['name'] as String)
+//               .toList();
+//         });
+//       }
 //     } catch (e) {
-//       print('Error fetching invoices: $e');
-//       return [];
-//     }
-//   }
-
-//   Future<List<String>> getTables() async {
-//     try {
-//       var response = await widget.systemProvider.getTables();
-//       return response
-//           .map((customer) => customer['attributes']['name'] as String)
-//           .toList();
-//     } catch (e) {
-//       print('Error fetching invoices: $e');
-//       return [];
+//       print('Error fetching tables: $e');
 //     }
 //   }
 
@@ -530,13 +508,13 @@ class _PaymentFormState extends State<PaymentForm> {
 //     showDialog(
 //       context: context,
 //       builder: (context) => ChangeNotifierProvider.value(
-//         value: _attendantProvider, // Use existing provider
+//         value: _selectAttendantProvider,
 //         child: SelectAttendantDialog(
-//           systemProvider: widget.systemProvider,
 //           onAttendantSelected: (attendant) {
 //             setState(() {
 //               _selectedAttendant = attendant;
 //               _attendantVerified = false;
+//               _selectAttendantProvider.selectAttendant(attendant);
 //             });
 
 //             if (attendant.hasPinSet) {
@@ -547,38 +525,36 @@ class _PaymentFormState extends State<PaymentForm> {
 //               });
 //             }
 //           },
+//           previouslySelectedAttendant: _selectedAttendant,
 //         ),
 //       ),
 //     );
 //   }
 
-//   void _promptForPin(AttendantModel attendant) {
+//   void _promptForPin(SelectAttendantModel attendant) {
 //     showDialog(
 //       context: context,
 //       barrierDismissible: false,
-//       builder: (context) => ChangeNotifierProvider(
-//         create: (_) => AttendantProvider(),
-//         child: AttendantPinDialog(
-//           attendant: attendant,
-//           onPinVerified: (verified) {
-//             setState(() {
-//               _attendantVerified = verified;
-//               if (!verified) {
-//                 _selectedAttendant =
-//                     null; // Clear selection if PIN verification failed
-//               }
-//             });
-
-//             if (verified) {
-//               ScaffoldMessenger.of(context).showSnackBar(
-//                 SnackBar(
-//                   content: Text('Welcome, ${attendant.name}!'),
-//                   backgroundColor: Colors.green,
-//                 ),
-//               );
+//       builder: (context) => SelectAttendantPinDialog(
+//         attendant: attendant,
+//         onPinVerified: (verified) {
+//           setState(() {
+//             _attendantVerified = verified;
+//             if (!verified) {
+//               _selectedAttendant = null;
+//               _selectAttendantProvider.selectAttendant(null);
 //             }
-//           },
-//         ),
+//           });
+
+//           if (verified) {
+//             ScaffoldMessenger.of(context).showSnackBar(
+//               SnackBar(
+//                 content: Text('Welcome, ${attendant.fullName}!'),
+//                 backgroundColor: Colors.green,
+//               ),
+//             );
+//           }
+//         },
 //       ),
 //     );
 //   }
@@ -595,14 +571,13 @@ class _PaymentFormState extends State<PaymentForm> {
 //             Text('Attendant'),
 //             Gap(3),
 //             GestureDetector(
+//               onTap: _attendantVerified ? null : _selectAttendant,
 //               child: Container(
 //                 height: 40,
 //                 padding: EdgeInsets.all(10),
 //                 decoration: BoxDecoration(
 //                   borderRadius: BorderRadius.circular(5),
-//                   border: Border.all(
-//                     color: ColorsRes.grey,
-//                   ),
+//                   border: Border.all(color: ColorsRes.grey),
 //                   color: _selectedAttendant != null && _attendantVerified
 //                       ? Colors.green.shade50
 //                       : Colors.white,
@@ -621,53 +596,41 @@ class _PaymentFormState extends State<PaymentForm> {
 //                     ),
 //                     Text(
 //                       _selectedAttendant != null
-//                           ? '${_selectedAttendant!.name} ${_attendantVerified ? '(Verified)' : '(Not Verified)'}'
+//                           ? '${_selectedAttendant!.fullName} ${_attendantVerified ? '(Verified)' : '(Not Verified)'}'
 //                           : 'Select Attendant',
 //                       style: TextStyle(
 //                         color: _selectedAttendant != null && _attendantVerified
 //                             ? Colors.green.shade700
 //                             : Colors.black,
-//                         fontWeight:
-//                             _selectedAttendant != null && _attendantVerified
-//                                 ? FontWeight.w600
-//                                 : FontWeight.normal,
+//                         fontWeight: _selectedAttendant != null && _attendantVerified
+//                             ? FontWeight.w600
+//                             : FontWeight.normal,
 //                       ),
 //                     ),
-//                     TextButton(
-//                         onPressed: () {},
-//                         child: Text(
-//                             _selectedAttendant != null && _attendantVerified
-//                                 ? 'Change'
-//                                 : '')),
-//                     TextButton(
-//                         onPressed: () {},
-//                         child: Text(
-//                             _selectedAttendant != null && _attendantVerified
-//                                 ? 'Edit'
-//                                 : '')),
+//                     if (_selectedAttendant != null && _attendantVerified)
+//                       TextButton(
+//                         onPressed: _selectAttendant,
+//                         child: Text('Edit'),
+//                       ),
 //                   ],
 //                 ),
 //               ),
-//               onTap: _selectAttendant,
 //             ),
 //             Gap(10),
 //             Row(
 //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //               children: [
-//                 const Text("Customer: ",
-//                     style: TextStyle(fontWeight: FontWeight.bold)),
+//                 const Text("Customer: ", style: TextStyle(fontWeight: FontWeight.bold)),
 //                 Switch(
-//                   activeColor: Colors.grey, // Color of the switch when it's on
-//                   inactiveThumbColor:
-//                       Colors.grey, // Color of the switch thumb when it's off
+//                   activeColor: Colors.grey,
+//                   inactiveThumbColor: Colors.grey,
 //                   inactiveTrackColor: Colors.grey[300],
 //                   value: isCustomName,
 //                   onChanged: (value) {
 //                     setState(() {
 //                       isCustomName = value;
 //                       if (!isCustomName) {
-//                         customerNameController.text =
-//                             selectedCustomer ?? "Walk-in Customer";
+//                         customerNameController.text = selectedCustomer ?? "Walk-in Customer";
 //                       } else {
 //                         customerNameController.clear();
 //                       }
@@ -680,15 +643,13 @@ class _PaymentFormState extends State<PaymentForm> {
 //             isCustomName
 //                 ? TextField(
 //                     controller: customerNameController,
-//                     decoration:
-//                         const InputDecoration(labelText: "Enter Customer Name"),
+//                     decoration: const InputDecoration(labelText: "Enter Customer Name"),
 //                   )
 //                 : DropdownButton<String>(
 //                     isExpanded: true,
 //                     value: selectedCustomer,
 //                     hint: Text(customerNameController.text),
-//                     items: customers
-//                         .map<DropdownMenuItem<String>>((String customer) {
+//                     items: customers.map<DropdownMenuItem<String>>((String customer) {
 //                       return DropdownMenuItem<String>(
 //                         value: customer,
 //                         child: Text(customer),
@@ -697,30 +658,28 @@ class _PaymentFormState extends State<PaymentForm> {
 //                     onChanged: (String? newCustomer) {
 //                       setState(() {
 //                         selectedCustomer = newCustomer;
-//                         customerNameController.text =
-//                             newCustomer ?? "Walk-in Customer";
+//                         customerNameController.text = newCustomer ?? "Walk-in Customer";
 //                       });
 //                     },
 //                   ),
-//             isCustomName
-//                 ? TextField(
-//                     controller: customerPhoneController,
-//                     keyboardType: TextInputType.numberWithOptions(),
-//                     decoration: const InputDecoration(
-//                       labelText: "Enter Customer Phone number",
-//                     ),
-//                   )
-//                 : SizedBox(),
+//             if (isCustomName)
+//               TextField(
+//                 controller: customerPhoneController,
+//                 keyboardType: TextInputType.numberWithOptions(),
+//                 decoration: const InputDecoration(
+//                   labelText: "Enter Customer Phone number",
+//                 ),
+//               ),
 //             const SizedBox(height: 10),
 //             if (widget.app == 'pos')
 //               DropdownButton<String>(
 //                 isExpanded: true,
 //                 value: selectedTable,
 //                 hint: Text(tableNameController.text),
-//                 items: tables.map<DropdownMenuItem<String>>((String customer) {
+//                 items: tables.map<DropdownMenuItem<String>>((String table) {
 //                   return DropdownMenuItem<String>(
-//                     value: customer,
-//                     child: Text(customer),
+//                     value: table,
+//                     child: Text(table),
 //                   );
 //                 }).toList(),
 //                 onChanged: (String? newTable) {
@@ -754,8 +713,7 @@ class _PaymentFormState extends State<PaymentForm> {
 //             if (widget.app == 'pos')
 //               Row(
 //                 children: [
-//                   const Text("Payment Type: ",
-//                       style: TextStyle(fontWeight: FontWeight.bold)),
+//                   const Text("Payment Type: ", style: TextStyle(fontWeight: FontWeight.bold)),
 //                   DropdownButton<String>(
 //                     value: paymentType,
 //                     items: <String>['Cash', 'Transfer', 'POS']
@@ -777,8 +735,7 @@ class _PaymentFormState extends State<PaymentForm> {
 //             if (widget.app == 'pos')
 //               Row(
 //                 children: [
-//                   const Text("Payment Status: ",
-//                       style: TextStyle(fontWeight: FontWeight.bold)),
+//                   const Text("Payment Status: ", style: TextStyle(fontWeight: FontWeight.bold)),
 //                   DropdownButton<String>(
 //                     value: paymentStatus,
 //                     items: <String>['Paid', 'Unpaid', 'Partial']
@@ -821,21 +778,30 @@ class _PaymentFormState extends State<PaymentForm> {
 //         TextButton(
 //           child: const Text("Submit"),
 //           onPressed: () {
+//             if (_selectedAttendant == null || !_attendantVerified) {
+//               ScaffoldMessenger.of(context).showSnackBar(
+//                 SnackBar(
+//                   content: Text('Please select and verify an attendant'),
+//                   backgroundColor: Colors.red,
+//                 ),
+//               );
+//               return;
+//             }
 //             widget.data = {};
-//             double receivedAmount =
-//                 double.tryParse(receivedAmountController.text) ?? 0.0;
+//             double receivedAmount = double.tryParse(receivedAmountController.text) ?? 0.0;
 //             Map<String, dynamic> paymentData = {
-//               'customerName': customerNameController.text ?? '',
-//               'customerPhoneNumber': customerPhoneController.text ?? '',
+//               'customerName': customerNameController.text,
+//               'customerPhoneNumber': customerPhoneController.text,
 //               'subtotal': widget.subtotal,
-//               'receivedAmount': receivedAmount ?? '',
-//               'paymentType': paymentType ?? '',
-//               'paymentStatus': paymentStatus ?? '',
-//               'change': change ?? '',
+//               'receivedAmount': receivedAmount,
+//               'paymentType': paymentType,
+//               'paymentStatus': paymentStatus,
+//               'change': change,
 //               'partialAmount': paymentStatus == 'Partial'
 //                   ? double.tryParse(partialAmountController.text) ?? 0.0
 //                   : null,
-//               'table': selectedTable ?? '',
+//               'table': selectedTable,
+//               'attendantId': _selectedAttendant?.id,
 //             };
 //             widget.onSubmit(paymentData);
 //             Navigator.of(context).pop();
@@ -847,11 +813,11 @@ class _PaymentFormState extends State<PaymentForm> {
 
 //   @override
 //   void dispose() {
-//     _attendantProvider.dispose();
 //     customerNameController.dispose();
 //     receivedAmountController.dispose();
 //     partialAmountController.dispose();
 //     tableNameController.dispose();
+//     customerPhoneController.dispose();
 //     super.dispose();
 //   }
 // }
