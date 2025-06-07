@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/data/repository/auth_repo.dart';
 // import 'package:spotstock_inventory/utils/toast_utils.dart';
+// import '../../../data/models/userdetails.dart Jobs';
 import '../../../data/models/userdetails.dart';
 import '../../helpers/user_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class AuthProvider extends ChangeNotifier {
   final SharedPreferences sharedPreferences;
@@ -26,9 +28,22 @@ class AuthProvider extends ChangeNotifier {
   String _loggedInToken = "";
   String get loggedInToken => _loggedInToken;
 
+  Future<bool> _checkInternetConnection() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult != ConnectivityResult.none;
+  }
+
   // Online user login
   Future<Map<String, dynamic>> userLogin(
       String email, String password, BuildContext context) async {
+    bool hasInternet = await _checkInternetConnection();
+    if (!hasInternet) {
+      return {
+        'status': false,
+        'message': 'No internet connection for online login',
+      };
+    }
+
     Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
     if (response['status'] == true) {
       UserPreferences().saveUser(response['data']);
@@ -47,7 +62,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       String? storedEmail = sharedPreferences.getString('offline_email');
       String? storedPassword = sharedPreferences.getString('offline_password');
-      
+
       if (storedEmail == email && storedPassword == password) {
         UserDetails? user = await UserPreferences().getUser();
         if (user != null) {
@@ -120,7 +135,6 @@ class AuthProvider extends ChangeNotifier {
     prefs.setString(loggedInToken, value);
   }
 }
-
 
 
 

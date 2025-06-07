@@ -57,8 +57,15 @@ class _LoginScreenDesktopState extends State<LoginScreenDesktop> {
       bool hasInternet = await _checkInternetConnection();
       bool isFirstLogin = await _isFirstLogin();
 
-      if (hasInternet || isFirstLogin) {
-        // Online login required for first login or when internet is available
+      if (isFirstLogin && !hasInternet) {
+        setState(() => _isLoading = false);
+        ToastUtils.showErrorToast(
+            context, 'Error', 'Internet connection required for first login');
+        return;
+      }
+
+      if (hasInternet) {
+        // Online login
         var response = await authProvider.userLogin(_email.text, _password.text, context);
         setState(() => _isLoading = false);
 
@@ -224,10 +231,9 @@ class _LoginScreenDesktopState extends State<LoginScreenDesktop> {
           )
         ],
       ),
-    );
+      );
   }
 }
-
 
 
 
