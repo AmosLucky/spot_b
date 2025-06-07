@@ -1034,6 +1034,18 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "syncfusion_flutter_core",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/syncfusion_flutter_core-29.1.38",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "syncfusion_flutter_datepicker",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/syncfusion_flutter_datepicker-29.1.38",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "synchronized",
       "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/synchronized-3.3.0+3",
       "packageUri": "lib/",
@@ -1190,7 +1202,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2025-06-07T06:25:44.099338Z",
+  "generated": "2025-06-07T16:48:12.555149Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///C:/Users/IFEANYI/flutter-extract/flutter",

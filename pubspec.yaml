@@ -53,6 +53,7 @@ dependencies:
   chip_list: ^3.1.0
   gap: ^3.0.1
   retry: ^3.1.2
+  syncfusion_flutter_datepicker: ^29.1.38
 
 # Force specific versions to resolve compatibility issues
 dependency_overrides:
