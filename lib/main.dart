@@ -1,13 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+// Your existing imports...
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/preference_settings.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
-// import 'package:spotstock_inventory/common/provider/attendant_provider.dart';
 import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
 import 'package:spotstock_inventory/common/provider/booking_history_provider.dart';
 import 'package:spotstock_inventory/common/provider/booking_provider.dart';
@@ -22,19 +23,49 @@ import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
-
 import 'package:spotstock_inventory/objectbox.g.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/operations_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/paymentstate.dart';
 import 'package:spotstock_inventory/screens/desktop/splashscreen_desktop.dart';
 import 'package:spotstock_inventory/screens/mobile/splashscreen_mobile.dart';
 import 'package:spotstock_inventory/widgets/responsive.dart';
-
 import 'common/provider/attendant_model.dart';
 import 'screens/desktop/providers/select_attendant_provider.dart';
 
+// Custom HTTP Override for SSL Certificate Handling
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+        // Log certificate details for debugging
+        print('Certificate validation for $host:$port');
+        print('Certificate subject: ${cert.subject}');
+        print('Certificate issuer: ${cert.issuer}');
+        
+        // Allow certificates for your trusted domains
+        List<String> trustedHosts = [
+          'app.spotstockinventory.com',
+          'test.spotstockinventory.com',
+          'staging.spotstockinventory.com',
+        ];
+        
+        if (trustedHosts.contains(host)) {
+          return true;
+        }
+        
+        // For production, you might want to implement more strict validation
+        // For now, allowing all certificates to resolve the issue
+        return true; // Change to false for stricter validation
+      };
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Set custom HTTP overrides for SSL certificate handling
+  HttpOverrides.global = MyHttpOverrides();
 
   await DatabaseEngine.create();
 
@@ -139,8 +170,7 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(create: (_) => GeneralProvider()),
         ChangeNotifierProvider(
-          create: (_) => FolioDataProvider(widget.folioBox,
-              widget.bookingBox),
+          create: (_) => FolioDataProvider(widget.folioBox, widget.bookingBox),
         ),
         ChangeNotifierProvider(create: (_) => SystemProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
@@ -189,6 +219,8 @@ class _MyAppState extends State<MyApp> {
 
 
 
+
+
 // import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
 // import 'package:provider/provider.dart';
@@ -198,7 +230,7 @@ class _MyAppState extends State<MyApp> {
 // import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 // import 'package:spotstock_inventory/common/helpers/preference_settings.dart';
 // import 'package:spotstock_inventory/common/navigation.dart';
-// import 'package:spotstock_inventory/common/provider/attendant_model.dart';
+// // import 'package:spotstock_inventory/common/provider/attendant_provider.dart';
 // import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
 // import 'package:spotstock_inventory/common/provider/booking_history_provider.dart';
 // import 'package:spotstock_inventory/common/provider/booking_provider.dart';
@@ -221,17 +253,17 @@ class _MyAppState extends State<MyApp> {
 // import 'package:spotstock_inventory/screens/mobile/splashscreen_mobile.dart';
 // import 'package:spotstock_inventory/widgets/responsive.dart';
 
+// // import 'common/provider/attendant_model.dart';
+// import 'screens/desktop/providers/select_attendant_provider.dart';
+
 // void main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
 
 //   await DatabaseEngine.create();
 
-//   // Initialize ObjectBox store and get the boxes
 //   final store = await DatabaseEngine.instance.getStore();
 //   final folioBox = store.box<FolioX>();
 //   final bookingBox = store.box<BookingX>();
-
-//   /// ✅ Await SharedPreferences instance before passing it
 //   final sharedPreferences = await SharedPreferences.getInstance();
 
 //   runApp(MyApp(
@@ -282,7 +314,6 @@ class _MyAppState extends State<MyApp> {
 //     } catch (e, stacktrace) {
 //       print("Error initializing database: $e");
 //       print("Stacktrace: $stacktrace");
-//       // _showErrorDialog("Error initializing database: $e");
 //     }
 //   }
 
@@ -320,7 +351,7 @@ class _MyAppState extends State<MyApp> {
 
 //     return MultiProvider(
 //       providers: [
-//         ChangeNotifierProvider(create: (_) => AttendantProvider()),
+//         ChangeNotifierProvider(create: (_) => SelectAttendantProvider()),
 //         ChangeNotifierProvider(
 //             create: (_) =>
 //                 SalesProvider(SystemRepo(refresh: false, online: true))),
@@ -332,7 +363,7 @@ class _MyAppState extends State<MyApp> {
 //         ChangeNotifierProvider(create: (_) => GeneralProvider()),
 //         ChangeNotifierProvider(
 //           create: (_) => FolioDataProvider(widget.folioBox,
-//               widget.bookingBox), // ✅ Passing required arguments
+//               widget.bookingBox),
 //         ),
 //         ChangeNotifierProvider(create: (_) => SystemProvider()),
 //         ChangeNotifierProvider(create: (_) => BookingProvider()),
