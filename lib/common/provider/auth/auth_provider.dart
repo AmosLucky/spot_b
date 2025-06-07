@@ -1,8 +1,8 @@
-import 'package:spotstock_inventory/data/repository/auth_repo.dart';
 import 'package:flutter/material.dart';
-import '../../../data/models/userdetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:spotstock_inventory/data/repository/auth_repo.dart';
+// import 'package:spotstock_inventory/utils/toast_utils.dart';
+import '../../../data/models/userdetails.dart';
 import '../../helpers/user_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -26,16 +26,48 @@ class AuthProvider extends ChangeNotifier {
   String _loggedInToken = "";
   String get loggedInToken => _loggedInToken;
 
-  // user Login
-  Future<Map<String, dynamic>> userLogin(String email, String password) async {
+  // Online user login
+  Future<Map<String, dynamic>> userLogin(
+      String email, String password, BuildContext context) async {
     Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
     if (response['status'] == true) {
       UserPreferences().saveUser(response['data']);
       UserPreferences().isLoggedIn(email, password, response['token']);
+      await sharedPreferences.setString('offline_email', email);
+      await sharedPreferences.setString('offline_password', password);
       notifyListeners();
       return response;
     }
     return response;
+  }
+
+  // Offline user login
+  Future<Map<String, dynamic>> offlineLogin(
+      String email, String password, BuildContext context) async {
+    try {
+      String? storedEmail = sharedPreferences.getString('offline_email');
+      String? storedPassword = sharedPreferences.getString('offline_password');
+      
+      if (storedEmail == email && storedPassword == password) {
+        UserDetails? user = await UserPreferences().getUser();
+        if (user != null) {
+          return {
+            'status': true,
+            'message': 'Offline login successful',
+            'data': user,
+          };
+        }
+      }
+      return {
+        'status': false,
+        'message': 'Invalid credentials or no offline data available'
+      };
+    } catch (e) {
+      return {
+        'status': false,
+        'message': 'Offline login error: $e'
+      };
+    }
   }
 
   void _getToken() async {
@@ -58,7 +90,6 @@ class AuthProvider extends ChangeNotifier {
 
   void startLoading() {
     _isLoading = true;
-    // notifyListeners();
   }
 
   void nextStep(int value) {
@@ -79,7 +110,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // for user authentication
   Future<String> get isLoggedInToken async {
     final prefs = sharedPreferences;
     return prefs.getString(loggedInToken) ?? "";
@@ -90,6 +120,108 @@ class AuthProvider extends ChangeNotifier {
     prefs.setString(loggedInToken, value);
   }
 }
+
+
+
+
+// ===========================================================
+// =================original auth_provider ====================
+// import 'package:spotstock_inventory/data/repository/auth_repo.dart';
+// import 'package:flutter/material.dart';
+// import '../../../data/models/userdetails.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+
+// import '../../helpers/user_preferences.dart';
+
+// class AuthProvider extends ChangeNotifier {
+//   final SharedPreferences sharedPreferences;
+
+//   AuthProvider({required this.sharedPreferences}) {
+//     _getToken();
+//   }
+
+//   UserDetails? userDetails;
+
+//   bool _isRegisterDone = false;
+//   bool get isRegisterDone => _isRegisterDone;
+
+//   bool _isLoading = false;
+//   bool get isLoading => _isLoading;
+
+//   int _current_step = 1;
+//   int get currentStep => _current_step;
+
+//   String _loggedInToken = "";
+//   String get loggedInToken => _loggedInToken;
+
+//   // user Login
+//   Future<Map<String, dynamic>> userLogin(String email, String password) async {
+//     Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
+//     if (response['status'] == true) {
+//       UserPreferences().saveUser(response['data']);
+//       UserPreferences().isLoggedIn(email, password, response['token']);
+//       notifyListeners();
+//       return response;
+//     }
+//     return response;
+//   }
+
+//   void _getToken() async {
+//     _loggedInToken = await isLoggedInToken;
+//     notifyListeners();
+//   }
+
+//   void doneRegister(int value) {
+//     if (value == 4) {
+//       _isRegisterDone = true;
+//     } else {
+//       _isRegisterDone = false;
+//     }
+//     notifyListeners();
+//   }
+
+//   void doneLoading() {
+//     _isLoading = false;
+//   }
+
+//   void startLoading() {
+//     _isLoading = true;
+//     // notifyListeners();
+//   }
+
+//   void nextStep(int value) {
+//     if (_current_step < 4) {
+//       _current_step++;
+//     }
+//     print("######### next step registration ###############");
+//     print(_current_step);
+//     notifyListeners();
+//   }
+
+//   void prevStep() {
+//     if (_current_step > 1) {
+//       _current_step--;
+//     }
+//     print("######### previous step registration ###############");
+//     print(_current_step);
+//     notifyListeners();
+//   }
+
+//   // for user authentication
+//   Future<String> get isLoggedInToken async {
+//     final prefs = sharedPreferences;
+//     return prefs.getString(loggedInToken) ?? "";
+//   }
+
+//   void setLoggedIn(String value) async {
+//     final prefs = sharedPreferences;
+//     prefs.setString(loggedInToken, value);
+//   }
+// }
+
+// ===========================================================
+// ================= end original auth_provider ====================
+
 
 
 // class AuthProvider extends ChangeNotifier {
