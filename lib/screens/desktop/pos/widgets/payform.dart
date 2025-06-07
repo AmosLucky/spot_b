@@ -143,6 +143,9 @@ class _PaymentFormState extends State<PaymentForm> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine if customer switch and dropdown should be disabled
+    bool isCustomerInputDisabled = _selectedAttendant != null && _attendantVerified;
+
     return AlertDialog(
       title: const Text("Payment"),
       content: SingleChildScrollView(
@@ -208,16 +211,18 @@ class _PaymentFormState extends State<PaymentForm> {
                   inactiveThumbColor: Colors.grey,
                   inactiveTrackColor: Colors.grey[300],
                   value: isCustomName,
-                  onChanged: (value) {
-                    setState(() {
-                      isCustomName = value;
-                      if (!isCustomName) {
-                        customerNameController.text = selectedCustomer ?? "Walk-in Customer";
-                      } else {
-                        customerNameController.clear();
-                      }
-                    });
-                  },
+                  onChanged: isCustomerInputDisabled
+                      ? null
+                      : (value) {
+                          setState(() {
+                            isCustomName = value;
+                            if (!isCustomName) {
+                              customerNameController.text = selectedCustomer ?? "Walk-in Customer";
+                            } else {
+                              customerNameController.clear();
+                            }
+                          });
+                        },
                 ),
               ],
             ),
@@ -226,6 +231,7 @@ class _PaymentFormState extends State<PaymentForm> {
                 ? TextField(
                     controller: customerNameController,
                     decoration: const InputDecoration(labelText: "Enter Customer Name"),
+                    enabled: !isCustomerInputDisabled,
                   )
                 : DropdownButton<String>(
                     isExpanded: true,
@@ -237,12 +243,14 @@ class _PaymentFormState extends State<PaymentForm> {
                         child: Text(customer),
                       );
                     }).toList(),
-                    onChanged: (String? newCustomer) {
-                      setState(() {
-                        selectedCustomer = newCustomer;
-                        customerNameController.text = newCustomer ?? "Walk-in Customer";
-                      });
-                    },
+                    onChanged: isCustomerInputDisabled
+                        ? null
+                        : (String? newCustomer) {
+                            setState(() {
+                              selectedCustomer = newCustomer;
+                              customerNameController.text = newCustomer ?? "Walk-in Customer";
+                            });
+                          },
                   ),
             if (isCustomName)
               TextField(
@@ -251,6 +259,7 @@ class _PaymentFormState extends State<PaymentForm> {
                 decoration: const InputDecoration(
                   labelText: "Enter Customer Phone number",
                 ),
+                enabled: !isCustomerInputDisabled,
               ),
             const SizedBox(height: 10),
             if (widget.app == 'pos')
@@ -406,17 +415,15 @@ class _PaymentFormState extends State<PaymentForm> {
 
 
 
+
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
 // import 'package:provider/provider.dart';
 // import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 // import 'package:spotstock_inventory/common/money.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
-// import 'package:spotstock_inventory/screens/desktop/pos/widgets/attendant_pin.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
-// // import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_model.dart';
 // import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
-
 // import '../../model/select_attendant_model.dart';
 // import '../dialogs/select_attendant_pin.dart';
 
@@ -467,7 +474,7 @@ class _PaymentFormState extends State<PaymentForm> {
 //     isCustomName = widget.data['customerName'] != null;
 //     customerNameController.text = widget.data['customerName'] ?? "Walk-in Customer";
 //     tableNameController.text = widget.data['table'] ?? "Select a table";
-//     customerPhoneController.text = widget.data['customerPhoneNumber'] ?? "Enter phone number";
+//     customerPhoneController.text = widget.data['customerPhoneNumber'] ?? "";
 //     _loadCustomers();
 //     _loadTables();
 //     _selectAttendantProvider = Provider.of<SelectAttendantProvider>(context, listen: false);
@@ -516,14 +523,7 @@ class _PaymentFormState extends State<PaymentForm> {
 //               _attendantVerified = false;
 //               _selectAttendantProvider.selectAttendant(attendant);
 //             });
-
-//             if (attendant.hasPinSet) {
-//               _promptForPin(attendant);
-//             } else {
-//               setState(() {
-//                 _attendantVerified = true;
-//               });
-//             }
+//             _promptForPin(attendant);
 //           },
 //           previouslySelectedAttendant: _selectedAttendant,
 //         ),
