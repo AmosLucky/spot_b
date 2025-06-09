@@ -235,18 +235,18 @@ class _LoginScreenDesktopState extends State<LoginScreenDesktop> {
                             paddingVertical: 15.0,
                           ),
                         ),
-                        const SizedBox(height: 10.0),
-                        TextButton(
-                          onPressed: () => LogoutUtils.logout(context),
-                          child: const Text(
-                            'Logout',
-                            style: TextStyle(
-                              color: Color(0xFFE53935),
-                              fontSize: 16,
-                              fontFamily: sofia,
-                            ),
-                          ),
-                        ),
+                        // const SizedBox(height: 10.0),
+                        // TextButton(
+                        //   onPressed: () => LogoutUtils.logout(context),
+                        //   child: const Text(
+                        //     'Logout',
+                        //     style: TextStyle(
+                        //       color: Color(0xFFE53935),
+                        //       fontSize: 16,
+                        //       fontFamily: sofia,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   )
