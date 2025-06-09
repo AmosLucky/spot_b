@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:objectbox/objectbox.dart';
 
+@Entity()
 class SelectAttendantModel {
-  final int id;
+  @Id()
+  int id = 0; // ObjectBox ID
+  
+
+  final int apiId; // Original ID from API
   final String firstName;
   final String lastName;
   final String fullName;
@@ -11,7 +16,7 @@ class SelectAttendantModel {
   final bool hasPinSet;
 
   SelectAttendantModel({
-    required this.id,
+    required this.apiId,
     required this.firstName,
     required this.lastName,
     required this.email,
@@ -26,7 +31,7 @@ class SelectAttendantModel {
         ? attributes['role'][0]['display_name']
         : 'No Department';
     return SelectAttendantModel(
-      id: int.parse(json['id'].toString()),
+      apiId: int.parse(json['id'].toString()),
       firstName: attributes['first_name'] ?? '',
       lastName: attributes['last_name'] ?? '',
       email: attributes['email'] ?? '',
@@ -48,7 +53,6 @@ class SelectAttendantModel {
 //   final String email;
 //   final String phone;
 //   final String department;
-//   final String pin;
 //   final bool hasPinSet;
 
 //   SelectAttendantModel({
@@ -58,8 +62,7 @@ class SelectAttendantModel {
 //     required this.email,
 //     required this.phone,
 //     required this.department,
-//     required this.pin,
-//     this.hasPinSet = true,
+//     required this.hasPinSet,
 //   }) : fullName = '$firstName $lastName';
 
 //   factory SelectAttendantModel.fromJson(Map<String, dynamic> json) {
@@ -74,8 +77,7 @@ class SelectAttendantModel {
 //       email: attributes['email'] ?? '',
 //       phone: attributes['phone'] ?? '',
 //       department: role,
-//       pin: attributes['pin']?.toString() ?? '',
-//       hasPinSet: attributes['pin'] != null && attributes['pin'].toString().isNotEmpty,
+//       hasPinSet: attributes['set_pin'] ?? false,
 //     );
 //   }
 // }

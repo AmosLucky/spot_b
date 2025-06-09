@@ -1,15 +1,15 @@
 import 'dart:convert';
 
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
-import 'package:spotstock_inventory/screens/desktop/pos/print_desktop.dart';
 import 'package:spotstock_inventory/widgets/register_tile.dart';
 import 'package:spotstock_inventory/widgets/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:spotstock_inventory/widgets/sidebar_inventory.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/widgets/transaction_tile.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/print_desktop.dart';
 
 import '../../../../widgets/dialogs.dart';
 import '../../../mobile/home/pages/transactions.dart';
@@ -335,45 +335,7 @@ class _BodyState extends State<Body> {
                                           children: [
                                             TextButton(
                                               onPressed: () async {
-                                                // List<OrderSyncItem> itemss = [];
-                                                //
-                                                // for (var itemData in reportData!) {
-                                                //   if (itemData.items != null) {
-                                                //     for (var items in jsonDecode(itemData.items)) {
-                                                //       if (items is Map<String, dynamic>) {
-                                                //         var product = items['product'];
-                                                //         print("productssss ==>> ${product}");
-                                                //
-                                                //         // Check if product is a map
-                                                //         int itemId = 1;
-                                                //         int quantity = items['quantity'] as int;
-                                                //         print("items ==>>> $itemId");
-                                                //
-                                                //         double totalAmount;
-                                                //         if (items['totalAmount'] is String) {
-                                                //           totalAmount = double.tryParse(items['totalAmount']) ??
-                                                //               0.0; // Handle String to double
-                                                //         } else if (items['totalAmount'] is int) {
-                                                //           totalAmount = (items['totalAmount'] as int)
-                                                //               .toDouble(); // Convert int to double
-                                                //         } else if (items['totalAmount'] is double) {
-                                                //           totalAmount = items['totalAmount']; // Already a double
-                                                //         } else {
-                                                //           totalAmount = 0.0; // Default value in case of unexpected type
-                                                //         }
-                                                //
-                                                //         OrderSyncItem item = OrderSyncItem(itemId, quantity, totalAmount);
-                                                //         itemss.add(item);
-                                                //         print("Items to Download ==>> $itemss");
-                                                //       }
-                                                //     }
-                                                //   }
-                                                //   else {
-                                                //     print('Expected itemData to be a Map, but got: $itemData');
-                                                //   }
-                                                // }
-                                                //
-                                                // double totalAmount = itemss.map((item) => item.price).reduce((a, b) => a + b);
+ 
 
                                                 systemProvider
                                                     .syncAllTransactions(
@@ -516,6 +478,7 @@ class _BodyState extends State<Body> {
         DateTime.parse(registerData![registerIndex!].lastUpdated),
         widget.user.company!.name,
         widget.user.company!.address,
+        null //No attendant selected
       );
 
       print('Document sent to printer successfully.');
@@ -523,6 +486,152 @@ class _BodyState extends State<Body> {
       print('Error printing document: $e');
     }
   }
+
+
+
+  Future<void> downloadHotelReport() async {
+    if (hotelReportData == null || hotelReportData!.isEmpty) {
+      print('No hotel report data available');
+      return;
+    }
+
+    List<Item> itemss = [];
+    print("Printing hotel report");
+
+    for (var itemData in hotelReportData!) {
+      try {
+        if (itemData == null) continue;
+
+        final String? itemName = itemData.roomName;
+        if (itemName == null) {
+          print('Skipping item with null roomName');
+          continue;
+        }
+
+        final int quantity = int.tryParse(itemData.duration ?? '0') ?? 0;
+
+        double totalAmount = 0.0;
+        if (itemData.amount != null) {
+          if (itemData.amount is String) {
+            totalAmount = double.tryParse(itemData.amount as String) ?? 0.0;
+          } else if (itemData.amount is int) {
+            totalAmount = (itemData.amount as int).toDouble();
+          } else if (itemData.amount is double) {
+            totalAmount = itemData.amount as double;
+          }
+        }
+
+        Item item = Item(itemName, quantity, totalAmount);
+        itemss.add(item);
+        print("Added item: $item");
+      } catch (e) {
+        print('Error processing item: $e');
+      }
+    }
+
+    double totalAmount = itemss.isEmpty
+        ? 0.0
+        : itemss.map((item) => item.price).reduce((a, b) => a + b);
+
+    if (widget.user.company == null) {
+      print('No company data available');
+      return;
+    }
+
+    if (registerData == null ||
+        registerIndex == null ||
+        registerIndex! >= registerData!.length) {
+      print('Invalid register data');
+      return;
+    }
+
+    // Parse date safely
+    DateTime? lastUpdated;
+    try {
+      lastUpdated = DateTime.parse(registerData![registerIndex!].lastUpdated);
+    } catch (e) {
+      print('Error parsing date: $e');
+      lastUpdated = DateTime.now(); // fallback to current date
+    }
+
+    try {
+      print("Company phone: ${widget.user.company?.phone}");
+
+      await printSampleDocument(
+        totalAmount,
+        [],
+        itemss,
+        '',
+        '',
+        widget.user.company?.email ?? '',
+        widget.user.company?.phone ?? '',
+        widget.user.firstName ?? '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        0.00,
+        500,
+        000.00,
+        '0.00',
+        lastUpdated,
+        widget.user.company?.name ?? '',
+        widget.user.company?.address ?? '',
+        null //No attendant selected
+      );
+
+      print('Document sent to printer successfully.');
+    } catch (e) {
+      print('Error printing document: $e');
+      // Consider showing an error message to the user
+    }
+  }
+}
+
+
+
+
+                                               // List<OrderSyncItem> itemss = [];
+                                                //
+                                                // for (var itemData in reportData!) {
+                                                //   if (itemData.items != null) {
+                                                //     for (var items in jsonDecode(itemData.items)) {
+                                                //       if (items is Map<String, dynamic>) {
+                                                //         var product = items['product'];
+                                                //         print("productssss ==>> ${product}");
+                                                //
+                                                //         // Check if product is a map
+                                                //         int itemId = 1;
+                                                //         int quantity = items['quantity'] as int;
+                                                //         print("items ==>>> $itemId");
+                                                //
+                                                //         double totalAmount;
+                                                //         if (items['totalAmount'] is String) {
+                                                //           totalAmount = double.tryParse(items['totalAmount']) ??
+                                                //               0.0; // Handle String to double
+                                                //         } else if (items['totalAmount'] is int) {
+                                                //           totalAmount = (items['totalAmount'] as int)
+                                                //               .toDouble(); // Convert int to double
+                                                //         } else if (items['totalAmount'] is double) {
+                                                //           totalAmount = items['totalAmount']; // Already a double
+                                                //         } else {
+                                                //           totalAmount = 0.0; // Default value in case of unexpected type
+                                                //         }
+                                                //
+                                                //         OrderSyncItem item = OrderSyncItem(itemId, quantity, totalAmount);
+                                                //         itemss.add(item);
+                                                //         print("Items to Download ==>> $itemss");
+                                                //       }
+                                                //     }
+                                                //   }
+                                                //   else {
+                                                //     print('Expected itemData to be a Map, but got: $itemData');
+                                                //   }
+                                                // }
+                                                //
+                                                // double totalAmount = itemss.map((item) => item.price).reduce((a, b) => a + b);
 
   // Future<void> downloadHotelReport() async {
   //   // Parse the items
@@ -638,103 +747,3 @@ class _BodyState extends State<Body> {
   //     print('Error printing document: $e');
   //   }
   // }
-
-  Future<void> downloadHotelReport() async {
-    if (hotelReportData == null || hotelReportData!.isEmpty) {
-      print('No hotel report data available');
-      return;
-    }
-
-    List<Item> itemss = [];
-    print("Printing hotel report");
-
-    for (var itemData in hotelReportData!) {
-      try {
-        if (itemData == null) continue;
-
-        final String? itemName = itemData.roomName;
-        if (itemName == null) {
-          print('Skipping item with null roomName');
-          continue;
-        }
-
-        final int quantity = int.tryParse(itemData.duration ?? '0') ?? 0;
-
-        double totalAmount = 0.0;
-        if (itemData.amount != null) {
-          if (itemData.amount is String) {
-            totalAmount = double.tryParse(itemData.amount as String) ?? 0.0;
-          } else if (itemData.amount is int) {
-            totalAmount = (itemData.amount as int).toDouble();
-          } else if (itemData.amount is double) {
-            totalAmount = itemData.amount as double;
-          }
-        }
-
-        Item item = Item(itemName, quantity, totalAmount);
-        itemss.add(item);
-        print("Added item: $item");
-      } catch (e) {
-        print('Error processing item: $e');
-      }
-    }
-
-    double totalAmount = itemss.isEmpty
-        ? 0.0
-        : itemss.map((item) => item.price).reduce((a, b) => a + b);
-
-    if (widget.user.company == null) {
-      print('No company data available');
-      return;
-    }
-
-    if (registerData == null ||
-        registerIndex == null ||
-        registerIndex! >= registerData!.length) {
-      print('Invalid register data');
-      return;
-    }
-
-    // Parse date safely
-    DateTime? lastUpdated;
-    try {
-      lastUpdated = DateTime.parse(registerData![registerIndex!].lastUpdated);
-    } catch (e) {
-      print('Error parsing date: $e');
-      lastUpdated = DateTime.now(); // fallback to current date
-    }
-
-    try {
-      print("Company phone: ${widget.user.company?.phone}");
-
-      await printSampleDocument(
-        totalAmount,
-        [],
-        itemss,
-        '',
-        '',
-        widget.user.company?.email ?? '',
-        widget.user.company?.phone ?? '',
-        widget.user.firstName ?? '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        0.00,
-        500,
-        000.00,
-        '0.00',
-        lastUpdated,
-        widget.user.company?.name ?? '',
-        widget.user.company?.address ?? '',
-      );
-
-      print('Document sent to printer successfully.');
-    } catch (e) {
-      print('Error printing document: $e');
-      // Consider showing an error message to the user
-    }
-  }
-}

@@ -338,23 +338,7 @@ class _BodyState extends State<Body> {
     );
   }
 
-  // void _printAllTransactions(List<Orders> transactions) {
-  //   List<Map<String, dynamic>> allTransactions = [];
-  //   for (var transaction in transactions) {
-  //     allTransactions.add(transaction.toMap());
-  //   }
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(
-  //       builder: (_) => PrintScreenDialog(
-  //         user: widget.user,
-  //         transactionData: allTransactions.fold<Map<String, dynamic>>(
-  //           {},
-  //           (previous, current) => {...previous, ...current},
-  //         ), // Ensure PrintScreenDialog can handle a list
-  //       ),
-  //     ),
-  //   );
-  // }
+
 
   void _printAllTransactions(List<Orders> transactions) {
     // Create a map to aggregate items by name
@@ -503,6 +487,7 @@ class _BodyState extends State<Body> {
         DateTime.now(), // Current date/time for the report
         widget.user.company!.name,
         widget.user.company!.address,
+        null // No Added attendantName
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -588,6 +573,7 @@ class _BodyState extends State<Body> {
         DateTime.parse(registerData![registerIndex!].lastUpdated),
         widget.user.company!.name,
         widget.user.company!.address,
+        null // No Added attendantName
       );
 
       print('Document sent to printer successfully.');
@@ -686,6 +672,7 @@ class _BodyState extends State<Body> {
         lastUpdated,
         widget.user.company?.name ?? '',
         widget.user.company?.address ?? '',
+        null // No Added attendantName
       );
 
       print('Document sent to printer successfully.');
@@ -695,3 +682,22 @@ class _BodyState extends State<Body> {
     }
   }
 }
+
+
+  // void _printAllTransactions(List<Orders> transactions) {
+  //   List<Map<String, dynamic>> allTransactions = [];
+  //   for (var transaction in transactions) {
+  //     allTransactions.add(transaction.toMap());
+  //   }
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (_) => PrintScreenDialog(
+  //         user: widget.user,
+  //         transactionData: allTransactions.fold<Map<String, dynamic>>(
+  //           {},
+  //           (previous, current) => {...previous, ...current},
+  //         ), // Ensure PrintScreenDialog can handle a list
+  //       ),
+  //     ),
+  //   );
+  // }

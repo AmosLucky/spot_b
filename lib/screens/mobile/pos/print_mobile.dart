@@ -701,6 +701,7 @@ class _PrintScreenDialogState extends State<PrintMobileScreenDialog> {
           createdAt,
         widget.user.company!.name,
         widget.user.company!.address,
+        null //No attendant selected
       );
 
       print('Document sent to printer successfully.');

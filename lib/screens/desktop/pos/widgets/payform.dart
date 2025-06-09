@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
@@ -69,12 +70,20 @@ class _PaymentFormState extends State<PaymentForm> {
       if (mounted) {
         setState(() {
           this.customers = customers
-              .map((customer) => customer['attributes']['name'] as String)
+              .map((customer) => customer['attributes']['name'].toString())
               .toList();
+          if (this.customers.isEmpty) {
+            this.customers = ['Walk-in Customer'];
+          }
         });
       }
     } catch (e) {
-      print('Error fetching customers: $e');
+      debugPrint('Error loading customers: $e');
+      if (mounted) {
+        setState(() {
+          customers = ['Walk-in Customer'];
+        });
+      }
     }
   }
 
@@ -84,12 +93,12 @@ class _PaymentFormState extends State<PaymentForm> {
       if (mounted) {
         setState(() {
           this.tables = tables
-              .map((customer) => customer['attributes']['name'] as String)
+              .map((table) => table['attributes']['name'].toString())
               .toList();
         });
       }
     } catch (e) {
-      print('Error fetching tables: $e');
+      debugPrint('Error loading tables: $e');
     }
   }
 
@@ -143,7 +152,6 @@ class _PaymentFormState extends State<PaymentForm> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine if customer switch and dropdown should be disabled
     bool isCustomerInputDisabled = _selectedAttendant != null && _attendantVerified;
 
     return AlertDialog(
@@ -230,7 +238,15 @@ class _PaymentFormState extends State<PaymentForm> {
             isCustomName
                 ? TextField(
                     controller: customerNameController,
-                    decoration: const InputDecoration(labelText: "Enter Customer Name"),
+                    decoration: InputDecoration(
+                      labelText: "Enter Customer Name",
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: isCustomerInputDisabled
+                            ? null
+                            : () => customerNameController.clear(),
+                      ),
+                    ),
                     enabled: !isCustomerInputDisabled,
                   )
                 : DropdownButton<String>(
@@ -256,8 +272,14 @@ class _PaymentFormState extends State<PaymentForm> {
               TextField(
                 controller: customerPhoneController,
                 keyboardType: TextInputType.numberWithOptions(),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Enter Customer Phone number",
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: isCustomerInputDisabled
+                        ? null
+                        : () => customerPhoneController.clear(),
+                  ),
                 ),
                 enabled: !isCustomerInputDisabled,
               ),
@@ -369,19 +391,42 @@ class _PaymentFormState extends State<PaymentForm> {
         TextButton(
           child: const Text("Submit"),
           onPressed: () {
-            if (_selectedAttendant == null || !_attendantVerified) {
+            // Determine attendantName
+            String attendantName = _selectedAttendant != null && _attendantVerified
+                ? _selectedAttendant!.fullName
+                : customerNameController.text.trim().isNotEmpty
+                    ? customerNameController.text.trim()
+                    : "Walk-in Customer";
+
+            // Validate inputs
+            if (_selectedAttendant == null &&
+                customerNameController.text.trim().isEmpty &&
+                selectedCustomer == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Please select and verify an attendant'),
+                const SnackBar(
+                  content: Text('Please select an attendant or provide a customer name'),
                   backgroundColor: Colors.red,
                 ),
               );
               return;
             }
-            widget.data = {};
+
             double receivedAmount = double.tryParse(receivedAmountController.text) ?? 0.0;
+            if (receivedAmount < 0 || (paymentStatus == 'Partial' && (double.tryParse(partialAmountController.text) ?? 0.0) <= 0)) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Invalid amount entered'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return;
+            }
+
+            widget.data = {};
             Map<String, dynamic> paymentData = {
-              'customerName': customerNameController.text,
+              'customerName': customerNameController.text.trim().isNotEmpty
+                  ? customerNameController.text.trim()
+                  : selectedCustomer ?? "Walk-in Customer",
               'customerPhoneNumber': customerPhoneController.text,
               'subtotal': widget.subtotal,
               'receivedAmount': receivedAmount,
@@ -393,6 +438,7 @@ class _PaymentFormState extends State<PaymentForm> {
                   : null,
               'table': selectedTable,
               'attendantId': _selectedAttendant?.id,
+              'attendantName': attendantName,
             };
             widget.onSubmit(paymentData);
             Navigator.of(context).pop();
@@ -412,6 +458,9 @@ class _PaymentFormState extends State<PaymentForm> {
     super.dispose();
   }
 }
+
+
+
 
 
 
@@ -561,6 +610,9 @@ class _PaymentFormState extends State<PaymentForm> {
 
 //   @override
 //   Widget build(BuildContext context) {
+//     // Determine if customer switch and dropdown should be disabled
+//     bool isCustomerInputDisabled = _selectedAttendant != null && _attendantVerified;
+
 //     return AlertDialog(
 //       title: const Text("Payment"),
 //       content: SingleChildScrollView(
@@ -626,16 +678,18 @@ class _PaymentFormState extends State<PaymentForm> {
 //                   inactiveThumbColor: Colors.grey,
 //                   inactiveTrackColor: Colors.grey[300],
 //                   value: isCustomName,
-//                   onChanged: (value) {
-//                     setState(() {
-//                       isCustomName = value;
-//                       if (!isCustomName) {
-//                         customerNameController.text = selectedCustomer ?? "Walk-in Customer";
-//                       } else {
-//                         customerNameController.clear();
-//                       }
-//                     });
-//                   },
+//                   onChanged: isCustomerInputDisabled
+//                       ? null
+//                       : (value) {
+//                           setState(() {
+//                             isCustomName = value;
+//                             if (!isCustomName) {
+//                               customerNameController.text = selectedCustomer ?? "Walk-in Customer";
+//                             } else {
+//                               customerNameController.clear();
+//                             }
+//                           });
+//                         },
 //                 ),
 //               ],
 //             ),
@@ -644,6 +698,7 @@ class _PaymentFormState extends State<PaymentForm> {
 //                 ? TextField(
 //                     controller: customerNameController,
 //                     decoration: const InputDecoration(labelText: "Enter Customer Name"),
+//                     enabled: !isCustomerInputDisabled,
 //                   )
 //                 : DropdownButton<String>(
 //                     isExpanded: true,
@@ -655,12 +710,14 @@ class _PaymentFormState extends State<PaymentForm> {
 //                         child: Text(customer),
 //                       );
 //                     }).toList(),
-//                     onChanged: (String? newCustomer) {
-//                       setState(() {
-//                         selectedCustomer = newCustomer;
-//                         customerNameController.text = newCustomer ?? "Walk-in Customer";
-//                       });
-//                     },
+//                     onChanged: isCustomerInputDisabled
+//                         ? null
+//                         : (String? newCustomer) {
+//                             setState(() {
+//                               selectedCustomer = newCustomer;
+//                               customerNameController.text = newCustomer ?? "Walk-in Customer";
+//                             });
+//                           },
 //                   ),
 //             if (isCustomName)
 //               TextField(
@@ -669,6 +726,7 @@ class _PaymentFormState extends State<PaymentForm> {
 //                 decoration: const InputDecoration(
 //                   labelText: "Enter Customer Phone number",
 //                 ),
+//                 enabled: !isCustomerInputDisabled,
 //               ),
 //             const SizedBox(height: 10),
 //             if (widget.app == 'pos')
@@ -802,6 +860,7 @@ class _PaymentFormState extends State<PaymentForm> {
 //                   : null,
 //               'table': selectedTable,
 //               'attendantId': _selectedAttendant?.id,
+//               'attendantName': _selectedAttendant?.fullName, // Added attendantName
 //             };
 //             widget.onSubmit(paymentData);
 //             Navigator.of(context).pop();

@@ -936,9 +936,58 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "13:7976920998866683740",
+      "lastPropertyId": "8:5155396035667685023",
+      "name": "SelectAttendantModel",
+      "properties": [
+        {
+          "id": "1:4378463541259968172",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8004823089706564068",
+          "name": "apiId",
+          "type": 6
+        },
+        {
+          "id": "3:1851057995285207996",
+          "name": "firstName",
+          "type": 9
+        },
+        {
+          "id": "4:7131081172016354201",
+          "name": "lastName",
+          "type": 9
+        },
+        {
+          "id": "5:5854679661456040279",
+          "name": "email",
+          "type": 9
+        },
+        {
+          "id": "6:8159545305580645714",
+          "name": "phone",
+          "type": 9
+        },
+        {
+          "id": "7:5202959231217831249",
+          "name": "department",
+          "type": 9
+        },
+        {
+          "id": "8:5155396035667685023",
+          "name": "hasPinSet",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "12:2304842742082983492",
+  "lastEntityId": "13:7976920998866683740",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
