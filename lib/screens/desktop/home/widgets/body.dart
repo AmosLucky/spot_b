@@ -106,6 +106,28 @@ class _BodyState extends State<Body> {
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    //getTables();
+    SystemProvider systemProvider = SystemProvider();
+    systemProvider.fetchTables(true, true);
+    super.initState();
+  }
+}
+
+
 
                       // sales summary
                       // Row(
@@ -155,23 +177,3 @@ class _BodyState extends State<Body> {
                       //     ),
                       //   ],
                       // ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    //getTables();
-    SystemProvider systemProvider = SystemProvider();
-    systemProvider.fetchTables(true, true);
-    super.initState();
-  }
-}

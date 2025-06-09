@@ -1,16 +1,19 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:spotstock_inventory/common/helpers/user_preferences.dart';
+import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
+import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
 // import 'package:spotstock_inventory/utils/toast_utils.dart';
 
-import '../../common/helpers/user_preferences.dart';
 import '../../common/utils/toast_utils.dart';
-import 'home/home_screen_desktop.dart';
 
 class SplashScreenDesktop extends StatefulWidget {
   const SplashScreenDesktop({super.key});
@@ -20,68 +23,105 @@ class SplashScreenDesktop extends StatefulWidget {
 }
 
 class _SplashScreenDesktopState extends State<SplashScreenDesktop> {
-  startTime() async {
-    var duration = const Duration(seconds: 5);
-    return Timer(duration, navigationPage);
-  }
-
-  void navigationPage() async {
-    final prefs = await SharedPreferences.getInstance();
-    print(prefs.getString('email'));
-    print(prefs.getString('password'));
-    print(prefs.getBool('isLoggedIn'));
-
-    if (prefs.getBool('isLoggedIn') == true) {
-      print("okkkkkk");
-      AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
-      UserPreferences userPreferences = UserPreferences();
-      UserDetails? user = await userPreferences.getUser();
-
-      if (user != null) {
-        Provider.of<UserProvider>(context, listen: false).setUser(user);
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return const HomeScreenDesktop();
-        }));
-        debugPrint("Logged in without api call");
-      } else {
-        await auth
-            .userLogin(
-          prefs.getString('email')!,
-          prefs.getString('password')!,
-          context,
-        )
-            .then((response) {
-          if (response['status'] == true) {
-            UserDetails user = response['data'];
-            context.read<UserProvider>().setUser(user);
-            ToastUtils.showSuccessToast(context, 'Login Successful', 'Welcome back!');
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const HomeScreenDesktop();
-            }));
-          } else {
-            ToastUtils.showErrorToast(context, 'Failed Login', response['message']);
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const LoginScreenDesktop();
-            }));
-          }
-        }).catchError((error) {
-          ToastUtils.showErrorToast(context, 'Error', 'An error occurred: $error');
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const LoginScreenDesktop();
-          }));
-        });
-      }
-    } else {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const LoginScreenDesktop();
-      }));
-    }
-  }
+  final GetStorage _storage = GetStorage();
 
   @override
   void initState() {
     super.initState();
     startTime();
+  }
+
+  startTime() async {
+    var duration = const Duration(seconds: 5);
+    return Timer(duration, navigationPage);
+  }
+
+  Future<bool> _checkInternetConnection() async {
+    try {
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        print('No internet connection detected in splash screen.');
+        return false;
+      }
+      final result = await InternetAddress.lookup('google.com').timeout(const Duration(seconds: 3));
+      final isConnected = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      print('Internet connection check in splash screen: $isConnected');
+      return isConnected;
+    } catch (e) {
+      print('Connectivity check failed in splash screen: $e');
+      return false;
+    }
+  }
+
+  void navigationPage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final hasLoggedIn = _storage.read('hasLoggedIn') ?? false;
+
+    print('Splash navigation: isLoggedIn=$isLoggedIn, hasLoggedIn=$hasLoggedIn');
+    print('cached_email: ${_storage.read('cached_email')}');
+    print('cached_user: ${_storage.read('cached_user') != null}');
+
+    try {
+      if (isLoggedIn && hasLoggedIn) {
+        bool hasInternet = await _checkInternetConnection();
+        String? cachedEmail = _storage.read('cached_email');
+        String? cachedPassword = _storage.read('cached_password');
+        String? cachedUserJson = _storage.read('cached_user');
+
+        print('Splash navigation: hasInternet=$hasInternet, cached_email=$cachedEmail');
+
+        if (cachedEmail != null && cachedPassword != null && cachedUserJson != null) {
+          Map<String, dynamic> response;
+          if (hasInternet) {
+            print('Proceeding with online login from splash screen.');
+            response = await authProvider.userLogin(cachedEmail, cachedPassword, context);
+          } else {
+            print('Proceeding with offline login from splash screen.');
+            response = await authProvider.offlineLogin(cachedEmail, cachedPassword, context);
+          }
+
+          if (response['status']) {
+            UserDetails user = response['data'];
+            Provider.of<UserProvider>(context, listen: false).setUser(user);
+            ToastUtils.showSuccessToast(context, 'Success', 'Welcome back!');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreenDesktop()),
+            );
+          } else {
+            print('Splash login failed: ${response['message']}');
+            ToastUtils.showErrorToast(context, 'Failed Login', response['message']);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreenDesktop()),
+            );
+          }
+        } else {
+          print('No cached credentials available in splash screen.');
+          ToastUtils.showErrorToast(
+              context, 'Error', 'No cached credentials available. Please log in.');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreenDesktop()),
+          );
+        }
+      } else {
+        print('Not logged in, navigating to login screen.');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreenDesktop()),
+        );
+      }
+    } catch (e) {
+      print('Navigation error in splash screen: $e');
+      ToastUtils.showErrorToast(context, 'Error', 'An error occurred: $e');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreenDesktop()),
+      );
+    }
   }
 
   @override
@@ -91,9 +131,10 @@ class _SplashScreenDesktopState extends State<SplashScreenDesktop> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFF2FCFE), // #F2FCFE
-              Color(0xFFFAF1FE), // #FAF1FE
+              Color(0xFFF2FCFE),
+              Color(0xFFFAF1FE),
             ],
+            stops: [0, 1],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -103,7 +144,7 @@ class _SplashScreenDesktopState extends State<SplashScreenDesktop> {
             'assets/images/spot-stock-white.png',
             width: 250,
             height: 200,
-            color: const Color(0xFF473069), // Set the image color to #473069
+            color: const Color(0xFF473069),
             colorBlendMode: BlendMode.srcIn,
           ),
         ),
@@ -111,120 +152,3 @@ class _SplashScreenDesktopState extends State<SplashScreenDesktop> {
     );
   }
 }
-
-
-
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
-// import 'package:spotstock_inventory/data/models/userdetails.dart';
-// import 'package:flutter/material.dart';
-// import 'dart:async';
-// import 'package:provider/provider.dart';
-// import 'package:spotstock_inventory/common/provider/user_provider.dart';
-// import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
-
-// import '../../common/helpers/user_preferences.dart';
-// import '../mobile/home/home_screen_mobile.dart';
-// import 'home/home_screen_desktop.dart';
-
-// class SplashScreenDesktop extends StatefulWidget {
-//   const SplashScreenDesktop({super.key});
-
-//   @override
-//   _SplashScreenDesktopState createState() => _SplashScreenDesktopState();
-// }
-
-// class _SplashScreenDesktopState extends State<SplashScreenDesktop> {
-//   startTime() async {
-//     var duration = const Duration(seconds: 5);
-//     return Timer(duration, navigationPage);
-//   }
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     startTime();
-//   }
-
-//   void navigationPage() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     print(prefs.getString('email'));
-//     print(prefs.getString('password'));
-//     print(prefs.getBool('isLoggedIn'));
-//     // var user = await Provider.of<UserProvider>(context, listen: false).isLoggedIn();
-//     // if (user == true) {
-//     //   Navigator.push(context, MaterialPageRoute(builder: (context) {
-//     //     return const HomeScreenDesktop();
-//     //   }));
-//     // } else {
-//     //   Navigator.push(context, MaterialPageRoute(builder: (context) {
-//     //     return const LoginScreenDesktop();
-//     //   }));
-//     // }
-//     if (prefs.getBool('isLoggedIn') == true) {
-//       print("okkkkkk");
-//       AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
-//       UserPreferences userPreferences = UserPreferences();
-//       UserDetails? user = (await userPreferences.getUser());
-
-//       if (user != null) {
-//         Provider.of<UserProvider>(context, listen: false).setUser(user);
-//         Navigator.push(context, MaterialPageRoute(builder: (context) {
-//           return const HomeScreenDesktop();
-//         }));
-//         debugPrint("Logged in without api call");
-//       } else {
-//         await auth
-//             .userLogin(
-//           prefs.getString('email')!,
-//           prefs.getString('password')!,
-//         )
-//             .then((response) {
-//           if (response['status'] == true) {
-//             UserDetails user = response['data'];
-//             context.read<UserProvider>().setUser(user);
-//             Navigator.push(context, MaterialPageRoute(builder: (context) {
-//               return const HomeScreenDesktop();
-//             }));
-//           }
-//         }).catchError((error) {
-//           Navigator.push(context, MaterialPageRoute(builder: (context) {
-//             return const LoginScreenDesktop();
-//           }));
-//         });
-//       }
-//     } else {
-//       // ignore: use_build_context_synchronously
-//       Navigator.push(context, MaterialPageRoute(builder: (context) {
-//         return const LoginScreenDesktop();
-//       }));
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Container(
-//         decoration: const BoxDecoration(
-//           gradient: LinearGradient(
-//             colors: [
-//               Color(0xFFF2FCFE), // #F2FCFE
-//               Color(0xFFFAF1FE), // #FAF1FE
-//             ],
-//             begin: Alignment.topLeft,
-//             end: Alignment.bottomRight,
-//           ),
-//         ),
-//         child: Center(
-//           child: Image.asset(
-//             'assets/images/spot-stock-white.png',
-//             width: 250,
-//             height: 200,
-//             color: const Color(0xFF473069), // Set the image color to #473069
-//             colorBlendMode: BlendMode.srcIn,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

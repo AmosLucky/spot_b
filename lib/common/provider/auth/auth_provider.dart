@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spotstock_inventory/common/utils/toast_utils.dart';
 import 'package:spotstock_inventory/data/repository/auth_repo.dart';
 // import 'package:spotstock_inventory/utils/toast_utils.dart';
-// import '../../../data/models/userdetails.dart Jobs';
 import '../../../data/models/userdetails.dart';
 import '../../helpers/user_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:convert';
+import 'dart:io';
 
 class AuthProvider extends ChangeNotifier {
   final SharedPreferences sharedPreferences;
+  final GetStorage _storage = GetStorage();
 
   AuthProvider({required this.sharedPreferences}) {
     _getToken();
@@ -29,8 +33,21 @@ class AuthProvider extends ChangeNotifier {
   String get loggedInToken => _loggedInToken;
 
   Future<bool> _checkInternetConnection() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult != ConnectivityResult.none;
+    try {
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        print('No internet connection detected.');
+        return false;
+      }
+      // Verify actual connectivity by pinging a reliable server
+      final result = await InternetAddress.lookup('google.com').timeout(Duration(seconds: 3));
+      final isConnected = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      print('Internet connection check: $isConnected');
+      return isConnected;
+    } catch (e) {
+      print('Connectivity check failed: $e');
+      return false;
+    }
   }
 
   // Online user login
@@ -38,51 +55,94 @@ class AuthProvider extends ChangeNotifier {
       String email, String password, BuildContext context) async {
     bool hasInternet = await _checkInternetConnection();
     if (!hasInternet) {
+      print('No internet for userLogin, should use offlineLogin instead.');
+      ToastUtils.showErrorToast(context, 'Error', 'No internet connection. Try offline login.');
       return {
         'status': false,
         'message': 'No internet connection for online login',
       };
     }
 
-    Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
-    if (response['status'] == true) {
-      UserPreferences().saveUser(response['data']);
-      UserPreferences().isLoggedIn(email, password, response['token']);
-      await sharedPreferences.setString('offline_email', email);
-      await sharedPreferences.setString('offline_password', password);
-      notifyListeners();
+    try {
+      print('Attempting online login with email: $email');
+      Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
+      if (response['status'] == true) {
+        UserDetails user = response['data'];
+        // Cache credentials and user details
+        await _storage.write('cached_email', email);
+        await _storage.write('cached_password', password);
+        await _storage.write('cached_user', jsonEncode(user.toJson()));
+        print('Cached credentials: email=$email, user=${user.toJson()}');
+        UserPreferences().saveUser(user);
+        UserPreferences().isLoggedIn(email, password, response['token']);
+        await sharedPreferences.setString('offline_email', email);
+        await sharedPreferences.setString('offline_password', password);
+        notifyListeners();
+        return response;
+      }
+      print('Online login failed: ${response['message']}');
       return response;
+    } catch (e) {
+      print('Online login error: $e');
+      ToastUtils.showErrorToast(context, 'Error', 'Login failed: $e');
+      return {
+        'status': false,
+        'message': 'Login failed: $e',
+      };
     }
-    return response;
   }
 
   // Offline user login
   Future<Map<String, dynamic>> offlineLogin(
       String email, String password, BuildContext context) async {
+    print('Attempting offline login with email: $email');
     try {
-      String? storedEmail = sharedPreferences.getString('offline_email');
-      String? storedPassword = sharedPreferences.getString('offline_password');
+      String? cachedEmail = _storage.read('cached_email');
+      String? cachedPassword = _storage.read('cached_password');
+      String? cachedUserJson = _storage.read('cached_user');
 
-      if (storedEmail == email && storedPassword == password) {
-        UserDetails? user = await UserPreferences().getUser();
-        if (user != null) {
-          return {
-            'status': true,
-            'message': 'Offline login successful',
-            'data': user,
-          };
-        }
+      print('Cached credentials: email=$cachedEmail, has_user=${cachedUserJson != null}');
+
+      if (cachedEmail == null || cachedPassword == null || cachedUserJson == null) {
+        print('No cached credentials found.');
+        return {
+          'status': false,
+          'message': 'No cached credentials available. Please log in online first.',
+        };
       }
-      return {
-        'status': false,
-        'message': 'Invalid credentials or no offline data available'
-      };
+
+      if (cachedEmail == email && cachedPassword == password) {
+        UserDetails user = UserDetails.fromJson(jsonDecode(cachedUserJson));
+        print('Offline login successful for email: $email');
+        return {
+          'status': true,
+          'message': 'Offline login successful',
+          'data': user,
+        };
+      } else {
+        print('Offline login failed: Invalid credentials');
+        return {
+          'status': false,
+          'message': 'Invalid credentials',
+        };
+      }
     } catch (e) {
+      print('Offline login error: $e');
       return {
         'status': false,
-        'message': 'Offline login error: $e'
+        'message': 'Offline login error: $e',
       };
     }
+  }
+
+  // Logout
+  Future<void> logout(BuildContext context) async {
+    print('Logging out user.');
+    await sharedPreferences.remove('isLoggedIn');
+    await sharedPreferences.remove('loggedInToken');
+    // Cached credentials in GetStorage are not removed
+    notifyListeners();
+    ToastUtils.showSuccessToast(context, 'Logout Successful', 'You have been logged out.');
   }
 
   void _getToken() async {
@@ -132,7 +192,7 @@ class AuthProvider extends ChangeNotifier {
 
   void setLoggedIn(String value) async {
     final prefs = sharedPreferences;
-    prefs.setString(loggedInToken, value);
+    await prefs.setString(loggedInToken, value);
   }
 }
 
