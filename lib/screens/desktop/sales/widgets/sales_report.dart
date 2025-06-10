@@ -34,6 +34,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   String _selectedDateFilter = 'Day';
   DateTime? _startDate;
   DateTime? _endDate;
+   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
 
   @override
   void initState() {
@@ -72,6 +73,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           vertical: 20,
                           user: widget.user,
                           systemProvider: widget.systemProvider,
+                          activeItem: _activeItem,
                           mediaQuery: MediaQuery.of(context).size,
                         ),
                       ),

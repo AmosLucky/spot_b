@@ -22,6 +22,7 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
+   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -50,7 +51,7 @@ class _BodyState extends State<Body> {
                         : SideBarInventory(
                             vertical: 20,
                             user: widget.user,
-                            systemProvider: widget.systemProvider),
+                            systemProvider: widget.systemProvider,  activeItem: _activeItem,),
                   ),
                 ),
 

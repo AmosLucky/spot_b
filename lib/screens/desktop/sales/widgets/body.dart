@@ -37,6 +37,7 @@ class _BodyState extends State<Body> {
   List? hotelReportData;
   List? registerData;
   int? registerIndex;
+    final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
 
   void _handleDateSelection(DateTime selectedDate) {
     setState(() {
@@ -72,6 +73,7 @@ class _BodyState extends State<Body> {
                       vertical: 20,
                       user: widget.user,
                       systemProvider: widget.systemProvider,
+                      activeItem: _activeItem,
                     ),
                   ),
                 ),

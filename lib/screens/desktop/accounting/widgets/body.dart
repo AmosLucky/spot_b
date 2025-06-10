@@ -43,6 +43,7 @@ class _BodyState extends State<Body> {
   List? registerData;
   int? registerIndex;
   final bool _isLoading = false;
+  final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
 
   // Callback function to handle the date range selection from the Header
   void _handleDateRangeSelection(DateTimeRange selectedDateRange) {
@@ -131,7 +132,7 @@ class _BodyState extends State<Body> {
                         : SideBarInventory(
                             vertical: 20,
                             user: widget.user,
-                            systemProvider: widget.systemProvider),
+                            systemProvider: widget.systemProvider, activeItem: _activeItem,),
                   ),
                 ),
 
