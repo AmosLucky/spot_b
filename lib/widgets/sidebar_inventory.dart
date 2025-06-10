@@ -4,11 +4,9 @@ import 'package:spotstock_inventory/common/utils/logout_utils.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/screens/desktop/accounting/accounting_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/catalogue/catalogue_desktop.dart';
-// import 'package:spotstock_inventory/screens desktop/home/home_screen_desktop.dart';
+import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
-import '../screens/desktop/home/home_screen_desktop.dart';
 
 class SideBarInventory extends StatelessWidget {
   final UserDetails user;
@@ -35,14 +33,14 @@ class SideBarInventory extends StatelessWidget {
           // Sidebar Logo
           Image.asset(
             'assets/images/spot-stock-logo.png',
-            width: 200,
+            width: 250,
             height: 90,
           ),
           const SizedBox(height: 10),
           // Sidebar Items
           Expanded(
             child: Container(
-              width: 200,
+              width: 250,
               decoration: BoxDecoration(
                 color: primaryColor,
                 borderRadius: BorderRadius.circular(10),
@@ -142,6 +140,7 @@ class SidebarItem extends StatelessWidget {
                 title: Text(
                   title,
                   style: const TextStyle(color: Colors.white),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 leading: Icon(
                   icon,
@@ -164,20 +163,25 @@ class SidebarItem extends StatelessWidget {
 
 
 
+
+// import 'package:spotstock_inventory/common/common.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/common/utils/logout_utils.dart';
 // import 'package:spotstock_inventory/data/models/userdetails.dart';
 // import 'package:spotstock_inventory/screens/desktop/accounting/accounting_desktop.dart';
 // import 'package:spotstock_inventory/screens/desktop/catalogue/catalogue_desktop.dart';
-// import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dart';
-// // import 'package:spotstock_inventory/utils/logout_utils.dart';
+// // import 'package:spotstock_inventory/screens desktop/home/home_screen_desktop.dart';
 // import 'package:flutter/material.dart';
+// import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
+// import '../screens/desktop/home/home_screen_desktop.dart';
 
 // class SideBarInventory extends StatelessWidget {
 //   final UserDetails user;
 //   final SystemProvider systemProvider;
 //   final double vertical;
 //   final double horizontal;
+//   final ValueNotifier<String> activeItem;
 
 //   const SideBarInventory({
 //     super.key,
@@ -185,6 +189,7 @@ class SidebarItem extends StatelessWidget {
 //     required this.systemProvider,
 //     this.vertical = 20.0,
 //     this.horizontal = 15.0,
+//     required this.activeItem,
 //   });
 
 //   @override
@@ -200,16 +205,15 @@ class SidebarItem extends StatelessWidget {
 //             height: 90,
 //           ),
 //           const SizedBox(height: 10),
-
 //           // Sidebar Items
 //           Expanded(
 //             child: Container(
-//               width: 200, // Fixed width for sidebar
+//               width: 350,
 //               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(16), // Set the border radius
+//                 color: primaryColor,
+//                 borderRadius: BorderRadius.circular(10),
 //               ),
-//               padding: const EdgeInsets.all(20),
+//               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
 //               child: ListView(
 //                 children: [
 //                   SidebarItem(
@@ -217,7 +221,10 @@ class SidebarItem extends StatelessWidget {
 //                     onTap: () => _navigateToPage(
 //                       context,
 //                       const HomeScreenDesktop(),
+//                       "Dashboard",
 //                     ),
+//                     icon: Icons.dashboard,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Catalogues",
@@ -228,18 +235,26 @@ class SidebarItem extends StatelessWidget {
 //                         systemProvider: systemProvider,
 //                         app: 'INVENTORY',
 //                       ),
+//                       "Catalogues",
 //                     ),
+//                     icon: MdiIcons.database,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Reports",
 //                     onTap: () => _navigateToPage(
 //                       context,
 //                       const AccountingDesktop(app: "INVENTORY"),
+//                       "Reports",
 //                     ),
+//                     icon: MdiIcons.chartBar,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Logout",
 //                     onTap: () => LogoutUtils.showLogoutDialog(context),
+//                     icon: MdiIcons.logout,
+//                     activeItem: activeItem,
 //                   ),
 //                 ],
 //               ),
@@ -250,8 +265,8 @@ class SidebarItem extends StatelessWidget {
 //     );
 //   }
 
-//   // Method to navigate to a specified page
-//   void _navigateToPage(BuildContext context, Widget page) {
+//   void _navigateToPage(BuildContext context, Widget page, String title) {
+//     activeItem.value = title;
 //     Navigator.push(
 //       context,
 //       MaterialPageRoute(builder: (context) => page),
@@ -262,13 +277,52 @@ class SidebarItem extends StatelessWidget {
 // class SidebarItem extends StatelessWidget {
 //   final String title;
 //   final VoidCallback? onTap;
-//   const SidebarItem({super.key, required this.title, this.onTap});
+//   final IconData icon;
+//   final ValueNotifier<String> activeItem;
+
+//   const SidebarItem({
+//     super.key,
+//     required this.title,
+//     this.onTap,
+//     required this.icon,
+//     required this.activeItem,
+//   });
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return ListTile(
-//       title: Text(title, style: const TextStyle(color: Colors.black)),
-//       onTap: onTap,
+//     return ValueListenableBuilder<String>(
+//       valueListenable: activeItem,
+//       builder: (context, activeTitle, child) {
+//         bool isActive = activeTitle == title;
+//         return MouseRegion(
+//           cursor: SystemMouseCursors.click,
+//           child: GestureDetector(
+//             onTap: onTap,
+//             child: Container(
+//               margin: const EdgeInsets.symmetric(vertical: 4),
+//               decoration: BoxDecoration(
+//                 color: isActive ? Colors.white.withOpacity(0.2) : Colors.transparent,
+//                 borderRadius: BorderRadius.circular(8),
+//               ),
+//               child: ListTile(
+//                 title: Text(
+//                   title,
+//                   style: const TextStyle(color: Colors.white),
+//                 ),
+//                 leading: Icon(
+//                   icon,
+//                   color: secondaryColor,
+//                 ),
+//                 onTap: onTap,
+//                 hoverColor: Colors.white.withOpacity(0.1),
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(8),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         );
+//       },
 //     );
 //   }
 // }

@@ -11,37 +11,42 @@ class Body extends StatefulWidget {
   final UserDetails user;
   final SystemProvider systemProvider;
   final String app;
-  const Body(
-      {super.key,
-      required this.user,
-      required this.systemProvider,
-      required this.app});
+  const Body({
+    super.key,
+    required this.user,
+    required this.systemProvider,
+    required this.app,
+  });
 
   @override
   State<Body> createState() => _BodyState();
 }
 
 class _BodyState extends State<Body> {
-   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
+  final ValueNotifier<String> _activeItem = ValueNotifier<String>("Catalogues");
+
+  @override
+  void dispose() {
+    _activeItem.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
       child: SingleChildScrollView(
-        // Use SingleChildScrollView to handle overflow
         child: Column(
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start, // Align to the top
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Sidebar Navigation with fixed width
                 ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxHeight:
-                        MediaQuery.of(context).size.height, // Set max height
+                    maxHeight: MediaQuery.of(context).size.height,
                   ),
                   child: SizedBox(
-                    width: 200, // Fixed width for sidebar
+                    width: 250,
                     child: widget.app == "HOTEL"
                         ? SideBarHotel(
                             vertical: 20,
@@ -51,76 +56,55 @@ class _BodyState extends State<Body> {
                         : SideBarInventory(
                             vertical: 20,
                             user: widget.user,
-                            systemProvider: widget.systemProvider,  activeItem: _activeItem,),
+                            systemProvider: widget.systemProvider,
+                            activeItem: _activeItem,
+                          ),
                   ),
                 ),
-
-                // Dashboard Content Area
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Dashboard Header
                       Header(
                         user: widget.user,
                         systemProvider: widget.systemProvider,
                       ),
-
-                      // Dashboard Content Area
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: SizedBox(
-                          height: MediaQuery.of(context)
-                              .size
-                              .height, // Use MediaQuery to define height
+                          height: MediaQuery.of(context).size.height,
                           child: GridView(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount:
-                                  4, // Adjust the number of columns based on design
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
-                              childAspectRatio:
-                                  1.5, // Adjust to get the card proportions right
+                              childAspectRatio: 1.5,
                             ),
                             children: [
                               HomeCard(
                                   title: "Products",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['productCount'] ?? '0'}"),
+                                  value: "${widget.systemProvider.dashboardStats['productCount'] ?? '0'}"),
                               HomeCard(
                                   title: "In Stock",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['productStockOut'] ?? '0'}"),
-                              // Test dommy data
+                                  value: "${widget.systemProvider.dashboardStats['productStockOut'] ?? '0'}"),
                               HomeCard(
                                   title: "Out of stock",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}"),
-                              // HomeCard(
-                              //     title: "Out of Stock",
-                              //     value:
-                              //         "${widget.systemProvider.dashboardStats['warehouseCount'] ?? '0'}"),
+                                  value: "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}"),
                               HomeCard(
                                   title: "Categories",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['categoryCount'] ?? '0'}"),
+                                  value: "${widget.systemProvider.dashboardStats['categoryCount'] ?? '0'}"),
                               HomeCard(
                                   title: "Customers",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['customerCount'] ?? '0'}"),
+                                  value: "${widget.systemProvider.dashboardStats['customerCount'] ?? '0'}"),
                               HomeCard(
                                   title: "Hotel Categories",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['hotelCategoryCount'] ?? '0'}"),
+                                  value: "${widget.systemProvider.dashboardStats['hotelCategoryCount'] ?? '0'}"),
                               HomeCard(
                                   title: "Hotel Amenities",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['hotelAmenityCount'] ?? '0'}"),
+                                  value: "${widget.systemProvider.dashboardStats['hotelAmenityCount'] ?? '0'}"),
                               HomeCard(
                                   title: "Hotel Rooms",
-                                  value:
-                                      "${widget.systemProvider.dashboardStats['hotelRoomCount'] ?? '0'}"),
+                                  value: "${widget.systemProvider.dashboardStats['hotelRoomCount'] ?? '0'}"),
                             ],
                           ),
                         ),
@@ -136,3 +120,129 @@ class _BodyState extends State<Body> {
     );
   }
 }
+
+
+
+
+// import 'package:spotstock_inventory/common/provider/system_provider.dart';
+// import 'package:spotstock_inventory/data/models/userdetails.dart';
+// import 'package:flutter/material.dart';
+// import 'package:spotstock_inventory/widgets/sidebar_inventory.dart';
+// import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
+// import 'card.dart';
+// import 'header.dart';
+// import '../../../../widgets/sidebar.dart';
+
+// class Body extends StatefulWidget {
+//   final UserDetails user;
+//   final SystemProvider systemProvider;
+//   final String app;
+//   const Body({
+//     super.key,
+//     required this.user,
+//     required this.systemProvider,
+//     required this.app,
+//   });
+
+//   @override
+//   State<Body> createState() => _BodyState();
+// }
+
+// class _BodyState extends State<Body> {
+//   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Catalogues");
+
+//   @override
+//   void dispose() {
+//     _activeItem.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+//       child: SingleChildScrollView(
+//         child: Column(
+//           children: [
+//             Row(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 ConstrainedBox(
+//                   constraints: BoxConstraints(
+//                     maxHeight: MediaQuery.of(context).size.height,
+//                   ),
+//                   child: SizedBox(
+//                     width: 200,
+//                     child: widget.app == "HOTEL"
+//                         ? SideBarHotel(
+//                             vertical: 20,
+//                             user: widget.user,
+//                             systemProvider: widget.systemProvider,
+//                           )
+//                         : SideBarInventory(
+//                             vertical: 20,
+//                             user: widget.user,
+//                             systemProvider: widget.systemProvider,
+//                             activeItem: _activeItem,
+//                           ),
+//                   ),
+//                 ),
+//                 Expanded(
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Header(
+//                         user: widget.user,
+//                         systemProvider: widget.systemProvider,
+//                       ),
+//                       Padding(
+//                         padding: const EdgeInsets.all(16.0),
+//                         child: SizedBox(
+//                           height: MediaQuery.of(context).size.height,
+//                           child: GridView(
+//                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//                               crossAxisCount: 4,
+//                               crossAxisSpacing: 16,
+//                               mainAxisSpacing: 16,
+//                               childAspectRatio: 1.5,
+//                             ),
+//                             children: [
+//                               HomeCard(
+//                                   title: "Products",
+//                                   value: "${widget.systemProvider.dashboardStats['productCount'] ?? '0'}"),
+//                               HomeCard(
+//                                   title: "In Stock",
+//                                   value: "${widget.systemProvider.dashboardStats['productStockOut'] ?? '0'}"),
+//                               HomeCard(
+//                                   title: "Out of stock",
+//                                   value: "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}"),
+//                               HomeCard(
+//                                   title: "Categories",
+//                                   value: "${widget.systemProvider.dashboardStats['categoryCount'] ?? '0'}"),
+//                               HomeCard(
+//                                   title: "Customers",
+//                                   value: "${widget.systemProvider.dashboardStats['customerCount'] ?? '0'}"),
+//                               HomeCard(
+//                                   title: "Hotel Categories",
+//                                   value: "${widget.systemProvider.dashboardStats['hotelCategoryCount'] ?? '0'}"),
+//                               HomeCard(
+//                                   title: "Hotel Amenities",
+//                                   value: "${widget.systemProvider.dashboardStats['hotelAmenityCount'] ?? '0'}"),
+//                               HomeCard(
+//                                   title: "Hotel Rooms",
+//                                   value: "${widget.systemProvider.dashboardStats['hotelRoomCount'] ?? '0'}"),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
