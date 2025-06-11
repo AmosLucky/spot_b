@@ -17,15 +17,6 @@ class DatabaseEngine {
     return instance;
   }
 
-  // Getter to access the store
-  // Future<Store> getStore() async {
-  //   if (_store == null) {
-  //     throw Exception(
-  //         'Store is not initialized. Call DatabaseEngine.create() first.');
-  //   }
-  //   return _store!;
-  // }
-
   Future<Store> getStore() async {
   if (_store == null) {
     try {
@@ -94,3 +85,14 @@ class DatabaseEngine {
     return query.find();
   }
 }
+
+
+
+  // Getter to access the store
+  // Future<Store> getStore() async {
+  //   if (_store == null) {
+  //     throw Exception(
+  //         'Store is not initialized. Call DatabaseEngine.create() first.');
+  //   }
+  //   return _store!;
+  // }

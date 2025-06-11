@@ -1164,16 +1164,6 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-//   Future<List<Map<String, dynamic>>> getAttendants() async {
-//   try {
-//     final response = await get('attendants'); // Adjust endpoint as needed
-//     return List<Map<String, dynamic>>.from(response['data'] ?? []);
-//   } catch (e) {
-//     print('Error fetching attendants: $e');
-//     return [];
-//   }
-// }
-
   Future<Map<String, dynamic>> syncAllTransactions(
     UserDetails user,
   ) async {
@@ -1188,67 +1178,7 @@ class SystemProvider with ChangeNotifier {
       // throw (error);
     }
   }
-  // Temporary dummy data method - returns Map data matching AttendantModel
-  // List<Map<String, dynamic>> getAttendants() {
-  //   return [
-  //     {
-  //       'id': '1',
-  //       'name': 'John Doe',
-  //       'department': 'Administration',
-  //       'pin_set': true,
-  //       'pin': '1234',
-  //     },
-  //     {
-  //       'id': '2',
-  //       'name': 'Jane Smith',
-  //       'department': 'Management',
-  //       'pin_set': true,
-  //       'pin': '5678',
-  //     },
-  //     {
-  //       'id': '3',
-  //       'name': 'Bob Johnson',
-  //       'department': 'Operations',
-  //       'pin_set': false,
-  //       'pin': null,
-  //     },
-  //     {
-  //       'id': '4',
-  //       'name': 'Alice Wilson',
-  //       'department': 'Customer Service',
-  //       'pin_set': true,
-  //       'pin': '9876',
-  //     },
-  //     {
-  //       'id': '5',
-  //       'name': 'Charlie Brown',
-  //       'department': 'Supervision',
-  //       'pin_set': true,
-  //       'pin': '4321',
-  //     },
-  //     {
-  //       'id': '6',
-  //       'name': 'Diana Prince',
-  //       'department': 'Security',
-  //       'pin_set': false,
-  //       'pin': null,
-  //     },
-  //     {
-  //       'id': '7',
-  //       'name': 'Frank Miller',
-  //       'department': 'Maintenance',
-  //       'pin_set': true,
-  //       'pin': '1111',
-  //     },
-  //     {
-  //       'id': '8',
-  //       'name': 'Grace Kelly',
-  //       'department': 'Sales',
-  //       'pin_set': true,
-  //       'pin': '2222',
-  //     },
-  //   ];
-  // }
+
 
   Future<bool> fetchStaffs(bool refresh, bool connectionStatus) async {
     UserDetails user =
@@ -1401,6 +1331,78 @@ class SystemProvider with ChangeNotifier {
     }
   }
 }
+
+//   Future<List<Map<String, dynamic>>> getAttendants() async {
+//   try {
+//     final response = await get('attendants'); // Adjust endpoint as needed
+//     return List<Map<String, dynamic>>.from(response['data'] ?? []);
+//   } catch (e) {
+//     print('Error fetching attendants: $e');
+//     return [];
+//   }
+// }
+
+  // Temporary dummy data method - returns Map data matching AttendantModel
+  // List<Map<String, dynamic>> getAttendants() {
+  //   return [
+  //     {
+  //       'id': '1',
+  //       'name': 'John Doe',
+  //       'department': 'Administration',
+  //       'pin_set': true,
+  //       'pin': '1234',
+  //     },
+  //     {
+  //       'id': '2',
+  //       'name': 'Jane Smith',
+  //       'department': 'Management',
+  //       'pin_set': true,
+  //       'pin': '5678',
+  //     },
+  //     {
+  //       'id': '3',
+  //       'name': 'Bob Johnson',
+  //       'department': 'Operations',
+  //       'pin_set': false,
+  //       'pin': null,
+  //     },
+  //     {
+  //       'id': '4',
+  //       'name': 'Alice Wilson',
+  //       'department': 'Customer Service',
+  //       'pin_set': true,
+  //       'pin': '9876',
+  //     },
+  //     {
+  //       'id': '5',
+  //       'name': 'Charlie Brown',
+  //       'department': 'Supervision',
+  //       'pin_set': true,
+  //       'pin': '4321',
+  //     },
+  //     {
+  //       'id': '6',
+  //       'name': 'Diana Prince',
+  //       'department': 'Security',
+  //       'pin_set': false,
+  //       'pin': null,
+  //     },
+  //     {
+  //       'id': '7',
+  //       'name': 'Frank Miller',
+  //       'department': 'Maintenance',
+  //       'pin_set': true,
+  //       'pin': '1111',
+  //     },
+  //     {
+  //       'id': '8',
+  //       'name': 'Grace Kelly',
+  //       'department': 'Sales',
+  //       'pin_set': true,
+  //       'pin': '2222',
+  //     },
+  //   ];
+  // }
 
 // Attendant model class (if you don't have it already)
 // class Attendant {
