@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
-import 'package:spotstock_inventory/objectbox.g.dart';
+// import 'package:spotstock_inventory/objectbox.g.dart';
 import '../model/select_attendant_model.dart';
 
 class SelectAttendantService {
