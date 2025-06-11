@@ -34,7 +34,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   String _selectedDateFilter = 'Day';
   DateTime? _startDate;
   DateTime? _endDate;
-   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
+  final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
+  bool _isSearchFocused = false;
 
   @override
   void initState() {
@@ -79,270 +80,305 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       ),
                     ),
                     Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          if (provider.isOffline)
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(10),
-                              margin: const EdgeInsets.symmetric(horizontal: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.amber[100],
-                                borderRadius: BorderRadius.circular(8),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            if (provider.isOffline)
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(10),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber[100],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.wifi_off,
+                                        color: Colors.amber[800], size: 16),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'You are offline - showing cached data',
+                                      style: TextStyle(
+                                          color: Colors.amber[800], fontSize: 12),
+                                    ),
+                                    const Spacer(),
+                                    TextButton(
+                                      onPressed: () =>
+                                          provider.fetchSales(refresh: true),
+                                      child: Text('Retry',
+                                          style: TextStyle(
+                                              color: Colors.amber[800])),
+                                    ),
+                                  ],
+                                ),
                               ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(Icons.wifi_off,
-                                      color: Colors.amber[800], size: 16),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'You are offline - showing cached data',
+                                  const Text(
+                                    'Sales Report',
                                     style: TextStyle(
-                                        color: Colors.amber[800], fontSize: 12),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 22,
+                                        color: Colors.black87),
                                   ),
-                                  const Spacer(),
-                                  TextButton(
-                                    onPressed: () =>
-                                        provider.fetchSales(refresh: true),
-                                    child: Text('Retry',
-                                        style: TextStyle(
-                                            color: Colors.amber[800])),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      child: Focus(
+                                        onFocusChange: (hasFocus) {
+                                          setState(() {
+                                            _isSearchFocused = hasFocus;
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          width: _isSearchFocused ? 300 : 200,
+                                          child: TextField(
+                                            controller: _searchController,
+                                            decoration: InputDecoration(
+                                              hintText: 'Reference code...',
+                                              prefixIcon: const Icon(
+                                                  Icons.search,
+                                                  size: 20),
+                                              border:
+                                                  const UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.grey,
+                                                    width: 0.5),
+                                              ),
+                                              enabledBorder:
+                                                  const UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.grey,
+                                                    width: 0.5),
+                                              ),
+                                              focusedBorder:
+                                                  const UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.grey,
+                                                    width: 0.5),
+                                              ),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 12),
+                                              filled: true,
+                                              fillColor: Colors.grey[50],
+                                            ),
+                                            onChanged: (value) =>
+                                                provider.setSearchQuery(
+                                                    value.isEmpty ? null : value),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () async {
+                                          final localCount = await provider
+                                              .getLocalSalesCount();
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Local sales count: $localCount'),
+                                                action: SnackBarAction(
+                                                  label: 'Clear',
+                                                  onPressed: () async {
+                                                    await provider
+                                                        .clearLocalData();
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                          content: Text(
+                                                              'Local data cleared')),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        icon: const Icon(Icons.storage, size: 20),
+                                        tooltip: 'Local Storage Info',
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          provider.fetchSales(refresh: true);
+                                        },
+                                        icon: const Icon(Icons.refresh, size: 20),
+                                        tooltip: 'Refresh Data',
+                                      ),
+                                      _buildDownloadButton(provider),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Sales Report',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 22,
-                                      color: Colors.black87),
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        final localCount =
-                                            await provider.getLocalSalesCount();
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  'Local sales count: $localCount'),
-                                              action: SnackBarAction(
-                                                label: 'Clear',
-                                                onPressed: () async {
-                                                  await provider.clearLocalData();
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                        content: Text(
-                                                            'Local data cleared')),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      icon: const Icon(Icons.storage, size: 20),
-                                      tooltip: 'Local Storage Info',
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        provider.fetchSales(refresh: true);
-                                      },
-                                      icon: const Icon(Icons.refresh, size: 20),
-                                      tooltip: 'Refresh Data',
-                                    ),
-                                    _buildDownloadButton(provider),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
 
-                          // Filters Section
-                          Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.15),
-                                  spreadRadius: 2,
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Filters',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                            // Filters Section
+                            Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.15),
+                                    spreadRadius: 2,
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
                                   ),
-                                ),
-                                const SizedBox(height: 12),
-                                Wrap(
-                                  spacing: 12,
-                                  runSpacing: 12,
-                                  children: [
-                                    SizedBox(
-                                      width: 200,
-                                      child: _buildDateFilter(),
-                                    ),
-                                    SizedBox(
-                                      width: 200,
-                                      child: _buildDropdown(
-                                        'Type',
-                                        provider.selectedType,
-                                        ['All Types', 'sales', 'returns'],
-                                        (value) => provider.setType(
-                                            value == 'All Types' ? null : value),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Filters',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black87,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: 200,
-                                      child: _buildDropdown(
-                                        'Warehouse',
-                                        provider.selectedWarehouse,
-                                        [
-                                          'All Warehouses',
-                                          'Calabar Branch',
-                                          'Main Branch'
-                                        ],
-                                        (value) => provider.setWarehouse(
-                                            value == 'All Warehouses'
-                                                ? null
-                                                : value),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 200,
-                                      child: _buildDropdown(
-                                        'Customer',
-                                        provider.selectedCustomer,
-                                        [
-                                          'All Customers',
-                                          'Emmanuel',
-                                          'Amaka',
-                                          'chinny',
-                                          'walk-in-customer'
-                                        ],
-                                        (value) => provider.setCustomer(
-                                            value == 'All Customers'
-                                                ? null
-                                                : value),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 200,
-                                      child: _buildDropdown(
-                                        'Attendant',
-                                        provider.selectedAttendant,
-                                        [
-                                          'All Attendants',
-                                          'Jennifer',
-                                          'Mbachukwu'
-                                        ],
-                                        (value) => provider.setAttendant(
-                                            value == 'All Attendants'
-                                                ? null
-                                                : value),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _searchController,
-                                        decoration: InputDecoration(
-                                          labelText: 'Search',
-                                          hintText: 'Reference code...',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            borderSide: BorderSide(
-                                                color: Colors.grey[300]!),
+                                      Row(
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: provider.resetFilters,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.grey[200],
+                                              foregroundColor: Colors.black87,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 20, vertical: 12),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              elevation: 0,
+                                            ),
+                                            child: const Text('Reset Filters',
+                                                style: TextStyle(fontSize: 14)),
                                           ),
-                                          prefixIcon:
-                                              const Icon(Icons.search, size: 20),
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 12, horizontal: 12),
-                                          filled: true,
-                                          fillColor: Colors.grey[50],
-                                        ),
-                                        onChanged: (value) =>
-                                            provider.setSearchQuery(
-                                                value.isEmpty ? null : value),
+                                          const SizedBox(width: 8),
+                                          ElevatedButton(
+                                            onPressed: provider.applyFilters,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  const Color(0xFF6B46C1),
+                                              foregroundColor: Colors.white,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 20, vertical: 12),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              elevation: 0,
+                                            ),
+                                            child: const Text('Apply Filters',
+                                                style: TextStyle(fontSize: 14)),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    ElevatedButton(
-                                      onPressed: provider.resetFilters,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.grey[200],
-                                        foregroundColor: Colors.black87,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 12),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        elevation: 0,
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 12,
+                                    runSpacing: 12,
+                                    children: [
+                                      SizedBox(
+                                        width: 200,
+                                        child: _buildDateFilter(),
                                       ),
-                                      child: const Text('Reset Filters',
-                                          style: TextStyle(fontSize: 14)),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    ElevatedButton(
-                                      onPressed: provider.applyFilters,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF6B46C1),
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 12),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                      SizedBox(
+                                        width: 200,
+                                        child: _buildDropdown(
+                                          'Type',
+                                          provider.selectedType,
+                                          ['All Types', 'sales', 'returns'],
+                                          (value) => provider.setType(
+                                              value == 'All Types' ? null : value),
                                         ),
-                                        elevation: 0,
                                       ),
-                                      child: const Text('Apply Filters',
-                                          style: TextStyle(fontSize: 14)),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      SizedBox(
+                                        width: 200,
+                                        child: _buildDropdown(
+                                          'Warehouse',
+                                          provider.selectedWarehouse,
+                                          [
+                                            'All Warehouses',
+                                            'Calabar Branch',
+                                            'Main Branch'
+                                          ],
+                                          (value) => provider.setWarehouse(
+                                              value == 'All Warehouses'
+                                                  ? null
+                                                  : value),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 200,
+                                        child: _buildDropdown(
+                                          'Customer',
+                                          provider.selectedCustomer,
+                                          [
+                                            'All Customers',
+                                            'Emmanuel',
+                                            'Amaka',
+                                            'chinny',
+                                            'walk-in-customer'
+                                          ],
+                                          (value) => provider.setCustomer(
+                                              value == 'All Customers'
+                                                  ? null
+                                                  : value),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 200,
+                                        child: _buildDropdown(
+                                          'Attendant',
+                                          provider.selectedAttendant,
+                                          [
+                                            'All Attendants',
+                                            'Jennifer',
+                                            'Mbachukwu'
+                                          ],
+                                          (value) => provider.setAttendant(
+                                              value == 'All Attendants'
+                                                  ? null
+                                                  : value),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
 
-                          // Sales Table
-                          Expanded(
-                            flex: 3, // Increased flex to make table taller
-                            child: Container(
+                            // Sales Table
+                            Container(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
@@ -360,33 +396,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Sales',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        Text(
-                                          provider.meta != null
-                                              ? 'Showing ${provider.meta!.from} to ${provider.meta!.to} of ${provider.meta!.total} sales'
-                                              : 'Loading...',
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
                                   // Table Header
                                   Container(
                                     padding: const EdgeInsets.symmetric(
@@ -513,7 +522,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                   ),
 
                                   // Table Content
-                                  Expanded(
+                                  SizedBox(
+                                    height: 10 * 70.0, // Height for 10 rows
                                     child: provider.isLoading
                                         ? const Center(
                                             child: CircularProgressIndicator())
@@ -527,77 +537,70 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                     child: Text(
                                                         'No cached sales data available'))
                                                 : ListView.builder(
+                                                    physics:
+                                                        const NeverScrollableScrollPhysics(),
                                                     itemCount:
-                                                        provider.sales.length,
+                                                        provider.sales.length > 10
+                                                            ? 10
+                                                            : provider
+                                                                .sales.length,
                                                     itemBuilder:
                                                         (context, index) {
                                                       final sale =
                                                           provider.sales[index];
-                                                      return _buildSaleRow(
-                                                          sale);
+                                                      return _buildSaleRow(sale);
                                                     },
                                                   ),
                                   ),
-
-                                  // Pagination
-                                  if (provider.meta != null)
-                                    Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          top: BorderSide(
-                                              color: Colors.grey[200]!),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            'Page ${provider.meta!.currentPage} of ${provider.meta!.lastPage}',
-                                            style: TextStyle(
-                                                color: Colors.grey[600]),
-                                          ),
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                onPressed:
-                                                    provider.currentPage > 1
-                                                        ? () {
-                                                            provider.setCurrentPage(
-                                                                provider.currentPage -
-                                                                    1);
-                                                            provider
-                                                                .fetchSales();
-                                                          }
-                                                        : null,
-                                                icon: const Icon(
-                                                    Icons.chevron_left),
-                                              ),
-                                              IconButton(
-                                                onPressed: provider
-                                                            .currentPage <
-                                                        provider.meta!.lastPage
-                                                    ? () {
-                                                        provider.setCurrentPage(
-                                                            provider.currentPage +
-                                                                1);
-                                                        provider.fetchSales();
-                                                      }
-                                                    : null,
-                                                icon: const Icon(
-                                                    Icons.chevron_right),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
                                 ],
                               ),
                             ),
-                          ),
-                        ],
+
+                            // Pagination
+                            if (provider.meta != null)
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Showing ${provider.meta!.from} to ${provider.meta!.to} of ${provider.meta!.total} sales | Page ${provider.meta!.currentPage} of ${provider.meta!.lastPage}',
+                                      style:
+                                          TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          onPressed: provider.currentPage > 1
+                                              ? () {
+                                                  provider.setCurrentPage(
+                                                      provider.currentPage - 1);
+                                                  provider.fetchSales();
+                                                }
+                                              : null,
+                                          icon:
+                                              const Icon(Icons.chevron_left),
+                                        ),
+                                        IconButton(
+                                          onPressed: provider.currentPage <
+                                                  provider.meta!.lastPage
+                                              ? () {
+                                                  provider.setCurrentPage(
+                                                      provider.currentPage + 1);
+                                                  provider.fetchSales();
+                                                }
+                                              : null,
+                                          icon:
+                                              const Icon(Icons.chevron_right),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -670,6 +673,9 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 
   void _showDateFilterDialog() {
     String tempFilter = _selectedDateFilter;
+    DateTime? tempStartDate = _startDate;
+    DateTime? tempEndDate = _endDate;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -700,34 +706,23 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 onChanged: (value) {
                   setState(() {
                     tempFilter = value!;
+                    if (tempFilter == 'Range') {
+                      Navigator.pop(context);
+                      _showRangeDatePickerDialog();
+                    }
                   });
                 },
               ),
               const SizedBox(height: 16),
-              Container(
-                height: 250,
-                child: SfDateRangePicker(
-                  onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-                    if (tempFilter == 'Range') {
-                      if (args.value is PickerDateRange) {
-                        setState(() {
-                          _startDate = args.value.startDate;
-                          _endDate = args.value.endDate ?? args.value.startDate;
-                        });
-                        context.read<SalesProvider>().setStartDate(
-                            _startDate != null
-                                ? DateFormat('yyyy-MM-dd').format(_startDate!)
-                                : null);
-                        context.read<SalesProvider>().setEndDate(
-                            _endDate != null
-                                ? DateFormat('yyyy-MM-dd').format(_endDate!)
-                                : null);
-                      }
-                    } else {
+              if (tempFilter != 'Range')
+                Container(
+                  height: 250,
+                  child: SfDateRangePicker(
+                    onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
                       DateTime selectedDate = args.value;
                       setState(() {
-                        _startDate = selectedDate;
-                        _endDate = selectedDate;
+                        tempStartDate = selectedDate;
+                        tempEndDate = null;
                       });
                       if (tempFilter == 'Day') {
                         context.read<SalesProvider>().setStartDate(
@@ -737,8 +732,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       } else if (tempFilter == 'Month') {
                         final firstDay =
                             DateTime(selectedDate.year, selectedDate.month);
-                        final lastDay =
-                            DateTime(selectedDate.year, selectedDate.month + 1, 0);
+                        final lastDay = DateTime(
+                            selectedDate.year, selectedDate.month + 1, 0);
                         context.read<SalesProvider>().setStartDate(
                             DateFormat('yyyy-MM-dd').format(firstDay));
                         context.read<SalesProvider>().setEndDate(
@@ -751,24 +746,21 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                         context.read<SalesProvider>().setEndDate(
                             DateFormat('yyyy-MM-dd').format(lastDay));
                       }
-                    }
-                  },
-                  selectionMode: tempFilter == 'Range'
-                      ? DateRangePickerSelectionMode.range
-                      : DateRangePickerSelectionMode.single,
-                  initialSelectedDate: DateTime.now(),
-                  maxDate: DateTime.now(),
-                  minDate: DateTime(2020),
-                  monthViewSettings: const DateRangePickerMonthViewSettings(
-                    firstDayOfWeek: 1,
-                  ),
-                  headerStyle: const DateRangePickerHeaderStyle(
-                    textAlign: TextAlign.center,
-                    textStyle: TextStyle(
-                        fontWeight: FontWeight.w600, color: Colors.black87),
+                    },
+                    selectionMode: DateRangePickerSelectionMode.single,
+                    initialSelectedDate: tempStartDate ?? DateTime.now(),
+                    maxDate: DateTime.now(),
+                    minDate: DateTime(2020),
+                    monthViewSettings: const DateRangePickerMonthViewSettings(
+                      firstDayOfWeek: 1,
+                    ),
+                    headerStyle: const DateRangePickerHeaderStyle(
+                      textAlign: TextAlign.center,
+                      textStyle: TextStyle(
+                          fontWeight: FontWeight.w600, color: Colors.black87),
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -781,11 +773,83 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
             onPressed: () {
               setState(() {
                 _selectedDateFilter = tempFilter;
+                _startDate = tempStartDate;
+                _endDate = tempEndDate;
               });
               Navigator.pop(context);
               context.read<SalesProvider>().applyFilters();
             },
             child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRangeDatePickerDialog() {
+    DateTime? tempStartDate = _startDate;
+    DateTime? tempEndDate = _endDate;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Date Range',
+            style: TextStyle(fontWeight: FontWeight.w600)),
+        content: Container(
+          width: 350,
+          height: 350,
+          child: SfDateRangePicker(
+            onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+              if (args.value is PickerDateRange) {
+                setState(() {
+                  tempStartDate = args.value.startDate;
+                  tempEndDate = args.value.endDate ?? args.value.startDate;
+                });
+              }
+            },
+            selectionMode: DateRangePickerSelectionMode.range,
+            initialSelectedRange: tempStartDate != null && tempEndDate != null
+                ? PickerDateRange(tempStartDate, tempEndDate)
+                : null,
+            maxDate: DateTime.now(),
+            minDate: DateTime(2020),
+            monthViewSettings: const DateRangePickerMonthViewSettings(
+              firstDayOfWeek: 1,
+            ),
+            headerStyle: const DateRangePickerHeaderStyle(
+              textAlign: TextAlign.center,
+              textStyle: TextStyle(
+                  fontWeight: FontWeight.w600, color: Colors.black87),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (tempStartDate != null && tempEndDate != null) {
+                setState(() {
+                  _selectedDateFilter = 'Range';
+                  _startDate = tempStartDate;
+                  _endDate = tempEndDate;
+                  context.read<SalesProvider>().setStartDate(
+                      DateFormat('yyyy-MM-dd').format(tempStartDate!));
+                  context.read<SalesProvider>().setEndDate(
+                      DateFormat('yyyy-MM-dd').format(tempEndDate!));
+                });
+                Navigator.pop(context);
+                context.read<SalesProvider>().applyFilters();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Please select both start and end dates')),
+                );
+              }
+            },
+            child: const Text('Set'),
           ),
         ],
       ),
@@ -935,7 +999,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 ),
                 if (canMakePayment)
                   InkWell(
-                    onTap:() => _showReconcilePaymentDialog(sale),
+                    onTap: () => _showReconcilePaymentDialog(sale),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 6),
@@ -1330,7 +1394,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                   '₦${NumberFormat('#,##0').format(item.subTotal)}',
                                   style: const TextStyle(fontSize: 12),
                                 )),
-                            ],
+                          ],
                         ),
                       );
                     },
@@ -1499,7 +1563,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.close),
                         ),
                       ],
@@ -1602,7 +1666,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                         TextButton(
                           onPressed: isProcessing
                               ? null
-                              : () => Navigator.of(context).pop(),
+                              : () => Navigator.pop(context),
                           child: const Text('Cancel'),
                         ),
                         const SizedBox(width: 8),
@@ -1610,10 +1674,10 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           onPressed: isProcessing
                               ? null
                               : () => _submitPayment(
-                                    sale.id.toString(),
-                                    paymentAmountController.text,
-                                    selectedPaymentType,
-                                    setState,
+                                    salesId: sale.id.toString(),
+                                    amount: paymentAmountController.text,
+                                    paymentType: selectedPaymentType,
+                                    setState: setState,
                                   ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6B46C1),
@@ -1661,8 +1725,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     );
   }
 
-  Future<void> _submitPayment(String salesId, String amount, String paymentType,
-      StateSetter setState) async {
+  Future<void> _submitPayment({
+    required String salesId,
+    required String amount,
+    required String paymentType,
+    required StateSetter setState,
+  }) async {
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter payment amount')),
@@ -1678,13 +1746,15 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
       return;
     }
 
-    setState(() {});
+    setState(() {
+      // Update isProcessing to true
+    });
 
     try {
       final response =
           await _reconcilePayment(salesId, paymentAmount, paymentType);
 
-      if (response['success'] == true) {
+      if (response['success']) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Payment recorded successfully')),
@@ -1702,7 +1772,9 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() {});
+      setState(() {
+        // Update isProcessing to false
+      });
     }
   }
 
@@ -1777,11 +1849,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 
 
 
-// // screens/sales_report_screen.dart
+
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
 // import 'package:provider/provider.dart';
 // import 'package:intl/intl.dart';
+// import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 // import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 // import 'package:spotstock_inventory/common/provider/sales_provider.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
@@ -1810,8 +1883,11 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 
 // class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //   final TextEditingController _searchController = TextEditingController();
-//   final TextEditingController _startDateController = TextEditingController();
-//   final TextEditingController _endDateController = TextEditingController();
+//   String _selectedDateFilter = 'Day';
+//   DateTime? _startDate;
+//   DateTime? _endDate;
+//   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
+//   bool _isSearchFocused = false;
 
 //   @override
 //   void initState() {
@@ -1824,7 +1900,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       backgroundColor: Colors.grey[50],
+//       backgroundColor: Colors.grey[100],
 //       body: LayoutBuilder(builder: (context, constraint) {
 //         return ConstrainedBox(
 //           constraints: BoxConstraints(
@@ -1835,6 +1911,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //             builder: (context, provider, child) {
 //               return Container(
 //                 width: MediaQuery.of(context).size.width * 0.95,
+//                 padding: const EdgeInsets.symmetric(vertical: 16),
 //                 child: Row(
 //                   mainAxisAlignment: MainAxisAlignment.start,
 //                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1844,309 +1921,314 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                         maxHeight: MediaQuery.of(context).size.height * 0.98,
 //                       ),
 //                       child: SizedBox(
-//                         width: 250,
+//                         width: 220,
 //                         child: SideBarPos(
 //                           vertical: 20,
 //                           user: widget.user,
 //                           systemProvider: widget.systemProvider,
+//                           activeItem: _activeItem,
 //                           mediaQuery: MediaQuery.of(context).size,
 //                         ),
 //                       ),
 //                     ),
 //                     Expanded(
-//                       child: Column(
-//                         mainAxisAlignment: MainAxisAlignment.start,
-//                         children: [
-//                           const SizedBox(height: 10),
-//                           if (provider.isOffline)
+//                       child: SingleChildScrollView(
+//                         child: Column(
+//                           mainAxisAlignment: MainAxisAlignment.start,
+//                           children: [
+//                             if (provider.isOffline)
+//                               Container(
+//                                 width: double.infinity,
+//                                 padding: const EdgeInsets.all(10),
+//                                 margin: const EdgeInsets.symmetric(horizontal: 16),
+//                                 decoration: BoxDecoration(
+//                                   color: Colors.amber[100],
+//                                   borderRadius: BorderRadius.circular(8),
+//                                 ),
+//                                 child: Row(
+//                                   children: [
+//                                     Icon(Icons.wifi_off,
+//                                         color: Colors.amber[800], size: 16),
+//                                     const SizedBox(width: 8),
+//                                     Text(
+//                                       'You are offline - showing cached data',
+//                                       style: TextStyle(
+//                                           color: Colors.amber[800], fontSize: 12),
+//                                     ),
+//                                     const Spacer(),
+//                                     TextButton(
+//                                       onPressed: () =>
+//                                           provider.fetchSales(refresh: true),
+//                                       child: Text('Retry',
+//                                           style: TextStyle(
+//                                               color: Colors.amber[800])),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                             Padding(
+//                               padding: const EdgeInsets.symmetric(
+//                                   horizontal: 16, vertical: 12),
+//                               child: Row(
+//                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                 children: [
+//                                   const Text(
+//                                     'Sales Report',
+//                                     style: TextStyle(
+//                                         fontWeight: FontWeight.bold,
+//                                         fontSize: 22,
+//                                         color: Colors.black87),
+//                                   ),
+//                                   Expanded(
+//                                     child: Padding(
+//                                       padding: const EdgeInsets.symmetric(horizontal: 16),
+//                                       child: Focus(
+//                                         onFocusChange: (hasFocus) {
+//                                           setState(() {
+//                                             _isSearchFocused = hasFocus;
+//                                           });
+//                                         },
+//                                         child: AnimatedContainer(
+//                                           duration: const Duration(milliseconds: 200),
+//                                           width: _isSearchFocused ? 300 : 200,
+//                                           child: TextField(
+//                                             controller: _searchController,
+//                                             decoration: InputDecoration(
+//                                               hintText: 'Reference code...',
+//                                               prefixIcon: const Icon(Icons.search, size: 20),
+//                                               border: const UnderlineInputBorder(
+//                                                 borderSide: BorderSide(color: Colors.grey, width: 0.5),
+//                                               ),
+//                                               enabledBorder: const UnderlineInputBorder(
+//                                                 borderSide: BorderSide(color: Colors.grey, width: 0.5),
+//                                               ),
+//                                               focusedBorder: const UnderlineInputBorder(
+//                                                 borderSide: BorderSide(color: Colors.grey, width: 0.5),
+//                                               ),
+//                                               contentPadding: const EdgeInsets.symmetric(
+//                                                   vertical: 12, horizontal: 12),
+//                                               filled: true,
+//                                               fillColor: Colors.grey[50],
+//                                             ),
+//                                             onChanged: (value) =>
+//                                                 provider.setSearchQuery(
+//                                                     value.isEmpty ? null : value),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                   Row(
+//                                     children: [
+//                                       IconButton(
+//                                         onPressed: () async {
+//                                           final localCount =
+//                                               await provider.getLocalSalesCount();
+//                                           if (context.mounted) {
+//                                             ScaffoldMessenger.of(context)
+//                                                 .showSnackBar(
+//                                               SnackBar(
+//                                                 content: Text(
+//                                                     'Local sales count: $localCount'),
+//                                                 action: SnackBarAction(
+//                                                   label: 'Clear',
+//                                                   onPressed: () async {
+//                                                     await provider.clearLocalData();
+//                                                     ScaffoldMessenger.of(context)
+//                                                         .showSnackBar(
+//                                                       const SnackBar(
+//                                                           content: Text(
+//                                                               'Local data cleared')),
+//                                                     );
+//                                                   },
+//                                                 ),
+//                                               ),
+//                                             );
+//                                           }
+//                                         },
+//                                         icon: const Icon(Icons.storage, size: 20),
+//                                         tooltip: 'Local Storage Info',
+//                                       ),
+//                                       IconButton(
+//                                         onPressed: () {
+//                                           provider.fetchSales(refresh: true);
+//                                         },
+//                                         icon: const Icon(Icons.refresh, size: 20),
+//                                         tooltip: 'Refresh Data',
+//                                       ),
+//                                       _buildDownloadButton(provider),
+//                                     ],
+//                                   ),
+//                                 ],
+//                               ),
+//                             ),
+
+//                             // Filters Section
 //                             Container(
 //                               width: double.infinity,
-//                               padding: const EdgeInsets.all(8),
-//                               color: Colors.orange[100],
-//                               child: Row(
-//                                 children: [
-//                                   Icon(Icons.wifi_off,
-//                                       color: Colors.orange[800], size: 16),
-//                                   const SizedBox(width: 8),
-//                                   Text(
-//                                     'You are offline - showing cached data',
-//                                     style: TextStyle(
-//                                         color: Colors.orange[800],
-//                                         fontSize: 12),
-//                                   ),
-//                                   const Spacer(),
-//                                   TextButton(
-//                                     onPressed: () =>
-//                                         provider.fetchSales(refresh: true),
-//                                     child: Text('Retry',
-//                                         style: TextStyle(
-//                                             color: Colors.orange[800])),
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-//                           Row(
-//                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                             children: [
-//                               const Text(
-//                                 'Sales Report',
-//                                 style: TextStyle(
-//                                     fontWeight: FontWeight.bold, fontSize: 16),
-//                               ),
-//                               Row(
-//                                 children: [
-//                                   IconButton(
-//                                     onPressed: () async {
-//                                       final localCount =
-//                                           await provider.getLocalSalesCount();
-//                                       if (context.mounted) {
-//                                         ScaffoldMessenger.of(context)
-//                                             .showSnackBar(
-//                                           SnackBar(
-//                                             content: Text(
-//                                                 'Local sales count: $localCount'),
-//                                             action: SnackBarAction(
-//                                               label: 'Clear',
-//                                               onPressed: () async {
-//                                                 await provider.clearLocalData();
-//                                                 ScaffoldMessenger.of(context)
-//                                                     .showSnackBar(
-//                                                   const SnackBar(
-//                                                       content: Text(
-//                                                           'Local data cleared')),
-//                                                 );
-//                                               },
-//                                             ),
-//                                           ),
-//                                         );
-//                                       }
-//                                     },
-//                                     icon: const Icon(Icons.storage),
-//                                     tooltip: 'Local Storage Info',
-//                                   ),
-//                                   IconButton(
-//                                     onPressed: () {
-//                                       provider.fetchSales(refresh: true);
-//                                     },
-//                                     icon: const Icon(Icons.refresh),
-//                                     tooltip: 'Refresh Data',
-//                                   ),
-//                                   // ElevatedButton.icon(
-//                                   //   onPressed: () {
-//                                   //     // Implement Excel export
-//                                   //   },
-//                                   //   icon: const Icon(Icons.file_download),
-//                                   //   label: const Text('Download'),
-//                                   //   style: ElevatedButton.styleFrom(
-//                                   //     backgroundColor: const Color(0xFF6B46C1),
-//                                   //     foregroundColor: Colors.white,
-//                                   //   ),
-//                                   // ),
-//                                   _buildDownloadButton(provider),
-//                                 ],
-//                               ),
-//                             ],
-//                           ),
-
-//                           // Filters Section
-//                           Container(
-//                             width: double.infinity,
-//                             color: Colors.white,
-//                             padding: const EdgeInsets.all(16),
-//                             child: Column(
-//                               crossAxisAlignment: CrossAxisAlignment.start,
-//                               children: [
-//                                 const Text(
-//                                   'Filters',
-//                                   style: TextStyle(
-//                                     fontSize: 15,
-//                                     fontWeight: FontWeight.w600,
-//                                   ),
-//                                 ),
-//                                 const SizedBox(height: 16),
-//                                 Row(
-//                                   children: [
-//                                     Expanded(
-//                                       child: _buildDateField(
-//                                         'Start Date',
-//                                         _startDateController,
-//                                         (date) => provider.setStartDate(date),
-//                                       ),
-//                                     ),
-//                                     const SizedBox(width: 10),
-//                                     Expanded(
-//                                       child: _buildDateField(
-//                                         'End Date',
-//                                         _endDateController,
-//                                         (date) => provider.setEndDate(date),
-//                                       ),
-//                                     ),
-//                                     const SizedBox(width: 10),
-//                                     Expanded(
-//                                       child: _buildDropdown(
-//                                         'Type',
-//                                         provider.selectedType,
-//                                         ['All Types', 'sales', 'returns'],
-//                                         (value) => provider.setType(
-//                                             value == 'All Types'
-//                                                 ? null
-//                                                 : value),
-//                                       ),
-//                                     ),
-//                                     Gap(10),
-//                                     Expanded(
-//                                       child: _buildDropdown(
-//                                         'Warehouse',
-//                                         provider.selectedWarehouse,
-//                                         [
-//                                           'All Warehouses',
-//                                           'Calabar Branch',
-//                                           'Main Branch'
-//                                         ],
-//                                         (value) => provider.setWarehouse(
-//                                             value == 'All Warehouses'
-//                                                 ? null
-//                                                 : value),
-//                                       ),
-//                                     ),
-//                                     Gap(10),
-//                                     Expanded(
-//                                       child: _buildDropdown(
-//                                         'Customer',
-//                                         provider.selectedCustomer,
-//                                         [
-//                                           'All Customers',
-//                                           'Emmanuel',
-//                                           'Amaka',
-//                                           'chinny',
-//                                           'walk-in-customer'
-//                                         ],
-//                                         (value) => provider.setCustomer(
-//                                             value == 'All Customers'
-//                                                 ? null
-//                                                 : value),
-//                                       ),
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 const SizedBox(height: 10),
-//                                 Row(
-//                                   mainAxisAlignment: MainAxisAlignment.start,
-//                                   crossAxisAlignment: CrossAxisAlignment.end,
-//                                   children: [
-//                                     const SizedBox(width: 10),
-//                                     Expanded(
-//                                       child: _buildDropdown(
-//                                         'Attendant',
-//                                         provider.selectedAttendant,
-//                                         [
-//                                           'All Attendants',
-//                                           'Jennifer',
-//                                           'Mbachukwu'
-//                                         ],
-//                                         (value) => provider.setAttendant(
-//                                             value == 'All Attendants'
-//                                                 ? null
-//                                                 : value),
-//                                       ),
-//                                     ),
-//                                     Gap(10),
-//                                     Container(
-//                                       width: 500,
-//                                       decoration: BoxDecoration(
-//                                           border:
-//                                               Border.all(color: Colors.grey),
-//                                           borderRadius:
-//                                               BorderRadius.circular(5)),
-//                                       child: TextField(
-//                                         controller: _searchController,
-//                                         decoration: const InputDecoration(
-//                                           labelText: 'Search',
-//                                           hintText:
-//                                               'Search by reference code...',
-//                                           border: OutlineInputBorder(),
-//                                           prefixIcon: Icon(Icons.search),
-//                                         ),
-//                                         onChanged: (value) =>
-//                                             provider.setSearchQuery(
-//                                                 value.isEmpty ? null : value),
-//                                       ),
-//                                     ),
-//                                     Gap(10),
-//                                     const SizedBox(width: 10),
-//                                     ElevatedButton(
-//                                       onPressed: provider.resetFilters,
-//                                       style: ElevatedButton.styleFrom(
-//                                         backgroundColor: Colors.grey[300],
-//                                         foregroundColor: Colors.black87,
-//                                         padding: const EdgeInsets.symmetric(
-//                                             vertical: 16, horizontal: 24),
-//                                       ),
-//                                       child: const Text('Reset Filters'),
-//                                     ),
-//                                     const SizedBox(width: 10),
-//                                     ElevatedButton(
-//                                       onPressed: provider.applyFilters,
-//                                       style: ElevatedButton.styleFrom(
-//                                         backgroundColor:
-//                                             const Color(0xFF6B46C1),
-//                                         foregroundColor: Colors.white,
-//                                         padding: const EdgeInsets.symmetric(
-//                                             vertical: 16, horizontal: 24),
-//                                       ),
-//                                       child: const Text('Apply Filters'),
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 const SizedBox(height: 10),
-//                               ],
-//                             ),
-//                           ),
-
-//                           // Sales Table
-//                           Expanded(
-//                             child: Container(
-//                               margin: const EdgeInsets.all(10),
+//                               margin: const EdgeInsets.symmetric(
+//                                   horizontal: 16, vertical: 8),
+//                               padding: const EdgeInsets.all(16),
 //                               decoration: BoxDecoration(
 //                                 color: Colors.white,
-//                                 borderRadius: BorderRadius.circular(8),
+//                                 borderRadius: BorderRadius.circular(12),
 //                                 boxShadow: [
 //                                   BoxShadow(
-//                                     color: Colors.grey.withOpacity(0.1),
-//                                     spreadRadius: 1,
-//                                     blurRadius: 5,
+//                                     color: Colors.grey.withOpacity(0.15),
+//                                     spreadRadius: 2,
+//                                     blurRadius: 8,
+//                                     offset: const Offset(0, 2),
 //                                   ),
 //                                 ],
 //                               ),
 //                               child: Column(
 //                                 crossAxisAlignment: CrossAxisAlignment.start,
 //                                 children: [
-//                                   Padding(
-//                                     padding: const EdgeInsets.all(10),
-//                                     child: Column(
-//                                       crossAxisAlignment:
-//                                           CrossAxisAlignment.start,
-//                                       children: [
-//                                         const Text(
-//                                           'Sales',
-//                                           style: TextStyle(
-//                                             fontSize: 18,
-//                                             fontWeight: FontWeight.w600,
-//                                           ),
+//                                   Row(
+//                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                     children: [
+//                                       const Text(
+//                                         'Filters',
+//                                         style: TextStyle(
+//                                           fontSize: 16,
+//                                           fontWeight: FontWeight.w600,
+//                                           color: Colors.black87,
 //                                         ),
-//                                         Text(
-//                                           provider.meta != null
-//                                               ? 'Showing ${provider.meta!.from} to ${provider.meta!.to} of ${provider.meta!.total} sales'
-//                                               : 'Loading...',
-//                                           style: TextStyle(
-//                                             color: Colors.grey[600],
-//                                             fontSize: 14,
+//                                       ),
+//                                       Row(
+//                                         children: [
+//                                           ElevatedButton(
+//                                             onPressed: provider.resetFilters,
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor: Colors.grey[200],
+//                                               foregroundColor: Colors.black87,
+//                                               padding: const EdgeInsets.symmetric(
+//                                                   horizontal: 20, vertical: 12),
+//                                               shape: RoundedRectangleBorder(
+//                                                 borderRadius:
+//                                                     BorderRadius.circular(8),
+//                                               ),
+//                                               elevation: 0,
+//                                             ),
+//                                             child: const Text('Reset Filters',
+//                                                 style: TextStyle(fontSize: 14)),
 //                                           ),
-//                                         ),
-//                                       ],
-//                                     ),
+//                                           const SizedBox(width: 8),
+//                                           ElevatedButton(
+//                                             onPressed: provider.applyFilters,
+//                                             style: ElevatedButton.styleFrom(
+//                                               backgroundColor:
+//                                                   const Color(0xFF6B46C1),
+//                                               foregroundColor: Colors.white,
+//                                               padding: const EdgeInsets.symmetric(
+//                                                   horizontal: 20, vertical: 12),
+//                                               shape: RoundedRectangleBorder(
+//                                                 borderRadius:
+//                                                     BorderRadius.circular(8),
+//                                               ),
+//                                               elevation: 0,
+//                                             ),
+//                                             child: const Text('Apply Filters',
+//                                                 style: TextStyle(fontSize: 14)),
+//                                           ),
+//                                         ],
+//                                       ),
+//                                     ],
 //                                   ),
+//                                   const SizedBox(height: 12),
+//                                   Wrap(
+//                                     spacing: 12,
+//                                     runSpacing: 12,
+//                                     children: [
+//                                       SizedBox(
+//                                         width: 200,
+//                                         child: _buildDateFilter(),
+//                                       ),
+//                                       SizedBox(
+//                                         width: 200,
+//                                         child: _buildDropdown(
+//                                           'Type',
+//                                           provider.selectedType,
+//                                           ['All Types', 'sales', 'returns'],
+//                                           (value) => provider.setType(
+//                                               value == 'All Types' ? null : value),
+//                                         ),
+//                                       ),
+//                                       SizedBox(
+//                                         width: 200,
+//                                         child: _buildDropdown(
+//                                           'Warehouse',
+//                                           provider.selectedWarehouse,
+//                                           [
+//                                             'All Warehouses',
+//                                             'Calabar Branch',
+//                                             'Main Branch'
+//                                           ],
+//                                           (value) => provider.setWarehouse(
+//                                               value == 'All Warehouses'
+//                                                   ? null
+//                                                   : value),
+//                                         ),
+//                                       ),
+//                                       SizedBox(
+//                                         width: 200,
+//                                         child: _buildDropdown(
+//                                           'Customer',
+//                                           provider.selectedCustomer,
+//                                           [
+//                                             'All Customers',
+//                                             'Emmanuel',
+//                                             'Amaka',
+//                                             'chinny',
+//                                             'walk-in-customer'
+//                                           ],
+//                                           (value) => provider.setCustomer(
+//                                               value == 'All Customers'
+//                                                   ? null
+//                                                   : value),
+//                                         ),
+//                                       ),
+//                                       SizedBox(
+//                                         width: 200,
+//                                         child: _buildDropdown(
+//                                           'Attendant',
+//                                           provider.selectedAttendant,
+//                                           [
+//                                             'All Attendants',
+//                                             'Jennifer',
+//                                             'Mbachukwu'
+//                                           ],
+//                                           (value) => provider.setAttendant(
+//                                               value == 'All Attendants'
+//                                                   ? null
+//                                                   : value),
+//                                         ),
+//                                       ),
+//                                     ],
+//                                   ),
+//                                 ],
+//                               ),
+//                             ),
 
+//                             // Sales Table
+//                             Container(
+//                               margin: const EdgeInsets.symmetric(
+//                                   horizontal: 16, vertical: 8),
+//                               decoration: BoxDecoration(
+//                                 color: Colors.white,
+//                                 borderRadius: BorderRadius.circular(12),
+//                                 boxShadow: [
+//                                   BoxShadow(
+//                                     color: Colors.grey.withOpacity(0.15),
+//                                     spreadRadius: 2,
+//                                     blurRadius: 8,
+//                                     offset: const Offset(0, 2),
+//                                   ),
+//                                 ],
+//                               ),
+//                               child: Column(
+//                                 crossAxisAlignment: CrossAxisAlignment.start,
+//                                 children: [
 //                                   // Table Header
 //                                   Container(
 //                                     padding: const EdgeInsets.symmetric(
@@ -2160,10 +2242,10 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                             color: Colors.grey[200]!),
 //                                       ),
 //                                     ),
-//                                     child: const Row(
+//                                     child: Row(
 //                                       mainAxisAlignment:
 //                                           MainAxisAlignment.spaceBetween,
-//                                       children: [
+//                                       children: const [
 //                                         SizedBox(width: 2),
 //                                         Expanded(
 //                                           flex: 2,
@@ -2273,7 +2355,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                   ),
 
 //                                   // Table Content
-//                                   Expanded(
+//                                   SizedBox(
+//                                     height: 10 * 70.0, // Height for 10 rows
 //                                     child: provider.isLoading
 //                                         ? const Center(
 //                                             child: CircularProgressIndicator())
@@ -2283,99 +2366,66 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                                     'Error: ${provider.error}'))
 //                                             : provider.sales.isEmpty &&
 //                                                     provider.isOffline
-//                                                 ? Center(
+//                                                 ? const Center(
 //                                                     child: Text(
 //                                                         'No cached sales data available'))
 //                                                 : ListView.builder(
-//                                                     itemCount:
-//                                                         provider.sales.length,
-//                                                     itemBuilder:
-//                                                         (context, index) {
-//                                                       final sale =
-//                                                           provider.sales[index];
-//                                                       return _buildSaleRow(
-//                                                           sale);
+//                                                     physics: const NeverScrollableScrollPhysics(),
+//                                                     itemCount: provider.sales.length > 10
+//                                                         ? 10
+//                                                         : provider.sales.length,
+//                                                     itemBuilder: (context, index) {
+//                                                       final sale = provider.sales[index];
+//                                                       return _buildSaleRow(sale);
 //                                                     },
 //                                                   ),
 //                                   ),
-//                                   // Expanded(
-//                                   //   child: provider.isLoading
-//                                   //       ? const Center(
-//                                   //           child: CircularProgressIndicator())
-//                                   //       : provider.error != null
-//                                   //           ? Center(
-//                                   //               child: Text(
-//                                   //                   'Error: ${provider.error}'))
-//                                   //           : ListView.builder(
-//                                   //               itemCount:
-//                                   //                   provider.sales.length,
-//                                   //               itemBuilder: (context, index) {
-//                                   //                 final sale =
-//                                   //                     provider.sales[index];
-//                                   //                 return _buildSaleRow(sale);
-//                                   //               },
-//                                   //             ),
-//                                   // ),
-
-//                                   // Pagination
-//                                   if (provider.meta != null)
-//                                     Container(
-//                                       padding: const EdgeInsets.all(16),
-//                                       decoration: BoxDecoration(
-//                                         border: Border(
-//                                           top: BorderSide(
-//                                               color: Colors.grey[200]!),
-//                                         ),
-//                                       ),
-//                                       child: Row(
-//                                         mainAxisAlignment:
-//                                             MainAxisAlignment.spaceBetween,
-//                                         children: [
-//                                           Text(
-//                                             'Page ${provider.meta!.currentPage} of ${provider.meta!.lastPage}',
-//                                             style: TextStyle(
-//                                                 color: Colors.grey[600]),
-//                                           ),
-//                                           Row(
-//                                             children: [
-//                                               IconButton(
-//                                                 onPressed:
-//                                                     provider.currentPage > 1
-//                                                         ? () {
-//                                                             provider.setCurrentPage(
-//                                                                 provider.currentPage -
-//                                                                     1);
-//                                                             provider
-//                                                                 .fetchSales();
-//                                                           }
-//                                                         : null,
-//                                                 icon: const Icon(
-//                                                     Icons.chevron_left),
-//                                               ),
-//                                               IconButton(
-//                                                 onPressed: provider
-//                                                             .currentPage <
-//                                                         provider.meta!.lastPage
-//                                                     ? () {
-//                                                         provider.setCurrentPage(
-//                                                             provider.currentPage +
-//                                                                 1);
-//                                                         provider.fetchSales();
-//                                                       }
-//                                                     : null,
-//                                                 icon: const Icon(
-//                                                     Icons.chevron_right),
-//                                               ),
-//                                             ],
-//                                           ),
-//                                         ],
-//                                       ),
-//                                     ),
 //                                 ],
 //                               ),
 //                             ),
-//                           ),
-//                         ],
+
+//                             // Pagination
+//                             if (provider.meta != null)
+//                               Padding(
+//                                 padding: const EdgeInsets.all(16),
+//                                 child: Row(
+//                                   mainAxisAlignment:
+//                                       MainAxisAlignment.spaceBetween,
+//                                   children: [
+//                                     Text(
+//                                       'Showing ${provider.meta!.from} to ${provider.meta!.to} of ${provider.meta!.total} sales | Page ${provider.meta!.currentPage} of ${provider.meta!.lastPage}',
+//                                       style: TextStyle(color: Colors.grey[600]),
+//                                     ),
+//                                     Row(
+//                                       children: [
+//                                         IconButton(
+//                                           onPressed: provider.currentPage > 1
+//                                               ? () {
+//                                                   provider.setCurrentPage(
+//                                                       provider.currentPage - 1);
+//                                                   provider.fetchSales();
+//                                                 }
+//                                               : null,
+//                                           icon: const Icon(Icons.chevron_left),
+//                                         ),
+//                                         IconButton(
+//                                           onPressed: provider.currentPage <
+//                                                   provider.meta!.lastPage
+//                                               ? () {
+//                                                   provider.setCurrentPage(
+//                                                       provider.currentPage + 1);
+//                                                   provider.fetchSales();
+//                                                 }
+//                                               : null,
+//                                           icon: const Icon(Icons.chevron_right),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                           ],
+//                         ),
 //                       ),
 //                     ),
 //                   ],
@@ -2388,45 +2438,185 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //     );
 //   }
 
-//   Widget _buildDateField(String label, TextEditingController controller,
-//       Function(String?) onChanged) {
+//   Widget _buildDateFilter() {
 //     return Column(
 //       crossAxisAlignment: CrossAxisAlignment.start,
 //       children: [
-//         Text(
-//           label,
-//           style: const TextStyle(fontWeight: FontWeight.w500),
+//         const Text(
+//           'Date Filter',
+//           style: TextStyle(
+//               fontWeight: FontWeight.w500, color: Colors.black87, fontSize: 14),
 //         ),
+//         const SizedBox(height: 8),
 //         Container(
 //           decoration: BoxDecoration(
-//               borderRadius: BorderRadius.circular(5),
-//               border: Border.all(color: Colors.grey)),
-//           child: TextField(
-//             controller: controller,
-//             decoration: InputDecoration(
-//               hintText: 'dd/mm/yyyy',
-//               border: const OutlineInputBorder(),
-//               suffixIcon: IconButton(
-//                 icon: const Icon(Icons.calendar_today),
-//                 onPressed: () async {
-//                   final date = await showDatePicker(
-//                     context: context,
-//                     initialDate: DateTime.now(),
-//                     firstDate: DateTime(2020),
-//                     lastDate: DateTime.now(),
-//                   );
-//                   if (date != null) {
-//                     final formattedDate = DateFormat('dd/MM/yyyy').format(date);
-//                     controller.text = formattedDate;
-//                     onChanged(DateFormat('yyyy-MM-dd').format(date));
-//                   }
-//                 },
+//             border: Border.all(color: Colors.grey[300]!),
+//             borderRadius: BorderRadius.circular(8),
+//             color: Colors.grey[50],
+//           ),
+//           child: InkWell(
+//             onTap: () => _showDateFilterDialog(),
+//             child: InputDecorator(
+//               decoration: InputDecoration(
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(8),
+//                   borderSide: BorderSide.none,
+//                 ),
+//                 contentPadding:
+//                     const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+//                 filled: true,
+//                 fillColor: Colors.transparent,
+//               ),
+//               child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Text(
+//                     _startDate != null && _endDate != null
+//                         ? _selectedDateFilter == 'Range'
+//                             ? '${DateFormat('dd/MM/yyyy').format(_startDate!)} - ${DateFormat('dd/MM/yyyy').format(_endDate!)}'
+//                             : _selectedDateFilter == 'Day'
+//                                 ? DateFormat('dd/MM/yyyy').format(_startDate!)
+//                                 : _selectedDateFilter == 'Month'
+//                                     ? DateFormat('MMMM yyyy').format(_startDate!)
+//                                     : DateFormat('yyyy').format(_startDate!)
+//                         : 'Select Date',
+//                     style: TextStyle(
+//                       color:
+//                           _startDate != null ? Colors.black87 : Colors.grey[600],
+//                       fontSize: 14,
+//                     ),
+//                   ),
+//                   const Icon(Icons.calendar_today, size: 18, color: Colors.grey),
+//                 ],
 //               ),
 //             ),
-//             readOnly: true,
 //           ),
 //         ),
 //       ],
+//     );
+//   }
+
+//   void _showDateFilterDialog() {
+//     String tempFilter = _selectedDateFilter;
+//     showDialog(
+//       context: context,
+//       builder: (context) => AlertDialog(
+//         title: const Text('Select Date Filter',
+//             style: TextStyle(fontWeight: FontWeight.w600)),
+//         content: Container(
+//           width: 350,
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               DropdownButtonFormField<String>(
+//                 value: tempFilter,
+//                 decoration: InputDecoration(
+//                   border: OutlineInputBorder(
+//                     borderRadius: BorderRadius.circular(8),
+//                   ),
+//                   contentPadding:
+//                       const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+//                   filled: true,
+//                   fillColor: Colors.grey[50],
+//                 ),
+//                 items: ['Day', 'Month', 'Year', 'Range'].map((filter) {
+//                   return DropdownMenuItem(
+//                     value: filter,
+//                     child: Text(filter),
+//                   );
+//                 }).toList(),
+//                 onChanged: (value) {
+//                   setState(() {
+//                     tempFilter = value!;
+//                   });
+//                 },
+//               ),
+//               const SizedBox(height: 16),
+//               Container(
+//                 height: 250,
+//                 child: SfDateRangePicker(
+//                   onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+//                     if (tempFilter == 'Range') {
+//                       if (args.value is PickerDateRange) {
+//                         setState(() {
+//                           _startDate = args.value.startDate;
+//                           _endDate = args.value.endDate ?? args.value.startDate;
+//                         });
+//                         context.read<SalesProvider>().setStartDate(
+//                             _startDate != null
+//                                 ? DateFormat('yyyy-MM-dd').format(_startDate!)
+//                                 : null);
+//                         context.read<SalesProvider>().setEndDate(
+//                             _endDate != null
+//                                 ? DateFormat('yyyy-MM-dd').format(_endDate!)
+//                                 : null);
+//                       }
+//                     } else {
+//                       DateTime selectedDate = args.value;
+//                       setState(() {
+//                         _startDate = selectedDate;
+//                         _endDate = tempFilter == 'Day' ? selectedDate : null;
+//                       });
+//                       if (tempFilter == 'Day') {
+//                         context.read<SalesProvider>().setStartDate(
+//                             DateFormat('yyyy-MM-dd').format(selectedDate));
+//                         context.read<SalesProvider>().setEndDate(
+//                             DateFormat('yyyy-MM-dd').format(selectedDate));
+//                       } else if (tempFilter == 'Month') {
+//                         final firstDay =
+//                             DateTime(selectedDate.year, selectedDate.month);
+//                         final lastDay =
+//                             DateTime(selectedDate.year, selectedDate.month + 1, 0);
+//                         context.read<SalesProvider>().setStartDate(
+//                             DateFormat('yyyy-MM-dd').format(firstDay));
+//                         context.read<SalesProvider>().setEndDate(
+//                             DateFormat('yyyy-MM-dd').format(lastDay));
+//                       } else if (tempFilter == 'Year') {
+//                         final firstDay = DateTime(selectedDate.year, 1, 1);
+//                         final lastDay = DateTime(selectedDate.year, 12, 31);
+//                         context.read<SalesProvider>().setStartDate(
+//                             DateFormat('yyyy-MM-dd').format(firstDay));
+//                         context.read<SalesProvider>().setEndDate(
+//                             DateFormat('yyyy-MM-dd').format(lastDay));
+//                       }
+//                     }
+//                   },
+//                   selectionMode: tempFilter == 'Range'
+//                       ? DateRangePickerSelectionMode.range
+//                       : DateRangePickerSelectionMode.single,
+//                   initialSelectedDate: DateTime.now(),
+//                   maxDate: DateTime.now(),
+//                   minDate: DateTime(2020),
+//                   monthViewSettings: const DateRangePickerMonthViewSettings(
+//                     firstDayOfWeek: 1,
+//                   ),
+//                   headerStyle: const DateRangePickerHeaderStyle(
+//                     textAlign: TextAlign.center,
+//                     textStyle: TextStyle(
+//                         fontWeight: FontWeight.w600, color: Colors.black87),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//         actions: [
+//           TextButton(
+//             onPressed: () => Navigator.pop(context),
+//             child: const Text('Cancel'),
+//           ),
+//           TextButton(
+//             onPressed: () {
+//               setState(() {
+//                 _selectedDateFilter = tempFilter;
+//               });
+//               Navigator.pop(context);
+//               context.read<SalesProvider>().applyFilters();
+//             },
+//             child: const Text('OK'),
+//           ),
+//         ],
+//       ),
 //     );
 //   }
 
@@ -2437,21 +2627,32 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //       children: [
 //         Text(
 //           label,
-//           style: const TextStyle(fontWeight: FontWeight.w500),
+//           style: const TextStyle(
+//               fontWeight: FontWeight.w500, color: Colors.black87, fontSize: 14),
 //         ),
+//         const SizedBox(height: 8),
 //         Container(
 //           decoration: BoxDecoration(
-//               borderRadius: BorderRadius.circular(5),
-//               border: Border.all(color: Colors.grey)),
+//             borderRadius: BorderRadius.circular(8),
+//             border: Border.all(color: Colors.grey[300]!),
+//             color: Colors.grey[50],
+//           ),
 //           child: DropdownButtonFormField<String>(
 //             value: value ?? items.first,
-//             decoration: const InputDecoration(
-//               border: OutlineInputBorder(),
+//             decoration: InputDecoration(
+//               border: OutlineInputBorder(
+//                 borderRadius: BorderRadius.circular(8),
+//                 borderSide: BorderSide.none,
+//               ),
+//               contentPadding:
+//                   const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+//               filled: true,
+//               fillColor: Colors.transparent,
 //             ),
 //             items: items.map((item) {
 //               return DropdownMenuItem(
 //                 value: item,
-//                 child: Text(item),
+//                 child: Text(item, style: const TextStyle(fontSize: 14)),
 //               );
 //             }).toList(),
 //             onChanged: onChanged,
@@ -2462,128 +2663,118 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //   }
 
 //   Widget _buildSaleRow(Sale sale) {
-//     // Check if payment status allows payment (unpaid or partially paid)
 //     bool canMakePayment = sale.paymentStatusText.toLowerCase() == 'unpaid' ||
 //         sale.paymentStatusText.toLowerCase() == 'partially paid';
 
 //     return ExpansionTile(
-//       childrenPadding: EdgeInsets.symmetric(horizontal: 0),
+//       childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
 //       title: Row(
 //         children: [
 //           Expanded(
 //             flex: 2,
 //             child: Text(
 //               sale.referenceCode,
-//               style: TextStyle(fontSize: 10),
+//               style: const TextStyle(fontSize: 12, color: Colors.black87),
 //             ),
 //           ),
 //           Expanded(
 //               flex: 2,
 //               child: Text(
 //                 DateFormat('dd MMM yyyy').format(sale.date),
-//                 style: TextStyle(fontSize: 10),
+//                 style: const TextStyle(fontSize: 12, color: Colors.black87),
 //               )),
 //           Expanded(
 //               flex: 2,
 //               child: Text(
 //                 sale.customerName,
-//                 style: TextStyle(fontSize: 10),
+//                 style: const TextStyle(fontSize: 12, color: Colors.black87),
 //               )),
 //           Expanded(
 //               flex: 2,
 //               child: Text(
-//                 'Staff', // You might want to add attendant data to Sale model
-//                 style: TextStyle(fontSize: 10),
+//                 'Staff',
+//                 style: const TextStyle(fontSize: 12, color: Colors.black87),
 //               )),
 //           Expanded(
 //               flex: 2,
 //               child: Text(
 //                 sale.warehouseName,
-//                 style: TextStyle(fontSize: 10),
+//                 style: const TextStyle(fontSize: 12, color: Colors.black87),
 //               )),
 //           Expanded(
 //             flex: 2,
 //             child: Text(
 //               '₦${NumberFormat('#,##0').format(sale.grandTotal)}',
-//               style: TextStyle(fontSize: 10),
+//               style: const TextStyle(fontSize: 12, color: Colors.black87),
 //             ),
 //           ),
 //           Expanded(
 //               flex: 2,
 //               child: Text(
 //                 '₦${NumberFormat('#,##0').format(sale.paidAmount)}',
-//                 style: TextStyle(fontSize: 10),
+//                 style: const TextStyle(fontSize: 12, color: Colors.black87),
 //               )),
 //           Expanded(
 //               flex: 2,
 //               child: Text(
 //                 '₦${NumberFormat('#,##0').format(sale.dueAmount)}',
-//                 style: TextStyle(fontSize: 10),
+//                 style: const TextStyle(fontSize: 12, color: Colors.black87),
 //               )),
 //           Expanded(
 //             flex: 2,
 //             child: Container(
-//               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+//               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
 //               decoration: BoxDecoration(
 //                 color: sale.paymentStatusColor,
 //                 borderRadius: BorderRadius.circular(12),
 //               ),
 //               child: Text(
 //                 sale.paymentStatusText,
-//                 style: const TextStyle(color: Colors.white, fontSize: 10),
+//                 style: const TextStyle(color: Colors.white, fontSize: 12),
 //                 textAlign: TextAlign.center,
 //               ),
 //             ),
 //           ),
-//           Gap(10),
+//           const Gap(10),
 //           Expanded(
 //             flex: 2,
 //             child: Container(
-//               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
+//               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
 //               decoration: BoxDecoration(
 //                 color: sale.status == 1 ? Colors.green : Colors.orange,
 //                 borderRadius: BorderRadius.circular(12),
 //               ),
 //               child: Text(
 //                 sale.statusText,
-//                 style: const TextStyle(color: Colors.white, fontSize: 10),
+//                 style: const TextStyle(color: Colors.white, fontSize: 12),
 //                 textAlign: TextAlign.center,
 //               ),
 //             ),
 //           ),
-//           // Gap(10),
 //           Expanded(
 //             flex: 2,
 //             child: Row(
 //               mainAxisSize: MainAxisSize.min,
 //               children: [
 //                 IconButton(
-//                   icon: const Icon(Icons.visibility, size: 15),
+//                   icon: const Icon(Icons.visibility, size: 16),
 //                   onPressed: () => _showSalesReceiptDialog(sale),
 //                   tooltip: 'View Receipt',
 //                 ),
 //                 if (canMakePayment)
-//                   // TextButton.icon(
-//                   //   onPressed: () => _showReconcilePaymentDialog(sale),
-//                   //   icon: const Icon(Icons.payment, size: 13),
-//                   //   label: const Text('Pay', style: TextStyle(fontSize: 10)),
-//                   //   style: TextButton.styleFrom(
-//                   //     foregroundColor: const Color(0xFF6B46C1),
-//                   //     padding: const EdgeInsets.symmetric(
-//                   //         horizontal: 0, vertical: 4),
-//                   //   ),
-//                   // ),
 //                   InkWell(
 //                     onTap: () => _showReconcilePaymentDialog(sale),
 //                     child: Container(
-//                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+//                       padding: const EdgeInsets.symmetric(
+//                           horizontal: 8, vertical: 6),
 //                       decoration: BoxDecoration(
-//                           color: ColorsRes.cardbggrey,
-//                           borderRadius: BorderRadius.circular(5)),
+//                           color: Colors.grey[200],
+//                           borderRadius: BorderRadius.circular(6)),
 //                       child: Row(
-//                         children: [
-//                           Icon(Icons.payment, size: 13),
-//                           Text('Pay', style: TextStyle(fontSize: 10)),
+//                         children: const [
+//                           Icon(Icons.payment, size: 14),
+//                           SizedBox(width: 4),
+//                           Text('Pay', style: TextStyle(fontSize: 12)),
 //                         ],
 //                       ),
 //                     ),
@@ -2634,10 +2825,13 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //             width: 600,
 //             height: 700,
 //             padding: const EdgeInsets.all(24),
+//             decoration: BoxDecoration(
+//               color: Colors.white,
+//               borderRadius: BorderRadius.circular(12),
+//             ),
 //             child: Column(
 //               crossAxisAlignment: CrossAxisAlignment.start,
 //               children: [
-//                 // Header
 //                 Container(
 //                   padding: const EdgeInsets.all(16),
 //                   decoration: const BoxDecoration(
@@ -2693,24 +2887,15 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                   ),
 //                 ),
 //                 const SizedBox(height: 16),
-
-//                 // Status badges
 //                 Row(
 //                   mainAxisAlignment: MainAxisAlignment.end,
 //                   children: [
 //                     InkWell(
 //                       onTap: () async {
-//                         // Print individual sale receipt using SalesPrintService
 //                         try {
-//                           // Get user details from your provider/state management
-//                           // Replace this with your actual way of getting user details
 //                           final user =
 //                               Provider.of<UserProvider>(context, listen: false)
 //                                   .user;
-//                           // OR however you access user details in your app
-//                           // final user = context.read<UserProvider>().user;
-
-//                           // Show loading indicator
 //                           showDialog(
 //                             context: context,
 //                             barrierDismissible: false,
@@ -2724,17 +2909,11 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                               ),
 //                             ),
 //                           );
-
-//                           // Print the individual sale receipt
 //                           await SalesPrintService()
 //                               .printSingleSaleReceipt(sale, user);
-
-//                           // Close loading dialog
 //                           if (Navigator.canPop(context)) {
 //                             Navigator.of(context).pop();
 //                           }
-
-//                           // Show success message
 //                           ScaffoldMessenger.of(context).showSnackBar(
 //                             const SnackBar(
 //                               content: Text('Receipt printed successfully!'),
@@ -2743,12 +2922,9 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                             ),
 //                           );
 //                         } catch (e) {
-//                           // Close loading dialog if open
 //                           if (Navigator.canPop(context)) {
 //                             Navigator.of(context).pop();
 //                           }
-
-//                           // Show error message
 //                           ScaffoldMessenger.of(context).showSnackBar(
 //                             SnackBar(
 //                               content: Text('Error printing receipt: $e'),
@@ -2810,8 +2986,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                   ],
 //                 ),
 //                 const SizedBox(height: 24),
-
-//                 // Customer and Attendant Info
 //                 Row(
 //                   children: [
 //                     Expanded(
@@ -2871,7 +3045,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                             ),
 //                             SizedBox(height: 8),
 //                             Text(
-//                               'Staff', // You can replace with actual attendant name
+//                               'Staff',
 //                               style: TextStyle(
 //                                 fontWeight: FontWeight.bold,
 //                                 fontSize: 12,
@@ -2888,8 +3062,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                   ],
 //                 ),
 //                 const SizedBox(height: 10),
-
-//                 // Sale Items
 //                 const Text(
 //                   'Sale Items',
 //                   style: TextStyle(
@@ -2898,8 +3070,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                   ),
 //                 ),
 //                 const SizedBox(height: 2),
-
-//                 // Items table header
 //                 Container(
 //                   padding:
 //                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -2937,8 +3107,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                     ],
 //                   ),
 //                 ),
-
-//                 // Items list
 //                 Expanded(
 //                   child: ListView.builder(
 //                     physics: const BouncingScrollPhysics(),
@@ -2977,7 +3145,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                 child: Text(
 //                                   'btl',
 //                                   style: TextStyle(fontSize: 12),
-//                                 )), // You can get unit from item if available
+//                                 )),
 //                             Expanded(
 //                                 flex: 2,
 //                                 child: Text(
@@ -2990,14 +3158,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                   '₦${NumberFormat('#,##0').format(item.subTotal)}',
 //                                   style: const TextStyle(fontSize: 12),
 //                                 )),
-//                           ],
+//                             ],
 //                         ),
 //                       );
 //                     },
 //                   ),
 //                 ),
-
-//                 // Grand Total
 //                 Container(
 //                   padding: const EdgeInsets.all(16),
 //                   child: Row(
@@ -3019,8 +3185,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                     ],
 //                   ),
 //                 ),
-
-//                 // Payment Summary
 //                 const Text(
 //                   'Payment Summary',
 //                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
@@ -3093,17 +3257,16 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                   ],
 //                 ),
 //                 const SizedBox(height: 24),
-
-//                 // Footer
 //                 Center(
 //                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
 //                     children: [
 //                       const Text(
 //                         'Thank you for your business! For any questions, please contact our support team.',
 //                         style: TextStyle(color: Colors.grey, fontSize: 12),
 //                         textAlign: TextAlign.center,
 //                       ),
-//                       const SizedBox(width: 10), // Replaced Gap with SizedBox
+//                       const SizedBox(width: 10),
 //                       InkWell(
 //                         onTap: () {
 //                           Navigator.pop(context);
@@ -3145,11 +3308,14 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //               child: Container(
 //                 width: 500,
 //                 padding: const EdgeInsets.all(24),
+//                 decoration: BoxDecoration(
+//                   color: Colors.white,
+//                   borderRadius: BorderRadius.circular(12),
+//                 ),
 //                 child: Column(
 //                   mainAxisSize: MainAxisSize.min,
 //                   crossAxisAlignment: CrossAxisAlignment.start,
 //                   children: [
-//                     // Header
 //                     Row(
 //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                       children: [
@@ -3167,8 +3333,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                       ],
 //                     ),
 //                     const SizedBox(height: 24),
-
-//                     // Sale Details
 //                     _buildInfoRow('Reference:', sale.referenceCode),
 //                     _buildInfoRow('Total Amount:',
 //                         '₦${NumberFormat('#,##0').format(sale.grandTotal)}'),
@@ -3176,8 +3340,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                         '₦${NumberFormat('#,##0').format(sale.paidAmount)}'),
 //                     _buildInfoRow('Balance:',
 //                         '₦${NumberFormat('#,##0').format(sale.dueAmount)}'),
-
-//                     // Status
 //                     Row(
 //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //                       children: [
@@ -3199,8 +3361,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                       ],
 //                     ),
 //                     const SizedBox(height: 24),
-
-//                     // Payment Amount Input
 //                     const Text(
 //                       'Payment Amount',
 //                       style: TextStyle(fontWeight: FontWeight.w500),
@@ -3208,23 +3368,23 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                     const SizedBox(height: 8),
 //                     Container(
 //                       decoration: BoxDecoration(
-//                         border: Border.all(
-//                           color: ColorsRes.btndarkshadow,
-//                         ),
-//                         borderRadius: BorderRadius.circular(5),
+//                         border: Border.all(color: Colors.grey[300]!),
+//                         borderRadius: BorderRadius.circular(8),
 //                       ),
 //                       child: TextField(
 //                         controller: paymentAmountController,
-//                         decoration: const InputDecoration(
+//                         decoration: InputDecoration(
 //                           hintText: 'Enter amount',
-//                           border: OutlineInputBorder(),
+//                           border: OutlineInputBorder(
+//                             borderRadius: BorderRadius.circular(8),
+//                           ),
+//                           contentPadding: const EdgeInsets.symmetric(
+//                               horizontal: 12, vertical: 12),
 //                         ),
 //                         keyboardType: TextInputType.number,
 //                       ),
 //                     ),
 //                     const SizedBox(height: 16),
-
-//                     // Payment Type
 //                     const Text(
 //                       'Payment Type',
 //                       style: TextStyle(fontWeight: FontWeight.w500),
@@ -3232,15 +3392,17 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                     const SizedBox(height: 8),
 //                     Container(
 //                       decoration: BoxDecoration(
-//                         border: Border.all(
-//                           color: ColorsRes.btndarkshadow,
-//                         ),
-//                         borderRadius: BorderRadius.circular(5),
+//                         border: Border.all(color: Colors.grey[300]!),
+//                         borderRadius: BorderRadius.circular(8),
 //                       ),
 //                       child: DropdownButtonFormField<String>(
 //                         value: selectedPaymentType,
-//                         decoration: const InputDecoration(
-//                           border: OutlineInputBorder(),
+//                         decoration: InputDecoration(
+//                           border: OutlineInputBorder(
+//                             borderRadius: BorderRadius.circular(8),
+//                           ),
+//                           contentPadding: const EdgeInsets.symmetric(
+//                               horizontal: 12, vertical: 12),
 //                         ),
 //                         items: [
 //                           'Cash',
@@ -3262,8 +3424,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                       ),
 //                     ),
 //                     const SizedBox(height: 32),
-
-//                     // Action Buttons
 //                     Row(
 //                       mainAxisAlignment: MainAxisAlignment.end,
 //                       children: [
@@ -3286,6 +3446,11 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                           style: ElevatedButton.styleFrom(
 //                             backgroundColor: const Color(0xFF6B46C1),
 //                             foregroundColor: Colors.white,
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 20, vertical: 12),
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius: BorderRadius.circular(8),
+//                             ),
 //                           ),
 //                           child: isProcessing
 //                               ? const SizedBox(
@@ -3341,22 +3506,17 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //       return;
 //     }
 
-//     setState(() {
-//       // Set processing state for the dialog
-//     });
+//     setState(() {});
 
 //     try {
-//       // Call your API here - replace with your actual API service
 //       final response =
 //           await _reconcilePayment(salesId, paymentAmount, paymentType);
 
 //       if (response['success'] == true) {
-//         Navigator.of(context).pop(); // Close dialog
+//         Navigator.of(context).pop();
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           const SnackBar(content: Text('Payment recorded successfully')),
 //         );
-
-//         // Refresh the sales data
 //         context.read<SalesProvider>().fetchSales(refresh: true);
 //       } else {
 //         ScaffoldMessenger.of(context).showSnackBar(
@@ -3370,27 +3530,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //         SnackBar(content: Text('Error: $e')),
 //       );
 //     } finally {
-//       setState(() {
-//         // Reset processing state
-//       });
+//       setState(() {});
 //     }
 //   }
 
-//   // Mock API call - replace with your actual API service
 //   Future<Map<String, dynamic>> _reconcilePayment(
 //       String salesId, double amount, String paymentType) async {
-//     // Example API call
-//     // final response = await http.post(
-//     //   Uri.parse('${baseUrl}/sales/$salesId/reconcile-payment'),
-//     //   headers: {'Content-Type': 'application/json'},
-//     //   body: json.encode({
-//     //     'amount': amount,
-//     //     'payment_type': paymentType,
-//     //   }),
-//     // );
-//     // return json.decode(response.body);
-
-//     // Mock response
 //     await Future.delayed(const Duration(seconds: 1));
 //     return {'success': true, 'message': 'Payment recorded successfully'};
 //   }
@@ -3441,7 +3586,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
 //         decoration: BoxDecoration(
 //           color: const Color(0xFF6B46C1),
-//           borderRadius: BorderRadius.circular(4),
+//           borderRadius: BorderRadius.circular(8),
 //         ),
 //         child: const Row(
 //           mainAxisSize: MainAxisSize.min,
