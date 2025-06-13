@@ -11,7 +11,7 @@ import 'package:spotstock_inventory/screens/desktop/sales/widgets/sale_report_de
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import '../screens/desktop/sales/screens/products_desktop_screen.dart';
+import '../screens/desktop/pos/screens/products_desktop_screen.dart';
 
 class SideBarPos extends StatelessWidget {
   final UserDetails user;

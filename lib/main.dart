@@ -25,6 +25,7 @@ import 'package:spotstock_inventory/data/repository/system_repo.dart';
 import 'package:spotstock_inventory/objectbox.g.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/operations_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/paymentstate.dart';
+import 'package:spotstock_inventory/screens/desktop/providers/products_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/splashscreen_desktop.dart';
 import 'package:spotstock_inventory/screens/mobile/splashscreen_mobile.dart';
 import 'package:spotstock_inventory/widgets/responsive.dart';
@@ -159,6 +160,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SelectAttendantProvider()),
+        ChangeNotifierProvider(create: (_) => ProductsProvider()),
         ChangeNotifierProvider(
             create: (_) =>
                 SalesProvider(SystemRepo(refresh: false, online: true))),

@@ -2235,6 +2235,44 @@ Future<void> clearLocalSales() async {
       return [];
     }
   }
+
+
+  // Add method to sync single transaction
+  Future<Map<String, dynamic>> syncSingleTransaction(
+    Map<String, dynamic> transactionData,
+    UserDetails user,
+  ) async {
+    try {
+      var response = await http.post(
+        Uri.parse('${baseUrl}sales'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': "Bearer ${user.token}"
+        },
+        body: jsonEncode(transactionData),
+      );
+
+      print("Syncing single transaction...");
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      var jsonData = json.decode(response.body);
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'status': true, 'message': jsonData['message'] ?? 'Transaction synced successfully'};
+      } else {
+        return {'status': false, 'message': jsonData['message'] ?? 'Failed to sync transaction'};
+      }
+    } catch (e) {
+      print("Single transaction sync error: $e");
+      return {
+        'status': false,
+        'message': 'Internet connection error!',
+      };
+    }
+  }
+
 }
 
 

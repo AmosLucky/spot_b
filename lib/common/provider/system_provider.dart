@@ -995,6 +995,8 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
+
+
   // Future<List<Booking>> getHotelTransactionsByRegister(String? registerId) async {
   //   try {
   //     var response = await SystemRepo(refresh: false, online: false)
@@ -1330,6 +1332,85 @@ class SystemProvider with ChangeNotifier {
       return [];
     }
   }
+
+
+  // Add this method to handle individual transaction sync
+  Future<Map<String, dynamic>> syncTransaction(Orders transaction) async {
+    try {
+      // Convert single transaction to the format expected by the API
+      var transactionData = _convertTransactionToSyncFormat(transaction);
+      
+      // Use the existing sync method but with single transaction
+      var response = await SystemRepo(refresh: false, online: false)
+          .syncSingleTransaction(transactionData, _getCurrentUser());
+      
+      if (response['status'] == true) {
+        // Update the transaction sync status locally
+        final store = await DatabaseEngine.instance.getStore();
+        final orderBox = store.box<Orders>();
+        
+        transaction.sync = 1;
+        orderBox.put(transaction);
+        
+        notifyListeners();
+      }
+      
+      return response;
+    } catch (error) {
+      print('Error syncing single transaction: $error');
+      return {
+        'status': false,
+        'message': 'Failed to sync transaction: $error',
+      };
+    }
+  }
+
+  // Helper method to convert transaction to sync format
+  Map<String, dynamic> _convertTransactionToSyncFormat(Orders transaction) {
+    var items = jsonDecode(transaction.items);
+    
+    return {
+      "company": {
+        "id": transaction.billerId,
+        "first_name": _getCurrentUser().firstName,
+        "last_name": _getCurrentUser().lastName,
+        "dob": '',
+        "salary_date": ''
+      },
+      "customer_id": null,
+      "date": transaction.createdAt.toIso8601String(),
+      "discount": 0,
+      "grand_total": transaction.amount.toString(),
+      "hold_ref_no": "",
+      "note": "",
+      "payment_status": transaction.status,
+      "payment_type": transaction.paymentMethod,
+      "received_amount": int.parse(transaction.amount.toString().replaceAll('.0', '')),
+      "sale_items": items
+          .map((e) => ({
+                "product_id": e['product']['stock']['product_id'],
+                "quantity": e['quantity'],
+                "product_price": e['totalAmount'].toString(),
+                "discount_type": 1,
+                "discount_value": 0,
+                "tax_value": 0,
+                "tax_type": 1
+              }))
+          .toList(),
+      "shipping": 0,
+      "status": transaction.status,
+      "tax_rate": 0,
+      "warehouse_id": items[0]['product']['stock']['warehouse_id'],
+      "is_offline": 1,
+      "offline_customer_name": transaction.customerName
+    };
+  }
+
+  // Helper method to get current user
+  UserDetails _getCurrentUser() {
+    return Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  }
+
 }
 
 //   Future<List<Map<String, dynamic>>> getAttendants() async {
