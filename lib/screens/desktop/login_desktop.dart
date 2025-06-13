@@ -9,10 +9,10 @@ import 'package:provider/provider.dart';
 import 'package:simple_text_field/simple_text_field.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:spotstock_inventory/widgets/button_widget.dart';
-import 'package:toastification/toastification.dart';
 import 'dart:io';
 
-import '../../common/utils/logout_utils.dart';
+// import 'package:toastification/toastification.dart';
+// import '../../common/utils/logout_utils.dart';
 import '../../common/utils/toast_utils.dart';
 
 final box = GetStorage();
@@ -235,18 +235,6 @@ class _LoginScreenDesktopState extends State<LoginScreenDesktop> {
                             paddingVertical: 15.0,
                           ),
                         ),
-                        // const SizedBox(height: 10.0),
-                        // TextButton(
-                        //   onPressed: () => LogoutUtils.logout(context),
-                        //   child: const Text(
-                        //     'Logout',
-                        //     style: TextStyle(
-                        //       color: Color(0xFFE53935),
-                        //       fontSize: 16,
-                        //       fontFamily: sofia,
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   )
@@ -260,6 +248,19 @@ class _LoginScreenDesktopState extends State<LoginScreenDesktop> {
   }
 }
 
+
+                        // const SizedBox(height: 10.0),
+                        // TextButton(
+                        //   onPressed: () => LogoutUtils.logout(context),
+                        //   child: const Text(
+                        //     'Logout',
+                        //     style: TextStyle(
+                        //       color: Color(0xFFE53935),
+                        //       fontSize: 16,
+                        //       fontFamily: sofia,
+                        //     ),
+                        //   ),
+                        // ),
 
 
 // import 'package:spotstock_inventory/common/common.dart';

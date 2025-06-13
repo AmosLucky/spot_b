@@ -7,8 +7,11 @@ import 'package:spotstock_inventory/screens/desktop/catalogue/catalogue_desktop.
 import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/sale_report_desktop.dart';
+// import 'package:spotstock_inventory/screens/desktop/products/products_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
+import '../screens/desktop/sales/screens/products_desktop_screen.dart';
 
 class SideBarPos extends StatelessWidget {
   final UserDetails user;
@@ -102,6 +105,20 @@ class SideBarPos extends StatelessWidget {
                       "Sales Report",
                     ),
                     icon: MdiIcons.information,
+                    activeItem: activeItem,
+                  ),
+                  SidebarItem(
+                    title: "Products",
+                    onTap: () => _navigateToPage(
+                      context,
+                      ProductsDesktopScreen(
+                        user: user,
+                        systemProvider: systemProvider,
+                        mediaQuery: mediaQuery,
+                      ),
+                      "Products",
+                    ),
+                    icon: MdiIcons.packageVariant,
                     activeItem: activeItem,
                   ),
                   SidebarItem(
@@ -322,8 +339,6 @@ class SidebarItem extends StatelessWidget {
 // import 'package:spotstock_inventory/screens/desktop/sales/widgets/sale_report_desktop.dart';
 // import 'package:flutter/material.dart';
 // import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-// // import 'package:spotstock_inventory/utils/logout_utils.dart';
-// // import 'package:spotstock_inventory/screens/desktop/sales/sales_screen_desktop.dart';
 
 // class SideBarPos extends StatelessWidget {
 //   final UserDetails user;
@@ -332,6 +347,7 @@ class SidebarItem extends StatelessWidget {
 //   final double vertical;
 //   final double horizontal;
 //   final VoidCallback? openInvoice;
+//   final ValueNotifier<String> activeItem;
 
 //   const SideBarPos({
 //     super.key,
@@ -341,6 +357,7 @@ class SidebarItem extends StatelessWidget {
 //     this.horizontal = 15.0,
 //     required this.mediaQuery,
 //     this.openInvoice,
+//     required this.activeItem,
 //   });
 
 //   @override
@@ -349,14 +366,21 @@ class SidebarItem extends StatelessWidget {
 //       padding: EdgeInsets.symmetric(vertical: vertical, horizontal: horizontal),
 //       child: Column(
 //         children: [
+//           // Sidebar Logo
+//           Image.asset(
+//             'assets/images/spot-stock-logo.png',
+//             width: 200,
+//             height: 90,
+//           ),
+//           const SizedBox(height: 10),
 //           // Sidebar Items
 //           Expanded(
 //             child: Container(
-//               width: 200, // Fixed width for sidebar
+//               width: 200,
 //               height: mediaQuery.height,
 //               decoration: BoxDecoration(
 //                 color: primaryColor,
-//                 borderRadius: BorderRadius.circular(10), // Set the border radius
+//                 borderRadius: BorderRadius.circular(10),
 //               ),
 //               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
 //               child: ListView(
@@ -366,15 +390,19 @@ class SidebarItem extends StatelessWidget {
 //                     onTap: () => _navigateToPage(
 //                       context,
 //                       const HomeScreenDesktop(),
+//                       "Dashboard",
 //                     ),
 //                     icon: Icons.dashboard,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Invoices",
 //                     onTap: () {
 //                       openInvoice!();
+//                       activeItem.value = "Invoices";
 //                     },
 //                     icon: MdiIcons.handBackLeft,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Catalogues",
@@ -385,30 +413,38 @@ class SidebarItem extends StatelessWidget {
 //                         systemProvider: systemProvider,
 //                         app: 'INVENTORY',
 //                       ),
+//                       "Catalogues",
 //                     ),
 //                     icon: MdiIcons.database,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Calculator",
+//                     onTap: () => activeItem.value = "Calculator",
 //                     icon: MdiIcons.calculator,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Sales Report",
-//                     icon: MdiIcons.information,
 //                     onTap: () => _navigateToPage(
 //                       context,
 //                       const SalesReportDesktop(),
+//                       "Sales Report",
 //                     ),
+//                     icon: MdiIcons.information,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Close POS",
-//                     icon: MdiIcons.close,
 //                     onTap: () => _showPOSDialog(context, isClosing: true),
+//                     icon: MdiIcons.close,
+//                     activeItem: activeItem,
 //                   ),
 //                   SidebarItem(
 //                     title: "Logout",
-//                     icon: MdiIcons.logout,
 //                     onTap: () => LogoutUtils.showLogoutDialog(context),
+//                     icon: MdiIcons.logout,
+//                     activeItem: activeItem,
 //                   ),
 //                 ],
 //               ),
@@ -434,7 +470,6 @@ class SidebarItem extends StatelessWidget {
 //     return response;
 //   }
 
-//   // Method to show the POS dialog with validation
 //   void _showPOSDialog(BuildContext context, {required bool isClosing}) {
 //     final TextEditingController amountController = TextEditingController();
 //     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -455,7 +490,6 @@ class SidebarItem extends StatelessWidget {
 //                       : "Open register to start your daily sales!",
 //                 ),
 //                 const SizedBox(height: 16),
-//                 // TextField for cash amount (opening or closing) with validation
 //                 TextFormField(
 //                   controller: amountController,
 //                   keyboardType: TextInputType.number,
@@ -471,7 +505,6 @@ class SidebarItem extends StatelessWidget {
 //                     }
 //                     if (double.tryParse(value) == null ||
 //                         double.parse(value) < 0) {
-//                       // Allow zero, block negatives
 //                       return 'Please enter a valid amount greater than or equal to 0';
 //                     }
 //                     return null;
@@ -484,13 +517,11 @@ class SidebarItem extends StatelessWidget {
 //             TextButton(
 //               onPressed: () async {
 //                 if (formKey.currentState?.validate() ?? false) {
-//                   Navigator.of(context).pop(); // Close dialog
-
+//                   Navigator.of(context).pop();
 //                   if (isClosing) {
 //                     var response =
 //                         await SystemRepo(refresh: false, online: false)
 //                             .closeRegister("INVENTORY", amountController.text);
-
 //                     if (response['status'] == true) {
 //                       Navigator.pushReplacement(context,
 //                           MaterialPageRoute(builder: (context) {
@@ -513,7 +544,6 @@ class SidebarItem extends StatelessWidget {
 //                             .openRegister(
 //                                 module: 'INVENTORY',
 //                                 amount: amountController.text);
-
 //                     if (response['status'] == true) {
 //                       Navigator.push(context,
 //                           MaterialPageRoute(builder: (context) {
@@ -536,7 +566,7 @@ class SidebarItem extends StatelessWidget {
 //             ),
 //             TextButton(
 //               onPressed: () {
-//                 Navigator.of(context).pop(); // Close the dialog
+//                 Navigator.of(context).pop();
 //               },
 //               child: const Text("Cancel"),
 //             ),
@@ -546,8 +576,8 @@ class SidebarItem extends StatelessWidget {
 //     );
 //   }
 
-//   // Method to navigate to the CatalogueDesktop page
-//   void _navigateToPage(BuildContext context, Widget page) {
+//   void _navigateToPage(BuildContext context, Widget page, String title) {
+//     activeItem.value = title;
 //     Navigator.push(
 //       context,
 //       MaterialPageRoute(builder: (context) => page),
@@ -558,25 +588,52 @@ class SidebarItem extends StatelessWidget {
 // class SidebarItem extends StatelessWidget {
 //   final String title;
 //   final VoidCallback? onTap;
-//   final IconData icon; // Add an icon property
-//   final Color tileColor; // Add a tile color property
+//   final IconData icon;
+//   final ValueNotifier<String> activeItem;
+
 //   const SidebarItem({
 //     super.key,
 //     required this.title,
 //     this.onTap,
 //     required this.icon,
-//     this.tileColor = Colors.white,
+//     required this.activeItem,
 //   });
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return ListTile(
-//       title: Text(title, style: const TextStyle(color: Colors.white)),
-//       onTap: onTap,
-//       leading: Icon(
-//         icon,
-//         color: secondaryColor,
-//       ),
+//     return ValueListenableBuilder<String>(
+//       valueListenable: activeItem,
+//       builder: (context, activeTitle, child) {
+//         bool isActive = activeTitle == title;
+//         return MouseRegion(
+//           cursor: SystemMouseCursors.click,
+//           child: GestureDetector(
+//             onTap: onTap,
+//             child: Container(
+//               margin: const EdgeInsets.symmetric(vertical: 4),
+//               decoration: BoxDecoration(
+//                 color: isActive ? Colors.white.withOpacity(0.2) : Colors.transparent,
+//                 borderRadius: BorderRadius.circular(8),
+//               ),
+//               child: ListTile(
+//                 title: Text(
+//                   title,
+//                   style: const TextStyle(color: Colors.white),
+//                 ),
+//                 leading: Icon(
+//                   icon,
+//                   color: secondaryColor,
+//                 ),
+//                 onTap: onTap,
+//                 hoverColor: Colors.white.withOpacity(0.1),
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(8),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         );
+//       },
 //     );
 //   }
 // }

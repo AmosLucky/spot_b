@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-// Your existing imports...
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/preference_settings.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
@@ -29,9 +28,9 @@ import 'package:spotstock_inventory/screens/desktop/hotel/widgets/paymentstate.d
 import 'package:spotstock_inventory/screens/desktop/splashscreen_desktop.dart';
 import 'package:spotstock_inventory/screens/mobile/splashscreen_mobile.dart';
 import 'package:spotstock_inventory/widgets/responsive.dart';
-import 'common/provider/attendant_model.dart';
 import 'screens/desktop/providers/select_attendant_provider.dart';
 
+// import 'common/provider/attendant_model.dart';
 // Custom HTTP Override for SSL Certificate Handling
 class MyHttpOverrides extends HttpOverrides {
   @override
