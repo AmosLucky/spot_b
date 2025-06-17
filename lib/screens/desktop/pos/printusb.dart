@@ -4,94 +4,6 @@ import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:win32/win32.dart';
 import 'package:intl/intl.dart';
 
-// Function to list printers
-// void listPrinters() {
-//   final pPrinterInfo = calloc<Pointer<PRINTER_INFO_2>>();
-//   final pcbNeeded = calloc<DWORD>();
-//   final pcReturned = calloc<DWORD>();
-
-//   // Get the size of the buffer needed
-//   EnumPrinters(PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS, nullptr, 2,
-//       nullptr, 0, pcbNeeded, pcReturned);
-
-//   if (pcbNeeded.value == 0) {
-//     print('No printers found.');
-//     return;
-//   }
-
-//   // Allocate the necessary buffer
-//   pPrinterInfo.value = calloc<BYTE>(pcbNeeded.value) as Pointer<PRINTER_INFO_2>;
-
-//   // Retrieve printer information
-//   if (EnumPrinters(
-//           PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS,
-//           nullptr,
-//           2,
-//           pPrinterInfo.value as Pointer<Uint8>,
-//           pcbNeeded.value,
-//           pcbNeeded,
-//           pcReturned) !=
-//       0) {
-//     final printerInfoList = pPrinterInfo.value.cast<PRINTER_INFO_2>();
-//     for (int i = 0; i < pcReturned.value; i++) {
-//       final printerName = printerInfoList[i].pPrinterName.toDartString();
-//       print('Printer Name: $printerName');
-//     }
-//   } else {
-//     print('Failed to enumerate printers.');
-//   }
-
-//   // Clean up
-//   calloc.free(pPrinterInfo.value);
-//   calloc.free(pcbNeeded);
-//   calloc.free(pcReturned);
-// }
-// List<String> listPrinters() {
-//   final pPrinterInfo = calloc<Pointer<PRINTER_INFO_2>>();
-//   final pcbNeeded = calloc<DWORD>();
-//   final pcReturned = calloc<DWORD>();
-
-//   List<String> printers = [];
-
-//   // Get the size of the buffer needed
-//   EnumPrinters(PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS, nullptr, 2,
-//       nullptr, 0, pcbNeeded, pcReturned);
-
-//   if (pcbNeeded.value == 0) {
-//     print('No printers found.');
-//     return printers;
-//   }
-
-//   // Allocate the necessary buffer
-//   pPrinterInfo.value = calloc<BYTE>(pcbNeeded.value) as Pointer<PRINTER_INFO_2>;
-
-//   // Retrieve printer information
-//   if (EnumPrinters(
-//           PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS,
-//           nullptr,
-//           2,
-//           pPrinterInfo.value as Pointer<Uint8>,
-//           pcbNeeded.value,
-//           pcbNeeded,
-//           pcReturned) !=
-//       0) {
-//     final printerInfoList = pPrinterInfo.value.cast<PRINTER_INFO_2>();
-//     for (int i = 0; i < pcReturned.value; i++) {
-//       final printerName = printerInfoList[i].pPrinterName.toDartString();
-//       printers.add(printerName);
-//     }
-//   } else {
-//     print('Failed to enumerate printers.');
-//   }
-
-//   // Clean up
-//   calloc.free(pPrinterInfo.value);
-//   calloc.free(pcbNeeded);
-//   calloc.free(pcReturned);
-
-//   return printers;
-// }
-
 List<String> listPrinters() {
   final pcbNeeded = calloc<DWORD>();
   final pcReturned = calloc<DWORD>();
@@ -347,3 +259,93 @@ extension on List<int> {
     return ptr;
   }
 }
+
+
+
+// Function to list printers
+// void listPrinters() {
+//   final pPrinterInfo = calloc<Pointer<PRINTER_INFO_2>>();
+//   final pcbNeeded = calloc<DWORD>();
+//   final pcReturned = calloc<DWORD>();
+
+//   // Get the size of the buffer needed
+//   EnumPrinters(PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS, nullptr, 2,
+//       nullptr, 0, pcbNeeded, pcReturned);
+
+//   if (pcbNeeded.value == 0) {
+//     print('No printers found.');
+//     return;
+//   }
+
+//   // Allocate the necessary buffer
+//   pPrinterInfo.value = calloc<BYTE>(pcbNeeded.value) as Pointer<PRINTER_INFO_2>;
+
+//   // Retrieve printer information
+//   if (EnumPrinters(
+//           PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS,
+//           nullptr,
+//           2,
+//           pPrinterInfo.value as Pointer<Uint8>,
+//           pcbNeeded.value,
+//           pcbNeeded,
+//           pcReturned) !=
+//       0) {
+//     final printerInfoList = pPrinterInfo.value.cast<PRINTER_INFO_2>();
+//     for (int i = 0; i < pcReturned.value; i++) {
+//       final printerName = printerInfoList[i].pPrinterName.toDartString();
+//       print('Printer Name: $printerName');
+//     }
+//   } else {
+//     print('Failed to enumerate printers.');
+//   }
+
+//   // Clean up
+//   calloc.free(pPrinterInfo.value);
+//   calloc.free(pcbNeeded);
+//   calloc.free(pcReturned);
+// }
+// List<String> listPrinters() {
+//   final pPrinterInfo = calloc<Pointer<PRINTER_INFO_2>>();
+//   final pcbNeeded = calloc<DWORD>();
+//   final pcReturned = calloc<DWORD>();
+
+//   List<String> printers = [];
+
+//   // Get the size of the buffer needed
+//   EnumPrinters(PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS, nullptr, 2,
+//       nullptr, 0, pcbNeeded, pcReturned);
+
+//   if (pcbNeeded.value == 0) {
+//     print('No printers found.');
+//     return printers;
+//   }
+
+//   // Allocate the necessary buffer
+//   pPrinterInfo.value = calloc<BYTE>(pcbNeeded.value) as Pointer<PRINTER_INFO_2>;
+
+//   // Retrieve printer information
+//   if (EnumPrinters(
+//           PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS,
+//           nullptr,
+//           2,
+//           pPrinterInfo.value as Pointer<Uint8>,
+//           pcbNeeded.value,
+//           pcbNeeded,
+//           pcReturned) !=
+//       0) {
+//     final printerInfoList = pPrinterInfo.value.cast<PRINTER_INFO_2>();
+//     for (int i = 0; i < pcReturned.value; i++) {
+//       final printerName = printerInfoList[i].pPrinterName.toDartString();
+//       printers.add(printerName);
+//     }
+//   } else {
+//     print('Failed to enumerate printers.');
+//   }
+
+//   // Clean up
+//   calloc.free(pPrinterInfo.value);
+//   calloc.free(pcbNeeded);
+//   calloc.free(pcReturned);
+
+//   return printers;
+// }

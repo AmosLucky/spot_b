@@ -2,11 +2,11 @@ import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/printusb.dart';
-import '../../../data/models/userdetails.dart';
+// import 'package:spotstock_inventory/common/common.dart';
+// import '../../../data/models/userdetails.dart';
 
-/// Generate a sample PDF document.
+/// Generate a sample PDF document with centered table headers and summary sections.
 Future<Uint8List> generateSamplePdf(
     PdfPageFormat format,
     double total,
@@ -103,45 +103,47 @@ Future<Uint8List> generateSamplePdf(
 
                 pw.SizedBox(height: 2),
 
-                // Table for items
-                hotelItems.isEmpty ? pw.Table.fromTextArray(
-                  context: context,
-                  headerAlignment: pw.Alignment.centerLeft,
-                  border: pw.TableBorder(horizontalInside: pw.BorderSide.none),
-                  data: <List<String>>[
-                    ['Item', 'Qty', 'Price', 'Amount'], // Table header
-                    ...items.map((item) {
-                      // Map each item into a row
-                      return [
-                        item.name,
-                        item.quantity.toString(),
-                        (item.price.toStringAsFixed(2)),
-                        ((item.price * item.quantity).toStringAsFixed(2))
-                      ];
-                    }),
-                  ],
-                  cellAlignment: pw.Alignment.centerLeft,
-                  cellPadding: pw.EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-                  headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                ) : pw.Table.fromTextArray(
-                  context: context,
-                  headerAlignment: pw.Alignment.centerLeft,
-                  border: pw.TableBorder(horizontalInside: pw.BorderSide.none),
-                  data: <List<dynamic>>[
-                    ['Item', 'Duration', 'Per Night', 'Amount'], // Table header
-                    ...hotelItems.map((item) {
-                      // Map each item into a row
-                      return [
-                        item.name,
-                        item.quantity.toString(),
-                        (double.parse(item.price.toString()).toStringAsFixed(2)),
-                        ((double.parse(item.price.toString()) * double.parse(item.quantity.toString())).toStringAsFixed(2))
-                      ];
-                    }),
-                  ],
-                  cellAlignment: pw.Alignment.centerLeft,
-                  cellPadding: pw.EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-                  headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+                // Table for items with fully centered headers and centered table
+                pw.Center(
+                  child: hotelItems.isEmpty ? pw.Table.fromTextArray(
+                    context: context,
+                    headerAlignment: pw.Alignment.center, // Center align header labels
+                    cellAlignment: pw.Alignment.center, // Center align all cell content including header values
+                    border: pw.TableBorder(horizontalInside: pw.BorderSide.none),
+                    data: <List<String>>[
+                      ['Item', 'Qty', 'Price', 'Amount'], // Table header
+                      ...items.map((item) {
+                        // Map each item into a row
+                        return [
+                          item.name,
+                          item.quantity.toString(),
+                          (item.price.toStringAsFixed(2)),
+                          ((item.price * item.quantity).toStringAsFixed(2))
+                        ];
+                      }),
+                    ],
+                    cellPadding: pw.EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+                  ) : pw.Table.fromTextArray(
+                    context: context,
+                    headerAlignment: pw.Alignment.center, // Center align header labels
+                    cellAlignment: pw.Alignment.center, // Center align all cell content including header values
+                    border: pw.TableBorder(horizontalInside: pw.BorderSide.none),
+                    data: <List<dynamic>>[
+                      ['Item', 'Duration', 'Per Night', 'Amount'], // Table header
+                      ...hotelItems.map((item) {
+                        // Map each item into a row
+                        return [
+                          item.name,
+                          item.quantity.toString(),
+                          (double.parse(item.price.toString()).toStringAsFixed(2)),
+                          ((double.parse(item.price.toString()) * double.parse(item.quantity.toString())).toStringAsFixed(2))
+                        ];
+                      }),
+                    ],
+                    cellPadding: pw.EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+                  ),
                 ),
 
                 pw.SizedBox(height: 2),
@@ -150,71 +152,111 @@ Future<Uint8List> generateSamplePdf(
 
                 pw.SizedBox(height: 2),
 
-                // Subtotal, VAT, Total, Paid By
-                pw.Table(
-                  border: null,
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(3),
-                    1: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
+                // Subtotal, VAT, Total, Paid By - Centered as a block
+                pw.Center(
+                  child: pw.Container(
+                    width: 200, // Fixed width to ensure proper centering
+                    child: pw.Table(
+                      border: null,
+                      columnWidths: {
+                        0: pw.FixedColumnWidth(120), // Fixed width for labels
+                        1: pw.FixedColumnWidth(80),  // Fixed width for values
+                      },
                       children: [
-                        pw.Text('Subtotal:', style: pw.TextStyle(fontSize: 8)),
-                        pw.Text('NGN${subtotal.toStringAsFixed(2)}',
-                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                            textAlign: pw.TextAlign.right),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              alignment: pw.Alignment.centerLeft,
+                              child: pw.Text('Subtotal:', style: pw.TextStyle(fontSize: 8)),
+                            ),
+                            pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text('NGN${subtotal.toStringAsFixed(2)}',
+                                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              alignment: pw.Alignment.centerLeft,
+                              child: pw.Text('Discount:', style: pw.TextStyle(fontSize: 8)),
+                            ),
+                            pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text('NGN0.00',
+                                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              alignment: pw.Alignment.centerLeft,
+                              child: pw.Text('Tax:', style: pw.TextStyle(fontSize: 8)),
+                            ),
+                            pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text('NGN0.00',
+                                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              alignment: pw.Alignment.centerLeft,
+                              child: pw.Text('Grand Total:', style: pw.TextStyle(fontSize: 8)),
+                            ),
+                            pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text('NGN${total.toStringAsFixed(2)}',
+                                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              alignment: pw.Alignment.centerLeft,
+                              child: pw.Text('Paid by:', style: pw.TextStyle(fontSize: 8)),
+                            ),
+                            pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text(paymentMethod,
+                                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              alignment: pw.Alignment.centerLeft,
+                              child: pw.Text('Amount paid:', style: pw.TextStyle(fontSize: 8)),
+                            ),
+                            pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text('NGN${receivedAmount.toStringAsFixed(2)}',
+                                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                        pw.TableRow(
+                          children: [
+                            pw.Container(
+                              alignment: pw.Alignment.centerLeft,
+                              child: pw.Text('Change:', style: pw.TextStyle(fontSize: 8)),
+                            ),
+                            pw.Container(
+                              alignment: pw.Alignment.centerRight,
+                              child: pw.Text('NGN${change.toStringAsFixed(2)}',
+                                  style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Discount:', style: pw.TextStyle(fontSize: 8)),
-                        pw.Text('NGN0.00',
-                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                            textAlign: pw.TextAlign.right),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Tax:', style: pw.TextStyle(fontSize: 8)),
-                        pw.Text('NGN0.00',
-                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                            textAlign: pw.TextAlign.right),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Grand Total:', style: pw.TextStyle(fontSize: 8)),
-                        pw.Text('NGN${total.toStringAsFixed(2)}',
-                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                            textAlign: pw.TextAlign.right),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Paid by:', style: pw.TextStyle(fontSize: 8)),
-                        pw.Text(paymentMethod,
-                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                            textAlign: pw.TextAlign.right),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Amount paid:', style: pw.TextStyle(fontSize: 8)),
-                        pw.Text('NGN${receivedAmount.toStringAsFixed(2)}',
-                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                            textAlign: pw.TextAlign.right),
-                      ],
-                    ),
-                    pw.TableRow(
-                      children: [
-                        pw.Text('Change:', style: pw.TextStyle(fontSize: 8)),
-                        pw.Text('NGN${change.toStringAsFixed(2)}',
-                            style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
-                            textAlign: pw.TextAlign.right),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
 
                 pw.SizedBox(height: 10),
@@ -291,15 +333,13 @@ Future<void> printSampleDocument(
 
 
 
-
 // import 'dart:typed_data';
 // import 'package:pdf/pdf.dart';
 // import 'package:pdf/widgets.dart' as pw;
 // import 'package:printing/printing.dart';
-// import 'package:spotstock_inventory/common/common.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/printusb.dart';
-
-// import '../../../data/models/userdetails.dart';
+// // import 'package:spotstock_inventory/common/common.dart';
+// // import '../../../data/models/userdetails.dart';
 
 // /// Generate a sample PDF document.
 // Future<Uint8List> generateSamplePdf(
@@ -325,6 +365,7 @@ Future<void> printSampleDocument(
 //     DateTime createdAt,
 //     String companyName,
 //     String companyAddress,
+//     String? attendantName, // Added attendantName parameter
 //     ) async {
 //   final pdf = pw.Document(); // Create a new PDF document.
 
@@ -384,11 +425,12 @@ Future<void> printSampleDocument(
 //                     style: pw.TextStyle(fontSize: 8)),
 
 //                 pw.Text('Sold By:  $staffName', style: pw.TextStyle(fontSize: 8)),
-//                  tableId != '' ? pw.Text('Table: :  ${tableId.toString()}', style: pw.TextStyle(fontSize: 8)) : pw.SizedBox(),
-//                 pw.Text('Date:  $createdAt', style: pw.TextStyle(fontSize: 8,)),
-//                 if(checkin != '') pw.Text('Checkin Date:  $checkin', style: pw.TextStyle(fontSize: 8,)),
-//                 if(checkout != '')pw.Text('Checkout Date:  $checkout', style: pw.TextStyle(fontSize: 8,)),
-
+//                 if(attendantName != null && attendantName != '') pw.Text('Attendant:  $attendantName',
+//                     style: pw.TextStyle(fontSize: 8)), // Added Attendant Name
+//                 tableId != '' ? pw.Text('Table: :  ${tableId.toString()}', style: pw.TextStyle(fontSize: 8)) : pw.SizedBox(),
+//                 pw.Text('Date:  $createdAt', style: pw.TextStyle(fontSize: 8)),
+//                 if(checkin != '') pw.Text('Checkin Date:  $checkin', style: pw.TextStyle(fontSize: 8)),
+//                 if(checkout != '')pw.Text('Checkout Date:  $checkout', style: pw.TextStyle(fontSize: 8)),
 
 //                 pw.SizedBox(height: 2),
 
@@ -397,7 +439,6 @@ Future<void> printSampleDocument(
 //                 pw.SizedBox(height: 2),
 
 //                 // Table for items
-
 //                 hotelItems.isEmpty ? pw.Table.fromTextArray(
 //                   context: context,
 //                   headerAlignment: pw.Alignment.centerLeft,
@@ -416,8 +457,7 @@ Future<void> printSampleDocument(
 //                   ],
 //                   cellAlignment: pw.Alignment.centerLeft,
 //                   cellPadding: pw.EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-//                   headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold,),
-//                   //headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
+//                   headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
 //                 ) : pw.Table.fromTextArray(
 //                   context: context,
 //                   headerAlignment: pw.Alignment.centerLeft,
@@ -436,8 +476,7 @@ Future<void> printSampleDocument(
 //                   ],
 //                   cellAlignment: pw.Alignment.centerLeft,
 //                   cellPadding: pw.EdgeInsets.symmetric(horizontal: 0, vertical: 2),
-//                   headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold,),
-//                   //headerDecoration: pw.BoxDecoration(color: PdfColors.blue),
+//                   headerStyle: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
 //                 ),
 
 //                 pw.SizedBox(height: 2),
@@ -447,72 +486,71 @@ Future<void> printSampleDocument(
 //                 pw.SizedBox(height: 2),
 
 //                 // Subtotal, VAT, Total, Paid By
-//                 pw.Row(
-//                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       pw.Text('Subtotal:', style: pw.TextStyle(fontSize: 8)),
-//                       //pw.SizedBox(width: 20),
-//                       pw.Text('NGN$subtotal',
-//                           style: pw.TextStyle(
-//                               fontSize: 8, fontWeight: pw.FontWeight.bold)),
-//                     ]),
-
-//                 pw.Row(
-//                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       pw.Text('Discount:', style: pw.TextStyle(fontSize: 8)),
-//                       //pw.SizedBox(width: 40),
-//                       pw.Text('NGN0.00',
-//                           style: pw.TextStyle(
-//                               fontSize: 8, fontWeight: pw.FontWeight.bold)),
-//                     ]),
-//                 pw.Row(
-//                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       pw.Text('Tax:', style: pw.TextStyle(fontSize: 8)),
-//                       //pw.SizedBox(width: 40),
-//                       pw.Text('NGN0.00',
-//                           style: pw.TextStyle(
-//                               fontSize: 8, fontWeight: pw.FontWeight.bold)),
-//                     ]),
-//                 pw.Row(
-//                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       pw.Text('Grand Total:', style: pw.TextStyle(fontSize: 8)),
-//                       //pw.SizedBox(width: 38),
-//                       pw.Text('NGN$total',
-//                           style: pw.TextStyle(
-//                               fontSize: 8, fontWeight: pw.FontWeight.bold)),
-//                     ]),
-
-//                 // Payment details
-//                 pw.Row(
-//                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       pw.Text('Paid by:', style: pw.TextStyle(fontSize: 8)),
-//                       //pw.SizedBox(width: 20),
-//                       pw.Text(paymentMethod,
-//                           style: pw.TextStyle(
-//                               fontSize: 8, fontWeight: pw.FontWeight.bold)),
-//                     ]),
-//                 pw.Row(
-//                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       pw.Text('Amount paid:', style: pw.TextStyle(fontSize: 8)),
-//                       //pw.SizedBox(width: 34),
-//                       pw.Text('NGN$receivedAmount',
-//                           style: pw.TextStyle(
-//                               fontSize: 8, fontWeight: pw.FontWeight.bold)),
-//                     ]),
-//                 pw.Row(
-//                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       pw.Text('Change:', style: pw.TextStyle(fontSize: 8)),
-//                       //pw.SizedBox(width: 25),
-//                       pw.Text('NGN$change',
-//                           style: pw.TextStyle(
-//                               fontSize: 8, fontWeight: pw.FontWeight.bold)),
-//                     ]),
+//                 pw.Table(
+//                   border: null,
+//                   columnWidths: {
+//                     0: pw.FlexColumnWidth(3),
+//                     1: pw.FlexColumnWidth(1),
+//                   },
+//                   children: [
+//                     pw.TableRow(
+//                       children: [
+//                         pw.Text('Subtotal:', style: pw.TextStyle(fontSize: 8)),
+//                         pw.Text('NGN${subtotal.toStringAsFixed(2)}',
+//                             style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+//                             textAlign: pw.TextAlign.right),
+//                       ],
+//                     ),
+//                     pw.TableRow(
+//                       children: [
+//                         pw.Text('Discount:', style: pw.TextStyle(fontSize: 8)),
+//                         pw.Text('NGN0.00',
+//                             style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+//                             textAlign: pw.TextAlign.right),
+//                       ],
+//                     ),
+//                     pw.TableRow(
+//                       children: [
+//                         pw.Text('Tax:', style: pw.TextStyle(fontSize: 8)),
+//                         pw.Text('NGN0.00',
+//                             style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+//                             textAlign: pw.TextAlign.right),
+//                       ],
+//                     ),
+//                     pw.TableRow(
+//                       children: [
+//                         pw.Text('Grand Total:', style: pw.TextStyle(fontSize: 8)),
+//                         pw.Text('NGN${total.toStringAsFixed(2)}',
+//                             style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+//                             textAlign: pw.TextAlign.right),
+//                       ],
+//                     ),
+//                     pw.TableRow(
+//                       children: [
+//                         pw.Text('Paid by:', style: pw.TextStyle(fontSize: 8)),
+//                         pw.Text(paymentMethod,
+//                             style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+//                             textAlign: pw.TextAlign.right),
+//                       ],
+//                     ),
+//                     pw.TableRow(
+//                       children: [
+//                         pw.Text('Amount paid:', style: pw.TextStyle(fontSize: 8)),
+//                         pw.Text('NGN${receivedAmount.toStringAsFixed(2)}',
+//                             style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+//                             textAlign: pw.TextAlign.right),
+//                       ],
+//                     ),
+//                     pw.TableRow(
+//                       children: [
+//                         pw.Text('Change:', style: pw.TextStyle(fontSize: 8)),
+//                         pw.Text('NGN${change.toStringAsFixed(2)}',
+//                             style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
+//                             textAlign: pw.TextAlign.right),
+//                       ],
+//                     ),
+//                   ],
+//                 ),
 
 //                 pw.SizedBox(height: 10),
 
@@ -554,6 +592,7 @@ Future<void> printSampleDocument(
 //     DateTime createdAt,
 //     String companyName,
 //     String companyAddress,
+//     String? attendantName, // Added attendantName parameter
 //     ) async {
 //   await Printing.layoutPdf(
 //     onLayout: (format) async => await generateSamplePdf(
@@ -577,8 +616,9 @@ Future<void> printSampleDocument(
 //         change,
 //         paymentMethod,
 //         createdAt,
-//     companyName,
-//       companyAddress,
+//         companyName,
+//         companyAddress,
+//         attendantName,
 //     ),
 //   );
 // }

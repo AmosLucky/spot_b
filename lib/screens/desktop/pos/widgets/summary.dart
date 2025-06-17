@@ -365,7 +365,7 @@ class _OrderSummaryState extends State<OrderSummary> {
                 children: [
                   widget.registerInfo['id'] != null
                       ? CustomButton(
-                          label: "Invoice",
+                          label: "Hold List",
                           icon: MdiIcons.handBackLeft,
                           color: secondaryColor,
                           onTap: () async {
