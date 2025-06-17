@@ -1,7 +1,3 @@
-
-// models/sale_models.dart
-
-// models/sale_models.dart
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
