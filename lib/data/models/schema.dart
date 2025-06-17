@@ -1,16 +1,87 @@
 import 'package:objectbox/objectbox.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
 
+// @Entity()
+// class Orders {
+//   @Id() // Auto-incrementing ID
+//   int id = 0;
+//   String customerName;
+//   String trxId;
+//   int productId;
+//   int quantity;
+//   double amount;
+//    String? paymentStatus;
+//   DateTime createdAt;
+//   String searchDate;
+//   int billerId;
+//   String paymentMethod;
+//   String items;
+//   String others;
+//   String companyId;
+//   String register;
+//   int status;
+//   String? tableId;
+//   int sync;
+
+//   Orders({
+//     required this.customerName,
+//     required this.trxId,
+//     required this.productId,
+//     required this.quantity,
+//     required this.amount,
+//     this.paymentStatus,
+//     required this.createdAt,
+//     required this.searchDate,
+//     required this.billerId,
+//     required this.paymentMethod,
+//     required this.items,
+//     required this.others,
+//     required this.companyId,
+//     required this.register,
+//     this.status = 0,
+//     this.tableId,
+//     this.sync = 0,
+//   });
+
+//   // Method to convert the Orders object to a Map
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'id': id,
+//       'customerName': customerName,
+//       'trxId': trxId,
+//       'productId': productId,
+//       'quantity': quantity,
+//       'amount': amount,
+//       'paymentStatus': paymentStatus,
+//       'createdAt': createdAt.toIso8601String(), // Convert DateTime to String
+//       'searchDate': searchDate,
+//       'billerId': billerId,
+//       'paymentMethod': paymentMethod,
+//       'items': items,
+//       'others': others,
+//       'companyId': companyId,
+//       'register': register,
+//       'status': status,
+//       'tableId': tableId,
+//       'sync': sync,
+//     };
+//   }
+// }
+
+
 @Entity()
 class Orders {
-  @Id() // Auto-incrementing ID
+  @Id()
   int id = 0;
+
   String customerName;
   String trxId;
   int productId;
   int quantity;
   double amount;
-   String? paymentStatus;
+  String? paymentStatus;
+  double? receivedAmount;
+  double? partialAmount;
   DateTime createdAt;
   String searchDate;
   int billerId;
@@ -30,6 +101,8 @@ class Orders {
     required this.quantity,
     required this.amount,
     this.paymentStatus,
+    this.receivedAmount,
+    this.partialAmount,
     required this.createdAt,
     required this.searchDate,
     required this.billerId,
@@ -43,7 +116,6 @@ class Orders {
     this.sync = 0,
   });
 
-  // Method to convert the Orders object to a Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -53,7 +125,9 @@ class Orders {
       'quantity': quantity,
       'amount': amount,
       'paymentStatus': paymentStatus,
-      'createdAt': createdAt.toIso8601String(), // Convert DateTime to String
+      'receivedAmount': receivedAmount,
+      'partialAmount': partialAmount,
+      'createdAt': createdAt.toIso8601String(),
       'searchDate': searchDate,
       'billerId': billerId,
       'paymentMethod': paymentMethod,
@@ -826,64 +900,3 @@ class SaleItemEntity {
     };
   }
 }
-
-
-
-// @Entity()
-// class MaintenanceRoom {
-//   @Id()
-//   int id = 0;
-  
-//   String? roomNumber;
-//   String? status;
-//   String? maintenanceNote;
-//   String? maintenanceDate;
-//   String? maintenanceExpectedEndDate;
-  
-//   @Property(type: PropertyType.date)
-//   DateTime? createdAt;
-  
-//   @Property(type: PropertyType.date)
-//   DateTime? updatedAt;
-
-// //   MaintenanceRoom({
-// //     this.id = 0,
-// //     this.roomNumber,
-// //     this.status,
-// //     this.maintenanceNote,
-// //     this.maintenanceDate,
-// //     this.maintenanceExpectedEndDate,
-// //     this.createdAt,
-// //     this.updatedAt,
-// //   });
-
-// //   factory MaintenanceRoom.fromJson(Map<String, dynamic> json) {
-// //     return MaintenanceRoom(
-// //       id: json['id'] ?? 0,
-// //       roomNumber: json['room_number'],
-// //       status: json['status'],
-// //       maintenanceNote: json['maintenance_note'],
-// //       maintenanceDate: json['maintenance_date'],
-// //       maintenanceExpectedEndDate: json['maintenance_expected_end_date'],
-// //       createdAt: json['created_at'] != null 
-// //           ? DateTime.parse(json['created_at']) 
-// //           : null,
-// //       updatedAt: json['updated_at'] != null
-// //           ? DateTime.parse(json['updated_at'])
-// //           : null,
-// //     );
-// //   }
-
-// //   Map<String, dynamic> toJson() {
-// //     return {
-// //       'id': id,
-// //       'room_number': roomNumber,
-// //       'status': status,
-// //       'maintenance_note': maintenanceNote,
-// //       'maintenance_date': maintenanceDate,
-// //       'maintenance_expected_end_date': maintenanceExpectedEndDate,
-// //       'created_at': createdAt?.toIso8601String(),
-// //       'updated_at': updatedAt?.toIso8601String(),
-// //     };
-// //   }
-// // }

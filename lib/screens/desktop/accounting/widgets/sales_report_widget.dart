@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/widgets/transaction_tile.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/print_desktop.dart';
 import 'package:spotstock_inventory/data/models/userdetails.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-// import 'debug_helper.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../helpers/debug_helper.dart';
@@ -21,36 +23,20 @@ class SalesReportWidget extends StatelessWidget {
     required this.systemProvider,
   });
 
-  // Helper method to extract payment status from order - Updated logic
+  // Helper method to extract payment status from order
   String _extractPaymentStatus(Orders sale) {
-    // First check if there's an explicit paymentStatus field
+    // Rely solely on paymentStatus field
     if (sale.paymentStatus != null && sale.paymentStatus!.isNotEmpty) {
-      return sale.paymentStatus!;
-    }
-    
-    // Then check the status field for payment information (status is int, not String)
-    if (sale.status != null) {
-      switch (sale.status) {
-        case 0:
-          return 'Pending';
-        case 1:
-          return 'Paid';
-        case 2:
-          return 'Partial';
-        case 3:
-          return 'Failed';
-        case 4:
-          return 'Cancelled';
+      switch (sale.paymentStatus) {
+        case 'Paid':
+        case 'Unpaid':
+        case 'Partial':
+          return sale.paymentStatus!;
         default:
-          return 'Unknown';
+          return 'Unpaid'; // Default to Unpaid for invalid values
       }
     }
-    
-    // Last fallback - check if payment method exists (but don't assume it means "Paid")
-    if (sale.paymentMethod != null && sale.paymentMethod!.isNotEmpty) {
-      return 'Pending'; // Changed from 'Paid' to 'Pending'
-    }
-    
+    // Fallback if paymentStatus is null or empty
     return 'Unpaid';
   }
 
@@ -85,12 +71,12 @@ class SalesReportWidget extends StatelessWidget {
                   itemCount: sales.length,
                   itemBuilder: (context, index) {
                     final sale = sales[index];
-                    
+
                     // Add debug logging
-                    if (index < 3) { // Debug first 3 items
+                    if (index < 3) {
                       PaymentStatusDebugHelper.debugTransactionStatus(sale);
                     }
-                    
+
                     return TransactionTile(
                       transactionId: sale.trxId,
                       amount: sale.amount,
@@ -129,31 +115,40 @@ class SalesReportWidget extends StatelessWidget {
 
   // Helper method to sync a single transaction
   void _syncSingleTransaction(Orders sale) {
-    // Since syncTransaction doesn't exist, we can either:
-    // 1. Call the existing syncAllTransactions method
-    // 2. Show a message that sync will happen with "Sync All"
-    // 3. Implement individual transaction sync
-    
-    // Option 1: Use existing sync all method
     systemProvider.syncAllTransactions(user).then((result) {
       print('Sync result: $result');
     }).catchError((error) {
       print('Sync error: $error');
     });
-    
-    // Option 2: Just show a message (uncomment if you prefer this approach)
-    // print('Individual sync not implemented. Use "Sync All" button.');
   }
 
   void _runDataMigration() async {
-    // await PaymentStatusMigrationHelper.updateExistingTransactionStatuses(user); // Assuming this exists
-    // Force rebuild
-    // setState(() {}); // setState is not available in StatelessWidget
+    // Migration script to update existing Orders
+    final store = await DatabaseEngine.instance.getStore();
+    final orderBox = store.box<Orders>();
+    final orders = orderBox.getAll();
+
+    for (var order in orders) {
+      if (order.paymentStatus == null || order.paymentStatus!.isEmpty) {
+        // Extract payment status from others field if available
+        if (order.others != null && order.others!.isNotEmpty) {
+          try {
+            final paymentData = jsonDecode(order.others!);
+            String newPaymentStatus = paymentData['paymentStatus'] ?? 'Unpaid';
+            order.paymentStatus = newPaymentStatus;
+            orderBox.put(order);
+          } catch (e) {
+            print('Error decoding others field for order ${order.trxId}: $e');
+          }
+        } else {
+          order.paymentStatus = 'Unpaid';
+          orderBox.put(order);
+        }
+      }
+    }
+    print('Data migration completed for payment statuses');
   }
 }
-
-
-
 
 
 
@@ -164,6 +159,10 @@ class SalesReportWidget extends StatelessWidget {
 // import 'package:spotstock_inventory/screens/desktop/pos/print_desktop.dart';
 // import 'package:spotstock_inventory/data/models/userdetails.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
+// // import 'debug_helper.dart';
+// import 'package:flutter/foundation.dart';
+
+// import '../../helpers/debug_helper.dart';
 
 // class SalesReportWidget extends StatelessWidget {
 //   final Future<List<Orders>> Function() fetchSalesReport;
@@ -176,6 +175,39 @@ class SalesReportWidget extends StatelessWidget {
 //     required this.user,
 //     required this.systemProvider,
 //   });
+
+//   // Helper method to extract payment status from order - Updated logic
+//   String _extractPaymentStatus(Orders sale) {
+//     // First check if there's an explicit paymentStatus field
+//     if (sale.paymentStatus != null && sale.paymentStatus!.isNotEmpty) {
+//       return sale.paymentStatus!;
+//     }
+    
+//     // Then check the status field for payment information (status is int, not String)
+//     if (sale.status != null) {
+//       switch (sale.status) {
+//         case 0:
+//           return 'Pending';
+//         case 1:
+//           return 'Paid';
+//         case 2:
+//           return 'Partial';
+//         case 3:
+//           return 'Failed';
+//         case 4:
+//           return 'Cancelled';
+//         default:
+//           return 'Unknown';
+//       }
+//     }
+    
+//     // Last fallback - check if payment method exists (but don't assume it means "Paid")
+//     if (sale.paymentMethod != null && sale.paymentMethod!.isNotEmpty) {
+//       return 'Pending'; // Changed from 'Paid' to 'Pending'
+//     }
+    
+//     return 'Unpaid';
+//   }
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -208,14 +240,21 @@ class SalesReportWidget extends StatelessWidget {
 //                   itemCount: sales.length,
 //                   itemBuilder: (context, index) {
 //                     final sale = sales[index];
-//                     //print("Sales Report data ==> ${sale.}");
+                    
+//                     // Add debug logging
+//                     if (index < 3) { // Debug first 3 items
+//                       PaymentStatusDebugHelper.debugTransactionStatus(sale);
+//                     }
+                    
 //                     return TransactionTile(
 //                       transactionId: sale.trxId,
-//                       amount: sale.status.toDouble(),
+//                       amount: sale.amount,
 //                       customer: sale.customerName,
 //                       createdAt: sale.createdAt,
 //                       isSynced: sale.sync == 1,
-//                       paymentMethod: sale.paymentMethod,
+//                       paymentMethod: sale.paymentMethod ?? 'Unknown',
+//                       paymentStatus: _extractPaymentStatus(sale),
+//                       status: sale.status,
 //                       onPrint: () {
 //                         Navigator.of(context).push(MaterialPageRoute(
 //                           builder: (_) => PrintScreenDialog(
@@ -224,15 +263,46 @@ class SalesReportWidget extends StatelessWidget {
 //                           ),
 //                         ));
 //                       },
-//                       onSync: () {},
+//                       onSync: () {
+//                         _syncSingleTransaction(sale);
+//                       },
 //                     );
 //                   },
 //                 );
 //               },
 //             ),
 //           ),
+//           if (kDebugMode)
+//             ElevatedButton(
+//               onPressed: _runDataMigration,
+//               child: Text('Update Payment Statuses'),
+//             ),
 //         ],
 //       ),
 //     );
+//   }
+
+//   // Helper method to sync a single transaction
+//   void _syncSingleTransaction(Orders sale) {
+//     // Since syncTransaction doesn't exist, we can either:
+//     // 1. Call the existing syncAllTransactions method
+//     // 2. Show a message that sync will happen with "Sync All"
+//     // 3. Implement individual transaction sync
+    
+//     // Option 1: Use existing sync all method
+//     systemProvider.syncAllTransactions(user).then((result) {
+//       print('Sync result: $result');
+//     }).catchError((error) {
+//       print('Sync error: $error');
+//     });
+    
+//     // Option 2: Just show a message (uncomment if you prefer this approach)
+//     // print('Individual sync not implemented. Use "Sync All" button.');
+//   }
+
+//   void _runDataMigration() async {
+//     // await PaymentStatusMigrationHelper.updateExistingTransactionStatuses(user); // Assuming this exists
+//     // Force rebuild
+//     // setState(() {}); // setState is not available in StatelessWidget
 //   }
 // }

@@ -87,7 +87,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 7886241321930313604),
       name: 'Orders',
-      lastPropertyId: const obx_int.IdUid(17, 5935592689397083727),
+      lastPropertyId: const obx_int.IdUid(20, 5262591713802253935),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -174,6 +174,21 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(17, 5935592689397083727),
             name: 'sync',
             type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(18, 6621517029054660455),
+            name: 'paymentStatus',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(19, 4184485380876704377),
+            name: 'receivedAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(20, 5262591713802253935),
+            name: 'partialAmount',
+            type: 8,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -1177,7 +1192,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final registerOffset = fbb.writeString(object.register);
           final tableIdOffset =
               object.tableId == null ? null : fbb.writeString(object.tableId!);
-          fbb.startTable(18);
+          final paymentStatusOffset = object.paymentStatus == null
+              ? null
+              : fbb.writeString(object.paymentStatus!);
+          fbb.startTable(21);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, customerNameOffset);
           fbb.addOffset(2, trxIdOffset);
@@ -1195,6 +1213,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(14, object.status);
           fbb.addOffset(15, tableIdOffset);
           fbb.addInt64(16, object.sync);
+          fbb.addOffset(17, paymentStatusOffset);
+          fbb.addFloat64(18, object.receivedAmount);
+          fbb.addFloat64(19, object.partialAmount);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -1212,6 +1233,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
           final amountParam =
               const fb.Float64Reader().vTableGet(buffer, rootOffset, 14, 0);
+          final paymentStatusParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 38);
+          final receivedAmountParam = const fb.Float64Reader()
+              .vTableGetNullable(buffer, rootOffset, 40);
+          final partialAmountParam = const fb.Float64Reader()
+              .vTableGetNullable(buffer, rootOffset, 42);
           final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 16, 0));
           final searchDateParam = const fb.StringReader(asciiOptimization: true)
@@ -1241,6 +1269,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
               productId: productIdParam,
               quantity: quantityParam,
               amount: amountParam,
+              paymentStatus: paymentStatusParam,
+              receivedAmount: receivedAmountParam,
+              partialAmount: partialAmountParam,
               createdAt: createdAtParam,
               searchDate: searchDateParam,
               billerId: billerIdParam,
@@ -2291,6 +2322,18 @@ class Orders_ {
   /// See [Orders.sync].
   static final sync =
       obx.QueryIntegerProperty<Orders>(_entities[1].properties[16]);
+
+  /// See [Orders.paymentStatus].
+  static final paymentStatus =
+      obx.QueryStringProperty<Orders>(_entities[1].properties[17]);
+
+  /// See [Orders.receivedAmount].
+  static final receivedAmount =
+      obx.QueryDoubleProperty<Orders>(_entities[1].properties[18]);
+
+  /// See [Orders.partialAmount].
+  static final partialAmount =
+      obx.QueryDoubleProperty<Orders>(_entities[1].properties[19]);
 }
 
 /// [Register] entity fields to define ObjectBox queries.

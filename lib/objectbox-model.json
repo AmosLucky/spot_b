@@ -69,7 +69,7 @@
     },
     {
       "id": "2:7886241321930313604",
-      "lastPropertyId": "17:5935592689397083727",
+      "lastPropertyId": "20:5262591713802253935",
       "name": "Orders",
       "properties": [
         {
@@ -157,6 +157,21 @@
           "id": "17:5935592689397083727",
           "name": "sync",
           "type": 6
+        },
+        {
+          "id": "18:6621517029054660455",
+          "name": "paymentStatus",
+          "type": 9
+        },
+        {
+          "id": "19:4184485380876704377",
+          "name": "receivedAmount",
+          "type": 8
+        },
+        {
+          "id": "20:5262591713802253935",
+          "name": "partialAmount",
+          "type": 8
         }
       ],
       "relations": []

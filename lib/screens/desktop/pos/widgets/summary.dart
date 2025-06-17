@@ -90,11 +90,15 @@ class _OrderSummaryState extends State<OrderSummary> {
   Future<void> _showPaymentDialog(BuildContext context, double subtotal) async {
     logger.i('Showing payment dialog with subtotal: $subtotal');
     await getInvoices();
+    
+    // Capture the CartProvider instance before showing the dialog
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return Consumer<CartProvider>(
-            builder: (context, cartProvider, child) => PaymentForm(
+            builder: (dialogContext, _, child) => PaymentForm(
                   isInvoice: cartProvider.selectedIndex != null,
                   data: cartProvider.selectedIndex != null
                       ? {
@@ -115,22 +119,22 @@ class _OrderSummaryState extends State<OrderSummary> {
                     logger.i('Submitting payment with data: $paymentData');
 
                     try {
-                      final value = await Provider.of<CartProvider>(context,
-                              listen: false)
-                          .checkout(context, subtotal, paymentData);
+                      // Use the captured cartProvider instead of Provider.of
+                      final value = await cartProvider.checkout(
+                          context, subtotal, paymentData);
 
                       if (value['status'] == true && value['txnID'] != null) {
                         var response = await getReceiptTxn(value['txnID']);
                         if (response.isNotEmpty && context.mounted) {
-                          logger.i('Navigating to PrintScreenDialog with transaction data: $response');
+                          logger.i(
+                              'Navigating to PrintScreenDialog with transaction data: $response');
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (_) => PrintScreenDialog(
                                     user: widget.user,
                                     transactionData: response,
                                   )));
                           await deleteInvoice(cartProvider.selectedInvoiceId);
-                          Provider.of<CartProvider>(context, listen: false)
-                              .deleteIndex();
+                          cartProvider.deleteIndex();
                         }
                       } else {
                         logger.w('Payment failed: $value');
@@ -297,7 +301,8 @@ class _OrderSummaryState extends State<OrderSummary> {
                                   child: IconButton(
                                     icon: const Icon(Icons.remove),
                                     onPressed: () {
-                                      logger.i('Decrementing quantity at index: $index');
+                                      logger.i(
+                                          'Decrementing quantity at index: $index');
                                       cart.decrementQuantity(index);
                                     },
                                   )),
@@ -331,7 +336,8 @@ class _OrderSummaryState extends State<OrderSummary> {
                                   child: IconButton(
                                     icon: const Icon(Icons.add),
                                     onPressed: () {
-                                      logger.i('Incrementing quantity at index: $index');
+                                      logger.i(
+                                          'Incrementing quantity at index: $index');
                                       cart.incrementQuantity(index);
                                     },
                                   )),
@@ -398,7 +404,8 @@ class _OrderSummaryState extends State<OrderSummary> {
                                                       }
                                                     : {},
                                                 onSubmit: (value) async {
-                                                  logger.i('Holding invoice with data: $value');
+                                                  logger.i(
+                                                      'Holding invoice with data: $value');
                                                   var response =
                                                       await cart.holdInvoice(
                                                     context,
@@ -413,7 +420,8 @@ class _OrderSummaryState extends State<OrderSummary> {
                                                     if (i['id'] ==
                                                         cartProvider
                                                             .selectedInvoiceId) {
-                                                      logger.i('Deleting invoice ID: ${i['id']}');
+                                                      logger.i(
+                                                          'Deleting invoice ID: ${i['id']}');
                                                       deleteInvoice(i['id']);
                                                     }
                                                     Provider.of<CartProvider>(
@@ -477,7 +485,8 @@ class _OrderSummaryState extends State<OrderSummary> {
   }
 
   void _editQuantity(BuildContext context, int index, int currentQuantity) {
-    logger.i('Editing quantity for index: $index, currentQuantity: $currentQuantity');
+    logger.i(
+        'Editing quantity for index: $index, currentQuantity: $currentQuantity');
     final TextEditingController quantityController = TextEditingController(
       text: currentQuantity.toString(),
     );
@@ -508,7 +517,8 @@ class _OrderSummaryState extends State<OrderSummary> {
                       .updateQuantity(index, newQuantity);
                   Navigator.of(context).pop();
                 } else {
-                  logger.w('Invalid quantity entered: ${quantityController.text}');
+                  logger.w(
+                      'Invalid quantity entered: ${quantityController.text}');
                   Dialogs.alertDialog(
                     context,
                     "Invalid Quantity",
