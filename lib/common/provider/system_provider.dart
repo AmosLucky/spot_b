@@ -19,6 +19,7 @@ class SystemProvider with ChangeNotifier {
   // List<NameModel> _items = [];
   SystemProvider() {
     _getDashboardFeed();
+    loadOrders();
   }
   final dbHelper = DatabaseEngine.instance;
 
@@ -35,6 +36,9 @@ class SystemProvider with ChangeNotifier {
   List _roomTypesItems = [];
   List get roomTypesItems => _roomTypesItems;
 
+  List<Orders> _orders = [];
+List<Orders> get orders => _orders;
+
   Map _roomResult = {};
   Map get roomResult => _roomResult;
 
@@ -48,6 +52,26 @@ class SystemProvider with ChangeNotifier {
   // List<NameModel> get items {
   //   return [..._items];
   // }
+
+
+Future<void> loadOrders() async {
+  final store = await DatabaseEngine.instance.getStore();
+  final orderBox = store.box<Orders>();
+  _orders = orderBox.getAll();
+  notifyListeners();
+}
+
+void updateOrder(Orders updatedOrder) {
+  final index = _orders.indexWhere((o) => o.trxId == updatedOrder.trxId);
+  if (index != -1) {
+    _orders[index] = updatedOrder;
+    notifyListeners();
+  } else {
+    _orders.add(updatedOrder);
+    notifyListeners();
+  }
+}
+
 
   Future<dynamic> _getDashboardFeed() async {
     _responseState = ResponseState.loading;
@@ -1166,18 +1190,45 @@ class SystemProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> syncAllTransactions(
-    UserDetails user,
-  ) async {
+  // Future<Map<String, dynamic>> syncAllTransactions(
+  //   UserDetails user,
+  // ) async {
+  //   try {
+  //     var response =
+  //         await SystemRepo(refresh: false, online: false).syncAllTransactions(
+  //       user,
+  //     );
+  //     return response;
+  //   } catch (error) {
+  //     return {};
+  //     // throw (error);
+  //   }
+  // }
+
+
+  Future<Map<String, dynamic>> syncAllTransactions(UserDetails user) async {
     try {
-      var response =
-          await SystemRepo(refresh: false, online: false).syncAllTransactions(
-        user,
-      );
-      return response;
+      final store = await DatabaseEngine.instance.getStore();
+      final orderBox = store.box<Orders>();
+      final unsyncedOrders = orderBox.query(Orders_.sync.equals(0)).build().find();
+      for (var order in unsyncedOrders) {
+        var transactionData = _convertTransactionToSyncFormat(order);
+        var response = await SystemRepo(refresh: false, online: true)
+            .syncSingleTransaction(transactionData, user);
+        if (response['status'] == true) {
+          order.sync = 1;
+          orderBox.put(order);
+        }
+      }
+      await loadOrders(); // Refresh orders list
+      notifyListeners();
+      return {'status': true, 'message': 'Transactions synced successfully'};
     } catch (error) {
-      return {};
-      // throw (error);
+      print('Error syncing transactions: $error');
+      return {
+        'status': false,
+        'message': 'Failed to sync transactions: $error',
+      };
     }
   }
 
@@ -1412,118 +1463,3 @@ class SystemProvider with ChangeNotifier {
   }
 
 }
-
-//   Future<List<Map<String, dynamic>>> getAttendants() async {
-//   try {
-//     final response = await get('attendants'); // Adjust endpoint as needed
-//     return List<Map<String, dynamic>>.from(response['data'] ?? []);
-//   } catch (e) {
-//     print('Error fetching attendants: $e');
-//     return [];
-//   }
-// }
-
-  // Temporary dummy data method - returns Map data matching AttendantModel
-  // List<Map<String, dynamic>> getAttendants() {
-  //   return [
-  //     {
-  //       'id': '1',
-  //       'name': 'John Doe',
-  //       'department': 'Administration',
-  //       'pin_set': true,
-  //       'pin': '1234',
-  //     },
-  //     {
-  //       'id': '2',
-  //       'name': 'Jane Smith',
-  //       'department': 'Management',
-  //       'pin_set': true,
-  //       'pin': '5678',
-  //     },
-  //     {
-  //       'id': '3',
-  //       'name': 'Bob Johnson',
-  //       'department': 'Operations',
-  //       'pin_set': false,
-  //       'pin': null,
-  //     },
-  //     {
-  //       'id': '4',
-  //       'name': 'Alice Wilson',
-  //       'department': 'Customer Service',
-  //       'pin_set': true,
-  //       'pin': '9876',
-  //     },
-  //     {
-  //       'id': '5',
-  //       'name': 'Charlie Brown',
-  //       'department': 'Supervision',
-  //       'pin_set': true,
-  //       'pin': '4321',
-  //     },
-  //     {
-  //       'id': '6',
-  //       'name': 'Diana Prince',
-  //       'department': 'Security',
-  //       'pin_set': false,
-  //       'pin': null,
-  //     },
-  //     {
-  //       'id': '7',
-  //       'name': 'Frank Miller',
-  //       'department': 'Maintenance',
-  //       'pin_set': true,
-  //       'pin': '1111',
-  //     },
-  //     {
-  //       'id': '8',
-  //       'name': 'Grace Kelly',
-  //       'department': 'Sales',
-  //       'pin_set': true,
-  //       'pin': '2222',
-  //     },
-  //   ];
-  // }
-
-// Attendant model class (if you don't have it already)
-// class Attendant {
-//   final String id;
-//   final String name;
-//   final String email;
-//   final String role;
-//   final bool isActive;
-//   final DateTime joinedDate;
-
-//   Attendant({
-//     required this.id,
-//     required this.name,
-//     required this.email,
-//     required this.role,
-//     required this.isActive,
-//     required this.joinedDate,
-//   });
-
-//   // Convert to Map for JSON serialization
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'id': id,
-//       'name': name,
-//       'email': email,
-//       'role': role,
-//       'isActive': isActive,
-//       'joinedDate': joinedDate.toIso8601String(),
-//     };
-//   }
-
-//   // Create from Map for JSON deserialization
-//   factory Attendant.fromMap(Map<String, dynamic> map) {
-//     return Attendant(
-//       id: map['id'] ?? '',
-//       name: map['name'] ?? '',
-//       email: map['email'] ?? '',
-//       role: map['role'] ?? '',
-//       isActive: map['isActive'] ?? false,
-//       joinedDate: DateTime.parse(map['joinedDate']),
-//     );
-//   }
-// }

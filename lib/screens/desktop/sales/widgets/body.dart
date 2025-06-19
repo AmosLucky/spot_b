@@ -684,22 +684,3 @@ class _BodyState extends State<Body> {
     }
   }
 }
-
-
-  // void _printAllTransactions(List<Orders> transactions) {
-  //   List<Map<String, dynamic>> allTransactions = [];
-  //   for (var transaction in transactions) {
-  //     allTransactions.add(transaction.toMap());
-  //   }
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(
-  //       builder: (_) => PrintScreenDialog(
-  //         user: widget.user,
-  //         transactionData: allTransactions.fold<Map<String, dynamic>>(
-  //           {},
-  //           (previous, current) => {...previous, ...current},
-  //         ), // Ensure PrintScreenDialog can handle a list
-  //       ),
-  //     ),
-  //   );
-  // }
