@@ -276,6 +276,8 @@ Future<Response> _fetchData(String endpoint, {bool refresh = false}) async {
 //   String? attendant,
 //   String? search,
 //   String? type,
+//   String? sortBy, // Add this
+//   String? sortOrder, // Add this
 // }) async {
 //   try {
 //     final queryParams = <String, String>{'page': page.toString()};
@@ -286,6 +288,8 @@ Future<Response> _fetchData(String endpoint, {bool refresh = false}) async {
 //     if (attendant != null) queryParams['attendant'] = attendant;
 //     if (search != null) queryParams['search'] = search;
 //     if (type != null) queryParams['type'] = type;
+//     if (sortBy != null) queryParams['sort_by'] = sortBy; // Add sorting field
+//     if (sortOrder != null) queryParams['sort_order'] = sortOrder; // Add sort direction
 
 //     String endpoint = 'sales';
 //     if (queryParams.isNotEmpty) {
@@ -304,7 +308,6 @@ Future<Response> _fetchData(String endpoint, {bool refresh = false}) async {
 //         await _saveSales(responseModel.data);
 //       } catch (e) {
 //         print('⚠️ Failed to save sales to local storage: $e');
-//         // Continue with API data, but local data may be outdated
 //       }
 //       print('Sales ======>>>>>> Success: ${responseModel.data.length} sales loaded');
 //       return responseModel;
@@ -336,7 +339,7 @@ Future<Response> _fetchData(String endpoint, {bool refresh = false}) async {
 //         ),
 //       );
 //     }
-//     rethrow; // No local data available, propagate error
+//     rethrow;
 //   }
 // }
 
@@ -351,8 +354,8 @@ Future<SalesResponse> fetchSales({
   String? attendant,
   String? search,
   String? type,
-  String? sortBy, // Add this
-  String? sortOrder, // Add this
+  String? sortBy = 'date', // Default to sorting by date
+  String? sortOrder = 'desc', // Default to descending order
 }) async {
   try {
     final queryParams = <String, String>{'page': page.toString()};
@@ -363,8 +366,8 @@ Future<SalesResponse> fetchSales({
     if (attendant != null) queryParams['attendant'] = attendant;
     if (search != null) queryParams['search'] = search;
     if (type != null) queryParams['type'] = type;
-    if (sortBy != null) queryParams['sort_by'] = sortBy; // Add sorting field
-    if (sortOrder != null) queryParams['sort_order'] = sortOrder; // Add sort direction
+    queryParams['sort_by'] = sortBy!; // Ensure sorting by date
+    queryParams['sort_order'] = sortOrder!; // Ensure descending order
 
     String endpoint = 'sales';
     if (queryParams.isNotEmpty) {
@@ -417,6 +420,8 @@ Future<SalesResponse> fetchSales({
     rethrow;
   }
 }
+
+
 
   // Save sales to local storage using your DatabaseEngine
 Future<void> _saveSales(List<Sale> sales) async {
