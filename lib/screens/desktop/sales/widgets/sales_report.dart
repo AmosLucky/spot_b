@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/provider/sales_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
@@ -36,6 +34,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   DateTime? _endDate;
   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
   bool _isSearchFocused = false;
+  final Map<String, bool> _expandedRows = {};
 
   @override
   void initState() {
@@ -49,10 +48,10 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: LayoutBuilder(builder: (context, constraint) {
+      body: LayoutBuilder(builder: (context, constraints) {
         return ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: constraint.maxHeight,
+            minHeight: constraints.maxHeight,
             maxWidth: MediaQuery.of(context).size.width * 0.98,
           ),
           child: Consumer<SalesProvider>(
@@ -147,9 +146,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                             controller: _searchController,
                                             decoration: InputDecoration(
                                               hintText: 'Reference code...',
-                                              prefixIcon: const Icon(
-                                                  Icons.search,
-                                                  size: 20),
+                                              prefixIcon:
+                                                  const Icon(Icons.search),
                                               border:
                                                   const UnderlineInputBorder(
                                                 borderSide: BorderSide(
@@ -200,26 +198,29 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                   onPressed: () async {
                                                     await provider
                                                         .clearLocalData();
-                                                    ScaffoldMessenger.of(context)
-                                                        .showSnackBar(
-                                                      const SnackBar(
-                                                          content: Text(
-                                                              'Local data cleared')),
-                                                    );
+                                                    if (context.mounted) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                'Local data cleared')),
+                                                      );
+                                                    }
                                                   },
                                                 ),
                                               ),
                                             );
                                           }
                                         },
-                                        icon: const Icon(Icons.storage, size: 20),
+                                        icon: const Icon(Icons.storage),
                                         tooltip: 'Local Storage Info',
                                       ),
                                       IconButton(
                                         onPressed: () {
                                           provider.fetchSales(refresh: true);
                                         },
-                                        icon: const Icon(Icons.refresh, size: 20),
+                                        icon: const Icon(Icons.refresh),
                                         tooltip: 'Refresh Data',
                                       ),
                                       _buildDownloadButton(provider),
@@ -228,8 +229,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                 ],
                               ),
                             ),
-
-                            // Filters Section
                             Container(
                               width: double.infinity,
                               margin: const EdgeInsets.symmetric(
@@ -376,8 +375,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                 ],
                               ),
                             ),
-
-                            // Sales Table
                             Container(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 8),
@@ -393,170 +390,38 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                   ),
                                 ],
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Table Header
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[50],
-                                      border: Border(
-                                        top: BorderSide(
-                                            color: Colors.grey[200]!),
-                                        bottom: BorderSide(
-                                            color: Colors.grey[200]!),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: const [
-                                        SizedBox(width: 2),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Reference',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Gap(10),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Text(
-                                            'Date',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Gap(10),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Customer',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Attendant',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Warehouse',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Grand Total',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Paid Amount',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Amount Due',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Payment Status',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Gap(15),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Status',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                        Gap(20),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            'Actions',
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minWidth:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * 0.9,
                                   ),
-
-                                  // Table Content
-                                  SizedBox(
-                                    height: 10 * 70.0, // Height for 10 rows
-                                    child: provider.isLoading
-                                        ? const Center(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      if (provider.isLoading)
+                                        const Center(
                                             child: CircularProgressIndicator())
-                                        : provider.error != null
-                                            ? Center(
-                                                child: Text(
-                                                    'Error: ${provider.error}'))
-                                            : provider.sales.isEmpty &&
-                                                    provider.isOffline
-                                                ? const Center(
-                                                    child: Text(
-                                                        'No cached sales data available'))
-                                                : ListView.builder(
-                                                    physics:
-                                                        const NeverScrollableScrollPhysics(),
-                                                    itemCount:
-                                                        provider.sales.length > 10
-                                                            ? 10
-                                                            : provider
-                                                                .sales.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      final sale =
-                                                          provider.sales[index];
-                                                      return _buildSaleRow(sale);
-                                                    },
-                                                  ),
+                                      else if (provider.error != null)
+                                        Center(
+                                            child:
+                                                Text('Error: ${provider.error}'))
+                                      else if (provider.sales.isEmpty &&
+                                          provider.isOffline)
+                                        const Center(
+                                            child: Text(
+                                                'No cached sales data available'))
+                                      else
+                                        _buildSalesTable(provider),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-
-                            // Pagination
                             if (provider.meta != null)
                               Padding(
                                 padding: const EdgeInsets.all(16),
@@ -566,8 +431,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                   children: [
                                     Text(
                                       'Showing ${provider.meta!.from} to ${provider.meta!.to} of ${provider.meta!.total} sales | Page ${provider.meta!.currentPage} of ${provider.meta!.lastPage}',
-                                      style:
-                                          TextStyle(color: Colors.grey[600]),
+                                      style: TextStyle(color: Colors.grey[600]),
                                     ),
                                     Row(
                                       children: [
@@ -579,8 +443,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                   provider.fetchSales();
                                                 }
                                               : null,
-                                          icon:
-                                              const Icon(Icons.chevron_left),
+                                          icon: const Icon(Icons.chevron_left),
                                         ),
                                         IconButton(
                                           onPressed: provider.currentPage <
@@ -591,8 +454,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                                   provider.fetchSales();
                                                 }
                                               : null,
-                                          icon:
-                                              const Icon(Icons.chevron_right),
+                                          icon: const Icon(Icons.chevron_right),
                                         ),
                                       ],
                                     ),
@@ -610,6 +472,459 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildSalesTable(SalesProvider provider) {
+    return Column(
+      children: [
+        DataTable(
+          showBottomBorder: true,
+          columnSpacing: 8,
+          headingRowHeight: 40,
+          dataRowHeight: 60,
+          columns: [
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Reference',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Date',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Customer',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Attendant',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Warehouse',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Grand Total',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Paid Amount',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Amount Due',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Payment Status',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Status',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Container(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  'Actions',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+          rows: [],
+        ),
+        ...provider.sales.asMap().entries.where((entry) => entry.key < 10).map(
+            (entry) => _buildSaleRowWithExpansion(entry.value, provider)),
+      ],
+    );
+  }
+
+  Widget _buildSaleRowWithExpansion(Sale sale, SalesProvider provider) {
+    bool canMakePayment = sale.paymentStatusText.toLowerCase() == 'unpaid' ||
+        sale.paymentStatusText.toLowerCase() == 'partially paid';
+    bool isExpanded = _expandedRows[sale.id.toString()] ?? false;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          height: 60,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: Colors.grey[200]!),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    sale.referenceCode,
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    DateFormat('dd MMM yyyy').format(sale.date),
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    sale.customerName,
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: const Text(
+                    'Staff',
+                    style: TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    sale.warehouseName,
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    '₦${NumberFormat('#,##0').format(sale.grandTotal)}',
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    '₦${NumberFormat('#,##0').format(sale.paidAmount)}',
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    '₦${NumberFormat('#,##0').format(sale.dueAmount)}',
+                    style: const TextStyle(fontSize: 12, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: sale.paymentStatusColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      sale.paymentStatusText,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: sale.status == 1 ? Colors.green : Colors.orange,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      sale.statusText,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.visibility, size: 16),
+                        onPressed: () => _showSalesReceiptDialog(sale),
+                        tooltip: 'View Receipt',
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isExpanded ? Icons.expand_less : Icons.expand_more,
+                          size: 16,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _expandedRows[sale.id.toString()] =
+                                !(_expandedRows[sale.id.toString()] ?? false);
+                          });
+                        },
+                        tooltip: 'View Sale Items',
+                      ),
+                      if (canMakePayment)
+                        InkWell(
+                          onTap: () => _showReconcilePaymentDialog(sale),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 6),
+                            decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(6)),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.payment, size: 14),
+                                SizedBox(width: 4),
+                                Text('Pay', style: TextStyle(fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isExpanded) _buildSaleItemsTable(sale),
+      ],
+    );
+  }
+
+  Widget _buildSaleItemsTable(Sale sale) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: MediaQuery.of(context).size.width * 0.9,
+        maxWidth: MediaQuery.of(context).size.width * 0.9,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Sale Items:',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width * 0.85,
+                ),
+                child: DataTable(
+                  columnSpacing: 16,
+                  headingRowHeight: 40,
+                  dataRowHeight: 50,
+                  columns: const [
+                    DataColumn(
+                      label: Text(
+                        'Product ID',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Quantity',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Price',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Subtotal',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                  rows: sale.saleItems.isEmpty
+                      ? [
+                          const DataRow(cells: [
+                            DataCell(Text('No items available')),
+                            DataCell(Text('')),
+                            DataCell(Text('')),
+                            DataCell(Text('')),
+                          ])
+                        ]
+                      : sale.saleItems.map((item) {
+                          return DataRow(cells: [
+                            DataCell(
+                              Text(
+                                'Product ${item.productId}',
+                                style: const TextStyle(fontSize: 12),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                '${item.quantity}',
+                                style: const TextStyle(fontSize: 12),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                '₦${NumberFormat('#,##0').format(item.productPrice)}',
+                                style: const TextStyle(fontSize: 12),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                '₦${NumberFormat('#,##0').format(item.subTotal)}',
+                                style: const TextStyle(fontSize: 12),
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ]);
+                        }).toList(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -632,13 +947,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
           child: InkWell(
             onTap: () => _showDateFilterDialog(),
             child: InputDecorator(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 filled: true,
                 fillColor: Colors.transparent,
               ),
@@ -652,7 +966,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             : _selectedDateFilter == 'Day'
                                 ? DateFormat('dd/MM/yyyy').format(_startDate!)
                                 : _selectedDateFilter == 'Month'
-                                    ? DateFormat('MMMM yyyy').format(_startDate!)
+                                    ? DateFormat('MMMM yyyy')
+                                        .format(_startDate!)
                                     : DateFormat('yyyy').format(_startDate!)
                         : 'Select Date',
                     style: TextStyle(
@@ -661,7 +976,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       fontSize: 14,
                     ),
                   ),
-                  const Icon(Icons.calendar_today, size: 18, color: Colors.grey),
+                  const Icon(Icons.calendar_today,
+                      size: 18, color: Colors.grey),
                 ],
               ),
             ),
@@ -681,7 +997,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Select Date Filter',
             style: TextStyle(fontWeight: FontWeight.w600)),
-        content: Container(
+        content: SizedBox(
           width: 350,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -715,11 +1031,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
               ),
               const SizedBox(height: 16),
               if (tempFilter != 'Range')
-                Container(
+                SizedBox(
                   height: 250,
                   child: SfDateRangePicker(
-                    onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-                      DateTime selectedDate = args.value;
+                    onSelectionChanged:
+                        (DateRangePickerSelectionChangedArgs args) {
+                      DateTime selectedDate = args.value as DateTime;
                       setState(() {
                         tempStartDate = selectedDate;
                         tempEndDate = null;
@@ -790,20 +1107,21 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     DateTime? tempStartDate = _startDate;
     DateTime? tempEndDate = _endDate;
 
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: const Text('Select Date Range',
             style: TextStyle(fontWeight: FontWeight.w600)),
-        content: Container(
+        content: SizedBox(
           width: 350,
           height: 350,
           child: SfDateRangePicker(
             onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
               if (args.value is PickerDateRange) {
                 setState(() {
-                  tempStartDate = args.value.startDate;
-                  tempEndDate = args.value.endDate ?? args.value.startDate;
+                  tempStartDate = (args.value as PickerDateRange).startDate;
+                  tempEndDate =
+                      (args.value as PickerDateRange).endDate ?? tempStartDate;
                 });
               }
             },
@@ -875,13 +1193,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
           ),
           child: DropdownButtonFormField<String>(
             value: value ?? items.first,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
               ),
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               filled: true,
               fillColor: Colors.transparent,
             ),
@@ -892,160 +1209,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
               );
             }).toList(),
             onChanged: onChanged,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSaleRow(Sale sale) {
-    bool canMakePayment = sale.paymentStatusText.toLowerCase() == 'unpaid' ||
-        sale.paymentStatusText.toLowerCase() == 'partially paid';
-
-    return ExpansionTile(
-      childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
-      title: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              sale.referenceCode,
-              style: const TextStyle(fontSize: 12, color: Colors.black87),
-            ),
-          ),
-          Expanded(
-              flex: 2,
-              child: Text(
-                DateFormat('dd MMM yyyy').format(sale.date),
-                style: const TextStyle(fontSize: 12, color: Colors.black87),
-              )),
-          Expanded(
-              flex: 2,
-              child: Text(
-                sale.customerName,
-                style: const TextStyle(fontSize: 12, color: Colors.black87),
-              )),
-          Expanded(
-              flex: 2,
-              child: Text(
-                'Staff',
-                style: const TextStyle(fontSize: 12, color: Colors.black87),
-              )),
-          Expanded(
-              flex: 2,
-              child: Text(
-                sale.warehouseName,
-                style: const TextStyle(fontSize: 12, color: Colors.black87),
-              )),
-          Expanded(
-            flex: 2,
-            child: Text(
-              '₦${NumberFormat('#,##0').format(sale.grandTotal)}',
-              style: const TextStyle(fontSize: 12, color: Colors.black87),
-            ),
-          ),
-          Expanded(
-              flex: 2,
-              child: Text(
-                '₦${NumberFormat('#,##0').format(sale.paidAmount)}',
-                style: const TextStyle(fontSize: 12, color: Colors.black87),
-              )),
-          Expanded(
-              flex: 2,
-              child: Text(
-                '₦${NumberFormat('#,##0').format(sale.dueAmount)}',
-                style: const TextStyle(fontSize: 12, color: Colors.black87),
-              )),
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: sale.paymentStatusColor,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                sale.paymentStatusText,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          const Gap(10),
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: sale.status == 1 ? Colors.green : Colors.orange,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                sale.statusText,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.visibility, size: 16),
-                  onPressed: () => _showSalesReceiptDialog(sale),
-                  tooltip: 'View Receipt',
-                ),
-                if (canMakePayment)
-                  InkWell(
-                    onTap: () => _showReconcilePaymentDialog(sale),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 6),
-                      decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(6)),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.payment, size: 14),
-                          SizedBox(width: 4),
-                          Text('Pay', style: TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                  )
-              ],
-            ),
-          ),
-        ],
-      ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Sale Items:',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              ...sale.saleItems.map((item) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Product ID: ${item.productId}'),
-                        Text('Qty: ${item.quantity}'),
-                        Text(
-                            'Price: ₦${NumberFormat('#,##0').format(item.productPrice)}'),
-                        Text(
-                            'Subtotal: ₦${NumberFormat('#,##0').format(item.subTotal)}'),
-                      ],
-                    ),
-                  )),
-            ],
           ),
         ),
       ],
@@ -1147,27 +1310,27 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           );
                           await SalesPrintService()
                               .printSingleSaleReceipt(sale, user);
-                          if (Navigator.canPop(context)) {
+                          if (context.mounted) {
                             Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Receipt printed successfully!'),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
                           }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Receipt printed successfully!'),
-                              backgroundColor: Colors.green,
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
                         } catch (e) {
-                          if (Navigator.canPop(context)) {
+                          if (context.mounted) {
                             Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error printing receipt: $e'),
+                                backgroundColor: Colors.red,
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
                           }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error printing receipt: $e'),
-                              backgroundColor: Colors.red,
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
                         }
                       },
                       child: Container(
@@ -1210,7 +1373,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        color: sale.status == 1 ? Colors.green : Colors.orange,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -1245,17 +1408,19 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             Text(
                               sale.customerName,
                               style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w500,
                                 fontSize: 12,
                               ),
                             ),
                             Text(
-                              'Customer ID: ${sale.customerId ?? "N/A"}',
-                              style: const TextStyle(fontSize: 12),
+                              'Customer ID: ${sale.customerId ?? 'N/A'}',
+                              style: TextStyle(
+                                  color: Colors.grey[500], fontSize: 11),
                             ),
                             Text(
                               'Sold from: ${sale.warehouseName}',
-                              style: const TextStyle(fontSize: 12),
+                              style: TextStyle(
+                                  color: Colors.grey[500], fontSize: 11),
                             ),
                           ],
                         ),
@@ -1283,13 +1448,14 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             Text(
                               'Staff',
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w500,
                                 fontSize: 12,
                               ),
                             ),
                             Text(
                               'Attendant ID: N/A',
-                              style: TextStyle(fontSize: 12),
+                              style: TextStyle(
+                                  color: Colors.grey, fontSize: 11),
                             ),
                           ],
                         ),
@@ -1316,27 +1482,22 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                   child: const Row(
                     children: [
                       Expanded(
-                          flex: 2,
                           child: Text('PRODUCT',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 10))),
                       Expanded(
-                          flex: 2,
                           child: Text('QUANTITY',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 10))),
                       Expanded(
-                          flex: 2,
                           child: Text('UNIT',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 10))),
                       Expanded(
-                          flex: 2,
                           child: Text('UNIT PRICE',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 10))),
                       Expanded(
-                          flex: 2,
                           child: Text('SUBTOTAL',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 10))),
@@ -1360,7 +1521,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Expanded(
-                              flex: 2,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -1375,25 +1535,14 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                 ],
                               ),
                             ),
-                            Expanded(flex: 2, child: Text('${item.quantity}')),
-                            const Expanded(
-                                flex: 2,
-                                child: Text(
-                                  'btl',
-                                  style: TextStyle(fontSize: 12),
-                                )),
+                            Expanded(child: Text('${item.quantity}')),
+                            const Expanded(child: Text('btl')),
                             Expanded(
-                                flex: 2,
                                 child: Text(
-                                  '₦${NumberFormat('#,##0').format(item.productPrice)}',
-                                  style: const TextStyle(fontSize: 12),
-                                )),
+                                    '₦${NumberFormat('#,##0').format(item.productPrice)}')),
                             Expanded(
-                                flex: 2,
                                 child: Text(
-                                  '₦${NumberFormat('#,##0').format(item.subTotal)}',
-                                  style: const TextStyle(fontSize: 12),
-                                )),
+                                    '₦${NumberFormat('#,##0').format(item.subTotal)}')),
                           ],
                         ),
                       );
@@ -1508,16 +1657,17 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           Navigator.pop(context);
                         },
                         child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(5)),
-                            child: const Text(
-                              'Exit',
-                              style: TextStyle(color: Colors.white),
-                            )),
-                      )
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(5)),
+                          child: const Text(
+                            'Exit',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1530,16 +1680,16 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   }
 
   void _showReconcilePaymentDialog(Sale sale) {
-    final TextEditingController paymentAmountController =
-        TextEditingController();
-    String selectedPaymentType = 'Cash';
-    bool isProcessing = false;
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setDialogState) {
+            bool isProcessing = false;
+            final TextEditingController paymentAmountController =
+                TextEditingController();
+            String selectedPaymentType = 'Cash';
+
             return Dialog(
               child: Container(
                 width: 500,
@@ -1609,12 +1759,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       ),
                       child: TextField(
                         controller: paymentAmountController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Enter amount',
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
+                          contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
                         ),
                         keyboardType: TextInputType.number,
@@ -1633,27 +1783,25 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       ),
                       child: DropdownButtonFormField<String>(
                         value: selectedPaymentType,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
+                          contentPadding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 12),
                         ),
-                        items: [
-                          'Cash',
-                          'Cheque',
-                          'Bank Transfer',
-                          'POS',
-                          'Other'
-                        ].map((type) {
-                          return DropdownMenuItem(
-                            value: type,
-                            child: Text(type),
-                          );
-                        }).toList(),
+                        items: const [
+                          DropdownMenuItem(value: 'Cash', child: Text('Cash')),
+                          DropdownMenuItem(
+                              value: 'Cheque', child: Text('Cheque')),
+                          DropdownMenuItem(
+                              value: 'Bank Transfer',
+                              child: Text('Bank Transfer')),
+                          DropdownMenuItem(value: 'POS', child: Text('POS')),
+                          DropdownMenuItem(value: 'Other', child: Text('Other')),
+                        ],
                         onChanged: (value) {
-                          setState(() {
+                          setDialogState(() {
                             selectedPaymentType = value!;
                           });
                         },
@@ -1677,7 +1825,11 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                     salesId: sale.id.toString(),
                                     amount: paymentAmountController.text,
                                     paymentType: selectedPaymentType,
-                                    setState: setState,
+                                    setDialogState: setDialogState,
+                                    updateProcessing: (value) =>
+                                        setDialogState(() {
+                                      isProcessing = value;
+                                    }),
                                   ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6B46C1),
@@ -1729,7 +1881,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     required String salesId,
     required String amount,
     required String paymentType,
-    required StateSetter setState,
+    required StateSetter setDialogState,
+    required Function(bool) updateProcessing,
   }) async {
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1746,35 +1899,37 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
       return;
     }
 
-    setState(() {
-      // Update isProcessing to true
-    });
+    updateProcessing(true);
 
     try {
       final response =
           await _reconcilePayment(salesId, paymentAmount, paymentType);
 
       if (response['success']) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Payment recorded successfully')),
-        );
-        context.read<SalesProvider>().fetchSales(refresh: true);
+        if (context.mounted) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Payment recorded successfully')),
+          );
+          context.read<SalesProvider>().fetchSales(refresh: true);
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text('Error: ${response['message'] ?? 'Unknown error'}')),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content:
+                    Text('Error: ${response['message'] ?? 'Unknown error'}')),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     } finally {
-      setState(() {
-        // Update isProcessing to false
-      });
+      updateProcessing(false);
     }
   }
 
@@ -1804,8 +1959,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
             break;
         }
       },
-      itemBuilder: (context) => [
-        const PopupMenuItem(
+      itemBuilder: (context) => const [
+        PopupMenuItem(
           value: 'current',
           child: Row(
             children: [
@@ -1815,7 +1970,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
             ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'all',
           child: Row(
             children: [
@@ -1845,8 +2000,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     );
   }
 }
-
-
 
 
 
@@ -1940,7 +2093,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                               Container(
 //                                 width: double.infinity,
 //                                 padding: const EdgeInsets.all(10),
-//                                 margin: const EdgeInsets.symmetric(horizontal: 16),
+//                                 margin:
+//                                     const EdgeInsets.symmetric(horizontal: 16),
 //                                 decoration: BoxDecoration(
 //                                   color: Colors.amber[100],
 //                                   borderRadius: BorderRadius.circular(8),
@@ -1970,7 +2124,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                               padding: const EdgeInsets.symmetric(
 //                                   horizontal: 16, vertical: 12),
 //                               child: Row(
-//                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                 mainAxisAlignment:
+//                                     MainAxisAlignment.spaceBetween,
 //                                 children: [
 //                                   const Text(
 //                                     'Sales Report',
@@ -1981,7 +2136,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                   ),
 //                                   Expanded(
 //                                     child: Padding(
-//                                       padding: const EdgeInsets.symmetric(horizontal: 16),
+//                                       padding: const EdgeInsets.symmetric(
+//                                           horizontal: 16),
 //                                       child: Focus(
 //                                         onFocusChange: (hasFocus) {
 //                                           setState(() {
@@ -1989,24 +2145,38 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                           });
 //                                         },
 //                                         child: AnimatedContainer(
-//                                           duration: const Duration(milliseconds: 200),
+//                                           duration:
+//                                               const Duration(milliseconds: 200),
 //                                           width: _isSearchFocused ? 300 : 200,
 //                                           child: TextField(
 //                                             controller: _searchController,
 //                                             decoration: InputDecoration(
 //                                               hintText: 'Reference code...',
-//                                               prefixIcon: const Icon(Icons.search, size: 20),
-//                                               border: const UnderlineInputBorder(
-//                                                 borderSide: BorderSide(color: Colors.grey, width: 0.5),
+//                                               prefixIcon: const Icon(
+//                                                   Icons.search,
+//                                                   size: 20),
+//                                               border:
+//                                                   const UnderlineInputBorder(
+//                                                 borderSide: BorderSide(
+//                                                     color: Colors.grey,
+//                                                     width: 0.5),
 //                                               ),
-//                                               enabledBorder: const UnderlineInputBorder(
-//                                                 borderSide: BorderSide(color: Colors.grey, width: 0.5),
+//                                               enabledBorder:
+//                                                   const UnderlineInputBorder(
+//                                                 borderSide: BorderSide(
+//                                                     color: Colors.grey,
+//                                                     width: 0.5),
 //                                               ),
-//                                               focusedBorder: const UnderlineInputBorder(
-//                                                 borderSide: BorderSide(color: Colors.grey, width: 0.5),
+//                                               focusedBorder:
+//                                                   const UnderlineInputBorder(
+//                                                 borderSide: BorderSide(
+//                                                     color: Colors.grey,
+//                                                     width: 0.5),
 //                                               ),
-//                                               contentPadding: const EdgeInsets.symmetric(
-//                                                   vertical: 12, horizontal: 12),
+//                                               contentPadding:
+//                                                   const EdgeInsets.symmetric(
+//                                                       vertical: 12,
+//                                                       horizontal: 12),
 //                                               filled: true,
 //                                               fillColor: Colors.grey[50],
 //                                             ),
@@ -2022,8 +2192,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                     children: [
 //                                       IconButton(
 //                                         onPressed: () async {
-//                                           final localCount =
-//                                               await provider.getLocalSalesCount();
+//                                           final localCount = await provider
+//                                               .getLocalSalesCount();
 //                                           if (context.mounted) {
 //                                             ScaffoldMessenger.of(context)
 //                                                 .showSnackBar(
@@ -2033,7 +2203,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                                 action: SnackBarAction(
 //                                                   label: 'Clear',
 //                                                   onPressed: () async {
-//                                                     await provider.clearLocalData();
+//                                                     await provider
+//                                                         .clearLocalData();
 //                                                     ScaffoldMessenger.of(context)
 //                                                         .showSnackBar(
 //                                                       const SnackBar(
@@ -2085,7 +2256,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                 crossAxisAlignment: CrossAxisAlignment.start,
 //                                 children: [
 //                                   Row(
-//                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                                     mainAxisAlignment:
+//                                         MainAxisAlignment.spaceBetween,
 //                                     children: [
 //                                       const Text(
 //                                         'Filters',
@@ -2370,12 +2542,17 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                                     child: Text(
 //                                                         'No cached sales data available'))
 //                                                 : ListView.builder(
-//                                                     physics: const NeverScrollableScrollPhysics(),
-//                                                     itemCount: provider.sales.length > 10
-//                                                         ? 10
-//                                                         : provider.sales.length,
-//                                                     itemBuilder: (context, index) {
-//                                                       final sale = provider.sales[index];
+//                                                     physics:
+//                                                         const NeverScrollableScrollPhysics(),
+//                                                     itemCount:
+//                                                         provider.sales.length > 10
+//                                                             ? 10
+//                                                             : provider
+//                                                                 .sales.length,
+//                                                     itemBuilder:
+//                                                         (context, index) {
+//                                                       final sale =
+//                                                           provider.sales[index];
 //                                                       return _buildSaleRow(sale);
 //                                                     },
 //                                                   ),
@@ -2394,7 +2571,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                   children: [
 //                                     Text(
 //                                       'Showing ${provider.meta!.from} to ${provider.meta!.to} of ${provider.meta!.total} sales | Page ${provider.meta!.currentPage} of ${provider.meta!.lastPage}',
-//                                       style: TextStyle(color: Colors.grey[600]),
+//                                       style:
+//                                           TextStyle(color: Colors.grey[600]),
 //                                     ),
 //                                     Row(
 //                                       children: [
@@ -2406,7 +2584,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                                   provider.fetchSales();
 //                                                 }
 //                                               : null,
-//                                           icon: const Icon(Icons.chevron_left),
+//                                           icon:
+//                                               const Icon(Icons.chevron_left),
 //                                         ),
 //                                         IconButton(
 //                                           onPressed: provider.currentPage <
@@ -2417,7 +2596,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                                   provider.fetchSales();
 //                                                 }
 //                                               : null,
-//                                           icon: const Icon(Icons.chevron_right),
+//                                           icon:
+//                                               const Icon(Icons.chevron_right),
 //                                         ),
 //                                       ],
 //                                     ),
@@ -2498,6 +2678,9 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 
 //   void _showDateFilterDialog() {
 //     String tempFilter = _selectedDateFilter;
+//     DateTime? tempStartDate = _startDate;
+//     DateTime? tempEndDate = _endDate;
+
 //     showDialog(
 //       context: context,
 //       builder: (context) => AlertDialog(
@@ -2528,34 +2711,23 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                 onChanged: (value) {
 //                   setState(() {
 //                     tempFilter = value!;
+//                     if (tempFilter == 'Range') {
+//                       Navigator.pop(context);
+//                       _showRangeDatePickerDialog();
+//                     }
 //                   });
 //                 },
 //               ),
 //               const SizedBox(height: 16),
-//               Container(
-//                 height: 250,
-//                 child: SfDateRangePicker(
-//                   onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-//                     if (tempFilter == 'Range') {
-//                       if (args.value is PickerDateRange) {
-//                         setState(() {
-//                           _startDate = args.value.startDate;
-//                           _endDate = args.value.endDate ?? args.value.startDate;
-//                         });
-//                         context.read<SalesProvider>().setStartDate(
-//                             _startDate != null
-//                                 ? DateFormat('yyyy-MM-dd').format(_startDate!)
-//                                 : null);
-//                         context.read<SalesProvider>().setEndDate(
-//                             _endDate != null
-//                                 ? DateFormat('yyyy-MM-dd').format(_endDate!)
-//                                 : null);
-//                       }
-//                     } else {
+//               if (tempFilter != 'Range')
+//                 Container(
+//                   height: 250,
+//                   child: SfDateRangePicker(
+//                     onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
 //                       DateTime selectedDate = args.value;
 //                       setState(() {
-//                         _startDate = selectedDate;
-//                         _endDate = tempFilter == 'Day' ? selectedDate : null;
+//                         tempStartDate = selectedDate;
+//                         tempEndDate = null;
 //                       });
 //                       if (tempFilter == 'Day') {
 //                         context.read<SalesProvider>().setStartDate(
@@ -2565,8 +2737,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                       } else if (tempFilter == 'Month') {
 //                         final firstDay =
 //                             DateTime(selectedDate.year, selectedDate.month);
-//                         final lastDay =
-//                             DateTime(selectedDate.year, selectedDate.month + 1, 0);
+//                         final lastDay = DateTime(
+//                             selectedDate.year, selectedDate.month + 1, 0);
 //                         context.read<SalesProvider>().setStartDate(
 //                             DateFormat('yyyy-MM-dd').format(firstDay));
 //                         context.read<SalesProvider>().setEndDate(
@@ -2579,24 +2751,21 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                         context.read<SalesProvider>().setEndDate(
 //                             DateFormat('yyyy-MM-dd').format(lastDay));
 //                       }
-//                     }
-//                   },
-//                   selectionMode: tempFilter == 'Range'
-//                       ? DateRangePickerSelectionMode.range
-//                       : DateRangePickerSelectionMode.single,
-//                   initialSelectedDate: DateTime.now(),
-//                   maxDate: DateTime.now(),
-//                   minDate: DateTime(2020),
-//                   monthViewSettings: const DateRangePickerMonthViewSettings(
-//                     firstDayOfWeek: 1,
-//                   ),
-//                   headerStyle: const DateRangePickerHeaderStyle(
-//                     textAlign: TextAlign.center,
-//                     textStyle: TextStyle(
-//                         fontWeight: FontWeight.w600, color: Colors.black87),
+//                     },
+//                     selectionMode: DateRangePickerSelectionMode.single,
+//                     initialSelectedDate: tempStartDate ?? DateTime.now(),
+//                     maxDate: DateTime.now(),
+//                     minDate: DateTime(2020),
+//                     monthViewSettings: const DateRangePickerMonthViewSettings(
+//                       firstDayOfWeek: 1,
+//                     ),
+//                     headerStyle: const DateRangePickerHeaderStyle(
+//                       textAlign: TextAlign.center,
+//                       textStyle: TextStyle(
+//                           fontWeight: FontWeight.w600, color: Colors.black87),
+//                     ),
 //                   ),
 //                 ),
-//               ),
 //             ],
 //           ),
 //         ),
@@ -2609,11 +2778,83 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //             onPressed: () {
 //               setState(() {
 //                 _selectedDateFilter = tempFilter;
+//                 _startDate = tempStartDate;
+//                 _endDate = tempEndDate;
 //               });
 //               Navigator.pop(context);
 //               context.read<SalesProvider>().applyFilters();
 //             },
 //             child: const Text('OK'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   void _showRangeDatePickerDialog() {
+//     DateTime? tempStartDate = _startDate;
+//     DateTime? tempEndDate = _endDate;
+
+//     showDialog(
+//       context: context,
+//       builder: (context) => AlertDialog(
+//         title: const Text('Select Date Range',
+//             style: TextStyle(fontWeight: FontWeight.w600)),
+//         content: Container(
+//           width: 350,
+//           height: 350,
+//           child: SfDateRangePicker(
+//             onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+//               if (args.value is PickerDateRange) {
+//                 setState(() {
+//                   tempStartDate = args.value.startDate;
+//                   tempEndDate = args.value.endDate ?? args.value.startDate;
+//                 });
+//               }
+//             },
+//             selectionMode: DateRangePickerSelectionMode.range,
+//             initialSelectedRange: tempStartDate != null && tempEndDate != null
+//                 ? PickerDateRange(tempStartDate, tempEndDate)
+//                 : null,
+//             maxDate: DateTime.now(),
+//             minDate: DateTime(2020),
+//             monthViewSettings: const DateRangePickerMonthViewSettings(
+//               firstDayOfWeek: 1,
+//             ),
+//             headerStyle: const DateRangePickerHeaderStyle(
+//               textAlign: TextAlign.center,
+//               textStyle: TextStyle(
+//                   fontWeight: FontWeight.w600, color: Colors.black87),
+//             ),
+//           ),
+//         ),
+//         actions: [
+//           TextButton(
+//             onPressed: () => Navigator.pop(context),
+//             child: const Text('Cancel'),
+//           ),
+//           TextButton(
+//             onPressed: () {
+//               if (tempStartDate != null && tempEndDate != null) {
+//                 setState(() {
+//                   _selectedDateFilter = 'Range';
+//                   _startDate = tempStartDate;
+//                   _endDate = tempEndDate;
+//                   context.read<SalesProvider>().setStartDate(
+//                       DateFormat('yyyy-MM-dd').format(tempStartDate!));
+//                   context.read<SalesProvider>().setEndDate(
+//                       DateFormat('yyyy-MM-dd').format(tempEndDate!));
+//                 });
+//                 Navigator.pop(context);
+//                 context.read<SalesProvider>().applyFilters();
+//               } else {
+//                 ScaffoldMessenger.of(context).showSnackBar(
+//                   const SnackBar(
+//                       content: Text('Please select both start and end dates')),
+//                 );
+//               }
+//             },
+//             child: const Text('Set'),
 //           ),
 //         ],
 //       ),
@@ -3158,7 +3399,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                                   '₦${NumberFormat('#,##0').format(item.subTotal)}',
 //                                   style: const TextStyle(fontSize: 12),
 //                                 )),
-//                             ],
+//                           ],
 //                         ),
 //                       );
 //                     },
@@ -3327,7 +3568,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                           ),
 //                         ),
 //                         IconButton(
-//                           onPressed: () => Navigator.of(context).pop(),
+//                           onPressed: () => Navigator.pop(context),
 //                           icon: const Icon(Icons.close),
 //                         ),
 //                       ],
@@ -3430,7 +3671,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                         TextButton(
 //                           onPressed: isProcessing
 //                               ? null
-//                               : () => Navigator.of(context).pop(),
+//                               : () => Navigator.pop(context),
 //                           child: const Text('Cancel'),
 //                         ),
 //                         const SizedBox(width: 8),
@@ -3438,10 +3679,10 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //                           onPressed: isProcessing
 //                               ? null
 //                               : () => _submitPayment(
-//                                     sale.id.toString(),
-//                                     paymentAmountController.text,
-//                                     selectedPaymentType,
-//                                     setState,
+//                                     salesId: sale.id.toString(),
+//                                     amount: paymentAmountController.text,
+//                                     paymentType: selectedPaymentType,
+//                                     setState: setState,
 //                                   ),
 //                           style: ElevatedButton.styleFrom(
 //                             backgroundColor: const Color(0xFF6B46C1),
@@ -3489,8 +3730,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //     );
 //   }
 
-//   Future<void> _submitPayment(String salesId, String amount, String paymentType,
-//       StateSetter setState) async {
+//   Future<void> _submitPayment({
+//     required String salesId,
+//     required String amount,
+//     required String paymentType,
+//     required StateSetter setState,
+//   }) async {
 //     if (amount.isEmpty) {
 //       ScaffoldMessenger.of(context).showSnackBar(
 //         const SnackBar(content: Text('Please enter payment amount')),
@@ -3506,13 +3751,15 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //       return;
 //     }
 
-//     setState(() {});
+//     setState(() {
+//       // Update isProcessing to true
+//     });
 
 //     try {
 //       final response =
 //           await _reconcilePayment(salesId, paymentAmount, paymentType);
 
-//       if (response['success'] == true) {
+//       if (response['success']) {
 //         Navigator.of(context).pop();
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           const SnackBar(content: Text('Payment recorded successfully')),
@@ -3530,7 +3777,9 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 //         SnackBar(content: Text('Error: $e')),
 //       );
 //     } finally {
-//       setState(() {});
+//       setState(() {
+//         // Update isProcessing to false
+//       });
 //     }
 //   }
 
