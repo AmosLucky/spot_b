@@ -45,77 +45,67 @@ class _BodyState extends State<Body> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate dynamic crossAxisCount based on screen width
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final int crossAxisCount = (screenWidth / 300).floor().clamp(2, 4); // Min 2, max 4 cards per row
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
       child: SingleChildScrollView(
-        child: Column(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height,
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height,
+              ),
+              child: SizedBox(
+                width: 250,
+                child: SideBarInventory(
+                  vertical: 20,
+                  user: widget.user,
+                  systemProvider: widget.systemProvider,
+                  activeItem: _activeItem,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Header(
+                    user: widget.user,
+                    systemProvider: widget.systemProvider,
                   ),
-                  child: SizedBox(
-                    width: 250,
-                    child: SideBarInventory(
-                      vertical: 20,
-                      user: widget.user,
-                      systemProvider: widget.systemProvider,
-                      activeItem: _activeItem,
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: GridView(
+                      shrinkWrap: true, // Prevent GridView from taking full height
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 300, // Maximum width of each card
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: screenWidth > 1200 ? 1.5 : 1.3, // Adjust aspect ratio for smaller screens
+                      ),
+                      children: [
+                        HomeCard(
+                            title: "Total Sales",
+                            value: Money.format(widget.systemProvider.dashboardStats['overallAmount'] ?? 0)),
+                        HomeCard(
+                            title: "Today Sales",
+                            value: Money.format(widget.systemProvider.dashboardStats['salesToday'] ?? 0)),
+                        HomeCard(
+                            title: "Yesterday",
+                            value: Money.format(widget.systemProvider.dashboardStats['yesterdayAmount'] ?? 0)),
+                        HomeCard(
+                            title: "Last Week",
+                            value: Money.format(widget.systemProvider.dashboardStats['lastweekAmount'] ?? 0)),
+                      ],
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Header(
-                        user: widget.user,
-                        systemProvider: widget.systemProvider,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height,
-                          child: GridView(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio: 1.5,
-                            ),
-                            children: [
-                              HomeCard(
-                                  title: "Total Sales",
-                                  value: Money.format(widget.systemProvider
-                                          .dashboardStats['overallAmount'] ??
-                                      0)),
-                              HomeCard(
-                                  title: "Today Sales",
-                                  value: Money.format(widget.systemProvider
-                                          .dashboardStats['salesToday'] ??
-                                      0)),
-                              HomeCard(
-                                  title: "Yesterday",
-                                  value: Money.format(widget.systemProvider
-                                          .dashboardStats['yesterdayAmount'] ??
-                                      0)),
-                              HomeCard(
-                                  title: "Last Week",
-                                  value: Money.format(widget.systemProvider
-                                          .dashboardStats['lastweekAmount'] ??
-                                      0)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -123,6 +113,7 @@ class _BodyState extends State<Body> {
     );
   }
 }
+
 
 
 
@@ -187,7 +178,7 @@ class _BodyState extends State<Body> {
 //                     maxHeight: MediaQuery.of(context).size.height,
 //                   ),
 //                   child: SizedBox(
-//                     width: 200,
+//                     width: 250,
 //                     child: SideBarInventory(
 //                       vertical: 20,
 //                       user: widget.user,
