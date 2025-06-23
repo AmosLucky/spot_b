@@ -476,340 +476,331 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   }
 
   Widget _buildSalesTable(SalesProvider provider) {
-    return Column(
-      children: [
-        DataTable(
-          showBottomBorder: true,
-          columnSpacing: 8,
-          headingRowHeight: 40,
-          dataRowHeight: 60,
-          columns: [
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Reference',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
+    return DataTable(
+      showBottomBorder: true,
+      columnSpacing: 8,
+      headingRowHeight: 40,
+      dataRowHeight: 60,
+      columns: [
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Reference',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
             ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Date',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Customer',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Attendant',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Warehouse',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Grand Total',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Paid Amount',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Amount Due',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Payment Status',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Status',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Container(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Actions',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ],
-          rows: [],
+          ),
         ),
-        ...provider.sales.asMap().entries.where((entry) => entry.key < 10).map(
-            (entry) => _buildSaleRowWithExpansion(entry.value, provider)),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Date',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Customer',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Attendant',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Warehouse',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Grand Total',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Paid Amount',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Amount Due',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Payment Status',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Status',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataColumn(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Actions',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
       ],
+      rows: provider.sales
+          .asMap()
+          .entries
+          .where((entry) => entry.key < 10)
+          .map((entry) => _buildSaleRowWithExpansion(entry.value, provider))
+          .toList(),
     );
   }
 
-  Widget _buildSaleRowWithExpansion(Sale sale, SalesProvider provider) {
+  DataRow _buildSaleRowWithExpansion(Sale sale, SalesProvider provider) {
     bool canMakePayment = sale.paymentStatusText.toLowerCase() == 'unpaid' ||
         sale.paymentStatusText.toLowerCase() == 'partially paid';
     bool isExpanded = _expandedRows[sale.id.toString()] ?? false;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          height: 60,
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Colors.grey[200]!),
+    return DataRow(
+      cells: [
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              sale.referenceCode,
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    sale.referenceCode,
-                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    DateFormat('dd MMM yyyy').format(sale.date),
-                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    sale.customerName,
-                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: const Text(
-                    'Staff',
-                    style: TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    sale.warehouseName,
-                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    '₦${NumberFormat('#,##0').format(sale.grandTotal)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    '₦${NumberFormat('#,##0').format(sale.paidAmount)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    '₦${NumberFormat('#,##0').format(sale.dueAmount)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: sale.paymentStatusColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      sale.paymentStatusText,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                      textAlign: TextAlign.center,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: sale.status == 1 ? Colors.green : Colors.orange,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      sale.statusText,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
-                      textAlign: TextAlign.center,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.visibility, size: 16),
-                        onPressed: () => _showSalesReceiptDialog(sale),
-                        tooltip: 'View Receipt',
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          isExpanded ? Icons.expand_less : Icons.expand_more,
-                          size: 16,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _expandedRows[sale.id.toString()] =
-                                !(_expandedRows[sale.id.toString()] ?? false);
-                          });
-                        },
-                        tooltip: 'View Sale Items',
-                      ),
-                      if (canMakePayment)
-                        InkWell(
-                          onTap: () => _showReconcilePaymentDialog(sale),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 6),
-                            decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(6)),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.payment, size: 14),
-                                SizedBox(width: 4),
-                                Text('Pay', style: TextStyle(fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              DateFormat('dd MMM yyyy').format(sale.date),
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
-        if (isExpanded) _buildSaleItemsTable(sale),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              sale.customerName,
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Staff',
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              sale.warehouseName,
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '₦${NumberFormat('#,##0').format(sale.grandTotal)}',
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '₦${NumberFormat('#,##0').format(sale.paidAmount)}',
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '₦${NumberFormat('#,##0').format(sale.dueAmount)}',
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: sale.paymentStatusColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                sale.paymentStatusText,
+                style: TextStyle(color: Colors.white, fontSize: 12),
+                textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: sale.status == 1 ? Colors.green : Colors.orange,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                sale.statusText,
+                style: TextStyle(color: Colors.white, fontSize: 12),
+                textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ),
+        DataCell(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.visibility, size: 16),
+                  onPressed: () => _showSalesReceiptDialog(sale),
+                  tooltip: 'View Receipt',
+                ),
+                IconButton(
+                  icon: Icon(
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                    size: 16,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _expandedRows[sale.id.toString()] =
+                          !(_expandedRows[sale.id.toString()] ?? false);
+                    });
+                  },
+                  tooltip: 'View Sale Items',
+                ),
+                if (canMakePayment)
+                  InkWell(
+                    onTap: () => _showReconcilePaymentDialog(sale),
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(6)),
+                      child: Row(
+                        children: [
+                          Icon(Icons.payment, size: 14),
+                          SizedBox(width: 4),
+                          Text('Pay', style: TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ],
+      onSelectChanged: (selected) {
+        if (selected ?? false) {
+          setState(() {
+            _expandedRows[sale.id.toString()] =
+                !(_expandedRows[sale.id.toString()] ?? false);
+          });
+        }
+      },
     );
   }
 
@@ -829,11 +820,11 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Sale Items:',
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: ConstrainedBox(
@@ -844,7 +835,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                   columnSpacing: 16,
                   headingRowHeight: 40,
                   dataRowHeight: 50,
-                  columns: const [
+                  columns: [
                     DataColumn(
                       label: Text(
                         'Product ID',
@@ -876,7 +867,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                   ],
                   rows: sale.saleItems.isEmpty
                       ? [
-                          const DataRow(cells: [
+                          DataRow(cells: [
                             DataCell(Text('No items available')),
                             DataCell(Text('')),
                             DataCell(Text('')),
@@ -888,7 +879,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             DataCell(
                               Text(
                                 'Product ${item.productId}',
-                                style: const TextStyle(fontSize: 12),
+                                style: TextStyle(fontSize: 12),
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -896,7 +887,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             DataCell(
                               Text(
                                 '${item.quantity}',
-                                style: const TextStyle(fontSize: 12),
+                                style: TextStyle(fontSize: 12),
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -904,7 +895,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             DataCell(
                               Text(
                                 '₦${NumberFormat('#,##0').format(item.productPrice)}',
-                                style: const TextStyle(fontSize: 12),
+                                style: TextStyle(fontSize: 12),
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -912,7 +903,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             DataCell(
                               Text(
                                 '₦${NumberFormat('#,##0').format(item.subTotal)}',
-                                style: const TextStyle(fontSize: 12),
+                                style: TextStyle(fontSize: 12),
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -932,12 +923,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Date Filter',
           style: TextStyle(
               fontWeight: FontWeight.w500, color: Colors.black87, fontSize: 14),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey[300]!),
@@ -947,7 +938,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
           child: InkWell(
             onTap: () => _showDateFilterDialog(),
             child: InputDecorator(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                 ),
@@ -976,8 +967,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       fontSize: 14,
                     ),
                   ),
-                  const Icon(Icons.calendar_today,
-                      size: 18, color: Colors.grey),
+                  Icon(Icons.calendar_today, size: 18, color: Colors.grey),
                 ],
               ),
             ),
@@ -995,7 +985,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Select Date Filter',
+        title: Text('Select Date Filter',
             style: TextStyle(fontWeight: FontWeight.w600)),
         content: SizedBox(
           width: 350,
@@ -1009,7 +999,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   filled: true,
                   fillColor: Colors.grey[50],
                 ),
@@ -1029,7 +1019,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               if (tempFilter != 'Range')
                 SizedBox(
                   height: 250,
@@ -1068,10 +1058,10 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                     initialSelectedDate: tempStartDate ?? DateTime.now(),
                     maxDate: DateTime.now(),
                     minDate: DateTime(2020),
-                    monthViewSettings: const DateRangePickerMonthViewSettings(
+                    monthViewSettings: DateRangePickerMonthViewSettings(
                       firstDayOfWeek: 1,
                     ),
-                    headerStyle: const DateRangePickerHeaderStyle(
+                    headerStyle: DateRangePickerHeaderStyle(
                       textAlign: TextAlign.center,
                       textStyle: TextStyle(
                           fontWeight: FontWeight.w600, color: Colors.black87),
@@ -1084,7 +1074,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -1096,7 +1086,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
               Navigator.pop(context);
               context.read<SalesProvider>().applyFilters();
             },
-            child: const Text('OK'),
+            child: Text('OK'),
           ),
         ],
       ),
@@ -1110,7 +1100,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     showDialog<void>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Select Date Range',
+        title: Text('Select Date Range',
             style: TextStyle(fontWeight: FontWeight.w600)),
         content: SizedBox(
           width: 350,
@@ -1131,10 +1121,10 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 : null,
             maxDate: DateTime.now(),
             minDate: DateTime(2020),
-            monthViewSettings: const DateRangePickerMonthViewSettings(
+            monthViewSettings: DateRangePickerMonthViewSettings(
               firstDayOfWeek: 1,
             ),
-            headerStyle: const DateRangePickerHeaderStyle(
+            headerStyle: DateRangePickerHeaderStyle(
               textAlign: TextAlign.center,
               textStyle: TextStyle(
                   fontWeight: FontWeight.w600, color: Colors.black87),
@@ -1144,7 +1134,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -1162,12 +1152,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 context.read<SalesProvider>().applyFilters();
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                       content: Text('Please select both start and end dates')),
                 );
               }
             },
-            child: const Text('Set'),
+            child: Text('Set'),
           ),
         ],
       ),
@@ -1181,10 +1171,10 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
               fontWeight: FontWeight.w500, color: Colors.black87, fontSize: 14),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
@@ -1193,7 +1183,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
           ),
           child: DropdownButtonFormField<String>(
             value: value ?? items.first,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderSide: BorderSide.none,
               ),
@@ -1205,7 +1195,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
             items: items.map((item) {
               return DropdownMenuItem(
                 value: item,
-                child: Text(item, style: const TextStyle(fontSize: 14)),
+                child: Text(item, style: TextStyle(fontSize: 14)),
               );
             }).toList(),
             onChanged: onChanged,
@@ -1223,7 +1213,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
           child: Container(
             width: 600,
             height: 700,
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -1232,8 +1222,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
                     color: Color(0xFF6B46C1),
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
@@ -1243,7 +1233,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
                               Icon(Icons.receipt, color: Colors.white),
                               SizedBox(width: 8),
@@ -1259,7 +1249,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           ),
                           Text(
                             sale.referenceCode,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
                             ),
@@ -1269,13 +1259,13 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
+                          Text(
                             'Date:',
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
                             DateFormat('dd MMMM yyyy').format(sale.date),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
@@ -1285,7 +1275,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -1298,7 +1288,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           showDialog(
                             context: context,
                             barrierDismissible: false,
-                            builder: (context) => const AlertDialog(
+                            builder: (context) => AlertDialog(
                               content: Row(
                                 children: [
                                   CircularProgressIndicator(),
@@ -1313,7 +1303,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           if (context.mounted) {
                             Navigator.of(context).pop();
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text('Receipt printed successfully!'),
                                 backgroundColor: Colors.green,
                                 duration: Duration(seconds: 3),
@@ -1327,20 +1317,20 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                               SnackBar(
                                 content: Text('Error printing receipt: $e'),
                                 backgroundColor: Colors.red,
-                                duration: const Duration(seconds: 4),
+                                duration: Duration(seconds: 4),
                               ),
                             );
                           }
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.blue,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.print, size: 16, color: Colors.white),
@@ -1354,42 +1344,40 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                         ),
                       ),
                     ),
-                    const Spacer(),
+                    Spacer(),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: sale.paymentStatusColor,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         sale.paymentStatusText,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: Colors.white, fontSize: 12),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: sale.status == 1 ? Colors.green : Colors.orange,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         sale.statusText,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: Colors.white, fontSize: 12),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Row(
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(8),
@@ -1397,44 +1385,44 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Customer Information',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: Colors.grey,
                                   fontSize: 15),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Text(
                               sale.customerName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
                               ),
                             ),
                             Text(
                               'Customer ID: ${sale.customerId ?? 'N/A'}',
-                              style: TextStyle(
-                                  color: Colors.grey[500], fontSize: 11),
+                              style:
+                                  TextStyle(color: Colors.grey[500], fontSize: 11),
                             ),
                             Text(
                               'Sold from: ${sale.warehouseName}',
-                              style: TextStyle(
-                                  color: Colors.grey[500], fontSize: 11),
+                              style:
+                                  TextStyle(color: Colors.grey[500], fontSize: 11),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -1454,8 +1442,8 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                             ),
                             Text(
                               'Attendant ID: N/A',
-                              style: TextStyle(
-                                  color: Colors.grey, fontSize: 11),
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 11),
                             ),
                           ],
                         ),
@@ -1463,23 +1451,22 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                const Text(
+                SizedBox(height: 10),
+                Text(
                   'Sale Items',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
                       Expanded(
                           child: Text('PRODUCT',
@@ -1506,13 +1493,13 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
+                    physics: BouncingScrollPhysics(),
                     itemCount: sale.saleItems.length,
                     itemBuilder: (context, index) {
                       final item = sale.saleItems[index];
                       return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 5),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                         decoration: BoxDecoration(
                           border: Border(
                               bottom: BorderSide(color: Colors.grey[200]!)),
@@ -1525,7 +1512,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Product ${item.productId}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 12)),
                                   Text('${item.productId}',
@@ -1536,7 +1523,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                               ),
                             ),
                             Expanded(child: Text('${item.quantity}')),
-                            const Expanded(child: Text('btl')),
+                            Expanded(child: Text('btl')),
                             Expanded(
                                 child: Text(
                                     '₦${NumberFormat('#,##0').format(item.productPrice)}')),
@@ -1550,89 +1537,89 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const Text(
+                      Text(
                         'Grand Total:',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 5),
+                      SizedBox(width: 5),
                       Text(
                         '₦${NumberFormat('#,##0').format(sale.grandTotal)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
-                const Text(
+                Text(
                   'Payment Summary',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey[300]!),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
                           children: [
-                            const Text('Grand Total',
+                            Text('Grand Total',
                                 style: TextStyle(color: Colors.grey)),
                             Text(
                               '₦${NumberFormat('#,##0').format(sale.grandTotal)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey[300]!),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
                           children: [
-                            const Text('Paid Amount',
+                            Text('Paid Amount',
                                 style: TextStyle(color: Colors.grey)),
                             Text(
                               '₦${NumberFormat('#,##0').format(sale.paidAmount)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey[300]!),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
                           children: [
-                            const Text('Balance Due',
+                            Text('Balance Due',
                                 style: TextStyle(color: Colors.grey)),
                             Text(
                               '₦${NumberFormat('#,##0').format(sale.dueAmount)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                           ],
@@ -1641,28 +1628,28 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Thank you for your business! For any questions, please contact our support team.',
                         style: TextStyle(color: Colors.grey, fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       InkWell(
                         onTap: () {
                           Navigator.pop(context);
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                               color: Colors.red,
                               borderRadius: BorderRadius.circular(5)),
-                          child: const Text(
+                          child: Text(
                             'Exit',
                             style: TextStyle(color: Colors.white),
                           ),
@@ -1693,7 +1680,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
             return Dialog(
               child: Container(
                 width: 500,
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -1705,7 +1692,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Reconcile Payment',
                           style: TextStyle(
                             fontSize: 18,
@@ -1714,11 +1701,11 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                         ),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.close),
+                          icon: Icon(Icons.close),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     _buildInfoRow('Reference:', sale.referenceCode),
                     _buildInfoRow('Total Amount:',
                         '₦${NumberFormat('#,##0').format(sale.grandTotal)}'),
@@ -1729,29 +1716,28 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Status:',
+                        Text('Status:',
                             style: TextStyle(fontWeight: FontWeight.w500)),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: sale.paymentStatusColor,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             sale.paymentStatusText,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
+                            style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    const Text(
+                    SizedBox(height: 24),
+                    Text(
                       'Payment Amount',
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey[300]!),
@@ -1759,23 +1745,23 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       ),
                       child: TextField(
                         controller: paymentAmountController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Enter amount',
                           border: OutlineInputBorder(
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 12),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         ),
                         keyboardType: TextInputType.number,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    SizedBox(height: 16),
+                    Text(
                       'Payment Type',
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey[300]!),
@@ -1783,14 +1769,14 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                       ),
                       child: DropdownButtonFormField<String>(
                         value: selectedPaymentType,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 12),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         ),
-                        items: const [
+                        items: [
                           DropdownMenuItem(value: 'Cash', child: Text('Cash')),
                           DropdownMenuItem(
                               value: 'Cheque', child: Text('Cheque')),
@@ -1807,7 +1793,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -1815,9 +1801,9 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                           onPressed: isProcessing
                               ? null
                               : () => Navigator.pop(context),
-                          child: const Text('Cancel'),
+                          child: Text('Cancel'),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         ElevatedButton(
                           onPressed: isProcessing
                               ? null
@@ -1832,16 +1818,16 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                     }),
                                   ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6B46C1),
+                            backgroundColor: Color(0xFF6B46C1),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           child: isProcessing
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
@@ -1850,7 +1836,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
                                         Colors.white),
                                   ),
                                 )
-                              : const Text('Submit Payment'),
+                              : Text('Submit Payment'),
                         ),
                       ],
                     ),
@@ -1866,12 +1852,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
+          Text(value, style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -1886,7 +1872,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
   }) async {
     if (amount.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter payment amount')),
+        SnackBar(content: Text('Please enter payment amount')),
       );
       return;
     }
@@ -1894,7 +1880,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     double? paymentAmount = double.tryParse(amount);
     if (paymentAmount == null || paymentAmount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount')),
+        SnackBar(content: Text('Please enter a valid amount')),
       );
       return;
     }
@@ -1909,7 +1895,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
         if (context.mounted) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Payment recorded successfully')),
+            SnackBar(content: Text('Payment recorded successfully')),
           );
           context.read<SalesProvider>().fetchSales(refresh: true);
         }
@@ -1935,7 +1921,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
 
   Future<Map<String, dynamic>> _reconcilePayment(
       String salesId, double amount, String paymentType) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 1));
     return {'success': true, 'message': 'Payment recorded successfully'};
   }
 
@@ -1959,7 +1945,7 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
             break;
         }
       },
-      itemBuilder: (context) => const [
+      itemBuilder: (context) => [
         PopupMenuItem(
           value: 'current',
           child: Row(
@@ -1982,12 +1968,12 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
         ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF6B46C1),
+          color: Color(0xFF6B46C1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.file_download, color: Colors.white, size: 16),
@@ -2000,7 +1986,6 @@ class _DesktopSalesReportScreenState extends State<DesktopSalesReportScreen> {
     );
   }
 }
-
 
 
 // import 'package:flutter/material.dart';
