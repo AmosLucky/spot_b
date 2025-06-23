@@ -28,7 +28,7 @@ class _ScaffoldingState extends State<Scaffolding> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFF2FCFE),
+              Color(0xFFF2FCFE),  
               Color(0xFFFAF1FE),
             ],
           ),
