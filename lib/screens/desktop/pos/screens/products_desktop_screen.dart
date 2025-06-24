@@ -3,7 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 // import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 
 import '../../providers/products_provider.dart';

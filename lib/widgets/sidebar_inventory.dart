@@ -1,7 +1,7 @@
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/utils/logout_utils.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/accounting/accounting_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/catalogue/catalogue_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dart';

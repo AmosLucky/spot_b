@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/primary_text_field.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:flutter/material.dart';
 import '../../../../common/custom_selector_sheet3.dart';
 import '../../../../common/secondary_custom_dropdown.dart';

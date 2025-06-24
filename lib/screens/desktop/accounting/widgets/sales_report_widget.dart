@@ -5,7 +5,7 @@ import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/widgets/transaction_tile.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/print_desktop.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:flutter/foundation.dart';
 

@@ -1,7 +1,7 @@
 // Add this helper to update existing transaction status values
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/objectbox.g.dart';
 
 class PaymentStatusMigrationHelper {

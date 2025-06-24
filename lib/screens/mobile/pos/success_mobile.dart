@@ -3,7 +3,7 @@
 import 'package:screenshot/screenshot.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/mobile/home/home_screen_mobile.dart';
 import 'package:spotstock_inventory/widgets/widgets.dart';
 import 'package:flutter/material.dart';

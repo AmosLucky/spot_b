@@ -12,7 +12,7 @@ import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/list_printers.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/printusb.dart';
 import 'package:spotstock_inventory/widgets/custom_btn.dart';

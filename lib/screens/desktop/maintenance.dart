@@ -7,7 +7,7 @@ import 'package:spotstock_inventory/common/provider/maintenance_provider.dart';
 import 'package:spotstock_inventory/common/provider/markroomfor_maintenance_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/dirty_room_available_dialog.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/mark_room_as_dirty.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/widgets/setroom_for_maintenance.dart';

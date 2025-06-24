@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/accounting/widgets/scaffold.dart';
 import 'package:spotstock_inventory/screens/desktop/maintenance.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/folio_screen_desktop.dart';

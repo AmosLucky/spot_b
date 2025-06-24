@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/maintain_booking.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/transfer_booking.dart';
 

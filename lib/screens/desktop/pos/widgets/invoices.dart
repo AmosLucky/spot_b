@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../data/models/userdetails.dart';
+import '../../../../data/models/user_details.dart';
 import '../print_invoices.dart';
 import '../printusb.dart';
 
@@ -235,12 +235,6 @@ class _InvoiceListState extends State<InvoiceList> {
 
     // Ensure the items data is in the correct format
     List<dynamic> itemsData;
-    // try {
-    //   itemsData = json.decode(_invoices);
-    // } catch (e) {
-    //   print("Error decoding items: $e");
-    //   return; // Exit if decoding fails
-    // }
 
     var invoiceData = jsonDecode(_invoices[selectedInvoiceIndex!]['invoice']);
     var invoice = _invoices[selectedInvoiceIndex!];
@@ -313,3 +307,11 @@ class _InvoiceListState extends State<InvoiceList> {
     }
   }
 }
+
+
+    // try {
+    //   itemsData = json.decode(_invoices);
+    // } catch (e) {
+    //   print("Error decoding items: $e");
+    //   return; // Exit if decoding fails
+    // }

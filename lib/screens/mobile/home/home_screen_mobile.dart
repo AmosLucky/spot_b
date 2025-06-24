@@ -1,7 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/mobile/home/pages/products.dart';
 import 'package:spotstock_inventory/screens/mobile/home/pages/transactions.dart';
 import 'package:spotstock_inventory/screens/mobile/home/pages/waiting_sync.dart';

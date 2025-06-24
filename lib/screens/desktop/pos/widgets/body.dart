@@ -3,7 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';

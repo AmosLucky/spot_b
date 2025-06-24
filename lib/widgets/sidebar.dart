@@ -1,7 +1,7 @@
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/accounting/accounting_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/accounting/widgets/booking%20history.dart';
 import 'package:spotstock_inventory/screens/desktop/catalogue/catalogue_desktop.dart';

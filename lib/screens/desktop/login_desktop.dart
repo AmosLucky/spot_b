@@ -1,7 +1,7 @@
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/home/home_screen_desktop.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';

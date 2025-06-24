@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/widgets/register_tile.dart';
 import 'package:spotstock_inventory/widgets/sidebar.dart';
 import 'package:spotstock_inventory/widgets/sidebar_inventory.dart';

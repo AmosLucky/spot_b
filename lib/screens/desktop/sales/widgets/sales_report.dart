@@ -6,7 +6,7 @@ import 'package:spotstock_inventory/common/provider/sales_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/sales/print/print_sales.dart';
 import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 

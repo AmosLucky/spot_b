@@ -3,7 +3,7 @@ import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/print_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/payform_invoice.dart';
 import 'package:spotstock_inventory/widgets/custom_btn.dart';

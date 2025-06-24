@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/data/repository/general_repo.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/print_desktop.dart';
 

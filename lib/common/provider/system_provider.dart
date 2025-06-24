@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/internet_connectivity.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -985,6 +987,25 @@ void updateOrder(Orders updatedOrder) {
       // throw (error);
     }
   }
+
+
+  
+
+
+// Add this method to check internet connectivity (similar to AuthProvider)
+Future<bool> _checkInternetConnection() async {
+  try {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      return false;
+    }
+    final result = await InternetAddress.lookup('google.com').timeout(Duration(seconds: 3));
+    return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+  } catch (e) {
+    print('Connectivity check failed: $e');
+    return false;
+  }
+}
 
   Future<Map<String, dynamic>> getPrinters() async {
     try {

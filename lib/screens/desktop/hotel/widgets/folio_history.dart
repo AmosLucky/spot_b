@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/folio_data_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/widgets/search_date_filter.dart';
 
 class FolioHistory extends StatefulWidget {

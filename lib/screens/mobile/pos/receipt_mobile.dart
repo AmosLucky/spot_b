@@ -11,7 +11,7 @@ import 'package:spotstock_inventory/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../../../common/provider/user_provider.dart';
-import '../../../data/models/userdetails.dart';
+import '../../../data/models/user_details.dart';
 import '../../desktop/pos/list_printers.dart';
 
 class ReceiptPrint extends StatefulWidget {

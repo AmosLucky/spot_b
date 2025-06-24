@@ -16,7 +16,7 @@ import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/maintenance_model.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
 import 'package:spotstock_inventory/widgets/widgets.dart';
 import 'package:provider/provider.dart';
@@ -211,7 +211,7 @@ Future<Response> _fetchData(String endpoint, {bool refresh = false}) async {
   // Fetch Warehouses
   Future<Response> fetchWarehouseAPI({bool refresh = false}) async {
     print("Fetch warehouse");
-    return await _fetchData('pos-warehouses?page[size]=0', refresh: refresh);
+    return await _fetchData('warehouses?page[size]=0', refresh: refresh);
   }
 
   // Fetch Stock Alerts

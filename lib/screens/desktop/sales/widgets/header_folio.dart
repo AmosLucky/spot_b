@@ -3,7 +3,7 @@ import 'package:intl/intl.dart'; // Import for date formatting
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/primary_text_field.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 
 class HeaderFolio extends StatefulWidget {
   final UserDetails user;

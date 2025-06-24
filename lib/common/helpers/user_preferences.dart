@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
-import '../../data/models/userdetails.dart';
+import '../../data/models/user_details.dart';
 
 final box = GetStorage();
 

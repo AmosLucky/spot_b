@@ -1,5 +1,5 @@
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/catalogue/widgets/scaffold.dart';
 import 'package:flutter/material.dart';
 

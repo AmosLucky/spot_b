@@ -4,7 +4,7 @@ import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
 import 'package:spotstock_inventory/screens/mobile/pos/receipt_mobile.dart';
 import 'package:spotstock_inventory/widgets/dialogs.dart';

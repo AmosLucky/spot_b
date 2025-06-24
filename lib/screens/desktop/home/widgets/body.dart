@@ -1,6 +1,6 @@
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/card.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/header.dart';
 import 'package:spotstock_inventory/widgets/sidebar_inventory.dart';

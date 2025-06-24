@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spotstock_inventory/common/provider/auth/auth_provider.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/common/style.dart';
-import 'package:spotstock_inventory/data/models/userdetails.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:provider/provider.dart';
 import '../common/navigation.dart';
 

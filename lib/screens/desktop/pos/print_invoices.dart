@@ -5,7 +5,7 @@ import 'package:printing/printing.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/printusb.dart';
 
-import '../../../data/models/userdetails.dart';
+import '../../../data/models/user_details.dart';
 
 /// Generate a sample PDF document.
 Future<Uint8List> generateSamplePdf(
