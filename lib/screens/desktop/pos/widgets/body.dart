@@ -100,8 +100,10 @@ class _BodyState extends State<Body> {
         final data = await widget.systemProvider.getProducts(1);
 
         setState(() {
-          _products = data;
-          _dataProducts = data;
+          // Filter products to only include those with stock quantity > 0
+          _products = data.where((product) => 
+              product['attributes']['stock']['quantity'] > 0).toList();
+          _dataProducts = _products;
           loadingProduct = false;
         });
 
@@ -127,7 +129,10 @@ class _BodyState extends State<Body> {
   }
 
   Future<List<dynamic>> getProducts() async {
-    return await widget.systemProvider.getProducts(0);
+    var products = await widget.systemProvider.getProducts(0);
+    // Filter products to only include those with stock quantity > 0
+    return products.where((product) => 
+        product['attributes']['stock']['quantity'] > 0).toList();
   }
 
   Future<void> readRegisterInfo() async {
@@ -241,8 +246,10 @@ class _BodyState extends State<Body> {
                               final data =
                                   await widget.systemProvider.getProducts(1);
                               setState(() {
-                                _products = data;
-                                _dataProducts = data;
+                                // Filter products to only include those with stock quantity > 0
+                                _products = data.where((product) => 
+                                    product['attributes']['stock']['quantity'] > 0).toList();
+                                _dataProducts = _products;
                                 loadingProduct = false;
                               });
                             } catch (e) {
@@ -521,17 +528,12 @@ class _BodyState extends State<Body> {
 
 
 
-
-
-
 // import 'dart:developer';
-
 // import 'package:audioplayers/audioplayers.dart';
 // import 'package:responsive_sizer/responsive_sizer.dart';
-// //import 'package:qrscan/qrscan.dart' as scanner;
 // import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
-// import 'package:spotstock_inventory/data/models/userdetails.dart';
+// import 'package:spotstock_inventory/data/models/user_details.dart';
 // import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
@@ -541,11 +543,9 @@ class _BodyState extends State<Body> {
 // import 'package:flutter/material.dart';
 // import 'package:permission_handler/permission_handler.dart';
 // import 'package:provider/provider.dart';
-// //import 'package:qrscan/qrscan.dart' as scanner;
-
 // import 'header.dart';
 // import 'invoices.dart';
-// import 'search_view.dart'; // Import the HeaderSection widget
+// import 'search_view.dart';
 
 // class Body extends StatefulWidget {
 //   final UserDetails user;
@@ -566,9 +566,10 @@ class _BodyState extends State<Body> {
 // class _BodyState extends State<Body> {
 //   late TextEditingController _barcodeController;
 //   final AudioPlayer _audioPlayer = AudioPlayer();
+//   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
 
 //   List _products = [];
-//   List <dynamic> warehouseData = [];
+//   List<dynamic> warehouseData = [];
 //   List _filterProducts = [];
 //   List _dataProducts = [];
 //   final bool _searching = false;
@@ -582,11 +583,11 @@ class _BodyState extends State<Body> {
 //   bool loadingProduct = false;
 //   String selectedCategory = '';
 //   bool isLoadingWarehouses = false;
-//   Map<String, dynamic>?  selectedBranch;
+//   Map<String, dynamic>? selectedBranch;
 
 //   final List<Map<String, dynamic>> branches = [
-//     {"label" : "Branch 1", "id" : "15"},
-//     {"label" : "sdfd", "id" : "27"}
+//     {"label": "Branch 1", "id": "15"},
+//     {"label": "sdfd", "id": "27"}
 //   ];
 
 //   @override
@@ -600,69 +601,60 @@ class _BodyState extends State<Body> {
 //     _productSearchResult = _products;
 //     _categoryResult = _products;
 //     _foundProducts = _productSearchResult;
-//     //_filterByCategories();
 //   }
 
 //   @override
 //   void dispose() {
 //     _barcodeController.dispose();
-//     _audioPlayer.dispose(); // Dispose of the audio player
+//     _audioPlayer.dispose();
+//     _activeItem.dispose();
 //     super.dispose();
 //   }
 
 //   Future<void> playSound() async {
-//     // Play the audio file from assets
 //     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
 //   }
 
-// Future<void> readProducts() async {
-//   setState(() {
-//     loadingProduct = true;
-//   });
-  
-//   try {
-//     // Load warehouse data first
-//     warehouseData = await widget.systemProvider.getWarehouse();
-//     log("Warehouse data ==>> $warehouseData");
+//   Future<void> readProducts() async {
+//     setState(() {
+//       loadingProduct = true;
+//     });
 
-//     // Check if we have warehouse data
-//     if (warehouseData.isNotEmpty) {
-//       // Use first warehouse or selected branch
-//       final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
-      
-//       // Fetch products for this warehouse
-//       await systemProvider.fetchProducts(true, true, warehouseId);
-      
-//       // Get products
-//       final data = await widget.systemProvider.getProducts(1);
-      
+//     try {
+//       warehouseData = await widget.systemProvider.getWarehouse();
+//       log("Warehouse data ==>> $warehouseData");
+
+//       if (warehouseData.isNotEmpty) {
+//         final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+//         await widget.systemProvider.fetchProducts(true, true, warehouseId);
+//         final data = await widget.systemProvider.getProducts(1);
+
+//         setState(() {
+//           _products = data;
+//           _dataProducts = data;
+//           loadingProduct = false;
+//         });
+
+//         log("Product data ==>> $data");
+//         _filterByCategories();
+//       } else {
+//         setState(() {
+//           loadingProduct = false;
+//         });
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text('No warehouses available')),
+//         );
+//       }
+//     } catch (e) {
 //       setState(() {
-//         _products = data;
-//         _dataProducts = data;
 //         loadingProduct = false;
 //       });
-      
-//       log("Product data ==>> $data");
-//       _filterByCategories();
-//     } else {
-//       setState(() {
-//         loadingProduct = false;
-//       });
-//       // Handle no warehouses case
+//       log("Error loading products: $e");
 //       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('No warehouses available')),
+//         SnackBar(content: Text('Error loading products')),
 //       );
 //     }
-//   } catch (e) {
-//     setState(() {
-//       loadingProduct = false;
-//     });
-//     log("Error loading products: $e");
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text('Error loading products')),
-//     );
 //   }
-// }
 
 //   Future<List<dynamic>> getProducts() async {
 //     return await widget.systemProvider.getProducts(0);
@@ -693,8 +685,7 @@ class _BodyState extends State<Body> {
 //     }
 
 //     if (status.isGranted) {
-//       //Scan QR code
-//       String? barcode = ""; //await scanner.scan();
+//       String? barcode = "";
 //       if (barcode == "-1") {
 //         setState(() {
 //           barcode = '';
@@ -722,108 +713,115 @@ class _BodyState extends State<Body> {
 //             Row(
 //               crossAxisAlignment: CrossAxisAlignment.start,
 //               children: [
-//                 // Sidebar Navigation with fixed width
 //                 ConstrainedBox(
 //                   constraints: BoxConstraints(
-//                     maxHeight: widget.mediaQuery.height, // Set max height
+//                     maxHeight: widget.mediaQuery.height,
 //                   ),
 //                   child: SideBarPos(
-//                       vertical: 10,
-//                       horizontal: 5,
-//                       user: widget.user,
-//                       mediaQuery: widget.mediaQuery,
-//                       systemProvider: widget.systemProvider,
-//                       openInvoice: () {
-//                         print("------------- open invoice -----------");
-//                         setState(() {
-//                           if (_registerInfo.isNotEmpty) {
-//                             _isInvoiceOpen = !_isInvoiceOpen;
-//                           }
-//                         });
-//                       }),
+//                     vertical: 10,
+//                     horizontal: 5,
+//                     user: widget.user,
+//                     mediaQuery: widget.mediaQuery,
+//                     systemProvider: widget.systemProvider,
+//                     activeItem: _activeItem,
+//                     openInvoice: () {
+//                       print("------------- open invoice -----------");
+//                       setState(() {
+//                         if (_registerInfo.isNotEmpty) {
+//                           _isInvoiceOpen = !_isInvoiceOpen;
+//                         }
+//                       });
+//                     },
+//                   ),
 //                 ),
-
-//                 // Dashboard Content Area
 //                 Expanded(
 //                   child: Column(
 //                     crossAxisAlignment: CrossAxisAlignment.start,
 //                     children: [
-//                       // Header Section for Search Bar and Barcode Scanner
-//                      Padding(
-//   padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 16.0),
-//   child: HeaderSection(
-//     systemProvider: widget.systemProvider,
-//     mediaQuery: widget.mediaQuery,
-//     user: widget.user,
-//     controller: _barcodeController,
-//     onChanged: (value) => _searchProducts(value),
-//     onClearButtonPressed: () {
-//       _barcodeController.clear();
-//       setState(() {
-//         _productSearchResult = _products;
-//         _foundProducts = _productSearchResult;
-//       });
-//     },
-//     onPressedScan: barcodeScan,
-//     items: warehouseData,
-//     selectedBranch: selectedBranch,
-//     onBranchSelected: (value) async {
-//       if (value == null) return;
-      
-//       setState(() {
-//         loadingProduct = true;
-//         selectedBranch = value;
-//       });
-      
-//       try {
-//         await systemProvider.fetchProducts(true, true, value['id']);
-//         final data = await widget.systemProvider.getProducts(1);
-//         setState(() {
-//           _products = data;
-//           _dataProducts = data;
-//           loadingProduct = false;
-//         });
-//       } catch (e) {
-//         setState(() {
-//           loadingProduct = false;
-//         });
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text('Error loading products for branch')),
-//         );
-//       }
-//     },
-//     hint: selectedBranch?['attributes']['name'] ?? 
-//           (warehouseData.isNotEmpty ? warehouseData[0]['attributes']['name'] : "Select Branch"),
-//   ),
-// ),
+//                       Padding(
+//                         padding: const EdgeInsets.symmetric(
+//                             vertical: 3.0, horizontal: 16.0),
+//                         child: HeaderSection(
+//                           systemProvider: widget.systemProvider,
+//                           mediaQuery: widget.mediaQuery,
+//                           user: widget.user,
+//                           controller: _barcodeController,
+//                           onChanged: (value) => _searchProducts(value),
+//                           onClearButtonPressed: () {
+//                             _barcodeController.clear();
+//                             setState(() {
+//                               _productSearchResult = _products;
+//                               _foundProducts = _productSearchResult;
+//                             });
+//                           },
+//                           onPressedScan: barcodeScan,
+//                           items: warehouseData,
+//                           selectedBranch: selectedBranch,
+//                           onBranchSelected: (value) async {
+//                             if (value == null) return;
 
+//                             setState(() {
+//                               loadingProduct = true;
+//                               selectedBranch = value;
+//                             });
+
+//                             try {
+//                               await widget.systemProvider
+//                                   .fetchProducts(true, true, value['id']);
+//                               final data =
+//                                   await widget.systemProvider.getProducts(1);
+//                               setState(() {
+//                                 _products = data;
+//                                 _dataProducts = data;
+//                                 loadingProduct = false;
+//                               });
+//                             } catch (e) {
+//                               setState(() {
+//                                 loadingProduct = false;
+//                               });
+//                               ScaffoldMessenger.of(context).showSnackBar(
+//                                 SnackBar(
+//                                     content:
+//                                         Text('Error loading products for branch')),
+//                               );
+//                             }
+//                           },
+//                           hint: selectedBranch?['attributes']['name'] ??
+//                               (warehouseData.isNotEmpty
+//                                   ? warehouseData[0]['attributes']['name']
+//                                   : "Select Branch"),
+//                         ),
+//                       ),
 //                       Row(
 //                         children: [
-
 //                           GestureDetector(
 //                             onTap: () {
 //                               setState(() {
 //                                 selectedCategory = '';
 //                               });
 //                               print(selectedCategory);
-//                               _filterByCategories(); 
+//                               _filterByCategories();
 //                             },
 //                             child: Container(
-//                               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//                               padding: EdgeInsets.symmetric(
+//                                   horizontal: 20, vertical: 10),
 //                               decoration: BoxDecoration(
-//                                   color: selectedCategory == '' ? Colors.purple : Colors.grey.withOpacity(0.1),
-//                                   borderRadius: BorderRadius.circular(10)
+//                                   color: selectedCategory == ''
+//                                       ? Colors.purple
+//                                       : Colors.grey.withOpacity(0.1),
+//                                   borderRadius: BorderRadius.circular(10)),
+//                               child: Text(
+//                                 "All",
+//                                 style: TextStyle(
+//                                     fontSize: 10.sp,
+//                                     fontWeight: FontWeight.w500,
+//                                     color: selectedCategory == ''
+//                                         ? Colors.white
+//                                         : Colors.black),
 //                               ),
-//                               child: Text("All", style: TextStyle(
-//                                   fontSize: 10.sp,
-//                                   fontWeight: FontWeight.w500,
-//                                   color: selectedCategory == '' ? Colors.white : Colors.black
-//                               ),),
 //                             ),
 //                           ),
-
-//                           SizedBox(width: 1.w,),
-
+//                           SizedBox(width: 1.w),
 //                           Expanded(
 //                             child: SizedBox(
 //                               height: 12.h,
@@ -837,51 +835,69 @@ class _BodyState extends State<Body> {
 //                                   mainAxisSpacing: 20,
 //                                   childAspectRatio: 0.4,
 //                                   padding: EdgeInsets.zero,
-//                                   children:  categoryData.isEmpty ? [SizedBox()] : categoryData.map((cat) =>  GestureDetector(
-//                                     onTap: () {
-//                                       setState(() {
-//                                         selectedCategory = cat['attributes']['name'];
-//                                       });
-//                                       print(selectedCategory);
-//                                       _filterByCategories();
-//                                     },
-//                                     child: Container(
-//                                       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-//                                       decoration: BoxDecoration(
-//                                         color: selectedCategory == cat['attributes']['name'] ? Colors.purple : Colors.grey.withOpacity(0.1),
-//                                         borderRadius: BorderRadius.circular(10)
-//                                       ),
-//                                         child: Center(
-//                                           child: Text(cat['attributes']['name'], style: TextStyle(
-//                                             fontSize: 10.sp,
-//                                             fontWeight: FontWeight.w500,
-//                                             color: selectedCategory == cat['attributes']['name'] ? Colors.white : Colors.black
-//                                           ),),
-//                                         ),
-//                                       ),
-//                                   )).toSet().toList()),
+//                                   children: categoryData.isEmpty
+//                                       ? [SizedBox()]
+//                                       : categoryData
+//                                           .map((cat) => GestureDetector(
+//                                                 onTap: () {
+//                                                   setState(() {
+//                                                     selectedCategory = cat[
+//                                                             'attributes']
+//                                                         ['name'];
+//                                                   });
+//                                                   print(selectedCategory);
+//                                                   _filterByCategories();
+//                                                 },
+//                                                 child: Container(
+//                                                   padding: EdgeInsets.symmetric(
+//                                                       horizontal: 10,
+//                                                       vertical: 5),
+//                                                   decoration: BoxDecoration(
+//                                                     color: selectedCategory ==
+//                                                             cat['attributes']
+//                                                                 ['name']
+//                                                         ? Colors.purple
+//                                                         : Colors.grey
+//                                                             .withOpacity(0.1),
+//                                                     borderRadius:
+//                                                         BorderRadius.circular(10),
+//                                                   ),
+//                                                   child: Center(
+//                                                     child: Text(
+//                                                       cat['attributes']['name'],
+//                                                       style: TextStyle(
+//                                                         fontSize: 10.sp,
+//                                                         fontWeight:
+//                                                             FontWeight.w500,
+//                                                         color: selectedCategory ==
+//                                                                 cat['attributes']
+//                                                                     ['name']
+//                                                             ? Colors.white
+//                                                             : Colors.black,
+//                                                       ),
+//                                                     ),
+//                                                   ),
+//                                                 ),
+//                                               ))
+//                                           .toSet()
+//                                           .toList()),
 //                             ),
 //                           ),
 //                         ],
 //                       ),
-
-//                       SizedBox(height: 1.h,),
-
-//                       // search
-//                     SearchView(
+//                       SizedBox(height: 1.h),
+//                       SearchView(
 //                         tapInvoiceOpen: () {
 //                           setState(() {
 //                             _isInvoiceOpen = !_isInvoiceOpen;
 //                           });
 //                         },
-//                         dataProducts: _foundProducts!, // Pass filtered products or original data
+//                         dataProducts: _foundProducts!,
 //                         getProducts: getProducts,
 //                         barcodeController: _barcodeController,
 //                         mediaQuery: widget.mediaQuery,
 //                         playSound: () => playSound(),
 //                       ),
-
-//                       // Main Dashboard Content Area
 //                       _barcodeController.text.isEmpty && !loadingProduct
 //                           ? Padding(
 //                               padding: const EdgeInsets.all(16.0),
@@ -898,7 +914,7 @@ class _BodyState extends State<Body> {
 //                                   ),
 //                                   itemBuilder: (context, index) {
 //                                     var product =
-//                                     _foundProducts![index]['attributes'];
+//                                         _foundProducts![index]['attributes'];
 //                                     return Consumer<CartProvider>(
 //                                       builder: (context, value, child) =>
 //                                           InkWell(
@@ -913,7 +929,8 @@ class _BodyState extends State<Body> {
 //                                                 "Warning",
 //                                                 "Product is out of stock!",
 //                                                 "cancel",
-//                                                 "save", []);
+//                                                 "save",
+//                                                 []);
 //                                           } else {
 //                                             if (_isInvoiceOpen) {
 //                                               setState(() {
@@ -928,7 +945,7 @@ class _BodyState extends State<Body> {
 //                                                 product['product_price'],
 //                                                 1,
 //                                                 product['product_code']);
-//                                             playSound(); // Play sound when product is added
+//                                             playSound();
 //                                           }
 //                                         },
 //                                         child: ProductDetails(product: product),
@@ -938,15 +955,13 @@ class _BodyState extends State<Body> {
 //                                 ),
 //                               ),
 //                             )
-//                           :  Padding(
-//                             padding: const EdgeInsets.only(top: 30),
-//                             child: Center(child: CircularProgressIndicator()),
-//                           ) ,
+//                           : Padding(
+//                               padding: const EdgeInsets.only(top: 30),
+//                               child: Center(child: CircularProgressIndicator()),
+//                             ),
 //                     ],
 //                   ),
 //                 ),
-
-//                 // Right Column: Order Summary
 //                 Padding(
 //                   padding:
 //                       const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -987,7 +1002,6 @@ class _BodyState extends State<Body> {
 //       selectedCategory = '';
 //     });
 //     if (_barcodeController.text.isEmpty) {
-//       // If the search field is empty or only contains white-space
 //       setState(() {
 //         _productSearchResult = _products;
 //         _foundProducts = _productSearchResult;
@@ -1010,7 +1024,6 @@ class _BodyState extends State<Body> {
 //           _foundProducts = _productSearchResult;
 //         }
 //       });
-//       //debugPrint(_foundProducts.toString());
 //     }
 //     debugPrint(_foundProducts.toString());
 //   }
@@ -1018,7 +1031,6 @@ class _BodyState extends State<Body> {
 //   void _filterByCategories() {
 //     print("Filter by category");
 //     if (selectedCategory == '') {
-//       // If the search field is empty or only contains white-space
 //       setState(() {
 //         _categoryResult = _products;
 //         _foundProducts = _categoryResult;
@@ -1026,13 +1038,12 @@ class _BodyState extends State<Body> {
 //     } else {
 //       setState(() {
 //         _categoryResult = _products.where((beneficiary) {
-//             return beneficiary['attributes']['product_category_name']
-//                 .toLowerCase()
-//                 .contains(selectedCategory.toLowerCase());
-//           }).toList();
-//           _foundProducts = _categoryResult;
+//           return beneficiary['attributes']['product_category_name']
+//               .toLowerCase()
+//               .contains(selectedCategory.toLowerCase());
+//         }).toList();
+//         _foundProducts = _categoryResult;
 //       });
-//       //debugPrint(_foundProducts.toString());
 //     }
 //     debugPrint(_foundProducts.toString());
 //   }

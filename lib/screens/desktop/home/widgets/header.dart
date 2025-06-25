@@ -2,16 +2,17 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/common.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
-import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
-import 'package:spotstock_inventory/screens/desktop/home/hotel_screen_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/frontdesk_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
 
-import '../../choose_module_desktop.dart';
+// import 'package:spotstock_inventory/data/models/userdetails.dart';
+// import '../../choose_module_desktop.dart';
+// import 'package:spotstock_inventory/screens/desktop/home/hotel_screen_desktop.dart';
 
 class Header extends StatefulWidget {
   final UserDetails user;
@@ -336,6 +337,7 @@ class _HeaderState extends State<Header> {
                         return EcosystemDesktop(
                           systemProvider: widget.systemProvider,
                           user: widget.user,
+                          
                         );
                       }));
                     } else if (module == 'HOTEL') {
