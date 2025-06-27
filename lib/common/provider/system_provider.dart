@@ -1040,19 +1040,6 @@ Future<bool> _checkInternetConnection() async {
     }
   }
 
-
-
-  // Future<List<Booking>> getHotelTransactionsByRegister(String? registerId) async {
-  //   try {
-  //     var response = await SystemRepo(refresh: false, online: false)
-  //         .getHotelTransactionsByRegister(registerId: registerId);
-  //     return response;
-  //   } catch (error) {
-  //     return [];
-  //     // throw (error);
-  //   }
-  // }
-
   Future<List<Orders>> getTransactionsByDate(DateTime? selectedDate) async {
     try {
       var response = await SystemRepo(refresh: false, online: false)
@@ -1484,3 +1471,16 @@ Future<bool> _checkInternetConnection() async {
   }
 
 }
+
+
+
+  // Future<List<Booking>> getHotelTransactionsByRegister(String? registerId) async {
+  //   try {
+  //     var response = await SystemRepo(refresh: false, online: false)
+  //         .getHotelTransactionsByRegister(registerId: registerId);
+  //     return response;
+  //   } catch (error) {
+  //     return [];
+  //     // throw (error);
+  //   }
+  // }

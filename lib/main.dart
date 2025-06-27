@@ -26,6 +26,7 @@ import 'package:spotstock_inventory/objectbox.g.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/operations_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/widgets/paymentstate.dart';
 import 'package:spotstock_inventory/screens/desktop/providers/products_provider.dart';
+import 'package:spotstock_inventory/screens/desktop/providers/warehouse_products_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/splashscreen_desktop.dart';
 import 'package:spotstock_inventory/screens/mobile/splashscreen_mobile.dart';
 import 'package:spotstock_inventory/widgets/responsive.dart';
@@ -42,18 +43,18 @@ class MyHttpOverrides extends HttpOverrides {
         print('Certificate validation for $host:$port');
         print('Certificate subject: ${cert.subject}');
         print('Certificate issuer: ${cert.issuer}');
-        
+
         // Allow certificates for your trusted domains
         List<String> trustedHosts = [
           'app.spotstockinventory.com',
           'test.spotstockinventory.com',
           'staging.spotstockinventory.com',
         ];
-        
+
         if (trustedHosts.contains(host)) {
           return true;
         }
-        
+
         // For production, you might want to implement more strict validation
         // For now, allowing all certificates to resolve the issue
         return true; // Change to false for stricter validation
@@ -158,63 +159,68 @@ class _MyAppState extends State<MyApp> {
     ]);
 
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => SelectAttendantProvider()),
-        ChangeNotifierProvider(create: (_) => ProductsProvider()),
-        ChangeNotifierProvider(
-            create: (_) =>
-                SalesProvider(SystemRepo(refresh: false, online: true))),
-        ChangeNotifierProvider(create: (context) => CartProvider()),
-        ChangeNotifierProvider(
-          create: (_) =>
-              AuthProvider(sharedPreferences: widget.sharedPreferences),
+  providers: [
+    ChangeNotifierProvider(create: (_) => SelectAttendantProvider()),
+    ChangeNotifierProvider(create: (_) => ProductsProvider()),
+    ChangeNotifierProvider(
+        create: (_) =>
+            SalesProvider(SystemRepo(refresh: false, online: true))),
+    ChangeNotifierProvider(create: (context) => CartProvider()),
+    ChangeNotifierProvider(create: (_) => SystemProvider()), // Moved SystemProvider up
+    ChangeNotifierProvider(
+      create: (context) => WarehouseProductsProvider(
+        Provider.of<SystemProvider>(context, listen: false),
+      ),
+    ),
+    ChangeNotifierProvider(
+      create: (_) =>
+          AuthProvider(sharedPreferences: widget.sharedPreferences),
+    ),
+    ChangeNotifierProvider(create: (_) => GeneralProvider()),
+    ChangeNotifierProvider(
+      create: (_) => FolioDataProvider(widget.folioBox, widget.bookingBox),
+    ),
+    ChangeNotifierProvider(create: (_) => BookingProvider()),
+    ChangeNotifierProvider(
+        create: (_) => MarkDirtyRoomProvider(
+              SystemRepo(refresh: false, online: true),
+            )),
+    ChangeNotifierProvider(create: (_) => UserProvider()),
+    ChangeNotifierProvider(create: (_) => OperationsProvider()),
+    ChangeNotifierProvider(create: (_) => PaymentState()),
+    ChangeNotifierProvider(
+        create: (_) => MarkRoomForMaintenanceProvider(
+            SystemRepo(refresh: false, online: true))),
+    ChangeNotifierProvider(
+        create: (_) => BookingHistoryProvider(
+            SystemRepo(refresh: false, online: true))),
+    ChangeNotifierProvider(
+      create: (_) => PreferenceSettingsProvider(
+        preferenceSettingsHelper: PreferenceSettingsHelper(
+          sharedPreferences: widget.sharedPreferences,
         ),
-        ChangeNotifierProvider(create: (_) => GeneralProvider()),
-        ChangeNotifierProvider(
-          create: (_) => FolioDataProvider(widget.folioBox, widget.bookingBox),
-        ),
-        ChangeNotifierProvider(create: (_) => SystemProvider()),
-        ChangeNotifierProvider(create: (_) => BookingProvider()),
-        ChangeNotifierProvider(
-            create: (_) => MarkDirtyRoomProvider(
-                  SystemRepo(refresh: false, online: true),
-                )),
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => OperationsProvider()),
-        ChangeNotifierProvider(create: (_) => PaymentState()),
-        ChangeNotifierProvider(
-            create: (_) => MarkRoomForMaintenanceProvider(
-                SystemRepo(refresh: false, online: true))),
-        ChangeNotifierProvider(
-            create: (_) => BookingHistoryProvider(
-                SystemRepo(refresh: false, online: true))),
-        ChangeNotifierProvider(
-          create: (_) => PreferenceSettingsProvider(
-            preferenceSettingsHelper: PreferenceSettingsHelper(
-              sharedPreferences: widget.sharedPreferences,
+      ),
+    ),
+  ],
+  child: Consumer<PreferenceSettingsProvider>(
+    builder: (context, preferenceSettingsProvider, _) {
+      return ResponsiveSizer(
+        builder: (context, orientation, screenType) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: preferenceSettingsProvider.themeData,
+            title: 'Spotstock Inventory',
+            navigatorKey: navigatorKey,
+            home: Responsive(
+              desktop: SplashScreenDesktop(),
+              mobile: SplashScreenMobile(),
             ),
-          ),
-        ),
-      ],
-      child: Consumer<PreferenceSettingsProvider>(
-        builder: (context, preferenceSettingsProvider, _) {
-          return ResponsiveSizer(
-            builder: (context, orientation, screenType) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                theme: preferenceSettingsProvider.themeData,
-                title: 'Spotstock Inventory',
-                navigatorKey: navigatorKey,
-                home: Responsive(
-                  desktop: SplashScreenDesktop(),
-                  mobile: SplashScreenMobile(),
-                ),
-              );
-            },
           );
         },
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 }
 
@@ -410,3 +416,65 @@ class _MyAppState extends State<MyApp> {
 //     );
 //   }
 // }
+
+
+
+    // return MultiProvider(
+    //   providers: [
+    //     ChangeNotifierProvider(create: (_) => SelectAttendantProvider()),
+    //     ChangeNotifierProvider(create: (_) => ProductsProvider()),
+    //     ChangeNotifierProvider(
+    //         create: (_) =>
+    //             SalesProvider(SystemRepo(refresh: false, online: true))),
+    //     ChangeNotifierProvider(create: (context) => CartProvider()),
+    //     ChangeNotifierProvider(create: (context) => WarehouseProductsProvider()),
+    //     ChangeNotifierProvider(
+    //       create: (_) =>
+    //           AuthProvider(sharedPreferences: widget.sharedPreferences),
+    //     ),
+    //     ChangeNotifierProvider(create: (_) => GeneralProvider()),
+    //     ChangeNotifierProvider(
+    //       create: (_) => FolioDataProvider(widget.folioBox, widget.bookingBox),
+    //     ),
+    //     ChangeNotifierProvider(create: (_) => SystemProvider()),
+    //     ChangeNotifierProvider(create: (_) => BookingProvider()),
+    //     ChangeNotifierProvider(
+    //         create: (_) => MarkDirtyRoomProvider(
+    //               SystemRepo(refresh: false, online: true),
+    //             )),
+    //     ChangeNotifierProvider(create: (_) => UserProvider()),
+    //     ChangeNotifierProvider(create: (_) => OperationsProvider()),
+    //     ChangeNotifierProvider(create: (_) => PaymentState()),
+    //     ChangeNotifierProvider(
+    //         create: (_) => MarkRoomForMaintenanceProvider(
+    //             SystemRepo(refresh: false, online: true))),
+    //     ChangeNotifierProvider(
+    //         create: (_) => BookingHistoryProvider(
+    //             SystemRepo(refresh: false, online: true))),
+    //     ChangeNotifierProvider(
+    //       create: (_) => PreferenceSettingsProvider(
+    //         preferenceSettingsHelper: PreferenceSettingsHelper(
+    //           sharedPreferences: widget.sharedPreferences,
+    //         ),
+    //       ),
+    //     ),
+    //   ],
+    //   child: Consumer<PreferenceSettingsProvider>(
+    //     builder: (context, preferenceSettingsProvider, _) {
+    //       return ResponsiveSizer(
+    //         builder: (context, orientation, screenType) {
+    //           return MaterialApp(
+    //             debugShowCheckedModeBanner: false,
+    //             theme: preferenceSettingsProvider.themeData,
+    //             title: 'Spotstock Inventory',
+    //             navigatorKey: navigatorKey,
+    //             home: Responsive(
+    //               desktop: SplashScreenDesktop(),
+    //               mobile: SplashScreenMobile(),
+    //             ),
+    //           );
+    //         },
+    //       );
+    //     },
+    //   ),
+    // );

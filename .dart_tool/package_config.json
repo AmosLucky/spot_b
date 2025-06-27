@@ -404,6 +404,12 @@
       "languageVersion": "3.1"
     },
     {
+      "name": "fl_chart",
+      "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/fl_chart-0.71.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "flat_buffers",
       "rootUri": "file:///C:/Users/IFEANYI/AppData/Local/Pub/Cache/hosted/pub.dev/flat_buffers-23.5.26",
       "packageUri": "lib/",
@@ -1376,7 +1382,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2025-06-18T13:58:57.569377Z",
+  "generated": "2025-06-27T20:41:21.163013Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///C:/Users/IFEANYI/flutter-extract/flutter",

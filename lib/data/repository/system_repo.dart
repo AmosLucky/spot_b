@@ -261,89 +261,6 @@ Future<Response> _fetchData(String endpoint, {bool refresh = false}) async {
     return await _fetchData('hotel/bookings/history', refresh: refresh);
   }
 
-
-  // Hotel  booking history
-  // Fetch Sales with filters and pagination
-   // Fetch Sales with filters and pagination
-
-// Future<SalesResponse> fetchSales({
-//   bool refresh = false,
-//   int page = 1,
-//   String? startDate,
-//   String? endDate,
-//   String? warehouse,
-//   String? customer,
-//   String? attendant,
-//   String? search,
-//   String? type,
-//   String? sortBy, // Add this
-//   String? sortOrder, // Add this
-// }) async {
-//   try {
-//     final queryParams = <String, String>{'page': page.toString()};
-//     if (startDate != null) queryParams['start_date'] = startDate;
-//     if (endDate != null) queryParams['end_date'] = endDate;
-//     if (warehouse != null) queryParams['warehouse'] = warehouse;
-//     if (customer != null) queryParams['customer'] = customer;
-//     if (attendant != null) queryParams['attendant'] = attendant;
-//     if (search != null) queryParams['search'] = search;
-//     if (type != null) queryParams['type'] = type;
-//     if (sortBy != null) queryParams['sort_by'] = sortBy; // Add sorting field
-//     if (sortOrder != null) queryParams['sort_order'] = sortOrder; // Add sort direction
-
-//     String endpoint = 'sales';
-//     if (queryParams.isNotEmpty) {
-//       final queryString = queryParams.entries
-//           .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
-//           .join('&');
-//       endpoint = 'sales?$queryString';
-//     }
-
-//     final response = await _fetchData(endpoint, refresh: refresh);
-//     if (response.statusCode == 200) {
-//       dynamic jsonData = response.data is String ? json.decode(response.data) : response.data;
-//       final responseModel = await compute<Map<String, dynamic>, SalesResponse>(
-//           SalesResponse.fromJson, jsonData as Map<String, dynamic>);
-//       try {
-//         await _saveSales(responseModel.data);
-//       } catch (e) {
-//         print('⚠️ Failed to save sales to local storage: $e');
-//       }
-//       print('Sales ======>>>>>> Success: ${responseModel.data.length} sales loaded');
-//       return responseModel;
-//     }
-//     throw Exception('Failed to load sales: HTTP ${response.statusCode}');
-//   } catch (e) {
-//     print('Error in fetchSales: $e');
-//     final localSales = await getLocalSales(
-//       page: page,
-//       startDate: startDate,
-//       endDate: endDate,
-//       warehouse: warehouse,
-//       customer: customer,
-//       attendant: attendant,
-//       search: search,
-//       type: type,
-//     );
-//     if (localSales.isNotEmpty) {
-//       print('✅ Fallback to local data: ${localSales.length} sales');
-//       return SalesResponse(
-//         data: localSales,
-//         meta: PaginationMeta(
-//           currentPage: page,
-//           from: ((page - 1) * 10) + 1,
-//           lastPage: (localSales.length / 10).ceil(),
-//           perPage: 10,
-//           to: ((page - 1) * 10) + localSales.length,
-//           total: localSales.length,
-//         ),
-//       );
-//     }
-//     rethrow;
-//   }
-// }
-
-
 Future<SalesResponse> fetchSales({
   bool refresh = false,
   int page = 1,
@@ -2222,36 +2139,6 @@ Future<void> clearLocalSales() async {
     return data ?? {};
   }
 
-  // Future<Map<String, dynamic>> checkout(
-  //     Map<String, dynamic> paymentData, total, data) async {
-  //   UserDetails user =
-  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-  //   final store = await DatabaseEngine.instance.getStore();
-
-  //   final orderBox = store.box<Orders>();
-  //   var txnID = generateRandomString(12);
-  //   Orders newOrder = Orders(
-  //     billerId: user.id,
-  //     customerName: paymentData['customerName'] ?? '',
-  //     trxId: txnID,
-  //     amount: total,
-  //     quantity: 1,
-  //     sync: 0,
-  //     status: 1,
-  //     productId: 0,
-  //     createdAt: DateTime.now(),
-  //     searchDate: searchDate(DateTime.now()),
-  //     paymentMethod: paymentData['paymentType'] ?? 'cash',
-  //     items: data,
-  //     others: jsonEncode(paymentData),
-  //     companyId: user.company!.id.toString(),
-  //     register: paymentData['registerId'].toString(),
-  //   );
-  //   orderBox.put(newOrder, mode: PutMode.insert);
-  //   return {'status': true, 'txnID': txnID};
-  // }
-
-
 Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
   final store = await DatabaseEngine.instance.getStore();
@@ -2408,8 +2295,122 @@ Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, d
       };
     }
   }
-
 }
+
+
+
+  // Future<Map<String, dynamic>> checkout(
+  //     Map<String, dynamic> paymentData, total, data) async {
+  //   UserDetails user =
+  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  //   final store = await DatabaseEngine.instance.getStore();
+
+  //   final orderBox = store.box<Orders>();
+  //   var txnID = generateRandomString(12);
+  //   Orders newOrder = Orders(
+  //     billerId: user.id,
+  //     customerName: paymentData['customerName'] ?? '',
+  //     trxId: txnID,
+  //     amount: total,
+  //     quantity: 1,
+  //     sync: 0,
+  //     status: 1,
+  //     productId: 0,
+  //     createdAt: DateTime.now(),
+  //     searchDate: searchDate(DateTime.now()),
+  //     paymentMethod: paymentData['paymentType'] ?? 'cash',
+  //     items: data,
+  //     others: jsonEncode(paymentData),
+  //     companyId: user.company!.id.toString(),
+  //     register: paymentData['registerId'].toString(),
+  //   );
+  //   orderBox.put(newOrder, mode: PutMode.insert);
+  //   return {'status': true, 'txnID': txnID};
+  // }
+
+
+
+
+  // Hotel  booking history
+  // Fetch Sales with filters and pagination
+   // Fetch Sales with filters and pagination
+
+// Future<SalesResponse> fetchSales({
+//   bool refresh = false,
+//   int page = 1,
+//   String? startDate,
+//   String? endDate,
+//   String? warehouse,
+//   String? customer,
+//   String? attendant,
+//   String? search,
+//   String? type,
+//   String? sortBy, // Add this
+//   String? sortOrder, // Add this
+// }) async {
+//   try {
+//     final queryParams = <String, String>{'page': page.toString()};
+//     if (startDate != null) queryParams['start_date'] = startDate;
+//     if (endDate != null) queryParams['end_date'] = endDate;
+//     if (warehouse != null) queryParams['warehouse'] = warehouse;
+//     if (customer != null) queryParams['customer'] = customer;
+//     if (attendant != null) queryParams['attendant'] = attendant;
+//     if (search != null) queryParams['search'] = search;
+//     if (type != null) queryParams['type'] = type;
+//     if (sortBy != null) queryParams['sort_by'] = sortBy; // Add sorting field
+//     if (sortOrder != null) queryParams['sort_order'] = sortOrder; // Add sort direction
+
+//     String endpoint = 'sales';
+//     if (queryParams.isNotEmpty) {
+//       final queryString = queryParams.entries
+//           .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+//           .join('&');
+//       endpoint = 'sales?$queryString';
+//     }
+
+//     final response = await _fetchData(endpoint, refresh: refresh);
+//     if (response.statusCode == 200) {
+//       dynamic jsonData = response.data is String ? json.decode(response.data) : response.data;
+//       final responseModel = await compute<Map<String, dynamic>, SalesResponse>(
+//           SalesResponse.fromJson, jsonData as Map<String, dynamic>);
+//       try {
+//         await _saveSales(responseModel.data);
+//       } catch (e) {
+//         print('⚠️ Failed to save sales to local storage: $e');
+//       }
+//       print('Sales ======>>>>>> Success: ${responseModel.data.length} sales loaded');
+//       return responseModel;
+//     }
+//     throw Exception('Failed to load sales: HTTP ${response.statusCode}');
+//   } catch (e) {
+//     print('Error in fetchSales: $e');
+//     final localSales = await getLocalSales(
+//       page: page,
+//       startDate: startDate,
+//       endDate: endDate,
+//       warehouse: warehouse,
+//       customer: customer,
+//       attendant: attendant,
+//       search: search,
+//       type: type,
+//     );
+//     if (localSales.isNotEmpty) {
+//       print('✅ Fallback to local data: ${localSales.length} sales');
+//       return SalesResponse(
+//         data: localSales,
+//         meta: PaginationMeta(
+//           currentPage: page,
+//           from: ((page - 1) * 10) + 1,
+//           lastPage: (localSales.length / 10).ceil(),
+//           perPage: 10,
+//           to: ((page - 1) * 10) + localSales.length,
+//           total: localSales.length,
+//         ),
+//       );
+//     }
+//     rethrow;
+//   }
+// }
 
 
   // Future<Response> fetchWarehouseAPI({bool refresh = false}) async {
