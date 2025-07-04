@@ -122,6 +122,12 @@ class SideBarPos extends StatelessWidget {
                     activeItem: activeItem,
                   ),
                   SidebarItem(
+                    title: "Table",
+                    onTap: () => activeItem.value = "Table",
+                    icon: MdiIcons.table,
+                    activeItem: activeItem,
+                  ),
+                  SidebarItem(
                     title: "Close POS",
                     onTap: () => _showPOSDialog(context, isClosing: true),
                     icon: MdiIcons.close,
@@ -299,7 +305,9 @@ class SidebarItem extends StatelessWidget {
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 4),
               decoration: BoxDecoration(
-                color: isActive ? Colors.white.withOpacity(0.2) : Colors.transparent,
+                color: isActive
+                    ? Colors.white.withOpacity(0.2)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ListTile(

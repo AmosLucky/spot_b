@@ -13,9 +13,11 @@ import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import '../screens/table_view.dart';
 import 'header.dart';
 import 'invoices.dart';
 import 'search_view.dart';
+// import 'table_view.dart';
 
 class Body extends StatefulWidget {
   final UserDetails user;
@@ -54,6 +56,7 @@ class _BodyState extends State<Body> {
   String selectedCategory = '';
   bool isLoadingWarehouses = false;
   Map<String, dynamic>? selectedBranch;
+  Map? selectedTable;
 
   final List<Map<String, dynamic>> branches = [
     {"label": "Branch 1", "id": "15"},
@@ -100,7 +103,6 @@ class _BodyState extends State<Body> {
         final data = await widget.systemProvider.getProducts(1);
 
         setState(() {
-          // Filter products to only include those with stock quantity > 0
           _products = data.where((product) => 
               product['attributes']['stock']['quantity'] > 0).toList();
           _dataProducts = _products;
@@ -130,7 +132,6 @@ class _BodyState extends State<Body> {
 
   Future<List<dynamic>> getProducts() async {
     var products = await widget.systemProvider.getProducts(0);
-    // Filter products to only include those with stock quantity > 0
     return products.where((product) => 
         product['attributes']['stock']['quantity'] > 0).toList();
   }
@@ -204,6 +205,7 @@ class _BodyState extends State<Body> {
                       setState(() {
                         if (_registerInfo.isNotEmpty) {
                           _isInvoiceOpen = !_isInvoiceOpen;
+                          selectedTable = null; // Reset table selection
                         }
                       });
                     },
@@ -246,7 +248,6 @@ class _BodyState extends State<Body> {
                               final data =
                                   await widget.systemProvider.getProducts(1);
                               setState(() {
-                                // Filter products to only include those with stock quantity > 0
                                 _products = data.where((product) => 
                                     product['attributes']['stock']['quantity'] > 0).toList();
                                 _dataProducts = _products;
@@ -269,181 +270,222 @@ class _BodyState extends State<Body> {
                                   : "Select Branch"),
                         ),
                       ),
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedCategory = '';
-                              });
-                              print(selectedCategory);
-                              _filterByCategories();
-                            },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              decoration: BoxDecoration(
-                                  color: selectedCategory == ''
-                                      ? Colors.purple
-                                      : Colors.grey.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Text(
-                                "All",
-                                style: TextStyle(
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: selectedCategory == ''
-                                        ? Colors.white
-                                        : Colors.black),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 1.w),
-                          Expanded(
-                            child: SizedBox(
-                              height: 12.h,
-                              width: MediaQuery.of(context).size.width,
-                              child: GridView.count(
-                                  shrinkWrap: false,
-                                  crossAxisCount: 2,
-                                  physics: const ClampingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 20,
-                                  childAspectRatio: 0.4,
-                                  padding: EdgeInsets.zero,
-                                  children: categoryData.isEmpty
-                                      ? [SizedBox()]
-                                      : categoryData
-                                          .map((cat) => GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selectedCategory = cat[
-                                                            'attributes']
-                                                        ['name'];
-                                                  });
-                                                  print(selectedCategory);
-                                                  _filterByCategories();
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5),
-                                                  decoration: BoxDecoration(
-                                                    color: selectedCategory ==
-                                                            cat['attributes']
-                                                                ['name']
-                                                        ? Colors.purple
-                                                        : Colors.grey
-                                                            .withOpacity(0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(10),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      cat['attributes']['name'],
-                                                      style: TextStyle(
-                                                        fontSize: 10.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: selectedCategory ==
-                                                                cat['attributes']
-                                                                    ['name']
-                                                            ? Colors.white
-                                                            : Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ))
-                                          .toSet()
-                                          .toList()),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 1.h),
-                      SearchView(
-                        tapInvoiceOpen: () {
-                          setState(() {
-                            _isInvoiceOpen = !_isInvoiceOpen;
-                          });
-                        },
-                        dataProducts: _foundProducts!,
-                        getProducts: getProducts,
-                        barcodeController: _barcodeController,
-                        mediaQuery: widget.mediaQuery,
-                        playSound: () => playSound(),
-                      ),
-                      _barcodeController.text.isEmpty && !loadingProduct
-                          ? Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: SizedBox(
-                                height: widget.mediaQuery.height - 50,
-                                child: GridView.builder(
-                                  itemCount: _foundProducts!.length,
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4,
-                                    crossAxisSpacing: 16,
-                                    mainAxisSpacing: 16,
-                                    childAspectRatio: 1.5,
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    var product =
-                                        _foundProducts![index]['attributes'];
-                                    return Consumer<CartProvider>(
-                                      builder: (context, value, child) =>
-                                          InkWell(
-                                        onTap: () {
-                                          print("tapped");
-                                          tappedIndex = index;
-                                          print("Selected index === $index");
-                                          if (product['stock']['quantity'] ==
-                                              0) {
-                                            Dialogs.alertDialog(
-                                                context,
-                                                "Warning",
-                                                "Product is out of stock!",
-                                                "cancel",
-                                                "save",
-                                                []);
-                                          } else {
-                                            if (_isInvoiceOpen) {
-                                              setState(() {
-                                                _isInvoiceOpen =
-                                                    !_isInvoiceOpen;
-                                              });
-                                            }
-                                            value.add(
-                                                product,
-                                                index,
-                                                generateRandomString(12),
-                                                product['product_price'],
-                                                1,
-                                                product['product_code']);
-                                            playSound();
-                                          }
-                                        },
-                                        child: ProductDetails(product: product),
+                      ValueListenableBuilder<String>(
+                        valueListenable: _activeItem,
+                        builder: (context, activeItem, child) {
+                          if (activeItem == "Table") {
+                            return TableView(
+                              mediaQuery: widget.mediaQuery,
+                              onTableSelected: (table) {
+                                setState(() {
+                                  selectedTable = table;
+                                  _isInvoiceOpen = false; // Ensure invoice is closed
+                                });
+                              },
+                            );
+                          }
+                          return Column(
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedCategory = '';
+                                      });
+                                      print(selectedCategory);
+                                      _filterByCategories();
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 10),
+                                      decoration: BoxDecoration(
+                                          color: selectedCategory == ''
+                                              ? Colors.purple
+                                              : Colors.grey.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Text(
+                                        "All",
+                                        style: TextStyle(
+                                            fontSize: 10.sp,
+                                            fontWeight: FontWeight.w500,
+                                            color: selectedCategory == ''
+                                                ? Colors.white
+                                                : Colors.black),
                                       ),
-                                    );
-                                  },
-                                ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 1.w),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 12.h,
+                                      width: MediaQuery.of(context).size.width,
+                                      child: GridView.count(
+                                        shrinkWrap: false,
+                                        crossAxisCount: 2,
+                                        physics: const ClampingScrollPhysics(),
+                                        scrollDirection: Axis.horizontal,
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 20,
+                                        childAspectRatio: 0.4,
+                                        padding: EdgeInsets.zero,
+                                        children: categoryData.isEmpty
+                                            ? [SizedBox()]
+                                            : categoryData
+                                                .map((cat) => GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          selectedCategory = cat[
+                                                                  'attributes']
+                                                              ['name'];
+                                                        });
+                                                        print(selectedCategory);
+                                                        _filterByCategories();
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                                horizontal: 10,
+                                                                vertical: 5),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: selectedCategory ==
+                                                                  cat['attributes']
+                                                                      ['name']
+                                                              ? Colors.purple
+                                                              : Colors.grey
+                                                                  .withOpacity(
+                                                                      0.1),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            cat['attributes']
+                                                                ['name'],
+                                                            style: TextStyle(
+                                                              fontSize: 10.sp,
+                                                              fontWeight:
+                                                                  FontWeight.w500,
+                                                              color: selectedCategory ==
+                                                                      cat['attributes']
+                                                                          ['name']
+                                                                  ? Colors.white
+                                                                  : Colors.black,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ))
+                                                .toSet()
+                                                .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.only(top: 30),
-                              child: Center(child: CircularProgressIndicator()),
-                            ),
+                              SizedBox(height: 1.h),
+                              SearchView(
+                                tapInvoiceOpen: () {
+                                  setState(() {
+                                    _isInvoiceOpen = !_isInvoiceOpen;
+                                    selectedTable = null; // Reset table selection
+                                  });
+                                },
+                                dataProducts: _foundProducts!,
+                                getProducts: getProducts,
+                                barcodeController: _barcodeController,
+                                mediaQuery: widget.mediaQuery,
+                                playSound: () => playSound(),
+                              ),
+                              _barcodeController.text.isEmpty && !loadingProduct
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: SizedBox(
+                                        height: widget.mediaQuery.height - 50,
+                                        child: GridView.builder(
+                                          itemCount: _foundProducts!.length,
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 4,
+                                            crossAxisSpacing: 16,
+                                            mainAxisSpacing: 16,
+                                            childAspectRatio: 1.5,
+                                          ),
+                                          itemBuilder: (context, index) {
+                                            var product = _foundProducts![index]
+                                                ['attributes'];
+                                            return Consumer<CartProvider>(
+                                              builder: (context, value, child) =>
+                                                  InkWell(
+                                                onTap: () {
+                                                  print("tapped");
+                                                  tappedIndex = index;
+                                                  print(
+                                                      "Selected index === $index");
+                                                  if (product['stock']
+                                                          ['quantity'] ==
+                                                      0) {
+                                                    Dialogs.alertDialog(
+                                                        context,
+                                                        "Warning",
+                                                        "Product is out of stock!",
+                                                        "cancel",
+                                                        "save",
+                                                        []);
+                                                  } else {
+                                                    if (_isInvoiceOpen) {
+                                                      setState(() {
+                                                        _isInvoiceOpen =
+                                                            !_isInvoiceOpen;
+                                                      });
+                                                    }
+                                                    value.add(
+                                                        product,
+                                                        index,
+                                                        generateRandomString(12),
+                                                        product[
+                                                            'product_price'],
+                                                        1,
+                                                        product['product_code']);
+                                                    playSound();
+                                                  }
+                                                },
+                                                child: ProductDetails(
+                                                    product: product),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.only(top: 30),
+                                      child: Center(
+                                          child: CircularProgressIndicator()),
+                                    ),
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: _isInvoiceOpen && _registerInfo.isNotEmpty
-                      ? InvoiceList(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 10),
+                  child: ValueListenableBuilder<String>(
+                    valueListenable: _activeItem,
+                    builder: (context, activeItem, child) {
+                      if (activeItem == "Table" && selectedTable != null) {
+                        return TableSummary(
+                          selectedTable: selectedTable!,
+                          mediaQuery: widget.mediaQuery,
+                        );
+                      } else if (_isInvoiceOpen && _registerInfo.isNotEmpty) {
+                        return InvoiceList(
                           products: _products,
                           mediaQuery: widget.mediaQuery,
                           systemProvider: widget.systemProvider,
@@ -452,18 +494,21 @@ class _BodyState extends State<Body> {
                           closeInvoice: () {
                             print("------------- close invoice -----------");
                             setState(() {
-                              if (_registerInfo.isNotEmpty) {
-                                _isInvoiceOpen = !_isInvoiceOpen;
-                              }
+                              _isInvoiceOpen = !_isInvoiceOpen;
+                              selectedTable = null; // Reset table selection
                             });
-                          })
-                      : OrderSummary(
-                          products: _products,
-                          mediaQuery: widget.mediaQuery,
-                          registerInfo: _registerInfo,
-                          systemProvider: widget.systemProvider,
-                          user: widget.user,
-                        ),
+                          },
+                        );
+                      }
+                      return OrderSummary(
+                        products: _products,
+                        mediaQuery: widget.mediaQuery,
+                        registerInfo: _registerInfo,
+                        systemProvider: widget.systemProvider,
+                        user: widget.user,
+                      );
+                    },
+                  ),
                 )
               ],
             ),
@@ -477,6 +522,7 @@ class _BodyState extends State<Body> {
     print("Onchanged called");
     setState(() {
       selectedCategory = '';
+      selectedTable = null; // Reset table selection when searching
     });
     if (_barcodeController.text.isEmpty) {
       setState(() {
@@ -507,6 +553,9 @@ class _BodyState extends State<Body> {
 
   void _filterByCategories() {
     print("Filter by category");
+    setState(() {
+      selectedTable = null; // Reset table selection when filtering
+    });
     if (selectedCategory == '') {
       setState(() {
         _categoryResult = _products;
@@ -528,6 +577,7 @@ class _BodyState extends State<Body> {
 
 
 
+
 // import 'dart:developer';
 // import 'package:audioplayers/audioplayers.dart';
 // import 'package:responsive_sizer/responsive_sizer.dart';
@@ -543,9 +593,11 @@ class _BodyState extends State<Body> {
 // import 'package:flutter/material.dart';
 // import 'package:permission_handler/permission_handler.dart';
 // import 'package:provider/provider.dart';
+// import '../screens/table_view.dart';
 // import 'header.dart';
 // import 'invoices.dart';
 // import 'search_view.dart';
+// // import 'table_view.dart';
 
 // class Body extends StatefulWidget {
 //   final UserDetails user;
@@ -584,6 +636,7 @@ class _BodyState extends State<Body> {
 //   String selectedCategory = '';
 //   bool isLoadingWarehouses = false;
 //   Map<String, dynamic>? selectedBranch;
+//   Map? selectedTable;
 
 //   final List<Map<String, dynamic>> branches = [
 //     {"label": "Branch 1", "id": "15"},
@@ -630,8 +683,9 @@ class _BodyState extends State<Body> {
 //         final data = await widget.systemProvider.getProducts(1);
 
 //         setState(() {
-//           _products = data;
-//           _dataProducts = data;
+//           _products = data.where((product) => 
+//               product['attributes']['stock']['quantity'] > 0).toList();
+//           _dataProducts = _products;
 //           loadingProduct = false;
 //         });
 
@@ -657,7 +711,9 @@ class _BodyState extends State<Body> {
 //   }
 
 //   Future<List<dynamic>> getProducts() async {
-//     return await widget.systemProvider.getProducts(0);
+//     var products = await widget.systemProvider.getProducts(0);
+//     return products.where((product) => 
+//         product['attributes']['stock']['quantity'] > 0).toList();
 //   }
 
 //   Future<void> readRegisterInfo() async {
@@ -771,8 +827,9 @@ class _BodyState extends State<Body> {
 //                               final data =
 //                                   await widget.systemProvider.getProducts(1);
 //                               setState(() {
-//                                 _products = data;
-//                                 _dataProducts = data;
+//                                 _products = data.where((product) => 
+//                                     product['attributes']['stock']['quantity'] > 0).toList();
+//                                 _dataProducts = _products;
 //                                 loadingProduct = false;
 //                               });
 //                             } catch (e) {
@@ -792,201 +849,243 @@ class _BodyState extends State<Body> {
 //                                   : "Select Branch"),
 //                         ),
 //                       ),
-//                       Row(
-//                         children: [
-//                           GestureDetector(
-//                             onTap: () {
-//                               setState(() {
-//                                 selectedCategory = '';
-//                               });
-//                               print(selectedCategory);
-//                               _filterByCategories();
-//                             },
-//                             child: Container(
-//                               padding: EdgeInsets.symmetric(
-//                                   horizontal: 20, vertical: 10),
-//                               decoration: BoxDecoration(
-//                                   color: selectedCategory == ''
-//                                       ? Colors.purple
-//                                       : Colors.grey.withOpacity(0.1),
-//                                   borderRadius: BorderRadius.circular(10)),
-//                               child: Text(
-//                                 "All",
-//                                 style: TextStyle(
-//                                     fontSize: 10.sp,
-//                                     fontWeight: FontWeight.w500,
-//                                     color: selectedCategory == ''
-//                                         ? Colors.white
-//                                         : Colors.black),
-//                               ),
-//                             ),
-//                           ),
-//                           SizedBox(width: 1.w),
-//                           Expanded(
-//                             child: SizedBox(
-//                               height: 12.h,
-//                               width: MediaQuery.of(context).size.width,
-//                               child: GridView.count(
-//                                   shrinkWrap: false,
-//                                   crossAxisCount: 2,
-//                                   physics: const ClampingScrollPhysics(),
-//                                   scrollDirection: Axis.horizontal,
-//                                   crossAxisSpacing: 10,
-//                                   mainAxisSpacing: 20,
-//                                   childAspectRatio: 0.4,
-//                                   padding: EdgeInsets.zero,
-//                                   children: categoryData.isEmpty
-//                                       ? [SizedBox()]
-//                                       : categoryData
-//                                           .map((cat) => GestureDetector(
-//                                                 onTap: () {
-//                                                   setState(() {
-//                                                     selectedCategory = cat[
-//                                                             'attributes']
-//                                                         ['name'];
-//                                                   });
-//                                                   print(selectedCategory);
-//                                                   _filterByCategories();
-//                                                 },
-//                                                 child: Container(
-//                                                   padding: EdgeInsets.symmetric(
-//                                                       horizontal: 10,
-//                                                       vertical: 5),
-//                                                   decoration: BoxDecoration(
-//                                                     color: selectedCategory ==
-//                                                             cat['attributes']
-//                                                                 ['name']
-//                                                         ? Colors.purple
-//                                                         : Colors.grey
-//                                                             .withOpacity(0.1),
-//                                                     borderRadius:
-//                                                         BorderRadius.circular(10),
-//                                                   ),
-//                                                   child: Center(
-//                                                     child: Text(
-//                                                       cat['attributes']['name'],
-//                                                       style: TextStyle(
-//                                                         fontSize: 10.sp,
-//                                                         fontWeight:
-//                                                             FontWeight.w500,
-//                                                         color: selectedCategory ==
-//                                                                 cat['attributes']
-//                                                                     ['name']
-//                                                             ? Colors.white
-//                                                             : Colors.black,
-//                                                       ),
-//                                                     ),
-//                                                   ),
-//                                                 ),
-//                                               ))
-//                                           .toSet()
-//                                           .toList()),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                       SizedBox(height: 1.h),
-//                       SearchView(
-//                         tapInvoiceOpen: () {
-//                           setState(() {
-//                             _isInvoiceOpen = !_isInvoiceOpen;
-//                           });
-//                         },
-//                         dataProducts: _foundProducts!,
-//                         getProducts: getProducts,
-//                         barcodeController: _barcodeController,
-//                         mediaQuery: widget.mediaQuery,
-//                         playSound: () => playSound(),
-//                       ),
-//                       _barcodeController.text.isEmpty && !loadingProduct
-//                           ? Padding(
-//                               padding: const EdgeInsets.all(16.0),
-//                               child: SizedBox(
-//                                 height: widget.mediaQuery.height - 50,
-//                                 child: GridView.builder(
-//                                   itemCount: _foundProducts!.length,
-//                                   gridDelegate:
-//                                       const SliverGridDelegateWithFixedCrossAxisCount(
-//                                     crossAxisCount: 4,
-//                                     crossAxisSpacing: 16,
-//                                     mainAxisSpacing: 16,
-//                                     childAspectRatio: 1.5,
-//                                   ),
-//                                   itemBuilder: (context, index) {
-//                                     var product =
-//                                         _foundProducts![index]['attributes'];
-//                                     return Consumer<CartProvider>(
-//                                       builder: (context, value, child) =>
-//                                           InkWell(
-//                                         onTap: () {
-//                                           print("tapped");
-//                                           tappedIndex = index;
-//                                           print("Selected index === $index");
-//                                           if (product['stock']['quantity'] ==
-//                                               0) {
-//                                             Dialogs.alertDialog(
-//                                                 context,
-//                                                 "Warning",
-//                                                 "Product is out of stock!",
-//                                                 "cancel",
-//                                                 "save",
-//                                                 []);
-//                                           } else {
-//                                             if (_isInvoiceOpen) {
-//                                               setState(() {
-//                                                 _isInvoiceOpen =
-//                                                     !_isInvoiceOpen;
-//                                               });
-//                                             }
-//                                             value.add(
-//                                                 product,
-//                                                 index,
-//                                                 generateRandomString(12),
-//                                                 product['product_price'],
-//                                                 1,
-//                                                 product['product_code']);
-//                                             playSound();
-//                                           }
-//                                         },
-//                                         child: ProductDetails(product: product),
+//                       ValueListenableBuilder<String>(
+//                         valueListenable: _activeItem,
+//                         builder: (context, activeItem, child) {
+//                           if (activeItem == "Table") {
+//                             return TableView(
+//                               mediaQuery: widget.mediaQuery,
+//                               onTableSelected: (table) {
+//                                 setState(() {
+//                                   selectedTable = table;
+//                                 });
+//                               },
+//                             );
+//                           }
+//                           return Column(
+//                             children: [
+//                               Row(
+//                                 children: [
+//                                   GestureDetector(
+//                                     onTap: () {
+//                                       setState(() {
+//                                         selectedCategory = '';
+//                                       });
+//                                       print(selectedCategory);
+//                                       _filterByCategories();
+//                                     },
+//                                     child: Container(
+//                                       padding: EdgeInsets.symmetric(
+//                                           horizontal: 20, vertical: 10),
+//                                       decoration: BoxDecoration(
+//                                           color: selectedCategory == ''
+//                                               ? Colors.purple
+//                                               : Colors.grey.withOpacity(0.1),
+//                                           borderRadius:
+//                                               BorderRadius.circular(10)),
+//                                       child: Text(
+//                                         "All",
+//                                         style: TextStyle(
+//                                             fontSize: 10.sp,
+//                                             fontWeight: FontWeight.w500,
+//                                             color: selectedCategory == ''
+//                                                 ? Colors.white
+//                                                 : Colors.black),
 //                                       ),
-//                                     );
-//                                   },
-//                                 ),
+//                                     ),
+//                                   ),
+//                                   SizedBox(width: 1.w),
+//                                   Expanded(
+//                                     child: SizedBox(
+//                                       height: 12.h,
+//                                       width: MediaQuery.of(context).size.width,
+//                                       child: GridView.count(
+//                                         shrinkWrap: false,
+//                                         crossAxisCount: 2,
+//                                         physics: const ClampingScrollPhysics(),
+//                                         scrollDirection: Axis.horizontal,
+//                                         crossAxisSpacing: 10,
+//                                         mainAxisSpacing: 20,
+//                                         childAspectRatio: 0.4,
+//                                         padding: EdgeInsets.zero,
+//                                         children: categoryData.isEmpty
+//                                             ? [SizedBox()]
+//                                             : categoryData
+//                                                 .map((cat) => GestureDetector(
+//                                                       onTap: () {
+//                                                         setState(() {
+//                                                           selectedCategory = cat[
+//                                                                   'attributes']
+//                                                               ['name'];
+//                                                         });
+//                                                         print(selectedCategory);
+//                                                         _filterByCategories();
+//                                                       },
+//                                                       child: Container(
+//                                                         padding:
+//                                                             EdgeInsets.symmetric(
+//                                                                 horizontal: 10,
+//                                                                 vertical: 5),
+//                                                         decoration:
+//                                                             BoxDecoration(
+//                                                           color: selectedCategory ==
+//                                                                   cat['attributes']
+//                                                                       ['name']
+//                                                               ? Colors.purple
+//                                                               : Colors.grey
+//                                                                   .withOpacity(
+//                                                                       0.1),
+//                                                           borderRadius:
+//                                                               BorderRadius
+//                                                                   .circular(10),
+//                                                         ),
+//                                                         child: Center(
+//                                                           child: Text(
+//                                                             cat['attributes']
+//                                                                 ['name'],
+//                                                             style: TextStyle(
+//                                                               fontSize: 10.sp,
+//                                                               fontWeight:
+//                                                                   FontWeight.w500,
+//                                                               color: selectedCategory ==
+//                                                                       cat['attributes']
+//                                                                           ['name']
+//                                                                   ? Colors.white
+//                                                                   : Colors.black,
+//                                                             ),
+//                                                           ),
+//                                                         ),
+//                                                       ),
+//                                                     ))
+//                                                 .toSet()
+//                                                 .toList(),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ],
 //                               ),
-//                             )
-//                           : Padding(
-//                               padding: const EdgeInsets.only(top: 30),
-//                               child: Center(child: CircularProgressIndicator()),
-//                             ),
+//                               SizedBox(height: 1.h),
+//                               SearchView(
+//                                 tapInvoiceOpen: () {
+//                                   setState(() {
+//                                     _isInvoiceOpen = !_isInvoiceOpen;
+//                                   });
+//                                 },
+//                                 dataProducts: _foundProducts!,
+//                                 getProducts: getProducts,
+//                                 barcodeController: _barcodeController,
+//                                 mediaQuery: widget.mediaQuery,
+//                                 playSound: () => playSound(),
+//                               ),
+//                               _barcodeController.text.isEmpty && !loadingProduct
+//                                   ? Padding(
+//                                       padding: const EdgeInsets.all(16.0),
+//                                       child: SizedBox(
+//                                         height: widget.mediaQuery.height - 50,
+//                                         child: GridView.builder(
+//                                           itemCount: _foundProducts!.length,
+//                                           gridDelegate:
+//                                               const SliverGridDelegateWithFixedCrossAxisCount(
+//                                             crossAxisCount: 4,
+//                                             crossAxisSpacing: 16,
+//                                             mainAxisSpacing: 16,
+//                                             childAspectRatio: 1.5,
+//                                           ),
+//                                           itemBuilder: (context, index) {
+//                                             var product = _foundProducts![index]
+//                                                 ['attributes'];
+//                                             return Consumer<CartProvider>(
+//                                               builder: (context, value, child) =>
+//                                                   InkWell(
+//                                                 onTap: () {
+//                                                   print("tapped");
+//                                                   tappedIndex = index;
+//                                                   print(
+//                                                       "Selected index === $index");
+//                                                   if (product['stock']
+//                                                           ['quantity'] ==
+//                                                       0) {
+//                                                     Dialogs.alertDialog(
+//                                                         context,
+//                                                         "Warning",
+//                                                         "Product is out of stock!",
+//                                                         "cancel",
+//                                                         "save",
+//                                                         []);
+//                                                   } else {
+//                                                     if (_isInvoiceOpen) {
+//                                                       setState(() {
+//                                                         _isInvoiceOpen =
+//                                                             !_isInvoiceOpen;
+//                                                       });
+//                                                     }
+//                                                     value.add(
+//                                                         product,
+//                                                         index,
+//                                                         generateRandomString(12),
+//                                                         product[
+//                                                             'product_price'],
+//                                                         1,
+//                                                         product['product_code']);
+//                                                     playSound();
+//                                                   }
+//                                                 },
+//                                                 child: ProductDetails(
+//                                                     product: product),
+//                                               ),
+//                                             );
+//                                           },
+//                                         ),
+//                                       ),
+//                                     )
+//                                   : Padding(
+//                                       padding: const EdgeInsets.only(top: 30),
+//                                       child: Center(
+//                                           child: CircularProgressIndicator()),
+//                                     ),
+//                             ],
+//                           );
+//                         },
+//                       ),
 //                     ],
 //                   ),
 //                 ),
 //                 Padding(
-//                   padding:
-//                       const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-//                   child: _isInvoiceOpen && _registerInfo.isNotEmpty
-//                       ? InvoiceList(
-//                           products: _products,
+//                   padding: const EdgeInsets.symmetric(
+//                       vertical: 10, horizontal: 10),
+//                   child: ValueListenableBuilder<String>(
+//                     valueListenable: _activeItem,
+//                     builder: (context, activeItem, child) {
+//                       if (activeItem == "Table" && selectedTable != null) {
+//                         return TableSummary(
+//                           selectedTable: selectedTable!,
 //                           mediaQuery: widget.mediaQuery,
-//                           systemProvider: widget.systemProvider,
-//                           registerInfo: _registerInfo,
-//                           user: widget.user,
-//                           closeInvoice: () {
-//                             print("------------- close invoice -----------");
-//                             setState(() {
-//                               if (_registerInfo.isNotEmpty) {
-//                                 _isInvoiceOpen = !_isInvoiceOpen;
-//                               }
-//                             });
-//                           })
-//                       : OrderSummary(
-//                           products: _products,
-//                           mediaQuery: widget.mediaQuery,
-//                           registerInfo: _registerInfo,
-//                           systemProvider: widget.systemProvider,
-//                           user: widget.user,
-//                         ),
+//                         );
+//                       }
+//                       return _isInvoiceOpen && _registerInfo.isNotEmpty
+//                           ? InvoiceList(
+//                               products: _products,
+//                               mediaQuery: widget.mediaQuery,
+//                               systemProvider: widget.systemProvider,
+//                               registerInfo: _registerInfo,
+//                               user: widget.user,
+//                               closeInvoice: () {
+//                                 print("------------- close invoice -----------");
+//                                 setState(() {
+//                                   if (_registerInfo.isNotEmpty) {
+//                                     _isInvoiceOpen = !_isInvoiceOpen;
+//                                   }
+//                                 });
+//                               })
+//                           : OrderSummary(
+//                               products: _products,
+//                               mediaQuery: widget.mediaQuery,
+//                               registerInfo: _registerInfo,
+//                               systemProvider: widget.systemProvider,
+//                               user: widget.user,
+//                             );
+//                     },
+//                   ),
 //                 )
 //               ],
 //             ),
