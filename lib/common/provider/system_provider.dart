@@ -1198,22 +1198,6 @@ Future<bool> _checkInternetConnection() async {
     }
   }
 
-  // Future<Map<String, dynamic>> syncAllTransactions(
-  //   UserDetails user,
-  // ) async {
-  //   try {
-  //     var response =
-  //         await SystemRepo(refresh: false, online: false).syncAllTransactions(
-  //       user,
-  //     );
-  //     return response;
-  //   } catch (error) {
-  //     return {};
-  //     // throw (error);
-  //   }
-  // }
-
-
   Future<Map<String, dynamic>> syncAllTransactions(UserDetails user) async {
     try {
       final store = await DatabaseEngine.instance.getStore();
@@ -1471,6 +1455,23 @@ Future<bool> _checkInternetConnection() async {
   }
 
 }
+
+
+
+  // Future<Map<String, dynamic>> syncAllTransactions(
+  //   UserDetails user,
+  // ) async {
+  //   try {
+  //     var response =
+  //         await SystemRepo(refresh: false, online: false).syncAllTransactions(
+  //       user,
+  //     );
+  //     return response;
+  //   } catch (error) {
+  //     return {};
+  //     // throw (error);
+  //   }
+  // }
 
 
 

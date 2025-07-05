@@ -2,11 +2,84 @@ import 'package:objectbox/objectbox.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
 
 
+// @Entity()
+// class Orders {
+//   @Id()
+//   int id = 0;
+
+//   String customerName;
+//   String trxId;
+//   int productId;
+//   int quantity;
+//   double amount;
+//   String? paymentStatus;
+//   double? receivedAmount;
+//   double? partialAmount;
+//   DateTime createdAt;
+//   String searchDate;
+//   int billerId;
+//   String paymentMethod;
+//   String items;
+//   String others;
+//   String companyId;
+//   String register;
+//   int status;
+//   String? tableId;
+//   int sync;
+
+//   Orders({
+//     required this.customerName,
+//     required this.trxId,
+//     required this.productId,
+//     required this.quantity,
+//     required this.amount,
+//     this.paymentStatus,
+//     this.receivedAmount,
+//     this.partialAmount,
+//     required this.createdAt,
+//     required this.searchDate,
+//     required this.billerId,
+//     required this.paymentMethod,
+//     required this.items,
+//     required this.others,
+//     required this.companyId,
+//     required this.register,
+//     this.status = 0,
+//     this.tableId,
+//     this.sync = 0,
+//   });
+
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'id': id,
+//       'customerName': customerName,
+//       'trxId': trxId,
+//       'productId': productId,
+//       'quantity': quantity,
+//       'amount': amount,
+//       'paymentStatus': paymentStatus,
+//       'receivedAmount': receivedAmount,
+//       'partialAmount': partialAmount,
+//       'createdAt': createdAt.toIso8601String(),
+//       'searchDate': searchDate,
+//       'billerId': billerId,
+//       'paymentMethod': paymentMethod,
+//       'items': items,
+//       'others': others,
+//       'companyId': companyId,
+//       'register': register,
+//       'status': status,
+//       'tableId': tableId,
+//       'sync': sync,
+//     };
+//   }
+// }
+
+
 @Entity()
 class Orders {
   @Id()
   int id = 0;
-
   String customerName;
   String trxId;
   int productId;
@@ -26,6 +99,8 @@ class Orders {
   int status;
   String? tableId;
   int sync;
+  String? attendantId; // New field for attendant tracking
+  String? invoiceReference; // New field for unique invoice reference
 
   Orders({
     required this.customerName,
@@ -47,6 +122,8 @@ class Orders {
     this.status = 0,
     this.tableId,
     this.sync = 0,
+    this.attendantId, // New parameter
+    this.invoiceReference, // New parameter
   });
 
   Map<String, dynamic> toMap() {
@@ -71,6 +148,8 @@ class Orders {
       'status': status,
       'tableId': tableId,
       'sync': sync,
+      'attendantId': attendantId,
+      'invoiceReference': invoiceReference,
     };
   }
 }
@@ -168,9 +247,55 @@ class Register {
   }
 }
 
+// @Entity()
+// class Invoice {
+//   @Id() // Auto-incrementing ID
+//   int id = 0;
+//   String userId;
+//   double amount;
+//   String reference;
+//   String invoice;
+//   String? tableId;
+//   String status;
+//   String companyId;
+//   String lastUpdated;
+//   String customerName;
+//   String customerPhone;
+
+//   Invoice({
+//     required this.userId,
+//     required this.amount,
+//     required this.reference,
+//     required this.invoice,
+//     required this.status,
+//     required this.companyId,
+//     required this.lastUpdated,
+//     this.tableId,
+//     required this.customerName,
+//     required this.customerPhone,
+//   });
+
+//   // Method to convert Invoice to a Map
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'id': id,
+//       'userId': userId,
+//       'amount': amount,
+//       'reference': reference,
+//       'invoice': invoice,
+//       'tableId': tableId,
+//       'status': status,
+//       'companyId': companyId,
+//       'customerName': customerName,
+//       'customerPhone': customerPhone,
+//       'lastUpdated': lastUpdated,
+//     };
+//   }
+// }
+
 @Entity()
 class Invoice {
-  @Id() // Auto-incrementing ID
+  @Id()
   int id = 0;
   String userId;
   double amount;
@@ -182,6 +307,8 @@ class Invoice {
   String lastUpdated;
   String customerName;
   String customerPhone;
+  String? attendantId; // New field for attendant tracking
+  String? originalReference; // New field to track original reference
 
   Invoice({
     required this.userId,
@@ -194,9 +321,10 @@ class Invoice {
     this.tableId,
     required this.customerName,
     required this.customerPhone,
+    this.attendantId, // New parameter
+    this.originalReference, // New parameter
   });
 
-  // Method to convert Invoice to a Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -210,9 +338,67 @@ class Invoice {
       'customerName': customerName,
       'customerPhone': customerPhone,
       'lastUpdated': lastUpdated,
+      'attendantId': attendantId,
+      'originalReference': originalReference,
     };
   }
 }
+
+
+@Entity()
+class SelectAttendantModel {
+  @Id()
+  int id = 0;
+  
+  int apiId; // Store the original API ID
+  String firstName;
+  String lastName;
+  String email;
+  String phone;
+  String department;
+  bool hasPinSet;
+  String? pin;
+
+  SelectAttendantModel({
+    required this.apiId,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phone,
+    required this.department,
+    required this.hasPinSet,
+    this.pin,
+  });
+
+  String get fullName => '$firstName $lastName';
+
+  factory SelectAttendantModel.fromJson(Map<String, dynamic> json) {
+    return SelectAttendantModel(
+      apiId: json['id'],
+      firstName: json['first_name'] ?? '',
+      lastName: json['last_name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      department: json['department'] ?? '',
+      hasPinSet: json['pin_set'] ?? false,
+      pin: json['pin'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': apiId,
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'phone': phone,
+      'department': department,
+      'pin_set': hasPinSet,
+      'pin': pin,
+    };
+  }
+}
+
 
 @Entity()
 class Users {

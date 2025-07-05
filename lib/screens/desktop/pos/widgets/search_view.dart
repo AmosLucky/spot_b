@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/money.dart';
-import 'package:spotstock_inventory/common/provider/cart_provider.dart';
+// import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 import 'package:spotstock_inventory/common/style.dart';
 import 'package:spotstock_inventory/widgets/custom_widgets.dart';
 import 'package:spotstock_inventory/widgets/dialogs.dart';
+
+import '../../../../common/provider/cart_provider.dart';
 
 class SearchView extends StatelessWidget {
   final List<dynamic> dataProducts;

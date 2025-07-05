@@ -1,6 +1,6 @@
-import 'package:spotstock_inventory/data/models/schema.dart';
+import 'package:spotstock_inventory/data/models/schema.dart' hide SelectAttendantModel;
 import 'package:spotstock_inventory/objectbox.g.dart';
-import 'package:spotstock_inventory/screens/desktop/model/select_attendant_model.dart';
+import 'package:spotstock_inventory/screens/desktop/model/select_attendant_model.dart' ;
 
 class ObjectBox {
   late final Store store;

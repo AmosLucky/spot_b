@@ -2139,14 +2139,62 @@ Future<void> clearLocalSales() async {
     return data ?? {};
   }
 
+// Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
+//   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+//   final store = await DatabaseEngine.instance.getStore();
+
+//   final orderBox = store.box<Orders>();
+//   var txnID = generateRandomString(12);
+
+//   // Map paymentStatus from string to corresponding value for Orders entity
+//   String paymentStatus;
+//   switch (paymentData['paymentStatus']) {
+//     case 'Paid':
+//       paymentStatus = 'Paid';
+//       break;
+//     case 'Unpaid':
+//       paymentStatus = 'Unpaid';
+//       break;
+//     case 'Partial':
+//       paymentStatus = 'Partial';
+//       break;
+//     default:
+//       paymentStatus = 'Unpaid'; // Default to Unpaid if invalid
+//   }
+
+//   Orders newOrder = Orders(
+//     billerId: user.id,
+//     customerName: paymentData['customerName'] ?? 'Walk-in Customer',
+//     trxId: txnID,
+//     amount: total,
+//     quantity: 1,
+//     sync: 0,
+//     status: 1,
+//     productId: 0,
+//     createdAt: DateTime.now(),
+//     searchDate: searchDate(DateTime.now()),
+//     paymentMethod: paymentData['paymentType'] ?? 'Cash',
+//     paymentStatus: paymentStatus,
+//     items: data,
+//     others: jsonEncode(paymentData),
+//     companyId: user.company!.id.toString(),
+//     register: paymentData['registerId'].toString(),
+//     tableId: paymentData['table'],
+//     partialAmount: paymentData['partialAmount']?.toDouble(),
+//     receivedAmount: paymentData['receivedAmount']?.toDouble(),
+//   );
+//   orderBox.put(newOrder, mode: PutMode.insert);
+//   return {'status': true, 'txnID': txnID};
+// }
+
+
 Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
   final store = await DatabaseEngine.instance.getStore();
-
   final orderBox = store.box<Orders>();
+  
   var txnID = generateRandomString(12);
-
-  // Map paymentStatus from string to corresponding value for Orders entity
+  
   String paymentStatus;
   switch (paymentData['paymentStatus']) {
     case 'Paid':
@@ -2159,7 +2207,7 @@ Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, d
       paymentStatus = 'Partial';
       break;
     default:
-      paymentStatus = 'Unpaid'; // Default to Unpaid if invalid
+      paymentStatus = 'Unpaid';
   }
 
   Orders newOrder = Orders(
@@ -2182,7 +2230,10 @@ Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, d
     tableId: paymentData['table'],
     partialAmount: paymentData['partialAmount']?.toDouble(),
     receivedAmount: paymentData['receivedAmount']?.toDouble(),
+    attendantId: paymentData['attendantId'], // Store attendant ID
+    invoiceReference: paymentData['invoiceReference'], // Store invoice reference
   );
+
   orderBox.put(newOrder, mode: PutMode.insert);
   return {'status': true, 'txnID': txnID};
 }
@@ -2203,29 +2254,94 @@ Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, d
     };
   }
 
-  Future<Map<String, dynamic>> holdInvoice(
-      total, registerId, data, table, customerName, customerPhone) async {
-    UserDetails user =
-        Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-    var txnID = generateRandomString(12);
-    final store = await DatabaseEngine.instance.getStore();
+  // Future<Map<String, dynamic>> holdInvoice(
+  //     total, registerId, data, table, customerName, customerPhone) async {
+  //   UserDetails user =
+  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  //   var txnID = generateRandomString(12);
+  //   final store = await DatabaseEngine.instance.getStore();
 
-    final invoiceBox = store.box<Invoice>();
-    Invoice newInvoice = Invoice(
-      userId: user.id.toString(),
-      companyId: registerId.toString(),
-      amount: total,
-      reference: txnID,
-      invoice: data,
-      status: '1',
-      tableId: table ?? '',
-      customerName: customerName ?? '',
-      customerPhone: customerPhone ?? '',
-      lastUpdated: searchDate(DateTime.now()),
-    );
-    invoiceBox.put(newInvoice);
-    return {'status': true, 'reference': txnID};
+  //   final invoiceBox = store.box<Invoice>();
+  //   Invoice newInvoice = Invoice(
+  //     userId: user.id.toString(),
+  //     companyId: registerId.toString(),
+  //     amount: total,
+  //     reference: txnID,
+  //     invoice: data,
+  //     status: '1',
+  //     tableId: table ?? '',
+  //     customerName: customerName ?? '',
+  //     customerPhone: customerPhone ?? '',
+  //     lastUpdated: searchDate(DateTime.now()),
+  //   );
+  //   invoiceBox.put(newInvoice);
+  //   return {'status': true, 'reference': txnID};
+  // }
+
+
+Future<Map<String, dynamic>> holdInvoice(
+    total, 
+    registerId, 
+    data, 
+    table, 
+    customerName, 
+    customerPhone, 
+    String? attendantId, 
+    String invoiceReference) async {
+  UserDetails user =
+      Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  
+  final store = await DatabaseEngine.instance.getStore();
+  final invoiceBox = store.box<Invoice>();
+  
+  Invoice newInvoice = Invoice(
+    userId: user.id.toString(),
+    companyId: registerId.toString(),
+    amount: total,
+    reference: invoiceReference, // Use provided reference
+    invoice: data,
+    status: '1',
+    tableId: table ?? '',
+    customerName: customerName ?? '',
+    customerPhone: customerPhone ?? '',
+    lastUpdated: searchDate(DateTime.now()),
+    attendantId: attendantId, // Store attendant ID
+    originalReference: invoiceReference, // Store original reference
+  );
+  
+  invoiceBox.put(newInvoice);
+  return {'status': true, 'reference': invoiceReference};
+}
+
+
+Future<Map<String, dynamic>> updateInvoice(
+    int invoiceId,
+    total, 
+    data, 
+    table, 
+    customerName, 
+    customerPhone, 
+    String? attendantId) async {
+  
+  final store = await DatabaseEngine.instance.getStore();
+  final invoiceBox = store.box<Invoice>();
+  
+  final existingInvoice = invoiceBox.get(invoiceId);
+  if (existingInvoice != null) {
+    existingInvoice.amount = total;
+    existingInvoice.invoice = data;
+    existingInvoice.tableId = table ?? '';
+    existingInvoice.customerName = customerName ?? '';
+    existingInvoice.customerPhone = customerPhone ?? '';
+    existingInvoice.attendantId = attendantId;
+    existingInvoice.lastUpdated = searchDate(DateTime.now());
+    
+    invoiceBox.put(existingInvoice);
+    return {'status': true, 'reference': existingInvoice.reference};
   }
+  
+  return {'status': false, 'message': 'Invoice not found'};
+}
 
   Future<Response> fetchStaffsAPI({bool refresh = false}) async {
     return await _fetchData('staffs?page[size]=0', refresh: refresh);

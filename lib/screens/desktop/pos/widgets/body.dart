@@ -7,7 +7,7 @@ import 'package:spotstock_inventory/data/models/user_details.dart';
 // import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
-import 'package:spotstock_inventory/widgets/custom_widgets.dart';
+// import 'package:spotstock_inventory/widgets/custom_widgets.dart';
 import 'package:spotstock_inventory/widgets/dialogs.dart';
 import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 import 'package:flutter/material.dart';
@@ -445,7 +445,7 @@ class _BodyState extends State<Body> {
                                                     value.add(
                                                         product,
                                                         index,
-                                                        generateRandomString(12),
+                                                        generateRandomStringForInvoice(12),
                                                         product[
                                                             'product_price'],
                                                         1,
