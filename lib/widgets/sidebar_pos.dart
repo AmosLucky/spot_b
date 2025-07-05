@@ -69,10 +69,10 @@ class SideBarPos extends StatelessWidget {
                     activeItem: activeItem,
                   ),
                   SidebarItem(
-                    title: "Invoices",
+                    title: "Hold List",
                     onTap: () {
                       openInvoice!();
-                      activeItem.value = "Invoices";
+                      activeItem.value = "Hold List";
                     },
                     icon: MdiIcons.handBackLeft,
                     activeItem: activeItem,
