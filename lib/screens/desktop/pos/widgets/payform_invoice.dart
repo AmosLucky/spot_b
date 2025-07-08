@@ -9,9 +9,6 @@ import '../../model/select_attendant_model.dart';
 import '../../providers/select_attendant_provider.dart';
 import '../../services/select_attendant_service.dart';
 import '../dialogs/select_attendant_pin.dart';
-// import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendant_pin.dart';
-// import '..//../model/select_attendant_model.dart';
-// import '../providers/select_attendant_provider.dart';
 
 class PayFormInvoice extends StatefulWidget {
   final SystemProvider systemProvider;
@@ -165,12 +162,10 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
     }
   }
 
-  // New validation method
   bool _validateForm() {
     final customerName = customerNameController.text.trim();
     final table = selectedTable?.trim();
 
-    // Check if either a table is selected or customer details are provided
     if (table == null && customerName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -181,7 +176,6 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
       return false;
     }
 
-    // If custom name is used, ensure customer name is not empty
     if (isCustomName && customerName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -229,7 +223,7 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
                           : Icons.person,
                       color: _selectedAttendant != null && _attendantVerified
                           ? Colors.green
-                          : ColorsRes.grey,
+                          : Colors.grey,
                       size: 20,
                     ),
                     Text(
@@ -350,7 +344,7 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
           },
         ),
         TextButton(
-          child: const Text("Save Invoice"),
+          child: Text("Save Invoice"),
           onPressed: () {
             if (!_validateForm()) {
               return;
@@ -428,8 +422,49 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
     try {
       final success = await SelectAttendantService().createPin(widget.attendant.apiId, pin);
       if (success) {
+        setState(() {
+          _isCreating = false;
+        });
+        Navigator.of(context).pop(); // Close CreatePinDialog
         widget.onPinCreated();
-        Navigator.of(context).pop();
+
+        // Create updated attendant model with hasPinSet: true
+        final updatedAttendant = SelectAttendantModel(
+          apiId: widget.attendant.apiId,
+          firstName: widget.attendant.firstName,
+          lastName: widget.attendant.lastName,
+          email: widget.attendant.email,
+          phone: widget.attendant.phone,
+          department: widget.attendant.department,
+          hasPinSet: true,
+        );
+
+        // Open SelectAttendantPinDialog to verify the new PIN
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => SelectAttendantPinDialog(
+            attendant: updatedAttendant,
+            onPinVerified: (verified) {
+              if (verified) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Welcome, ${updatedAttendant.fullName}!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Invalid PIN entered'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('PIN created successfully'),
@@ -492,7 +527,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
             ),
             Gap(10),
             const Text('Confirm PIN'),
-            Gap(10),
+            Gap(2),
             TextField(
               controller: _confirmPinController,
               keyboardType: TextInputType.number,
@@ -543,6 +578,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 
 
 
+
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
 // import 'package:provider/provider.dart';
@@ -550,9 +586,13 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 // import 'package:spotstock_inventory/common/money.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
-// import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
 // import '../../model/select_attendant_model.dart';
+// import '../../providers/select_attendant_provider.dart';
+// import '../../services/select_attendant_service.dart';
 // import '../dialogs/select_attendant_pin.dart';
+// // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendant_pin.dart';
+// // import '..//../model/select_attendant_model.dart';
+// // import '../providers/select_attendant_provider.dart';
 
 // class PayFormInvoice extends StatefulWidget {
 //   final SystemProvider systemProvider;
@@ -653,31 +693,57 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //   }
 
 //   void _promptForPin(SelectAttendantModel attendant) {
-//     showDialog(
-//       context: context,
-//       barrierDismissible: false,
-//       builder: (context) => SelectAttendantPinDialog(
-//         attendant: attendant,
-//         onPinVerified: (verified) {
-//           setState(() {
-//             _attendantVerified = verified;
-//             if (!verified) {
-//               _selectedAttendant = null;
-//               _selectAttendantProvider.selectAttendant(null);
-//             }
-//           });
+//     if (attendant.hasPinSet) {
+//       showDialog(
+//         context: context,
+//         barrierDismissible: false,
+//         builder: (context) => SelectAttendantPinDialog(
+//           attendant: attendant,
+//           onPinVerified: (verified) {
+//             setState(() {
+//               _attendantVerified = verified;
+//               if (!verified) {
+//                 _selectedAttendant = null;
+//                 _selectAttendantProvider.selectAttendant(null);
+//               }
+//             });
 
-//           if (verified) {
-//             ScaffoldMessenger.of(context).showSnackBar(
-//               SnackBar(
-//                 content: Text('Welcome, ${attendant.fullName}!'),
-//                 backgroundColor: Colors.green,
-//               ),
-//             );
-//           }
-//         },
-//       ),
-//     );
+//             if (verified) {
+//               ScaffoldMessenger.of(context).showSnackBar(
+//                 SnackBar(
+//                   content: Text('Welcome, ${attendant.fullName}!'),
+//                   backgroundColor: Colors.green,
+//                 ),
+//               );
+//             }
+//           },
+//         ),
+//       );
+//     } else {
+//       showDialog(
+//         context: context,
+//         barrierDismissible: false,
+//         builder: (context) => CreatePinDialog(
+//           attendant: attendant,
+//           onPinCreated: () {
+//             setState(() {
+//               _selectedAttendant = attendant;
+//               _attendantVerified = false;
+//               _selectAttendantProvider.selectAttendant(attendant);
+//             });
+//             _promptForPin(SelectAttendantModel(
+//               apiId: attendant.apiId,
+//               firstName: attendant.firstName,
+//               lastName: attendant.lastName,
+//               email: attendant.email,
+//               phone: attendant.phone,
+//               department: attendant.department,
+//               hasPinSet: true,
+//             ));
+//           },
+//         ),
+//       );
+//     }
 //   }
 
 //   // New validation method
@@ -712,8 +778,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 
 //   @override
 //   Widget build(BuildContext context) {
-//     // Remove attendant-based disabling of customer input
-//     bool isCustomerInputDisabled = false; // Always enable customer input
+//     bool isCustomerInputDisabled = false;
 
 //     return AlertDialog(
 //       title: const Text("Invoice"),
@@ -722,7 +787,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //           mainAxisSize: MainAxisSize.min,
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             Text('Attendant (Optional)'), // Indicate attendant is optional
+//             Text('Attendant (Optional)'),
 //             Gap(3),
 //             GestureDetector(
 //               onTap: _attendantVerified ? null : _selectAttendant,
@@ -765,6 +830,11 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //                       TextButton(
 //                         onPressed: _selectAttendant,
 //                         child: Text('Edit'),
+//                       )
+//                     else if (_selectedAttendant != null && !_selectedAttendant!.hasPinSet)
+//                       TextButton(
+//                         onPressed: () => _promptForPin(_selectedAttendant!),
+//                         child: Text("Don't have a PIN? Create PIN"),
 //                       ),
 //                   ],
 //                 ),
@@ -870,7 +940,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //               'customerName': customerNameController.text,
 //               'customerPhoneNumber': customerPhoneController.text,
 //               'table': selectedTable,
-//               'attendantId': _selectedAttendant?.id, // Allow null
+//               'attendantId': _selectedAttendant?.id,
 //             };
 //             widget.onSubmit(invoiceData);
 //             Navigator.of(context).pop();
@@ -888,5 +958,166 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //     tableNameController.dispose();
 //     customerPhoneController.dispose();
 //     super.dispose();
+//   }
+// }
+
+// class CreatePinDialog extends StatefulWidget {
+//   final SelectAttendantModel attendant;
+//   final VoidCallback onPinCreated;
+
+//   const CreatePinDialog({
+//     super.key,
+//     required this.attendant,
+//     required this.onPinCreated,
+//   });
+
+//   @override
+//   State<CreatePinDialog> createState() => _CreatePinDialogState();
+// }
+
+// class _CreatePinDialogState extends State<CreatePinDialog> {
+//   final TextEditingController _pinController = TextEditingController();
+//   final TextEditingController _confirmPinController = TextEditingController();
+//   bool _isCreating = false;
+//   String? _errorMessage;
+
+//   void _createPin() async {
+//     setState(() {
+//       _isCreating = true;
+//       _errorMessage = null;
+//     });
+
+//     final pin = _pinController.text.trim();
+//     final confirmPin = _confirmPinController.text.trim();
+
+//     if (pin.length != 6 || !RegExp(r'^\d+$').hasMatch(pin)) {
+//       setState(() {
+//         _isCreating = false;
+//         _errorMessage = 'PIN must be 6 digits';
+//       });
+//       return;
+//     }
+
+//     if (pin != confirmPin) {
+//       setState(() {
+//         _isCreating = false;
+//         _errorMessage = 'PINs do not match';
+//       });
+//       return;
+//     }
+
+//     try {
+//       final success = await SelectAttendantService().createPin(widget.attendant.apiId, pin);
+//       if (success) {
+//         widget.onPinCreated();
+//         Navigator.of(context).pop();
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text('PIN created successfully'),
+//             backgroundColor: Colors.green,
+//           ),
+//         );
+//       } else {
+//         setState(() {
+//           _isCreating = false;
+//           _errorMessage = 'Failed to create PIN';
+//         });
+//       }
+//     } catch (e) {
+//       setState(() {
+//         _isCreating = false;
+//         _errorMessage = 'Error creating PIN: $e';
+//       });
+//     }
+//   }
+
+//   @override
+//   void dispose() {
+//     _pinController.dispose();
+//     _confirmPinController.dispose();
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return AlertDialog(
+//       title: Text('Create PIN for ${widget.attendant.fullName}'),
+//       content: SingleChildScrollView(
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             const Text('Enter new 6-digit PIN'),
+//             Gap(10),
+//             TextField(
+//               controller: _pinController,
+//               keyboardType: TextInputType.number,
+//               obscureText: true,
+//               maxLength: 6,
+//               decoration: InputDecoration(
+//                 hintText: 'Enter PIN',
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(5),
+//                   borderSide: BorderSide(color: ColorsRes.grey),
+//                 ),
+//                 enabledBorder: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(5),
+//                   borderSide: BorderSide(color: ColorsRes.grey),
+//                 ),
+//                 focusedBorder: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(5),
+//                   borderSide: const BorderSide(color: Colors.blue),
+//                 ),
+//                 contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+//               ),
+//             ),
+//             Gap(10),
+//             const Text('Confirm PIN'),
+//             Gap(10),
+//             TextField(
+//               controller: _confirmPinController,
+//               keyboardType: TextInputType.number,
+//               obscureText: true,
+//               maxLength: 6,
+//               decoration: InputDecoration(
+//                 hintText: 'Confirm PIN',
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(5),
+//                   borderSide: BorderSide(color: ColorsRes.grey),
+//                 ),
+//                 enabledBorder: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(5),
+//                   borderSide: BorderSide(color: ColorsRes.grey),
+//                 ),
+//                 focusedBorder: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(5),
+//                   borderSide: const BorderSide(color: Colors.blue),
+//                 ),
+//                 errorText: _errorMessage,
+//                 contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: () {
+//             Navigator.of(context).pop();
+//           },
+//           child: const Text('Cancel'),
+//         ),
+//         TextButton(
+//           onPressed: _isCreating ? null : _createPin,
+//           child: _isCreating
+//               ? const SizedBox(
+//                   width: 20,
+//                   height: 20,
+//                   child: CircularProgressIndicator(strokeWidth: 2),
+//                 )
+//               : const Text('Create'),
+//         ),
+//       ],
+//     );
 //   }
 // }

@@ -5,11 +5,11 @@ import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
-// import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendant_pin.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/payform_invoice.dart'; // Import for CreatePinDialog
 import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
 import '../../model/select_attendant_model.dart';
 import '../dialogs/select_attendant_pin.dart';
+// import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendant_pin.dart';
 
 class PaymentForm extends StatefulWidget {
   final String app;

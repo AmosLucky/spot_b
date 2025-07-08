@@ -6,6 +6,8 @@ import '../model/select_attendant_model.dart';
 
 class SelectAttendantService {
   final String _baseUrl = 'https://app.spotstockinventory.com/api/attendants';
+  final String _setPinUrl = 'https://app.spotstockinventory.com/api/set-pin';
+  final String _verifyPinUrl = 'https://app.spotstockinventory.com/api/verify-pin';
 
   Future<List<SelectAttendantModel>> getAttendants() async {
     final store = await DatabaseEngine.instance.getStore();
@@ -70,7 +72,7 @@ class SelectAttendantService {
     }
   }
 
-  Future<bool> createPin(int attendantId, String pin) async {
+  Future<bool> createPin(int userId, String pin) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -80,14 +82,14 @@ class SelectAttendantService {
       }
 
       final response = await http.post(
-        Uri.parse('https://app.spotstockinventory.com/api/attendants/set-pin'),
+        Uri.parse(_setPinUrl),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'attendant_id': attendantId,
+          'user_id': userId,
           'pin': pin,
         }),
       );
@@ -95,14 +97,19 @@ class SelectAttendantService {
       print('Create PIN response status: ${response.statusCode}');
       print('Create PIN response body: ${response.body}');
 
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return jsonResponse['success'] == true;
+      } else {
+        throw Exception('Failed to create PIN: ${response.statusCode} - ${response.body}');
+      }
     } catch (e) {
       print('Error creating PIN: $e');
       throw Exception('Error creating PIN: $e');
     }
   }
 
-  Future<Map<String, dynamic>> verifyPin(int attendantId, String pin) async {
+  Future<Map<String, dynamic>> verifyPin(int userId, String pin) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -112,14 +119,14 @@ class SelectAttendantService {
       }
 
       final response = await http.post(
-        Uri.parse('https://app.spotstockinventory.com/api/attendants/verify-pin'),
+        Uri.parse(_verifyPinUrl),
         headers: {
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'attendant_id': attendantId,
+          'user_id': userId,
           'pin': pin,
         }),
       );
@@ -128,14 +135,15 @@ class SelectAttendantService {
       print('Verify PIN response body: ${response.body}');
 
       if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
         return {
-          'success': true,
-          'message': 'PIN verified successfully'
+          'success': jsonResponse['success'] == true,
+          'message': jsonResponse['message'] ?? 'PIN verified successfully'
         };
       } else {
         return {
           'success': false,
-          'message': 'Invalid PIN'
+          'message': 'Invalid PIN: ${response.statusCode} - ${response.body}'
         };
       }
     } catch (e) {
@@ -149,15 +157,16 @@ class SelectAttendantService {
 }
 
 
+
+
 // import 'dart:convert';
 // import 'package:http/http.dart' as http;
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:spotstock_inventory/common/helpers/database_engine.dart';
-// // import 'package:spotstock_inventory/objectbox.g.dart';
 // import '../model/select_attendant_model.dart';
 
 // class SelectAttendantService {
-//   final String _baseUrl = 'https://app.spotstockinventory.com/api/staffs';
+//   final String _baseUrl = 'https://app.spotstockinventory.com/api/attendants';
 
 //   Future<List<SelectAttendantModel>> getAttendants() async {
 //     final store = await DatabaseEngine.instance.getStore();
@@ -219,6 +228,83 @@ class SelectAttendantService {
 //       }
 //       print('Error fetching attendants: $e');
 //       throw Exception('Error fetching attendants: $e');
+//     }
+//   }
+
+//   Future<bool> createPin(int attendantId, String pin) async {
+//     try {
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('token') ?? '';
+      
+//       if (token.isEmpty) {
+//         throw Exception('No authentication token found');
+//       }
+
+//       final response = await http.post(
+//         Uri.parse('https://app.spotstockinventory.com/api/attendants/set-pin'),
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//           'Accept': 'application/json',
+//           'Content-Type': 'application/json',
+//         },
+//         body: json.encode({
+//           'attendant_id': attendantId,
+//           'pin': pin,
+//         }),
+//       );
+
+//       print('Create PIN response status: ${response.statusCode}');
+//       print('Create PIN response body: ${response.body}');
+
+//       return response.statusCode == 200;
+//     } catch (e) {
+//       print('Error creating PIN: $e');
+//       throw Exception('Error creating PIN: $e');
+//     }
+//   }
+
+//   Future<Map<String, dynamic>> verifyPin(int attendantId, String pin) async {
+//     try {
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('token') ?? '';
+      
+//       if (token.isEmpty) {
+//         throw Exception('No authentication token found');
+//       }
+
+//       final response = await http.post(
+//         Uri.parse('https://app.spotstockinventory.com/api/attendants/verify-pin'),
+//         headers: {
+//           'Authorization': 'Bearer $token',
+//           'Accept': 'application/json',
+//           'Content-Type': 'application/json',
+//         },
+//         body: json.encode({
+//           'attendant_id': attendantId,
+//           'pin': pin,
+//         }),
+//       );
+
+//       print('Verify PIN response status: ${response.statusCode}');
+//       print('Verify PIN response body: ${response.body}');
+
+//       if (response.statusCode == 200) {
+//         return {
+//           'success': true,
+//           'message': 'PIN verified successfully'
+//         };
+//       } else {
+//         return {
+//           'success': false,
+//           'message': 'Invalid PIN'
+//         };
+//       }
+//     } catch (e) {
+//       print('Error verifying PIN: $e');
+//       return {
+//         'success': false,
+//         'message': 'Error verifying PIN: $e'
+//       };
 //     }
 //   }
 // }
