@@ -1,3 +1,14 @@
+// Add this extension to your existing UserDetails class
+import 'package:spotstock_inventory/common/utils/role_detector.dart';
+
+extension UserDetailsExtension on UserDetails {
+  String get userRole => RoleDetector.determineUserRole(this);
+  bool get isHotelAdmin => RoleDetector.isHotelAdmin(this);
+  bool get isStoreAdmin => RoleDetector.isStoreAdmin(this);
+  bool get isSuperAdmin => RoleDetector.isSuperAdmin(this);
+}
+
+
 class UserDetails {
   final int id;
   final String firstName;
@@ -65,6 +76,46 @@ class UserDetails {
   }
 }
 
+// class Company {
+//   final int id;
+//   final String name;
+//   final String email;
+//   final String phone;
+//   final String address;
+//   final String logo;
+
+//   Company({
+//     required this.id,
+//     required this.name,
+//     required this.email,
+//     required this.phone,
+//     required this.address,
+//     required this.logo,
+//   });
+
+//   factory Company.fromJson(Map<String, dynamic> json) {
+//     return Company(
+//       id: json['id'],
+//       name: json['name'],
+//       email: json['email'],
+//       phone: json['phone'],
+//       address: json['address'],
+//       logo: json['logo'],
+//     );
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'id': id,
+//       'name': name,
+//       'email': email,
+//       'phone': phone,
+//       'address': address,
+//       'logo': logo,
+//     };
+//   }
+// }
+
 class Company {
   final int id;
   final String name;
@@ -72,6 +123,7 @@ class Company {
   final String phone;
   final String address;
   final String logo;
+  final double? amount; // Add this field
 
   Company({
     required this.id,
@@ -80,6 +132,7 @@ class Company {
     required this.phone,
     required this.address,
     required this.logo,
+    this.amount, // Add this parameter
   });
 
   factory Company.fromJson(Map<String, dynamic> json) {
@@ -90,6 +143,7 @@ class Company {
       phone: json['phone'],
       address: json['address'],
       logo: json['logo'],
+      amount: json['amount']?.toDouble(), // Add this line
     );
   }
 
@@ -101,6 +155,7 @@ class Company {
       'phone': phone,
       'address': address,
       'logo': logo,
+      'amount': amount, // Add this line
     };
   }
 }

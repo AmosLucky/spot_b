@@ -2,80 +2,6 @@ import 'package:objectbox/objectbox.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
 
 
-// @Entity()
-// class Orders {
-//   @Id()
-//   int id = 0;
-
-//   String customerName;
-//   String trxId;
-//   int productId;
-//   int quantity;
-//   double amount;
-//   String? paymentStatus;
-//   double? receivedAmount;
-//   double? partialAmount;
-//   DateTime createdAt;
-//   String searchDate;
-//   int billerId;
-//   String paymentMethod;
-//   String items;
-//   String others;
-//   String companyId;
-//   String register;
-//   int status;
-//   String? tableId;
-//   int sync;
-
-//   Orders({
-//     required this.customerName,
-//     required this.trxId,
-//     required this.productId,
-//     required this.quantity,
-//     required this.amount,
-//     this.paymentStatus,
-//     this.receivedAmount,
-//     this.partialAmount,
-//     required this.createdAt,
-//     required this.searchDate,
-//     required this.billerId,
-//     required this.paymentMethod,
-//     required this.items,
-//     required this.others,
-//     required this.companyId,
-//     required this.register,
-//     this.status = 0,
-//     this.tableId,
-//     this.sync = 0,
-//   });
-
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'id': id,
-//       'customerName': customerName,
-//       'trxId': trxId,
-//       'productId': productId,
-//       'quantity': quantity,
-//       'amount': amount,
-//       'paymentStatus': paymentStatus,
-//       'receivedAmount': receivedAmount,
-//       'partialAmount': partialAmount,
-//       'createdAt': createdAt.toIso8601String(),
-//       'searchDate': searchDate,
-//       'billerId': billerId,
-//       'paymentMethod': paymentMethod,
-//       'items': items,
-//       'others': others,
-//       'companyId': companyId,
-//       'register': register,
-//       'status': status,
-//       'tableId': tableId,
-//       'sync': sync,
-//     };
-//   }
-// }
-
-
 @Entity()
 class Orders {
   @Id()
@@ -246,52 +172,6 @@ class Register {
     };
   }
 }
-
-// @Entity()
-// class Invoice {
-//   @Id() // Auto-incrementing ID
-//   int id = 0;
-//   String userId;
-//   double amount;
-//   String reference;
-//   String invoice;
-//   String? tableId;
-//   String status;
-//   String companyId;
-//   String lastUpdated;
-//   String customerName;
-//   String customerPhone;
-
-//   Invoice({
-//     required this.userId,
-//     required this.amount,
-//     required this.reference,
-//     required this.invoice,
-//     required this.status,
-//     required this.companyId,
-//     required this.lastUpdated,
-//     this.tableId,
-//     required this.customerName,
-//     required this.customerPhone,
-//   });
-
-//   // Method to convert Invoice to a Map
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'id': id,
-//       'userId': userId,
-//       'amount': amount,
-//       'reference': reference,
-//       'invoice': invoice,
-//       'tableId': tableId,
-//       'status': status,
-//       'companyId': companyId,
-//       'customerName': customerName,
-//       'customerPhone': customerPhone,
-//       'lastUpdated': lastUpdated,
-//     };
-//   }
-// }
 
 @Entity()
 class Invoice {

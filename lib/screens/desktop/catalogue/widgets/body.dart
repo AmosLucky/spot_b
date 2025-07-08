@@ -3,6 +3,7 @@ import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:spotstock_inventory/widgets/sidebar_inventory.dart';
+// import 'package:spotstock_inventory/utils/role_detector.dart'; // Add this import
 import 'card.dart';
 import 'header.dart';
 import '../../../../widgets/sidebar.dart';
@@ -11,6 +12,7 @@ class Body extends StatefulWidget {
   final UserDetails user;
   final SystemProvider systemProvider;
   final String app;
+
   const Body({
     super.key,
     required this.user,
@@ -31,11 +33,8 @@ class _BodyState extends State<Body> {
     super.dispose();
   }
 
-  // Method to show bottom sheet with out-of-stock products
   void _showOutOfStockProducts() async {
-    // Fetch all products
     final products = await widget.systemProvider.getProducts(0);
-    // Filter out-of-stock products
     final outOfStockProducts = products
         .where((product) => product['attributes']['stock']['quantity'] == 0)
         .toList();
@@ -44,7 +43,7 @@ class _BodyState extends State<Body> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) => DraggableScrollableSheet(
@@ -54,13 +53,12 @@ class _BodyState extends State<Body> {
         expand: false,
         builder: (context, scrollController) => Column(
           children: [
-            // Header with close button
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Out of Stock Products",
                     style: TextStyle(
                       fontSize: 18,
@@ -68,7 +66,7 @@ class _BodyState extends State<Body> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -76,7 +74,7 @@ class _BodyState extends State<Body> {
             ),
             Expanded(
               child: outOfStockProducts.isEmpty
-                  ? Center(child: Text("No out-of-stock products found"))
+                  ? const Center(child: Text("No out-of-stock products found"))
                   : GridView.builder(
                       controller: scrollController,
                       padding: const EdgeInsets.all(16.0),
@@ -100,11 +98,67 @@ class _BodyState extends State<Body> {
     );
   }
 
+  // Method to build store-specific cards
+  List<Widget> _buildStoreCards() {
+    return [
+      HomeCard(
+          title: "Products",
+          value: "${widget.systemProvider.dashboardStats['productCount'] ?? '0'}"),
+      HomeCard(
+          title: "In Stock",
+          value: "${widget.systemProvider.dashboardStats['productStockOut'] ?? '0'}"),
+      HomeCard(
+          title: "Out of stock",
+          value: "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}",
+          onViewPressed: _showOutOfStockProducts),
+      HomeCard(
+          title: "Categories",
+          value: "${widget.systemProvider.dashboardStats['categoryCount'] ?? '0'}"),
+      // HomeCard(
+      //     title: "Customers",
+      //     value: "${widget.systemProvider.dashboardStats['customerCount'] ?? '0'}"),
+    ];
+  }
+
+  // Method to build hotel-specific cards
+  List<Widget> _buildHotelCards() {
+    return [
+      HomeCard(
+          title: "Customers",
+          value: "${widget.systemProvider.dashboardStats['customerCount'] ?? '0'}"),
+      HomeCard(
+          title: "Hotel Categories",
+          value: "${widget.systemProvider.dashboardStats['hotelCategoryCount'] ?? '0'}"),
+      HomeCard(
+          title: "Hotel Amenities",
+          value: "${widget.systemProvider.dashboardStats['hotelAmenityCount'] ?? '0'}"),
+      HomeCard(
+          title: "Hotel Rooms",
+          value: "${widget.systemProvider.dashboardStats['hotelRoomCount'] ?? '0'}"),
+    ];
+  }
+
+  // Method to build super admin cards (all cards)
+  List<Widget> _buildSuperAdminCards() {
+    return [
+      ..._buildStoreCards(),
+      ..._buildHotelCards(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Calculate dynamic crossAxisCount based on screen width
     final double screenWidth = MediaQuery.of(context).size.width;
-    final int crossAxisCount = (screenWidth / 300).floor().clamp(2, 4); // Min 2, max 4 cards per row
+
+    // Determine which cards to show based on user role
+    List<Widget> cardsToShow;
+    if (widget.user.isSuperAdmin) {
+      cardsToShow = _buildSuperAdminCards();
+    } else if (widget.user.isHotelAdmin) {
+      cardsToShow = _buildHotelCards();
+    } else {
+      cardsToShow = _buildStoreCards();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -151,33 +205,7 @@ class _BodyState extends State<Body> {
                         mainAxisSpacing: 16,
                         childAspectRatio: screenWidth > 1200 ? 1.5 : 1.3,
                       ),
-                      children: [
-                        HomeCard(
-                            title: "Products",
-                            value: "${widget.systemProvider.dashboardStats['productCount'] ?? '0'}"),
-                        HomeCard(
-                            title: "In Stock",
-                            value: "${widget.systemProvider.dashboardStats['productStockOut'] ?? '0'}"),
-                        HomeCard(
-                            title: "Out of stock",
-                            value: "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}",
-                            onViewPressed: _showOutOfStockProducts),
-                        HomeCard(
-                            title: "Categories",
-                            value: "${widget.systemProvider.dashboardStats['categoryCount'] ?? '0'}"),
-                        HomeCard(
-                            title: "Customers",
-                            value: "${widget.systemProvider.dashboardStats['customerCount'] ?? '0'}"),
-                        HomeCard(
-                            title: "Hotel Categories",
-                            value: "${widget.systemProvider.dashboardStats['hotelCategoryCount'] ?? '0'}"),
-                        HomeCard(
-                            title: "Hotel Amenities",
-                            value: "${widget.systemProvider.dashboardStats['hotelAmenityCount'] ?? '0'}"),
-                        HomeCard(
-                            title: "Hotel Rooms",
-                            value: "${widget.systemProvider.dashboardStats['hotelRoomCount'] ?? '0'}"),
-                      ],
+                      children: cardsToShow,
                     ),
                   ),
                 ],
@@ -193,8 +221,10 @@ class _BodyState extends State<Body> {
 
 
 
+
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/data/models/user_details.dart';
+// import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 // import 'package:flutter/material.dart';
 // import 'package:spotstock_inventory/widgets/sidebar_inventory.dart';
 // import 'card.dart';
@@ -223,6 +253,75 @@ class _BodyState extends State<Body> {
 //   void dispose() {
 //     _activeItem.dispose();
 //     super.dispose();
+//   }
+
+//   // Method to show bottom sheet with out-of-stock products
+//   void _showOutOfStockProducts() async {
+//     // Fetch all products
+//     final products = await widget.systemProvider.getProducts(0);
+//     // Filter out-of-stock products
+//     final outOfStockProducts = products
+//         .where((product) => product['attributes']['stock']['quantity'] == 0)
+//         .toList();
+
+//     showModalBottomSheet(
+//       context: context,
+//       isScrollControlled: true,
+//       backgroundColor: Colors.white,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+//       ),
+//       builder: (context) => DraggableScrollableSheet(
+//         initialChildSize: 0.7,
+//         minChildSize: 0.4,
+//         maxChildSize: 0.9,
+//         expand: false,
+//         builder: (context, scrollController) => Column(
+//           children: [
+//             // Header with close button
+//             Padding(
+//               padding: const EdgeInsets.all(16.0),
+//               child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Text(
+//                     "Out of Stock Products",
+//                     style: TextStyle(
+//                       fontSize: 18,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                   IconButton(
+//                     icon: Icon(Icons.close),
+//                     onPressed: () => Navigator.pop(context),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             Expanded(
+//               child: outOfStockProducts.isEmpty
+//                   ? Center(child: Text("No out-of-stock products found"))
+//                   : GridView.builder(
+//                       controller: scrollController,
+//                       padding: const EdgeInsets.all(16.0),
+//                       itemCount: outOfStockProducts.length,
+//                       gridDelegate:
+//                           const SliverGridDelegateWithFixedCrossAxisCount(
+//                         crossAxisCount: 4,
+//                         crossAxisSpacing: 16,
+//                         mainAxisSpacing: 16,
+//                         childAspectRatio: 1.5,
+//                       ),
+//                       itemBuilder: (context, index) {
+//                         var product = outOfStockProducts[index]['attributes'];
+//                         return ProductDetails(product: product);
+//                       },
+//                     ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
 //   }
 
 //   @override
@@ -268,14 +367,13 @@ class _BodyState extends State<Body> {
 //                   Padding(
 //                     padding: const EdgeInsets.all(16.0),
 //                     child: GridView(
-//                       shrinkWrap: true, // Prevent GridView from taking full height
-//                       // physics: const NeverScrollableScrollView(), // Disable GridView scrolling
+//                       shrinkWrap: true,
 //                       physics: const NeverScrollableScrollPhysics(),
 //                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-//                         maxCrossAxisExtent: 300, // Maximum width of each card
+//                         maxCrossAxisExtent: 300,
 //                         crossAxisSpacing: 16,
 //                         mainAxisSpacing: 16,
-//                         childAspectRatio: screenWidth > 1200 ? 1.5 : 1.3, // Adjust aspect ratio for smaller screens
+//                         childAspectRatio: screenWidth > 1200 ? 1.5 : 1.3,
 //                       ),
 //                       children: [
 //                         HomeCard(
@@ -286,7 +384,8 @@ class _BodyState extends State<Body> {
 //                             value: "${widget.systemProvider.dashboardStats['productStockOut'] ?? '0'}"),
 //                         HomeCard(
 //                             title: "Out of stock",
-//                             value: "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}"),
+//                             value: "${widget.systemProvider.dashboardStats['productsOutOfStock'] ?? '0'}",
+//                             onViewPressed: _showOutOfStockProducts),
 //                         HomeCard(
 //                             title: "Categories",
 //                             value: "${widget.systemProvider.dashboardStats['categoryCount'] ?? '0'}"),
