@@ -407,8 +407,8 @@ class _PaymentFormState extends State<PaymentForm> {
             const SizedBox(height: 10),
             Text(
               change >= 0
-                  ? "Balance: ${Money.format(change)}"
-                  : "Change: ${Money.format(change.abs())}",
+                  ? "change: ${Money.format(change)}"
+                  : "Balance Due: ${Money.format(change.abs())}",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],

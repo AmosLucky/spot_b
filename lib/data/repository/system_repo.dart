@@ -2139,54 +2139,6 @@ Future<void> clearLocalSales() async {
     return data ?? {};
   }
 
-// Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
-//   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-//   final store = await DatabaseEngine.instance.getStore();
-
-//   final orderBox = store.box<Orders>();
-//   var txnID = generateRandomString(12);
-
-//   // Map paymentStatus from string to corresponding value for Orders entity
-//   String paymentStatus;
-//   switch (paymentData['paymentStatus']) {
-//     case 'Paid':
-//       paymentStatus = 'Paid';
-//       break;
-//     case 'Unpaid':
-//       paymentStatus = 'Unpaid';
-//       break;
-//     case 'Partial':
-//       paymentStatus = 'Partial';
-//       break;
-//     default:
-//       paymentStatus = 'Unpaid'; // Default to Unpaid if invalid
-//   }
-
-//   Orders newOrder = Orders(
-//     billerId: user.id,
-//     customerName: paymentData['customerName'] ?? 'Walk-in Customer',
-//     trxId: txnID,
-//     amount: total,
-//     quantity: 1,
-//     sync: 0,
-//     status: 1,
-//     productId: 0,
-//     createdAt: DateTime.now(),
-//     searchDate: searchDate(DateTime.now()),
-//     paymentMethod: paymentData['paymentType'] ?? 'Cash',
-//     paymentStatus: paymentStatus,
-//     items: data,
-//     others: jsonEncode(paymentData),
-//     companyId: user.company!.id.toString(),
-//     register: paymentData['registerId'].toString(),
-//     tableId: paymentData['table'],
-//     partialAmount: paymentData['partialAmount']?.toDouble(),
-//     receivedAmount: paymentData['receivedAmount']?.toDouble(),
-//   );
-//   orderBox.put(newOrder, mode: PutMode.insert);
-//   return {'status': true, 'txnID': txnID};
-// }
-
 
 Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
@@ -2253,30 +2205,6 @@ Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, d
       'status': true,
     };
   }
-
-  // Future<Map<String, dynamic>> holdInvoice(
-  //     total, registerId, data, table, customerName, customerPhone) async {
-  //   UserDetails user =
-  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-  //   var txnID = generateRandomString(12);
-  //   final store = await DatabaseEngine.instance.getStore();
-
-  //   final invoiceBox = store.box<Invoice>();
-  //   Invoice newInvoice = Invoice(
-  //     userId: user.id.toString(),
-  //     companyId: registerId.toString(),
-  //     amount: total,
-  //     reference: txnID,
-  //     invoice: data,
-  //     status: '1',
-  //     tableId: table ?? '',
-  //     customerName: customerName ?? '',
-  //     customerPhone: customerPhone ?? '',
-  //     lastUpdated: searchDate(DateTime.now()),
-  //   );
-  //   invoiceBox.put(newInvoice);
-  //   return {'status': true, 'reference': txnID};
-  // }
 
 
 Future<Map<String, dynamic>> holdInvoice(
@@ -2412,6 +2340,80 @@ Future<Map<String, dynamic>> updateInvoice(
     }
   }
 }
+
+
+  // Future<Map<String, dynamic>> holdInvoice(
+  //     total, registerId, data, table, customerName, customerPhone) async {
+  //   UserDetails user =
+  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  //   var txnID = generateRandomString(12);
+  //   final store = await DatabaseEngine.instance.getStore();
+
+  //   final invoiceBox = store.box<Invoice>();
+  //   Invoice newInvoice = Invoice(
+  //     userId: user.id.toString(),
+  //     companyId: registerId.toString(),
+  //     amount: total,
+  //     reference: txnID,
+  //     invoice: data,
+  //     status: '1',
+  //     tableId: table ?? '',
+  //     customerName: customerName ?? '',
+  //     customerPhone: customerPhone ?? '',
+  //     lastUpdated: searchDate(DateTime.now()),
+  //   );
+  //   invoiceBox.put(newInvoice);
+  //   return {'status': true, 'reference': txnID};
+  // }
+
+
+// Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
+//   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+//   final store = await DatabaseEngine.instance.getStore();
+
+//   final orderBox = store.box<Orders>();
+//   var txnID = generateRandomString(12);
+
+//   // Map paymentStatus from string to corresponding value for Orders entity
+//   String paymentStatus;
+//   switch (paymentData['paymentStatus']) {
+//     case 'Paid':
+//       paymentStatus = 'Paid';
+//       break;
+//     case 'Unpaid':
+//       paymentStatus = 'Unpaid';
+//       break;
+//     case 'Partial':
+//       paymentStatus = 'Partial';
+//       break;
+//     default:
+//       paymentStatus = 'Unpaid'; // Default to Unpaid if invalid
+//   }
+
+//   Orders newOrder = Orders(
+//     billerId: user.id,
+//     customerName: paymentData['customerName'] ?? 'Walk-in Customer',
+//     trxId: txnID,
+//     amount: total,
+//     quantity: 1,
+//     sync: 0,
+//     status: 1,
+//     productId: 0,
+//     createdAt: DateTime.now(),
+//     searchDate: searchDate(DateTime.now()),
+//     paymentMethod: paymentData['paymentType'] ?? 'Cash',
+//     paymentStatus: paymentStatus,
+//     items: data,
+//     others: jsonEncode(paymentData),
+//     companyId: user.company!.id.toString(),
+//     register: paymentData['registerId'].toString(),
+//     tableId: paymentData['table'],
+//     partialAmount: paymentData['partialAmount']?.toDouble(),
+//     receivedAmount: paymentData['receivedAmount']?.toDouble(),
+//   );
+//   orderBox.put(newOrder, mode: PutMode.insert);
+//   return {'status': true, 'txnID': txnID};
+// }
 
 
 
