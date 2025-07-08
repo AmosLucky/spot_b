@@ -124,6 +124,10 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 
       if (token.isEmpty) {
         ToastUtils.showErrorToast(context, 'Error', 'Authentication token not found');
+        setState(() {
+          _isLoading = false;
+          _isSubmitted = false;
+        });
         return;
       }
 
@@ -134,35 +138,71 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
         token: token,
       );
 
-      if (result['success']) {
-        ToastUtils.showSuccessToast(context, 'Success', result['message']);
+      print('Payment reconciliation result: $result');
+
+      // Handle different success scenarios
+      if (result['success'] == true) {
+        String message = result['message'] ?? 'Payment processed successfully';
         
-        // Notify parent components about the payment update
-        widget.onSubmit?.call(amount, _selectedPaymentType);
-        widget.onPaymentUpdated?.call();
-        
-        // Refresh the system provider to update UI
-        systemProvider.loadOrders();
-        
-        Navigator.of(context).pop();
-      } else {
-        if (result['message'].toString().toLowerCase().contains('already fully paid')) {
-          ToastUtils.showInfoToast(context, 'Info', result['message']);
-          Navigator.of(context).pop();
+        // Show appropriate toast based on sync status
+        if (result['synced'] == true) {
+          ToastUtils.showSuccessToast(context, 'Success', message);
+        } else if (result['localUpdated'] == true) {
+          // Local update succeeded but server sync failed
+          if (result['serverError'] != null) {
+            ToastUtils.showInfoToast(context, 'Saved Locally', 
+              'Payment saved locally. Server sync will retry automatically.');
+          } else {
+            ToastUtils.showInfoToast(context, 'Offline Mode', message);
+          }
         } else {
-          ToastUtils.showErrorToast(context, 'Error', result['message']);
+          ToastUtils.showSuccessToast(context, 'Success', message);
+        }
+        
+        // Always notify parent components if local update succeeded
+        if (result['localUpdated'] == true) {
+          widget.onSubmit?.call(amount, _selectedPaymentType);
+          widget.onPaymentUpdated?.call();
+          
+          // Refresh the system provider to update UI
+          try {
+            await systemProvider.loadOrders();
+          } catch (e) {
+            print('Error refreshing orders: $e');
+          }
+        }
+        
+        // Close dialog on any success
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+        
+      } else {
+        // Handle failure cases
+        String errorMessage = result['message'] ?? 'Failed to process payment';
+        
+        if (errorMessage.toLowerCase().contains('already fully paid')) {
+          ToastUtils.showInfoToast(context, 'Info', errorMessage);
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+        } else {
+          ToastUtils.showErrorToast(context, 'Error', errorMessage);
         }
       }
-    } catch (e) {
-      print('Error submitting payment: $e');
-      ToastUtils.showErrorToast(context, 'Error', 'Failed to process payment: $e');
-    } finally {
+    
+  } catch (e) {
+    print('Error submitting payment: $e');
+    ToastUtils.showErrorToast(context, 'Error', 'Failed to process payment: $e');
+  } finally {
+    if (mounted) {
       setState(() {
         _isLoading = false;
         _isSubmitted = false;
       });
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -269,8 +309,7 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
                       color: Colors.white,
                     ),
                   ),
-                ),
-              ],
+            )],
             ),
             const SizedBox(height: 32),
 
@@ -431,35 +470,26 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 
 
 
-
 // import 'package:flutter/material.dart';
-// import 'package:spotstock_inventory/common/helpers/database_engine.dart';
-// import 'package:spotstock_inventory/data/api/api_client.dart';
-// import 'package:spotstock_inventory/data/models/schema.dart';
-// import 'package:spotstock_inventory/common/utils/toast_utils.dart';
-// // import 'package:spotstock_inventory/data/api_client.dart';
-// import 'package:spotstock_inventory/common/provider/user_provider.dart';
 // import 'package:provider/provider.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
-// import 'package:connectivity_plus/connectivity_plus.dart';
-// import 'package:get_storage/get_storage.dart';
-// import 'package:spotstock_inventory/objectbox.g.dart';
+// import 'package:spotstock_inventory/common/provider/user_provider.dart';
+// import 'package:spotstock_inventory/common/provider/system_provider.dart';
+// import 'package:spotstock_inventory/common/utils/toast_utils.dart';
+// import 'package:spotstock_inventory/data/models/payment_reconciliation_model.dart';
+// import 'package:spotstock_inventory/screens/desktop/services/payment_reconciliation_service.dart';
+// // import '../services/payment_reconciliation_service.dart';
+// // import '../models/payment_reconciliation_model.dart';
 
 // class ReconcilePaymentDialog extends StatefulWidget {
-//   final String reference; // Transaction ID
-//   final double totalAmount; // Total amount of the sale
-//   final double paidSoFar; // Amount paid so far
-//   final String status; // Current payment status
-//   final Function(double amount, String paymentType)? onSubmit; // Callback for UI updates
+//   final String transactionId;
+//   final Function(double amount, String paymentType)? onSubmit;
+//   final VoidCallback? onPaymentUpdated;
 
 //   const ReconcilePaymentDialog({
 //     Key? key,
-//     required this.reference,
-//     required this.totalAmount,
-//     required this.paidSoFar,
-//     required this.status,
+//     required this.transactionId,
 //     this.onSubmit,
+//     this.onPaymentUpdated,
 //   }) : super(key: key);
 
 //   @override
@@ -468,11 +498,14 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 
 // class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //   final TextEditingController _amountController = TextEditingController();
+//   final PaymentReconciliationService _paymentService = PaymentReconciliationService();
+  
 //   String _selectedPaymentType = 'Cash';
 //   bool _isLoading = false;
-//   bool _isSubmitted = false; // Track if payment has been submitted
-//   final GetStorage _storage = GetStorage();
+//   bool _isSubmitted = false;
+//   PaymentReconciliationModel? _paymentData;
 
+//   // Consistent payment types list
 //   final List<String> _paymentTypes = [
 //     'Cash',
 //     'Cheque',
@@ -481,39 +514,50 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //     'Card',
 //   ];
 
-//   // Map UI payment types to server-expected payment_type values
-//   int _mapPaymentTypeToServerValue(String paymentType) {
-//     switch (paymentType.toLowerCase()) {
-//       case 'cash':
-//         return 1; // CASH
-//       case 'cheque':
-//         return 2; // CHEQUE
-//       case 'bank transfer':
-//         return 3; // BANK_TRANSFER
-//       default:
-//         return 4; // OTHER (Mobile Money, Card, etc.)
+//   @override
+//   void initState() {
+//     super.initState();
+//     _loadPaymentData();
+//   }
+
+//   Future<void> _loadPaymentData() async {
+//     setState(() {
+//       _isLoading = true;
+//     });
+
+//     try {
+//       final paymentData = await _paymentService.getPaymentReconciliationData(widget.transactionId);
+//       if (paymentData != null) {
+//         setState(() {
+//           _paymentData = paymentData;
+//           // Ensure the payment method is valid for the dropdown
+//           if (_paymentTypes.contains(paymentData.paymentMethod)) {
+//             _selectedPaymentType = paymentData.paymentMethod;
+//           } else {
+//             // Fallback to Cash if the payment method is not in our list
+//             _selectedPaymentType = 'Cash';
+//             print('Warning: Payment method "${paymentData.paymentMethod}" not found in dropdown options. Defaulting to Cash.');
+//           }
+//         });
+//       } else {
+//         ToastUtils.showErrorToast(context, 'Error', 'Transaction not found');
+//         Navigator.of(context).pop();
+//       }
+//     } catch (e) {
+//       print('Error loading payment data: $e');
+//       ToastUtils.showErrorToast(context, 'Error', 'Failed to load payment data: $e');
+//       Navigator.of(context).pop();
+//     } finally {
+//       setState(() {
+//         _isLoading = false;
+//       });
 //     }
 //   }
 
-//   // Map payment type number to string for storage/display
-//   String _mapPaymentTypeNumberToString(int paymentType) {
-//     switch (paymentType) {
-//       case 1:
-//         return 'CASH';
-//       case 2:
-//         return 'CHEQUE';
-//       case 3:
-//         return 'BANK_TRANSFER';
-//       case 4:
-//       default:
-//         return 'OTHER';
-//     }
-//   }
-
-//   double get balance => widget.totalAmount - widget.paidSoFar;
-
-//   Color get statusColor {
-//     switch (widget.status.toLowerCase()) {
+//   Color get _statusColor {
+//     if (_paymentData == null) return Colors.grey;
+    
+//     switch (_paymentData!.paymentStatus.toLowerCase()) {
 //       case 'partial':
 //         return Colors.orange;
 //       case 'paid':
@@ -526,210 +570,111 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //     }
 //   }
 
-//   @override
-//   void dispose() {
-//     _amountController.dispose();
-//     super.dispose();
-//   }
-
-//   // Check internet connectivity
-//   Future<bool> _checkInternetConnection() async {
-//     var connectivityResult = await Connectivity().checkConnectivity();
-//     return connectivityResult != ConnectivityResult.none;
-//   }
-
-//   // Update local Orders entity in ObjectBox
-//   Future<void> _updateLocalOrder({
-//     required double amount,
-//     required int paymentType,
-//     required bool isSynced,
-//     required bool isFullyPaid, // Flag to handle "Sale already fully paid"
-//   }) async {
-//     final store = await DatabaseEngine.instance.getStore();
-//     final orderBox = store.box<Orders>();
-
-//     // Find the order by trxId
-//     final query = orderBox.query(Orders_.trxId.equals(widget.reference)).build();
-//     final order = query.findFirst();
-
-//     if (order != null) {
-//       if (isFullyPaid) {
-//         // If server indicates fully paid, set status to Paid and match total amount
-//         order.paymentStatus = 'Paid';
-//         order.receivedAmount = order.amount; // Ensure receivedAmount equals total amount
-//         order.partialAmount = 0.0;
-//         order.sync = isSynced ? 1 : 0;
-//         order.paymentMethod = _mapPaymentTypeNumberToString(paymentType);
-//       } else {
-//         // Calculate new values for normal payment
-//         final newReceivedAmount = (order.receivedAmount ?? 0.0) + amount;
-//         final newPartialAmount = order.partialAmount ?? 0.0;
-//         final newBalance = order.amount - newReceivedAmount;
-//         String newPaymentStatus;
-
-//         if (newReceivedAmount >= order.amount) {
-//           newPaymentStatus = 'Paid';
-//         } else if (newReceivedAmount > 0) {
-//           newPaymentStatus = 'Partial';
-//         } else {
-//           newPaymentStatus = 'Unpaid';
-//         }
-
-//         // Update order fields
-//         order.receivedAmount = newReceivedAmount;
-//         order.partialAmount = newPartialAmount;
-//         order.paymentStatus = newPaymentStatus;
-//         order.paymentMethod = _mapPaymentTypeNumberToString(paymentType);
-//         order.sync = isSynced ? 1 : 0; // Mark as unsynced if offline
-//       }
-
-//       // Save to ObjectBox
-//       orderBox.put(order);
-//       print('Updated order ${order.trxId} locally: ${order.paymentStatus}, received: ${order.receivedAmount}');
-//     } else {
-//       print('Order with trxId ${widget.reference} not found in local database');
-//     }
-
-//     query.close();
-//   }
-
-//   // Submit payment to server
-//   Future<Map<String, dynamic>> _submitPaymentToServer(double amount, int paymentType) async {
-//     final apiClient = ApiClient();
-//     final userProvider = Provider.of<UserProvider>(context, listen: false);
-//     String token = userProvider.user.token ?? _storage.read('token') ?? '';
-
-//     if (token.isEmpty) {
-//       return {
-//         'success': false,
-//         'message': 'Authentication token not found',
-//       };
-//     }
-
-//     final url = Uri.parse('${apiClient.baseUrl}sales/${widget.reference}/reconcile-payment');
-//     final headers = {
-//       'Content-Type': 'application/json',
-//       'Authorization': 'Bearer $token',
-//     };
-//     final body = jsonEncode({
-//       'amount': amount,
-//       'payment_type': paymentType,
-//     });
-
-//     try {
-//       final response = await http.post(url, headers: headers, body: body);
-//       final responseBody = jsonDecode(response.body);
-
-//       if (response.statusCode == 200 || responseBody['status'] == true) {
-//         return {
-//           'success': true,
-//           'message': responseBody['message'] ?? 'Payment reconciled successfully',
-//           'isFullyPaid': responseBody['message'] == 'Sale already fully paid.',
-//         };
-//       } else {
-//         return {
-//           'success': false,
-//           'message': responseBody['message'] ?? 'Failed to reconcile payment',
-//           'isFullyPaid': responseBody['message'] == 'Sale already fully paid.',
-//         };
-//       }
-//     } catch (e) {
-//       return {
-//         'success': false,
-//         'message': 'Network error: $e',
-//         'isFullyPaid': false,
-//       };
-//     }
-//   }
-
-//   void _submitPayment() async {
-//     if (_isSubmitted) {
-//       return; // Prevent duplicate submissions
-//     }
+//   Future<void> _submitPayment() async {
+//     if (_isSubmitted || _paymentData == null) return;
 
 //     final amount = double.tryParse(_amountController.text);
-
 //     if (amount == null || amount <= 0) {
 //       ToastUtils.showErrorToast(context, 'Error', 'Please enter a valid amount');
 //       return;
 //     }
 
-//     if (amount > balance) {
+//     if (amount > _paymentData!.balance) {
 //       ToastUtils.showErrorToast(context, 'Error', 'Amount cannot exceed the balance');
 //       return;
 //     }
 
 //     setState(() {
 //       _isLoading = true;
-//       _isSubmitted = true; // Mark as submitted to prevent duplicates
+//       _isSubmitted = true;
 //     });
 
-//     final paymentType = _mapPaymentTypeToServerValue(_selectedPaymentType);
-//     bool isOnline = await _checkInternetConnection();
-
 //     try {
-//       if (isOnline) {
-//         // Online: Submit to server and update local database
-//         final serverResponse = await _submitPaymentToServer(amount, paymentType);
-//         if (serverResponse['success']) {
-//           // Update local database with synced status
-//           await _updateLocalOrder(
-//             amount: amount,
-//             paymentType: paymentType,
-//             isSynced: true,
-//             isFullyPaid: serverResponse['isFullyPaid'] ?? false,
-//           );
-//           ToastUtils.showSuccessToast(context, 'Success', serverResponse['message']);
-//           widget.onSubmit?.call(amount, _selectedPaymentType);
+//       final userProvider = Provider.of<UserProvider>(context, listen: false);
+//       final systemProvider = Provider.of<SystemProvider>(context, listen: false);
+//       final token = userProvider.user.token ?? '';
+
+//       if (token.isEmpty) {
+//         ToastUtils.showErrorToast(context, 'Error', 'Authentication token not found');
+//         return;
+//       }
+
+//       final result = await _paymentService.processPaymentReconciliation(
+//         transactionId: widget.transactionId,
+//         amount: amount,
+//         paymentType: _selectedPaymentType,
+//         token: token,
+//       );
+
+//       if (result['success']) {
+//         ToastUtils.showSuccessToast(context, 'Success', result['message']);
+        
+//         // Notify parent components about the payment update
+//         widget.onSubmit?.call(amount, _selectedPaymentType);
+//         widget.onPaymentUpdated?.call();
+        
+//         // Refresh the system provider to update UI
+//         systemProvider.loadOrders();
+        
+//         Navigator.of(context).pop();
+//       } else {
+//         if (result['message'].toString().toLowerCase().contains('already fully paid')) {
+//           ToastUtils.showInfoToast(context, 'Info', result['message']);
 //           Navigator.of(context).pop();
 //         } else {
-//           // Handle "Sale already fully paid" or other errors
-//           if (serverResponse['isFullyPaid'] == true) {
-//             await _updateLocalOrder(
-//               amount: 0.0, // No additional amount since already paid
-//               paymentType: paymentType,
-//               isSynced: true,
-//               isFullyPaid: true,
-//             );
-//             ToastUtils.showInfoToast(context, 'Info', 'Sale is already fully paid.');
-//             Navigator.of(context).pop();
-//           } else {
-//             // Server failed, store locally as unsynced
-//             await _updateLocalOrder(
-//               amount: amount,
-//               paymentType: paymentType,
-//               isSynced: false,
-//               isFullyPaid: false,
-//             );
-//             ToastUtils.showErrorToast(context, 'Error', serverResponse['message']);
-//           }
+//           ToastUtils.showErrorToast(context, 'Error', result['message']);
 //         }
-//       } else {
-//         // Offline: Store locally as unsynced
-//         await _updateLocalOrder(
-//           amount: amount,
-//           paymentType: paymentType,
-//           isSynced: false,
-//           isFullyPaid: false,
-//         );
-//         ToastUtils.showSuccessToast(context, 'Success', 'Payment saved offline. Will sync when online.');
-//         widget.onSubmit?.call(amount, _selectedPaymentType);
-//         Navigator.of(context).pop();
 //       }
 //     } catch (e) {
+//       print('Error submitting payment: $e');
 //       ToastUtils.showErrorToast(context, 'Error', 'Failed to process payment: $e');
-//       setState(() {
-//         _isSubmitted = false; // Allow retry on error
-//       });
 //     } finally {
 //       setState(() {
 //         _isLoading = false;
+//         _isSubmitted = false;
 //       });
 //     }
 //   }
 
 //   @override
 //   Widget build(BuildContext context) {
+//     if (_isLoading && _paymentData == null) {
+//       return Dialog(
+//         child: Container(
+//           padding: const EdgeInsets.all(24),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               CircularProgressIndicator(),
+//               SizedBox(height: 16),
+//               Text('Loading payment data...'),
+//             ],
+//           ),
+//         ),
+//       );
+//     }
+
+//     if (_paymentData == null) {
+//       return Dialog(
+//         child: Container(
+//           padding: const EdgeInsets.all(24),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Icon(Icons.error, color: Colors.red, size: 48),
+//               SizedBox(height: 16),
+//               Text('Failed to load payment data'),
+//               SizedBox(height: 16),
+//               ElevatedButton(
+//                 onPressed: () => Navigator.of(context).pop(),
+//                 child: Text('Close'),
+//               ),
+//             ],
+//           ),
+//         ),
+//       );
+//     }
+
 //     return Dialog(
 //       backgroundColor: Colors.white,
 //       shape: RoundedRectangleBorder(
@@ -742,7 +687,7 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //           mainAxisSize: MainAxisSize.min,
 //           crossAxisAlignment: CrossAxisAlignment.start,
 //           children: [
-//             // Header with title and close button
+//             // Header
 //             Row(
 //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //               children: [
@@ -756,29 +701,22 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //                 ),
 //                 IconButton(
 //                   onPressed: () => Navigator.of(context).pop(),
-//                   icon: const Icon(
-//                     Icons.close,
-//                     size: 24,
-//                     color: Colors.grey,
-//                   ),
+//                   icon: const Icon(Icons.close, size: 24, color: Colors.grey),
 //                   padding: EdgeInsets.zero,
 //                   constraints: const BoxConstraints(),
 //                 ),
 //               ],
 //             ),
-
 //             const SizedBox(height: 24),
 
 //             // Payment details
-//             _buildDetailRow('Reference:', widget.reference),
+//             _buildDetailRow('Reference:', _paymentData!.transactionId),
 //             const SizedBox(height: 12),
-//             _buildDetailRow(
-//                 'Total Amount:', '₦${widget.totalAmount.toStringAsFixed(0)}'),
+//             _buildDetailRow('Total Amount:', '₦${_paymentData!.totalAmount.toStringAsFixed(0)}'),
 //             const SizedBox(height: 12),
-//             _buildDetailRow(
-//                 'Paid So Far:', '₦${widget.paidSoFar.toStringAsFixed(0)}'),
+//             _buildDetailRow('Paid So Far:', '₦${_paymentData!.paidSoFar.toStringAsFixed(0)}'),
 //             const SizedBox(height: 12),
-//             _buildDetailRow('Balance:', '₦${balance.toStringAsFixed(0)}'),
+//             _buildDetailRow('Balance:', '₦${_paymentData!.balance.toStringAsFixed(0)}'),
 //             const SizedBox(height: 12),
 
 //             // Status row
@@ -787,20 +725,16 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //               children: [
 //                 const Text(
 //                   'Status:',
-//                   style: TextStyle(
-//                     fontSize: 16,
-//                     color: Colors.black87,
-//                   ),
+//                   style: TextStyle(fontSize: 16, color: Colors.black87),
 //                 ),
 //                 Container(
-//                   padding:
-//                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+//                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 //                   decoration: BoxDecoration(
-//                     color: statusColor,
+//                     color: _statusColor,
 //                     borderRadius: BorderRadius.circular(16),
 //                   ),
 //                   child: Text(
-//                     widget.status,
+//                     _paymentData!.paymentStatus,
 //                     style: const TextStyle(
 //                       fontSize: 14,
 //                       fontWeight: FontWeight.w500,
@@ -810,7 +744,6 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //                 ),
 //               ],
 //             ),
-
 //             const SizedBox(height: 32),
 
 //             // Payment Amount input
@@ -836,13 +769,11 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //                   hintText: 'Enter amount',
 //                   hintStyle: TextStyle(color: Colors.grey),
 //                   border: InputBorder.none,
-//                   contentPadding:
-//                       EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+//                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
 //                 ),
 //                 enabled: !_isLoading,
 //               ),
 //             ),
-
 //             const SizedBox(height: 24),
 
 //             // Payment Type dropdown
@@ -865,20 +796,18 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //               child: DropdownButtonHideUnderline(
 //                 child: DropdownButton<String>(
 //                   value: _selectedPaymentType,
-//                   icon:
-//                       const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+//                   icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
 //                   style: const TextStyle(fontSize: 16, color: Colors.black87),
 //                   onChanged: _isLoading
 //                       ? null
 //                       : (String? newValue) {
-//                           if (newValue != null) {
+//                           if (newValue != null && _paymentTypes.contains(newValue)) {
 //                             setState(() {
 //                               _selectedPaymentType = newValue;
 //                             });
 //                           }
 //                         },
-//                   items: _paymentTypes
-//                       .map<DropdownMenuItem<String>>((String value) {
+//                   items: _paymentTypes.map<DropdownMenuItem<String>>((String value) {
 //                     return DropdownMenuItem<String>(
 //                       value: value,
 //                       child: Text(value),
@@ -887,7 +816,6 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //                 ),
 //               ),
 //             ),
-
 //             const SizedBox(height: 32),
 
 //             // Action buttons
@@ -950,10 +878,7 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //       children: [
 //         Text(
 //           label,
-//           style: const TextStyle(
-//             fontSize: 16,
-//             color: Colors.black87,
-//           ),
+//           style: const TextStyle(fontSize: 16, color: Colors.black87),
 //         ),
 //         Text(
 //           value,
@@ -965,5 +890,11 @@ class _ReconcilePaymentDialogState extends State<ReconcilePaymentDialog> {
 //         ),
 //       ],
 //     );
+//   }
+
+//   @override
+//   void dispose() {
+//     _amountController.dispose();
+//     super.dispose();
 //   }
 // }

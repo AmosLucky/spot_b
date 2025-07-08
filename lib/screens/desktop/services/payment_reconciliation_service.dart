@@ -6,7 +6,7 @@ import 'package:spotstock_inventory/data/api/api_client.dart';
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/data/models/payment_reconciliation_model.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
-// import 'package:spotstock_inventory/common/utils/toast_utils.dart';
+import 'package:spotstock_inventory/common/utils/toast_utils.dart';
 import 'package:spotstock_inventory/objectbox.g.dart';
 // import '../models/payment_reconciliation_model.dart';
 
@@ -222,7 +222,7 @@ class PaymentReconciliationService {
         
         if (serverResponse['success']) {
           // Update local database with synced status
-          await updateLocalOrderPayment(
+          final localUpdateSuccess = await updateLocalOrderPayment(
             transactionId: transactionId,
             amount: amount,
             paymentType: paymentType,
@@ -232,44 +232,50 @@ class PaymentReconciliationService {
           
           return {
             'success': true,
-            'message': serverResponse['message'],
+            'message': serverResponse['message'] ?? 'Payment reconciled successfully',
             'synced': true,
+            'localUpdated': localUpdateSuccess,
           };
         } else {
-          // Server failed, store locally as unsynced
+          // Server failed, but update locally as unsynced for offline capability
+          final localUpdateSuccess = await updateLocalOrderPayment(
+            transactionId: transactionId,
+            amount: amount,
+            paymentType: paymentType,
+            isSynced: false,
+            isFullyPaid: false,
+          );
+          
           if (serverResponse['isFullyPaid'] == true) {
-            await updateLocalOrderPayment(
-              transactionId: transactionId,
-              amount: 0.0,
-              paymentType: paymentType,
-              isSynced: true,
-              isFullyPaid: true,
-            );
-            
             return {
               'success': true,
               'message': 'Sale is already fully paid.',
-              'synced': true,
+              'synced': false,
+              'localUpdated': localUpdateSuccess,
             };
           } else {
-            await updateLocalOrderPayment(
-              transactionId: transactionId,
-              amount: amount,
-              paymentType: paymentType,
-              isSynced: false,
-              isFullyPaid: false,
-            );
-            
-            return {
-              'success': false,
-              'message': serverResponse['message'],
-              'synced': false,
-            };
+            // If local update succeeded, treat as success with warning
+            if (localUpdateSuccess) {
+              return {
+                'success': true,
+                'message': 'Payment saved locally. Server sync failed but will retry later.',
+                'synced': false,
+                'localUpdated': true,
+                'serverError': serverResponse['message'],
+              };
+            } else {
+              return {
+                'success': false,
+                'message': serverResponse['message'] ?? 'Failed to process payment',
+                'synced': false,
+                'localUpdated': false,
+              };
+            }
           }
         }
       } else {
         // Offline: Store locally as unsynced
-        await updateLocalOrderPayment(
+        final localUpdateSuccess = await updateLocalOrderPayment(
           transactionId: transactionId,
           amount: amount,
           paymentType: paymentType,
@@ -278,20 +284,48 @@ class PaymentReconciliationService {
         );
         
         return {
-          'success': true,
-          'message': 'Payment saved offline. Will sync when online.',
+          'success': localUpdateSuccess,
+          'message': localUpdateSuccess 
+              ? 'Payment saved offline. Will sync when online.'
+              : 'Failed to save payment offline.',
           'synced': false,
+          'localUpdated': localUpdateSuccess,
         };
       }
     } catch (e) {
+      // Try to save locally even if there's an exception
+      try {
+        final localUpdateSuccess = await updateLocalOrderPayment(
+          transactionId: transactionId,
+          amount: amount,
+          paymentType: paymentType,
+          isSynced: false,
+          isFullyPaid: false,
+        );
+        
+        if (localUpdateSuccess) {
+          return {
+            'success': true,
+            'message': 'Payment saved locally. Network error occurred but payment is recorded.',
+            'synced': false,
+            'localUpdated': true,
+            'networkError': e.toString(),
+          };
+        }
+      } catch (localError) {
+        print('Local update also failed: $localError');
+      }
+      
       return {
         'success': false,
         'message': 'Failed to process payment: $e',
         'synced': false,
+        'localUpdated': false,
       };
     }
   }
 }
+
 
 
 
@@ -305,7 +339,7 @@ class PaymentReconciliationService {
 // import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 // import 'package:spotstock_inventory/data/models/payment_reconciliation_model.dart';
 // import 'package:spotstock_inventory/data/models/schema.dart';
-// import 'package:spotstock_inventory/common/utils/toast_utils.dart';
+// // import 'package:spotstock_inventory/common/utils/toast_utils.dart';
 // import 'package:spotstock_inventory/objectbox.g.dart';
 // // import '../models/payment_reconciliation_model.dart';
 
@@ -330,6 +364,41 @@ class PaymentReconciliationService {
 //     3: 'Bank Transfer',
 //     4: 'Mobile Money',
 //   };
+
+//   // Database to display mapping for payment methods
+//   static const Map<String, String> databaseToDisplayMapping = {
+//     'CASH': 'Cash',
+//     'Cash': 'Cash',
+//     'cash': 'Cash',
+//     'CHEQUE': 'Cheque',
+//     'Cheque': 'Cheque',
+//     'cheque': 'Cheque',
+//     'BANK_TRANSFER': 'Bank Transfer',
+//     'Bank Transfer': 'Bank Transfer',
+//     'bank_transfer': 'Bank Transfer',
+//     'MOBILE_MONEY': 'Mobile Money',
+//     'Mobile Money': 'Mobile Money',
+//     'mobile_money': 'Mobile Money',
+//     'CARD': 'Card',
+//     'Card': 'Card',
+//     'card': 'Card',
+//     'TRANSFER': 'Bank Transfer',
+//     'Transfer': 'Bank Transfer',
+//     'transfer': 'Bank Transfer',
+//     'POS': 'Card',
+//     'pos': 'Card',
+//     'OTHER': 'Mobile Money',
+//     'other': 'Mobile Money',
+//   };
+
+//   // Convert database payment method to display format
+//   static String normalizePaymentMethod(String? paymentMethod) {
+//     if (paymentMethod == null || paymentMethod.isEmpty) {
+//       return 'Cash'; // Default fallback
+//     }
+    
+//     return databaseToDisplayMapping[paymentMethod] ?? 'Cash';
+//   }
 
 //   // Get payment reconciliation data for a transaction
 //   Future<PaymentReconciliationModel?> getPaymentReconciliationData(String transactionId) async {
