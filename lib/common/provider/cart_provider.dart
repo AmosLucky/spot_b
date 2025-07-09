@@ -193,47 +193,90 @@ class CartProvider with ChangeNotifier {
     return response;
   }
 
-  // Updated holdInvoice method to handle redo state
-  Future<Map<String, dynamic>> holdInvoice(
-      BuildContext context, 
-      registerId, 
-      subTotal, 
-      table, 
-      customerName, 
-      customerPhone, 
-      {String? attendantId}) async {
+  // // Updated holdInvoice method to handle redo state
+  // Future<Map<String, dynamic>> holdInvoice(
+  //     BuildContext context, 
+  //     registerId, 
+  //     subTotal, 
+  //     table, 
+  //     customerName, 
+  //     customerPhone, 
+  //     {String? attendantId}) async {
     
-    var json = jsonEncode(items.map((e) => e.toJson()).toList());
-    print("========= final item =============");
-    print(json);
+  //   var json = jsonEncode(items.map((e) => e.toJson()).toList());
+  //   print("========= final item =============");
+  //   print(json);
     
-    String invoiceReference;
+  //   String invoiceReference;
     
-    if (_isRedoingInvoice && _currentInvoiceReference != null) {
-      // Use existing reference for redo operations
-      invoiceReference = _currentInvoiceReference!;
+  //   if (_isRedoingInvoice && _currentInvoiceReference != null) {
+  //     // Use existing reference for redo operations
+  //     invoiceReference = _currentInvoiceReference!;
       
-      // Update existing invoice instead of creating new one
-      var response = await SystemRepo(refresh: false, online: false)
-          .updateInvoice(_selectedInvoiceId, subTotal, json, table, customerName, customerPhone, attendantId);
+  //     // Update existing invoice instead of creating new one
+  //     var response = await SystemRepo(refresh: false, online: false)
+  //         .updateInvoice(_selectedInvoiceId, subTotal, json, table, customerName, customerPhone, attendantId);
       
-      if (response['status'] == true) {
-        removeAll();
-      }
-      return response;
-    } else {
-      // Generate new reference for new invoices
-      invoiceReference = _generateUniqueInvoiceReference(attendantId, customerName ?? 'Walk-in Customer');
+  //     if (response['status'] == true) {
+  //       removeAll();
+  //     }
+  //     return response;
+  //   } else {
+  //     // Generate new reference for new invoices
+  //     invoiceReference = _generateUniqueInvoiceReference(attendantId, customerName ?? 'Walk-in Customer');
       
-      var response = await SystemRepo(refresh: false, online: false)
-          .holdInvoice(subTotal, registerId, json, table, customerName, customerPhone, attendantId, invoiceReference);
+  //     var response = await SystemRepo(refresh: false, online: false)
+  //         .holdInvoice(subTotal, registerId, json, table, customerName, customerPhone, attendantId, invoiceReference);
       
-      if (response['status'] == true) {
-        removeAll();
-      }
-      return response;
+  //     if (response['status'] == true) {
+  //       removeAll();
+  //     }
+  //     return response;
+  //   }
+  // }
+
+// In cart_provider.dart, when calling holdInvoice, ensure attendantId is passed as String
+Future<Map<String, dynamic>> holdInvoice(
+    BuildContext context,
+    registerId,
+    subTotal,
+    table,
+    customerName,
+    customerPhone,
+    {String? attendantId}) async { // Parameter is already String? which is correct
+
+  var json = jsonEncode(items.map((e) => e.toJson()).toList());
+  print("========= final item =============");
+  print(json);
+
+  String invoiceReference;
+
+  if (_isRedoingInvoice && _currentInvoiceReference != null) {
+    // Use existing reference for redo operations
+    invoiceReference = _currentInvoiceReference!;
+
+    // Update existing invoice instead of creating new one
+    var response = await SystemRepo(refresh: false, online: false)
+        .updateInvoice(_selectedInvoiceId, subTotal, json, table, customerName, customerPhone, attendantId);
+
+    if (response['status'] == true) {
+      removeAll();
     }
+    return response;
+  } else {
+    // Generate new reference for new invoices
+    invoiceReference = _generateUniqueInvoiceReference(attendantId, customerName ?? 'Walk-in Customer');
+
+    var response = await SystemRepo(refresh: false, online: false)
+        .holdInvoice(subTotal, registerId, json, table, customerName, customerPhone, attendantId, invoiceReference);
+
+    if (response['status'] == true) {
+      removeAll();
+    }
+    return response;
   }
+}
+
 
   summary(BuildContext context, SystemProvider systemProvider, String customer,
       data) {

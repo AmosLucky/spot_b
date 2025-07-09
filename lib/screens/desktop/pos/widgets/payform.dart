@@ -471,7 +471,8 @@ class _PaymentFormState extends State<PaymentForm> {
                   ? double.tryParse(partialAmountController.text) ?? 0.0
                   : null,
               'table': selectedTable,
-              'attendantId': _selectedAttendant?.id,
+              'attendantId': _selectedAttendant?.apiId?.toString(),
+              // 'attendantId': _selectedAttendant?.id,
               'attendantName': attendantName,
             };
             widget.onSubmit(paymentData);

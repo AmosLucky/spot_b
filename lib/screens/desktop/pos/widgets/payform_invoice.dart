@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
-import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
 import '../../model/select_attendant_model.dart';
 import '../../providers/select_attendant_provider.dart';
 import '../../services/select_attendant_service.dart';
 import '../dialogs/select_attendant_pin.dart';
+// import 'package:spotstock_inventory/common/money.dart';
 
 class PayFormInvoice extends StatefulWidget {
   final SystemProvider systemProvider;
@@ -353,7 +353,8 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
               'customerName': customerNameController.text,
               'customerPhoneNumber': customerPhoneController.text,
               'table': selectedTable,
-              'attendantId': _selectedAttendant?.id,
+              'attendantId': _selectedAttendant?.apiId?.toString(),
+              // 'attendantId': _selectedAttendant?.id,
             };
             widget.onSubmit(invoiceData);
             Navigator.of(context).pop();

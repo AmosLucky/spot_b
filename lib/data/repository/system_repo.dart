@@ -2182,7 +2182,8 @@ Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, d
     tableId: paymentData['table'],
     partialAmount: paymentData['partialAmount']?.toDouble(),
     receivedAmount: paymentData['receivedAmount']?.toDouble(),
-    attendantId: paymentData['attendantId'], // Store attendant ID
+    // attendantId: paymentData['attendantId'], // Store attendant ID
+     attendantId: paymentData['attendantId']?.toString(),
     invoiceReference: paymentData['invoiceReference'], // Store invoice reference
   );
 
