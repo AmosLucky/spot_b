@@ -17,8 +17,8 @@ class UserProvider with ChangeNotifier {
     status: 0,
     token: '',
     language: '',
-    isAdmin: 0, // Add this line
-    isSuper: 0, // Add this line
+    isAdmin: 0, 
+    isSuper: 0, 
     company: null,
     role: null,
   );

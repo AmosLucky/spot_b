@@ -9,7 +9,7 @@ import 'package:spotstock_inventory/data/repository/system_repo.dart';
 import 'package:spotstock_inventory/screens/desktop/hotel/frontdesk_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
-// import 'package:spotstock_inventory/utils/role_detector.dart';
+import 'package:spotstock_inventory/common/utils/role_detector.dart';
 
 class Header extends StatefulWidget {
   final UserDetails user;
@@ -27,17 +27,14 @@ class _HeaderState extends State<Header> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getData();
-      // Debug role detection
       _debugRoleDetection();
     });
   }
 
   void _debugRoleDetection() {
     print('=== HEADER ROLE DEBUG ===');
-    print('User Role: ${widget.user.userRole}');
-    print('Is Hotel Admin: ${widget.user.isHotelAdmin}');
-    print('Is Store Admin: ${widget.user.isStoreAdmin}');
-    print('Is Super Admin: ${widget.user.isSuperAdmin}');
+    // Use the debug method to print complete user details
+    RoleDetector.debugUserDetails(widget.user);
     print('========================');
   }
 
@@ -51,13 +48,14 @@ class _HeaderState extends State<Header> {
     final String formattedDate =
         DateFormat('MMM d, yyyy').format(DateTime.now());
 
-    // Debug the user role in build method
+    // Use the improved role detection
+    final canAccessStore = widget.user.canAccessStore;
+    final canAccessHotel = widget.user.canAccessHotel;
     final userRole = widget.user.userRole;
-    final isHotelAdmin = widget.user.isHotelAdmin;
-    final isStoreAdmin = widget.user.isStoreAdmin;
-    final isSuperAdmin = widget.user.isSuperAdmin;
 
-    print('BUILD - User Role: $userRole, Hotel: $isHotelAdmin, Store: $isStoreAdmin, Super: $isSuperAdmin');
+    print('BUILD - User Role: $userRole');
+    print('BUILD - Can Access Store: $canAccessStore');
+    print('BUILD - Can Access Hotel: $canAccessHotel');
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -89,11 +87,12 @@ class _HeaderState extends State<Header> {
                 ),
               ),
             ),
+
             // Conditional Button Rendering
             Row(
               children: [
-                // POS Button - Only show for Store Admins and Super Admins
-                if (isStoreAdmin || isSuperAdmin) ...[
+                // POS Button - Show for users who can access store features
+                if (canAccessStore) ...[
                   OutlinedButton(
                     onPressed: () async {
                       bool isOpen = await _isOpenRegister("INVENTORY");
@@ -125,11 +124,11 @@ class _HeaderState extends State<Header> {
                     ),
                   ),
                   // Add spacing if both buttons will be shown
-                  if (isHotelAdmin || isSuperAdmin) const SizedBox(width: 10),
+                  if (canAccessHotel) const SizedBox(width: 10),
                 ],
-                
-                // HOTEL Button - Only show for Hotel Admins and Super Admins
-                if (isHotelAdmin || isSuperAdmin)
+
+                // HOTEL Button - Show for users who can access hotel features
+                if (canAccessHotel)
                   OutlinedButton(
                     onPressed: () async {
                       bool isOpen = await _isOpenRegister("HOTEL");
@@ -176,7 +175,7 @@ class _HeaderState extends State<Header> {
                   ),
                   // Debug info - remove this in production
                   Text(
-                    'Role: $userRole',
+                    'Role: $userRole | Store: $canAccessStore | Hotel: $canAccessHotel',
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -371,13 +370,10 @@ class _HeaderState extends State<Header> {
 // import 'package:spotstock_inventory/screens/desktop/login_desktop.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/ecosystem_desktop.dart';
 
-// // import 'package:spotstock_inventory/data/models/userdetails.dart';
-// // import '../../choose_module_desktop.dart';
-// // import 'package:spotstock_inventory/screens/desktop/home/hotel_screen_desktop.dart';
-
 // class Header extends StatefulWidget {
 //   final UserDetails user;
 //   final SystemProvider systemProvider;
+
 //   const Header({super.key, required this.user, required this.systemProvider});
 
 //   @override
@@ -385,19 +381,25 @@ class _HeaderState extends State<Header> {
 // }
 
 // class _HeaderState extends State<Header> {
-//   // @override
-//   // void initState() {
-//   //   getData();
-//   //   // TODO: implement initState
-//   //   super.initState();
-//   // }
-
+//   @override
 //   void initState() {
 //     super.initState();
-//     // Delay the data fetch until after the first frame is rendered
 //     WidgetsBinding.instance.addPostFrameCallback((_) {
 //       getData();
+//       _debugRoleDetection();
 //     });
+//   }
+
+//   void _debugRoleDetection() {
+//     print('=== HEADER ROLE DEBUG ===');
+//     print('User Role: ${widget.user.userRole}');
+//     print('Is Hotel Admin: ${widget.user.isHotelAdmin}');
+//     print('Is Store Admin: ${widget.user.isStoreAdmin}');
+//     print('Is Super Admin: ${widget.user.isSuperAdmin}');
+//     print('Can Access Hotel: ${widget.user.canAccessHotel}');
+//     print('Can Access Store: ${widget.user.canAccessStore}');
+//     print('Has POS Permissions: ${widget.user.hasPosPermissions}');
+//     print('========================');
 //   }
 
 //   Future<void> getData() async {
@@ -407,9 +409,15 @@ class _HeaderState extends State<Header> {
 
 //   @override
 //   Widget build(BuildContext context) {
-//     // Format today's date
 //     final String formattedDate =
 //         DateFormat('MMM d, yyyy').format(DateTime.now());
+
+//     // Use the improved role detection
+//     final canAccessStore = widget.user.canAccessStore;
+//     final canAccessHotel = widget.user.canAccessHotel;
+//     final isSuperAdmin = widget.user.isSuperAdmin;
+
+//     print('BUILD - Can Access Store: $canAccessStore, Can Access Hotel: $canAccessHotel, Super: $isSuperAdmin');
 
 //     return Padding(
 //       padding: const EdgeInsets.all(16.0),
@@ -441,83 +449,78 @@ class _HeaderState extends State<Header> {
 //                 ),
 //               ),
 //             ),
-//             // FRD and POS Buttons
+
+//             // Conditional Button Rendering
 //             Row(
 //               children: [
-//                 OutlinedButton(
-//                   onPressed: () async {
-//                     // Check if the register is open before navigating
-//                     bool isOpen = await _isOpenRegister("INVENTORY");
+//                 // POS Button - Show for users who can access store features
+//                 if (canAccessStore) ...[
+//                   OutlinedButton(
+//                     onPressed: () async {
+//                       bool isOpen = await _isOpenRegister("INVENTORY");
+//                       if (isOpen) {
+//                         _navigateToPage(
+//                           context,
+//                           EcosystemDesktop(
+//                             systemProvider: widget.systemProvider,
+//                             user: widget.user,
+//                           ),
+//                         );
+//                       } else {
+//                         _showPOSDialog(context, "INVENTORY");
+//                       }
+//                     },
+//                     style: OutlinedButton.styleFrom(
+//                       side: BorderSide(color: primaryColor, width: 1),
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(8),
+//                       ),
+//                       padding: const EdgeInsets.symmetric(
+//                         horizontal: 24,
+//                         vertical: 16,
+//                       ),
+//                     ),
+//                     child: Text(
+//                       "POS",
+//                       style: TextStyle(color: primaryColor),
+//                     ),
+//                   ),
+//                   // Add spacing if both buttons will be shown
+//                   if (canAccessHotel) const SizedBox(width: 10),
+//                 ],
 
-//                     if (isOpen) {
-//                       _navigateToPage(
-//                         context,
-//                         EcosystemDesktop(
-//                           systemProvider: widget.systemProvider,
-//                           user: widget.user,
-//                         ),
-//                       );
-//                     } else {
-//                       // Show POS dialog if register is not open
-//                       _showPOSDialog(context, "INVENTORY");
-//                     }
-//                   },
-//                   style: OutlinedButton.styleFrom(
-//                     side: BorderSide(
-//                         color: primaryColor,
-//                         width: 1), // Outline color and width
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(8), // Rounded corners
+//                 // HOTEL Button - Show for users who can access hotel features
+//                 if (canAccessHotel)
+//                   OutlinedButton(
+//                     onPressed: () async {
+//                       bool isOpen = await _isOpenRegister("HOTEL");
+//                       if (isOpen) {
+//                         _navigateToPage(
+//                           context,
+//                           FrontDeskDesktop(
+//                             systemProvider: widget.systemProvider,
+//                             user: widget.user,
+//                           ),
+//                         );
+//                       } else {
+//                         _showPOSDialog(context, "HOTEL");
+//                       }
+//                     },
+//                     style: OutlinedButton.styleFrom(
+//                       side: BorderSide(color: primaryColor, width: 1),
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(8),
+//                       ),
+//                       padding: const EdgeInsets.symmetric(
+//                         horizontal: 24,
+//                         vertical: 16,
+//                       ),
 //                     ),
-//                     padding: const EdgeInsets.symmetric(
-//                       horizontal: 24, // Horizontal padding
-//                       vertical: 16, // Vertical padding
-//                     ),
-//                   ),
-//                   child: Text(
-//                     "POS",
-//                     style: TextStyle(color: primaryColor),
-//                   ),
-//                 ),
-//                 SizedBox(
-//                   width: 10,
-//                 ),
-
-//                 OutlinedButton(
-//                   onPressed: () async {
-//                     // Check if the register is open before navigating
-//                     bool isOpen = await _isOpenRegister("HOTEL");
-
-//                     if (isOpen) {
-//                       _navigateToPage(
-//                         context,
-//                         FrontDeskDesktop(
-//                           systemProvider: widget.systemProvider,
-//                           user: widget.user,
-//                         ),
-//                       );
-//                     } else {
-//                       // Show POS dialog if register is not open
-//                       _showPOSDialog(context, "HOTEL");
-//                     }
-//                   },
-//                   style: OutlinedButton.styleFrom(
-//                     side: BorderSide(
-//                         color: primaryColor,
-//                         width: 1), // Outline color and width
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(8), // Rounded corners
-//                     ),
-//                     padding: const EdgeInsets.symmetric(
-//                       horizontal: 24, // Horizontal padding
-//                       vertical: 16, // Vertical padding
+//                     child: Text(
+//                       "HOTEL",
+//                       style: TextStyle(color: primaryColor),
 //                     ),
 //                   ),
-//                   child: Text(
-//                     "HOTEL",
-//                     style: TextStyle(color: primaryColor),
-//                   ),
-//                 ),
 //               ],
 //             ),
 //           ]),
@@ -525,9 +528,19 @@ class _HeaderState extends State<Header> {
 //           Row(
 //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //             children: [
-//               Text(
-//                 'Welcome, ${widget.user.firstName}',
-//                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(
+//                     'Welcome, ${widget.user.firstName}',
+//                     style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+//                   ),
+//                   // Debug info - remove this in production
+//                   Text(
+//                     'Role: ${widget.user.userRole}',
+//                     style: TextStyle(fontSize: 12, color: Colors.grey),
+//                   ),
+//                 ],
 //               ),
 //               InkWell(
 //                 onTap: () {},
@@ -554,16 +567,14 @@ class _HeaderState extends State<Header> {
 //     );
 //   }
 
-//   // Method to check if the register is open
 //   Future<bool> _isOpenRegister(String text) async {
 //     var response =
 //         await SystemRepo(refresh: false, online: false).isRegisterOpen(text);
 //     print("----------register open ------------");
 //     print(response);
-//     return response['total'] != 0; // Return true if register is open
+//     return response['total'] != 0;
 //   }
 
-//   // Method to show the logout confirmation dialog
 //   void _showLogoutDialog(BuildContext context) {
 //     showDialog(
 //       context: context,
@@ -574,20 +585,15 @@ class _HeaderState extends State<Header> {
 //           actions: [
 //             TextButton(
 //               onPressed: () async {
-//                 // Proceed with logout logic here
-//                 // You can call a method to handle logout (e.g., clearing session or tokens)
-//                 Navigator.of(context).pop(); // Close the dialog
+//                 Navigator.of(context).pop();
 //                 ScaffoldMessenger.of(context).showSnackBar(
 //                   const SnackBar(
 //                       content: Text('You have logged out successfully')),
 //                 );
-//                 // Navigate to login screen or perform other necessary actions
 //                 SharedPreferences preferences =
 //                     await SharedPreferences.getInstance();
 //                 await preferences.clear();
-
 //                 Navigator.of(context).popUntil((route) => route.isFirst);
-
 //                 Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
 //                   MaterialPageRoute(
 //                     builder: (BuildContext context) {
@@ -601,7 +607,7 @@ class _HeaderState extends State<Header> {
 //             ),
 //             TextButton(
 //               onPressed: () {
-//                 Navigator.of(context).pop(); // Close the dialog
+//                 Navigator.of(context).pop();
 //               },
 //               child: const Text("Cancel"),
 //             ),
@@ -611,7 +617,6 @@ class _HeaderState extends State<Header> {
 //     );
 //   }
 
-//   // Method to show the POS dialog with validation
 //   void _showPOSDialog(BuildContext context, String module) {
 //     final TextEditingController amountController = TextEditingController();
 //     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -624,12 +629,10 @@ class _HeaderState extends State<Header> {
 //           content: Form(
 //             key: formKey,
 //             child: Column(
-//               mainAxisSize:
-//                   MainAxisSize.min, // Set column height based on content
+//               mainAxisSize: MainAxisSize.min,
 //               children: [
 //                 const Text("Open register to start your daily sales!"),
-//                 const SizedBox(height: 16), // Add spacing
-//                 // TextField for cash at hand with validation
+//                 const SizedBox(height: 16),
 //                 TextFormField(
 //                   controller: amountController,
 //                   keyboardType: TextInputType.number,
@@ -654,15 +657,11 @@ class _HeaderState extends State<Header> {
 //           actions: [
 //             TextButton(
 //               onPressed: () async {
-//                 // Validate the form before proceeding
 //                 if (formKey.currentState?.validate() ?? false) {
-//                   Navigator.of(context).pop(); // Close the dialog
-
-//                   // Open register with the entered cash amount
+//                   Navigator.of(context).pop();
 //                   var response = await SystemRepo(refresh: false, online: false)
 //                       .openRegister(
 //                           module: module, amount: amountController.text);
-
 //                   if (response['status'] == true) {
 //                     if (module == 'INVENTORY') {
 //                       Navigator.push(context,
@@ -670,7 +669,6 @@ class _HeaderState extends State<Header> {
 //                         return EcosystemDesktop(
 //                           systemProvider: widget.systemProvider,
 //                           user: widget.user,
-                          
 //                         );
 //                       }));
 //                     } else if (module == 'HOTEL') {
@@ -682,7 +680,6 @@ class _HeaderState extends State<Header> {
 //                         );
 //                       }));
 //                     }
-//                     ;
 //                   } else {
 //                     ScaffoldMessenger.of(context).showSnackBar(
 //                       const SnackBar(
@@ -697,7 +694,7 @@ class _HeaderState extends State<Header> {
 //             ),
 //             TextButton(
 //               onPressed: () {
-//                 Navigator.of(context).pop(); // Close the dialog
+//                 Navigator.of(context).pop();
 //                 ScaffoldMessenger.of(context).showSnackBar(
 //                   const SnackBar(content: Text('Register closed!')),
 //                 );
@@ -710,7 +707,6 @@ class _HeaderState extends State<Header> {
 //     );
 //   }
 
-//   // Method to navigate to a specified page
 //   void _navigateToPage(BuildContext context, Widget page) {
 //     Navigator.push(
 //       context,

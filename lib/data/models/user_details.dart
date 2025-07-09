@@ -6,6 +6,12 @@ extension UserDetailsExtension on UserDetails {
   bool get isStoreAdmin => RoleDetector.isStoreAdmin(this);
   bool get isSuperAdmin => RoleDetector.isSuperAdmin(this);
   bool get isStoreStaff => RoleDetector.isStoreStaff(this);
+  bool get isHotelStaff => RoleDetector.isHotelStaff(this);
+  bool get isAnyAdmin => RoleDetector.isAnyAdmin(this);
+  bool get isAnyStaff => RoleDetector.isAnyStaff(this);
+  bool get canAccessHotel => RoleDetector.canAccessHotel(this);
+  bool get canAccessStore => RoleDetector.canAccessStore(this);
+  bool get hasPosPermissions => RoleDetector.hasPosPermissions(this);
 }
 
 class UserDetails {
@@ -20,8 +26,8 @@ class UserDetails {
   final String token;
   final int status;
   final String language;
-  final int isAdmin; // Add this field
-  final int isSuper; // Add this field
+  final int isAdmin;
+  final int isSuper;
   final Company? company;
   final Role? role;
 
@@ -37,8 +43,8 @@ class UserDetails {
     required this.status,
     required this.token,
     required this.language,
-    this.isAdmin = 0, // Make optional with default value
-    this.isSuper = 0, // Make optional with default value
+    this.isAdmin = 0,
+    this.isSuper = 0,
     required this.company,
     required this.role,
   });
@@ -55,10 +61,10 @@ class UserDetails {
       updatedAt: json['updated_at'],
       status: json['status'],
       language: json['language'],
-      isAdmin: json['is_admin'] ?? 0, // Add this line
-      isSuper: json['is_super'] ?? 0, // Add this line
-      company: Company.fromJson(json['company']),
-      role: Role.fromJson(json['role']),
+      isAdmin: json['is_admin'] ?? 0,
+      isSuper: json['is_super'] ?? 0,
+      company: json['company'] != null ? Company.fromJson(json['company']) : null,
+      role: json['role'] != null ? Role.fromJson(json['role']) : null,
       token: json['token'],
     );
   }
@@ -75,16 +81,15 @@ class UserDetails {
       'updated_at': updatedAt,
       'status': status,
       'language': language,
-      'is_admin': isAdmin, // Add this line
-      'is_super': isSuper, // Add this line
-      'company': company!.toJson(),
-      'role': role!.toJson(),
+      'is_admin': isAdmin,
+      'is_super': isSuper,
+      'company': company?.toJson(),
+      'role': role?.toJson(),
       'token': token
     };
   }
 }
 
-// Keep existing Company, Role, and PermissionModel classes unchanged
 class Company {
   final int id;
   final String name;
@@ -196,9 +201,6 @@ class PermissionModel {
 
 
 
-
-
-// // Add this extension to your existing UserDetails class
 // import 'package:spotstock_inventory/common/utils/role_detector.dart';
 
 // extension UserDetailsExtension on UserDetails {
@@ -206,8 +208,8 @@ class PermissionModel {
 //   bool get isHotelAdmin => RoleDetector.isHotelAdmin(this);
 //   bool get isStoreAdmin => RoleDetector.isStoreAdmin(this);
 //   bool get isSuperAdmin => RoleDetector.isSuperAdmin(this);
+//   bool get isStoreStaff => RoleDetector.isStoreStaff(this);
 // }
-
 
 // class UserDetails {
 //   final int id;
@@ -221,6 +223,8 @@ class PermissionModel {
 //   final String token;
 //   final int status;
 //   final String language;
+//   final int isAdmin; // Add this field
+//   final int isSuper; // Add this field
 //   final Company? company;
 //   final Role? role;
 
@@ -236,25 +240,30 @@ class PermissionModel {
 //     required this.status,
 //     required this.token,
 //     required this.language,
+//     this.isAdmin = 0, // Make optional with default value
+//     this.isSuper = 0, // Make optional with default value
 //     required this.company,
 //     required this.role,
 //   });
 
 //   factory UserDetails.fromJson(Map<String, dynamic> json) {
 //     return UserDetails(
-//         id: json['id'],
-//         firstName: json['first_name'],
-//         lastName: json['last_name'],
-//         email: json['email'],
-//         phone: json['phone'],
-//         defaultPassword: json['default_password'] ?? "",
-//         createdAt: json['created_at'],
-//         updatedAt: json['updated_at'],
-//         status: json['status'],
-//         language: json['language'],
-//         company: Company.fromJson(json['company']),
-//         role: Role.fromJson(json['role']),
-//         token: json['token']);
+//       id: json['id'],
+//       firstName: json['first_name'],
+//       lastName: json['last_name'],
+//       email: json['email'],
+//       phone: json['phone'],
+//       defaultPassword: json['default_password'] ?? "",
+//       createdAt: json['created_at'],
+//       updatedAt: json['updated_at'],
+//       status: json['status'],
+//       language: json['language'],
+//       isAdmin: json['is_admin'] ?? 0, // Add this line
+//       isSuper: json['is_super'] ?? 0, // Add this line
+//       company: Company.fromJson(json['company']),
+//       role: Role.fromJson(json['role']),
+//       token: json['token'],
+//     );
 //   }
 
 //   Map<String, dynamic> toJson() {
@@ -269,6 +278,8 @@ class PermissionModel {
 //       'updated_at': updatedAt,
 //       'status': status,
 //       'language': language,
+//       'is_admin': isAdmin, // Add this line
+//       'is_super': isSuper, // Add this line
 //       'company': company!.toJson(),
 //       'role': role!.toJson(),
 //       'token': token
@@ -276,6 +287,7 @@ class PermissionModel {
 //   }
 // }
 
+// // Keep existing Company, Role, and PermissionModel classes unchanged
 // class Company {
 //   final int id;
 //   final String name;
@@ -283,7 +295,7 @@ class PermissionModel {
 //   final String phone;
 //   final String address;
 //   final String logo;
-//   final double? amount; // Add this field
+//   final double? amount;
 
 //   Company({
 //     required this.id,
@@ -292,7 +304,7 @@ class PermissionModel {
 //     required this.phone,
 //     required this.address,
 //     required this.logo,
-//     this.amount, // Add this parameter
+//     this.amount,
 //   });
 
 //   factory Company.fromJson(Map<String, dynamic> json) {
@@ -303,7 +315,7 @@ class PermissionModel {
 //       phone: json['phone'],
 //       address: json['address'],
 //       logo: json['logo'],
-//       amount: json['amount']?.toDouble(), // Add this line
+//       amount: json['amount']?.toDouble(),
 //     );
 //   }
 
@@ -315,7 +327,7 @@ class PermissionModel {
 //       'phone': phone,
 //       'address': address,
 //       'logo': logo,
-//       'amount': amount, // Add this line
+//       'amount': amount,
 //     };
 //   }
 // }
