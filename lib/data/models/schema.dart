@@ -576,12 +576,176 @@ class MaintenanceRoom {
 // Sales Report screen
 
 
+// @Entity()
+// class SaleEntity {
+//   @Id()
+//   int id = 0;
+//   int originalId;
+
+//   String type;
+//   DateTime date;
+//   int isReturn;
+//   int customerId;
+//   String customerName;
+//   int warehouseId;
+//   String warehouseName;
+//   double taxRate;
+//   double taxAmount;
+//   double discount;
+//   double shipping;
+//   double grandTotal;
+//   double? receivedAmount;
+//   double paidAmount;
+//   double partialAmount;
+//   double dueAmount;
+//   int paymentType;
+//   String? note;
+//   int status;
+//   int paymentStatus;
+//   String referenceCode;
+//   DateTime createdAt;
+//   String barcodeUrl;
+//   int isOffline;
+//   String? offlineCustomerName;
+
+//   SaleEntity({
+//     this.id = 0,
+//     required this.originalId,
+//     required this.type,
+//     required this.date,
+//     required this.isReturn,
+//     required this.customerId,
+//     required this.customerName,
+//     required this.warehouseId,
+//     required this.warehouseName,
+//     required this.taxRate,
+//     required this.taxAmount,
+//     required this.discount,
+//     required this.shipping,
+//     required this.grandTotal,
+//     this.receivedAmount,
+//     required this.paidAmount,
+//     required this.partialAmount,
+//     required this.dueAmount,
+//     required this.paymentType,
+//     this.note,
+//     required this.status,
+//     required this.paymentStatus,
+//     required this.referenceCode,
+//     required this.createdAt,
+//     required this.barcodeUrl,
+//     required this.isOffline,
+//     this.offlineCustomerName,
+//   });
+
+//   // Convert from API model to ObjectBox entity
+//   factory SaleEntity.fromSale(Sale sale) {
+//     return SaleEntity(
+//       // id: sale.id,
+//       id: 0,
+//       originalId: sale.id,
+//       type: sale.type,
+//       date: sale.date,
+//       isReturn: sale.isReturn,
+//       customerId: sale.customerId,
+//       customerName: sale.customerName,
+//       warehouseId: sale.warehouseId,
+//       warehouseName: sale.warehouseName,
+//       taxRate: sale.taxRate,
+//       taxAmount: sale.taxAmount,
+//       discount: sale.discount,
+//       shipping: sale.shipping,
+//       grandTotal: sale.grandTotal,
+//       receivedAmount: sale.receivedAmount,
+//       paidAmount: sale.paidAmount,
+//       partialAmount: sale.partialAmount,
+//       dueAmount: sale.dueAmount,
+//       paymentType: sale.paymentType,
+//       note: sale.note,
+//       status: sale.status,
+//       paymentStatus: sale.paymentStatus,
+//       referenceCode: sale.referenceCode,
+//       createdAt: sale.createdAt,
+//       barcodeUrl: sale.barcodeUrl,
+//       isOffline: sale.isOffline,
+//       offlineCustomerName: sale.offlineCustomerName,
+//     );
+//   }
+
+//   // Convert to API model
+//   Sale toSale() {
+//     return Sale(
+//       // id: id,
+//       id: originalId,
+//       type: type,
+//       date: date,
+//       isReturn: isReturn,
+//       customerId: customerId,
+//       customerName: customerName,
+//       warehouseId: warehouseId,
+//       warehouseName: warehouseName,
+//       taxRate: taxRate,
+//       taxAmount: taxAmount,
+//       discount: discount,
+//       shipping: shipping,
+//       grandTotal: grandTotal,
+//       receivedAmount: receivedAmount,
+//       paidAmount: paidAmount,
+//       partialAmount: partialAmount,
+//       dueAmount: dueAmount,
+//       paymentType: paymentType,
+//       note: note,
+//       status: status,
+//       paymentStatus: paymentStatus,
+//       referenceCode: referenceCode,
+//       // saleItems: [], // Will be populated separately
+//       saleItems: [], // Populated later in getLocalSales
+//       createdAt: createdAt,
+//       barcodeUrl: barcodeUrl,
+//       isOffline: isOffline,
+//       offlineCustomerName: offlineCustomerName,
+//     );
+//   }
+
+//   // Method to convert SaleEntity to a Map (following your pattern)
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'id': id,
+//       'type': type,
+//       'date': date.toIso8601String(),
+//       'isReturn': isReturn,
+//       'customerId': customerId,
+//       'customerName': customerName,
+//       'warehouseId': warehouseId,
+//       'warehouseName': warehouseName,
+//       'taxRate': taxRate,
+//       'taxAmount': taxAmount,
+//       'discount': discount,
+//       'shipping': shipping,
+//       'grandTotal': grandTotal,
+//       'receivedAmount': receivedAmount,
+//       'paidAmount': paidAmount,
+//       'partialAmount': partialAmount,
+//       'dueAmount': dueAmount,
+//       'paymentType': paymentType,
+//       'note': note,
+//       'status': status,
+//       'paymentStatus': paymentStatus,
+//       'referenceCode': referenceCode,
+//       'createdAt': createdAt.toIso8601String(),
+//       'barcodeUrl': barcodeUrl,
+//       'isOffline': isOffline,
+//       'offlineCustomerName': offlineCustomerName,
+//     };
+//   }
+// }
+
+
 @Entity()
 class SaleEntity {
   @Id()
   int id = 0;
   int originalId;
-
   String type;
   DateTime date;
   int isReturn;
@@ -607,6 +771,10 @@ class SaleEntity {
   String barcodeUrl;
   int isOffline;
   String? offlineCustomerName;
+  
+  // **NEW: Added attendant fields**
+  String? attendantName;
+  String? attendantId;
 
   SaleEntity({
     this.id = 0,
@@ -636,12 +804,15 @@ class SaleEntity {
     required this.barcodeUrl,
     required this.isOffline,
     this.offlineCustomerName,
+    
+    // **NEW: Added attendant parameters**
+    this.attendantName,
+    this.attendantId,
   });
 
   // Convert from API model to ObjectBox entity
   factory SaleEntity.fromSale(Sale sale) {
     return SaleEntity(
-      // id: sale.id,
       id: 0,
       originalId: sale.id,
       type: sale.type,
@@ -669,13 +840,17 @@ class SaleEntity {
       barcodeUrl: sale.barcodeUrl,
       isOffline: sale.isOffline,
       offlineCustomerName: sale.offlineCustomerName,
+      
+      // **NEW: Map attendant fields if they exist in Sale model**
+      // Note: You may need to add these fields to your Sale model too
+      attendantName: null, // Update this if Sale model has attendantName
+      attendantId: null,   // Update this if Sale model has attendantId
     );
   }
 
   // Convert to API model
   Sale toSale() {
     return Sale(
-      // id: id,
       id: originalId,
       type: type,
       date: date,
@@ -698,7 +873,6 @@ class SaleEntity {
       status: status,
       paymentStatus: paymentStatus,
       referenceCode: referenceCode,
-      // saleItems: [], // Will be populated separately
       saleItems: [], // Populated later in getLocalSales
       createdAt: createdAt,
       barcodeUrl: barcodeUrl,
@@ -711,6 +885,7 @@ class SaleEntity {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'originalId': originalId,
       'type': type,
       'date': date.toIso8601String(),
       'isReturn': isReturn,
@@ -736,9 +911,14 @@ class SaleEntity {
       'barcodeUrl': barcodeUrl,
       'isOffline': isOffline,
       'offlineCustomerName': offlineCustomerName,
+      
+      // **NEW: Include attendant fields in map**
+      'attendantName': attendantName,
+      'attendantId': attendantId,
     };
   }
 }
+
 
 @Entity()
 class SaleItemEntity {

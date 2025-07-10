@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:3713997970766520879",
-      "lastPropertyId": "12:6275051998814184470",
+      "lastPropertyId": "14:5769437727657365396",
       "name": "Invoice",
       "properties": [
         {
@@ -63,13 +63,23 @@
           "id": "12:6275051998814184470",
           "name": "customerPhone",
           "type": 9
+        },
+        {
+          "id": "13:5004667284343682890",
+          "name": "attendantId",
+          "type": 9
+        },
+        {
+          "id": "14:5769437727657365396",
+          "name": "originalReference",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "2:7886241321930313604",
-      "lastPropertyId": "20:5262591713802253935",
+      "lastPropertyId": "22:7532026352314976025",
       "name": "Orders",
       "properties": [
         {
@@ -172,6 +182,16 @@
           "id": "20:5262591713802253935",
           "name": "partialAmount",
           "type": 8
+        },
+        {
+          "id": "21:974725519070089049",
+          "name": "attendantId",
+          "type": 9
+        },
+        {
+          "id": "22:7532026352314976025",
+          "name": "invoiceReference",
+          "type": 9
         }
       ],
       "relations": []
@@ -671,7 +691,7 @@
     },
     {
       "id": "11:8081494730027905127",
-      "lastPropertyId": "27:5556198196467676607",
+      "lastPropertyId": "29:8018134426361316784",
       "name": "SaleEntity",
       "properties": [
         {
@@ -809,6 +829,16 @@
           "id": "27:5556198196467676607",
           "name": "originalId",
           "type": 6
+        },
+        {
+          "id": "28:6984158368593373176",
+          "name": "attendantName",
+          "type": 9
+        },
+        {
+          "id": "29:8018134426361316784",
+          "name": "attendantId",
+          "type": 9
         }
       ],
       "relations": []
@@ -954,7 +984,7 @@
     },
     {
       "id": "13:7976920998866683740",
-      "lastPropertyId": "8:5155396035667685023",
+      "lastPropertyId": "9:4003876650830016463",
       "name": "SelectAttendantModel",
       "properties": [
         {
@@ -1041,7 +1071,8 @@
     5912845798230417177,
     6649215881229165045,
     4633140566523539235,
-    5945536197580053257
+    5945536197580053257,
+    4003876650830016463
   ],
   "retiredRelationUids": [],
   "version": 1
