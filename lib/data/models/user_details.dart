@@ -28,6 +28,7 @@ class UserDetails {
   final String language;
   final int isAdmin;
   final int isSuper;
+  final String? warehouseId; // Added: Store warehouse_id from login response
   final Company? company;
   final Role? role;
 
@@ -45,6 +46,7 @@ class UserDetails {
     required this.language,
     this.isAdmin = 0,
     this.isSuper = 0,
+    this.warehouseId, // Added: warehouse_id field
     required this.company,
     required this.role,
   });
@@ -63,6 +65,7 @@ class UserDetails {
       language: json['language'],
       isAdmin: json['is_admin'] ?? 0,
       isSuper: json['is_super'] ?? 0,
+      warehouseId: json['warehouse_id']?.toString(), // Added: Parse warehouse_id
       company: json['company'] != null ? Company.fromJson(json['company']) : null,
       role: json['role'] != null ? Role.fromJson(json['role']) : null,
       token: json['token'],
@@ -83,10 +86,31 @@ class UserDetails {
       'language': language,
       'is_admin': isAdmin,
       'is_super': isSuper,
+      'warehouse_id': warehouseId, // Added: Include warehouse_id in JSON
       'company': company?.toJson(),
       'role': role?.toJson(),
       'token': token
     };
+  }
+
+  // Helper method to get warehouse IDs as a list
+  List<int> get warehouseIds {
+    if (warehouseId == null || warehouseId!.isEmpty) return [];
+    
+    try {
+      // Remove brackets and parse the comma-separated values
+      String cleanString = warehouseId!.replaceAll('[', '').replaceAll(']', '');
+      if (cleanString.isEmpty) return [];
+      
+      return cleanString
+          .split(',')
+          .map((id) => int.tryParse(id.trim()) ?? 0)
+          .where((id) => id > 0)
+          .toList();
+    } catch (e) {
+      print("Error parsing warehouse IDs: $e");
+      return [];
+    }
   }
 }
 
@@ -201,6 +225,8 @@ class PermissionModel {
 
 
 
+
+
 // import 'package:spotstock_inventory/common/utils/role_detector.dart';
 
 // extension UserDetailsExtension on UserDetails {
@@ -209,6 +235,12 @@ class PermissionModel {
 //   bool get isStoreAdmin => RoleDetector.isStoreAdmin(this);
 //   bool get isSuperAdmin => RoleDetector.isSuperAdmin(this);
 //   bool get isStoreStaff => RoleDetector.isStoreStaff(this);
+//   bool get isHotelStaff => RoleDetector.isHotelStaff(this);
+//   bool get isAnyAdmin => RoleDetector.isAnyAdmin(this);
+//   bool get isAnyStaff => RoleDetector.isAnyStaff(this);
+//   bool get canAccessHotel => RoleDetector.canAccessHotel(this);
+//   bool get canAccessStore => RoleDetector.canAccessStore(this);
+//   bool get hasPosPermissions => RoleDetector.hasPosPermissions(this);
 // }
 
 // class UserDetails {
@@ -223,8 +255,8 @@ class PermissionModel {
 //   final String token;
 //   final int status;
 //   final String language;
-//   final int isAdmin; // Add this field
-//   final int isSuper; // Add this field
+//   final int isAdmin;
+//   final int isSuper;
 //   final Company? company;
 //   final Role? role;
 
@@ -240,8 +272,8 @@ class PermissionModel {
 //     required this.status,
 //     required this.token,
 //     required this.language,
-//     this.isAdmin = 0, // Make optional with default value
-//     this.isSuper = 0, // Make optional with default value
+//     this.isAdmin = 0,
+//     this.isSuper = 0,
 //     required this.company,
 //     required this.role,
 //   });
@@ -258,10 +290,10 @@ class PermissionModel {
 //       updatedAt: json['updated_at'],
 //       status: json['status'],
 //       language: json['language'],
-//       isAdmin: json['is_admin'] ?? 0, // Add this line
-//       isSuper: json['is_super'] ?? 0, // Add this line
-//       company: Company.fromJson(json['company']),
-//       role: Role.fromJson(json['role']),
+//       isAdmin: json['is_admin'] ?? 0,
+//       isSuper: json['is_super'] ?? 0,
+//       company: json['company'] != null ? Company.fromJson(json['company']) : null,
+//       role: json['role'] != null ? Role.fromJson(json['role']) : null,
 //       token: json['token'],
 //     );
 //   }
@@ -278,16 +310,15 @@ class PermissionModel {
 //       'updated_at': updatedAt,
 //       'status': status,
 //       'language': language,
-//       'is_admin': isAdmin, // Add this line
-//       'is_super': isSuper, // Add this line
-//       'company': company!.toJson(),
-//       'role': role!.toJson(),
+//       'is_admin': isAdmin,
+//       'is_super': isSuper,
+//       'company': company?.toJson(),
+//       'role': role?.toJson(),
 //       'token': token
 //     };
 //   }
 // }
 
-// // Keep existing Company, Role, and PermissionModel classes unchanged
 // class Company {
 //   final int id;
 //   final String name;

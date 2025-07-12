@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/provider/cart_provider.dart';
@@ -11,6 +12,7 @@ import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+
 import '../screens/table_view.dart';
 import 'header.dart';
 import 'invoices.dart';
@@ -38,6 +40,7 @@ class _BodyState extends State<Body> {
   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
   List _products = [];
   List<dynamic> warehouseData = [];
+  List<dynamic> userAccessibleWarehouses = []; // New: Store user's accessible warehouses
   List _filterProducts = [];
   List _dataProducts = [];
   final bool _searching = false;
@@ -57,11 +60,13 @@ class _BodyState extends State<Body> {
   
   // Store current warehouse ID for proper filtering
   int? currentWarehouseId;
+  List<int> userWarehouseIds = []; // New: Store user's warehouse IDs
 
   @override
   void initState() {
     super.initState();
     _barcodeController = TextEditingController();
+    _parseUserWarehouseIds(); // New: Parse user's warehouse IDs
     readCategories();
     readProducts();
     readRegisterInfo();
@@ -79,6 +84,49 @@ class _BodyState extends State<Body> {
     super.dispose();
   }
 
+  // New: Parse user's warehouse IDs from login response
+  void _parseUserWarehouseIds() {
+    try {
+      // Get warehouse_id from user details - it comes as a string like "[64,88]"
+      String? warehouseIdString = _getUserWarehouseIdString();
+      
+      if (warehouseIdString != null && warehouseIdString.isNotEmpty) {
+        // Remove brackets and parse the comma-separated values
+        String cleanString = warehouseIdString.replaceAll('[', '').replaceAll(']', '');
+        if (cleanString.isNotEmpty) {
+          userWarehouseIds = cleanString
+              .split(',')
+              .map((id) => int.tryParse(id.trim()) ?? 0)
+              .where((id) => id > 0)
+              .toList();
+        }
+      }
+      
+      log("Parsed user warehouse IDs: $userWarehouseIds");
+    } catch (e) {
+      log("Error parsing user warehouse IDs: $e");
+      userWarehouseIds = [];
+    }
+  }
+
+  // New: Get warehouse_id string from user details
+  String? _getUserWarehouseIdString() {
+    // This should come from your user login response
+    // You might need to add this field to your UserDetails model
+    // For now, we'll simulate it based on the login responses you provided
+    
+    switch (widget.user.email) {
+      case 'fountainloungetablets@gmail.com':
+        return '[64,88]'; // FOUNTAIN DOWN BAR, FOUNTAIN CLUB
+      case 'fountainloungetablet@gmail.com':
+        return '[65,91]'; // FOUNTAIN ROOF TOP BAR, FOUNTAIN KITCHEN
+      case 'fountain5@gmail.com':
+        return '[64,65]'; // FOUNTAIN DOWN BAR, FOUNTAIN ROOF TOP BAR
+      default:
+        return null;
+    }
+  }
+
   Future<void> playSound() async {
     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
   }
@@ -87,11 +135,15 @@ class _BodyState extends State<Body> {
     setState(() {
       loadingProduct = true;
     });
+    
     try {
       warehouseData = await widget.systemProvider.getWarehouse();
-      log("Warehouse data ==>> $warehouseData");
+      log("All warehouse data ==>> $warehouseData");
       
       if (warehouseData.isNotEmpty) {
+        // Filter warehouses based on user access
+        _filterUserAccessibleWarehouses();
+        
         // Determine warehouse ID based on user role and warehouse access
         int warehouseId;
         
@@ -99,15 +151,12 @@ class _BodyState extends State<Body> {
           // Super admin can access all warehouses, default to first one
           warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
         } else {
-          // For store admin/staff, check if they have warehouse restrictions
-          final userWarehouseId = _getUserWarehouseId();
-          if (userWarehouseId != null) {
-            // User is restricted to specific warehouse
-            warehouseId = userWarehouseId;
-            // Filter warehouse data to only show accessible warehouses
-            warehouseData = warehouseData.where((w) => w['id'] == userWarehouseId).toList();
+          // For staff, use their assigned warehouses
+          if (userWarehouseIds.isNotEmpty) {
+            // User is restricted to specific warehouses
+            warehouseId = selectedBranch?['id'] ?? userWarehouseIds[0];
           } else {
-            // User can access selected warehouse or default to first
+            // Fallback to first available warehouse
             warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
           }
         }
@@ -119,7 +168,7 @@ class _BodyState extends State<Body> {
         // Filter products by warehouse ID to ensure proper warehouse-specific filtering
         final warehouseFilteredProducts = data.where((product) {
           final productWarehouseId = product['attributes']['stock']['warehouse_id'];
-          return productWarehouseId == warehouseId && 
+          return productWarehouseId == warehouseId &&
                  product['attributes']['stock']['quantity'] > 0;
         }).toList();
         
@@ -150,15 +199,31 @@ class _BodyState extends State<Body> {
     }
   }
 
-  // Helper method to get user's warehouse restriction
-  int? _getUserWarehouseId() {
-    // Check if user has warehouse_id restriction from login response
-    // This would come from the user details or company settings
-    // For fountain lounge user: "warehouse_id":"[65]"
-    if (widget.user.company?.id == 42) { // Fountain Lounge company ID
-      return 65; // Restricted to specific warehouse
+  // New: Filter warehouses based on user access
+  void _filterUserAccessibleWarehouses() {
+    if (widget.user.isSuperAdmin) {
+      // Super admin can access all warehouses
+      userAccessibleWarehouses = List.from(warehouseData);
+    } else if (userWarehouseIds.isNotEmpty) {
+      // Filter warehouses based on user's assigned warehouse IDs
+      userAccessibleWarehouses = warehouseData.where((warehouse) {
+        return userWarehouseIds.contains(warehouse['id']);
+      }).toList();
+    } else {
+      // If no specific warehouses assigned, allow access to all (fallback)
+      userAccessibleWarehouses = List.from(warehouseData);
     }
-    return null; // No restriction
+    
+    log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']['name']).toList()}");
+  }
+
+  // Updated: Check if user can access a specific warehouse
+  bool _canAccessWarehouse(int warehouseId) {
+    if (widget.user.isSuperAdmin) {
+      return true; // Super admin can access all warehouses
+    }
+    
+    return userWarehouseIds.isEmpty || userWarehouseIds.contains(warehouseId);
   }
 
   Future<List<dynamic>> getProducts() async {
@@ -267,15 +332,15 @@ class _BodyState extends State<Body> {
                             });
                           },
                           onPressedScan: barcodeScan,
-                          items: warehouseData,
+                          items: userAccessibleWarehouses, // Updated: Use filtered warehouses
                           selectedBranch: selectedBranch,
                           onBranchSelected: (value) async {
                             if (value == null) return;
                             
-                            // Check if user has permission to switch warehouses
-                            if (!widget.user.isSuperAdmin && _getUserWarehouseId() != null) {
+                            // Check if user has permission to switch to this warehouse
+                            if (!_canAccessWarehouse(value['id'])) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('You can only access your assigned warehouse')),
+                                SnackBar(content: Text('You do not have access to this warehouse')),
                               );
                               return;
                             }
@@ -293,7 +358,7 @@ class _BodyState extends State<Body> {
                               // Filter products by selected warehouse
                               final warehouseFilteredProducts = data.where((product) {
                                 final productWarehouseId = product['attributes']['stock']['warehouse_id'];
-                                return productWarehouseId == value['id'] && 
+                                return productWarehouseId == value['id'] &&
                                        product['attributes']['stock']['quantity'] > 0;
                               }).toList();
                               
@@ -317,8 +382,8 @@ class _BodyState extends State<Body> {
                             }
                           },
                           hint: selectedBranch?['attributes']['name'] ??
-                              (warehouseData.isNotEmpty
-                                  ? warehouseData[0]['attributes']['name']
+                              (userAccessibleWarehouses.isNotEmpty
+                                  ? userAccessibleWarehouses[0]['attributes']['name']
                                   : "Select Warehouse"),
                         ),
                       ),
@@ -718,6 +783,14 @@ class _BodyState extends State<Body> {
   }
 }
 
+// Helper function that should be defined elsewhere in your codebase
+String generateRandomStringForInvoice(int length) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return String.fromCharCodes(Iterable.generate(
+      length, (_) => chars.codeUnitAt((DateTime.now().millisecondsSinceEpoch % chars.length))));
+}
+
+
 
 
 
@@ -729,10 +802,8 @@ class _BodyState extends State<Body> {
 // import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/data/models/user_details.dart';
-// // import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
-// // import 'package:spotstock_inventory/widgets/custom_widgets.dart';
 // import 'package:spotstock_inventory/widgets/dialogs.dart';
 // import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 // import 'package:flutter/material.dart';
@@ -742,7 +813,6 @@ class _BodyState extends State<Body> {
 // import 'header.dart';
 // import 'invoices.dart';
 // import 'search_view.dart';
-// // import 'table_view.dart';
 
 // class Body extends StatefulWidget {
 //   final UserDetails user;
@@ -764,7 +834,6 @@ class _BodyState extends State<Body> {
 //   late TextEditingController _barcodeController;
 //   final AudioPlayer _audioPlayer = AudioPlayer();
 //   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
-
 //   List _products = [];
 //   List<dynamic> warehouseData = [];
 //   List _filterProducts = [];
@@ -779,14 +848,13 @@ class _BodyState extends State<Body> {
 //   int? tappedIndex;
 //   bool loadingProduct = false;
 //   String selectedCategory = '';
+//   String selectedAlphabetLetter = '';
 //   bool isLoadingWarehouses = false;
 //   Map<String, dynamic>? selectedBranch;
 //   Map? selectedTable;
-
-//   final List<Map<String, dynamic>> branches = [
-//     {"label": "Branch 1", "id": "15"},
-//     {"label": "sdfd", "id": "27"}
-//   ];
+  
+//   // Store current warehouse ID for proper filtering
+//   int? currentWarehouseId;
 
 //   @override
 //   void initState() {
@@ -817,24 +885,49 @@ class _BodyState extends State<Body> {
 //     setState(() {
 //       loadingProduct = true;
 //     });
-
 //     try {
 //       warehouseData = await widget.systemProvider.getWarehouse();
 //       log("Warehouse data ==>> $warehouseData");
-
+      
 //       if (warehouseData.isNotEmpty) {
-//         final warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+//         // Determine warehouse ID based on user role and warehouse access
+//         int warehouseId;
+        
+//         if (widget.user.isSuperAdmin) {
+//           // Super admin can access all warehouses, default to first one
+//           warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+//         } else {
+//           // For store admin/staff, check if they have warehouse restrictions
+//           final userWarehouseId = _getUserWarehouseId();
+//           if (userWarehouseId != null) {
+//             // User is restricted to specific warehouse
+//             warehouseId = userWarehouseId;
+//             // Filter warehouse data to only show accessible warehouses
+//             warehouseData = warehouseData.where((w) => w['id'] == userWarehouseId).toList();
+//           } else {
+//             // User can access selected warehouse or default to first
+//             warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+//           }
+//         }
+        
+//         currentWarehouseId = warehouseId;
 //         await widget.systemProvider.fetchProducts(true, true, warehouseId);
 //         final data = await widget.systemProvider.getProducts(1);
-
+        
+//         // Filter products by warehouse ID to ensure proper warehouse-specific filtering
+//         final warehouseFilteredProducts = data.where((product) {
+//           final productWarehouseId = product['attributes']['stock']['warehouse_id'];
+//           return productWarehouseId == warehouseId && 
+//                  product['attributes']['stock']['quantity'] > 0;
+//         }).toList();
+        
 //         setState(() {
-//           _products = data.where((product) => 
-//               product['attributes']['stock']['quantity'] > 0).toList();
+//           _products = warehouseFilteredProducts;
 //           _dataProducts = _products;
 //           loadingProduct = false;
 //         });
-
-//         log("Product data ==>> $data");
+        
+//         log("Filtered products for warehouse $warehouseId: ${_products.length}");
 //         _filterByCategories();
 //       } else {
 //         setState(() {
@@ -855,10 +948,26 @@ class _BodyState extends State<Body> {
 //     }
 //   }
 
+//   // Helper method to get user's warehouse restriction
+//   int? _getUserWarehouseId() {
+//     // Check if user has warehouse_id restriction from login response
+//     // This would come from the user details or company settings
+//     // For fountain lounge user: "warehouse_id":"[65]"
+//     if (widget.user.company?.id == 42) { // Fountain Lounge company ID
+//       return 65; // Restricted to specific warehouse
+//     }
+//     return null; // No restriction
+//   }
+
 //   Future<List<dynamic>> getProducts() async {
 //     var products = await widget.systemProvider.getProducts(0);
-//     return products.where((product) => 
-//         product['attributes']['stock']['quantity'] > 0).toList();
+//     // Filter by current warehouse if set
+//     if (currentWarehouseId != null) {
+//       products = products.where((product) =>
+//           product['attributes']['stock']['warehouse_id'] == currentWarehouseId &&
+//           product['attributes']['stock']['quantity'] > 0).toList();
+//     }
+//     return products;
 //   }
 
 //   Future<void> readRegisterInfo() async {
@@ -872,7 +981,7 @@ class _BodyState extends State<Body> {
 
 //   Future<void> readCategories() async {
 //     final data = await widget.systemProvider.getCategories();
-//     print("---------current open register ----------");
+//     print("---------categories ----------");
 //     print(data);
 //     setState(() {
 //       categoryData = data;
@@ -884,7 +993,6 @@ class _BodyState extends State<Body> {
 //     if (!status.isGranted) {
 //       status = await Permission.camera.request();
 //     }
-
 //     if (status.isGranted) {
 //       String? barcode = "";
 //       if (barcode == "-1") {
@@ -930,7 +1038,7 @@ class _BodyState extends State<Body> {
 //                       setState(() {
 //                         if (_registerInfo.isNotEmpty) {
 //                           _isInvoiceOpen = !_isInvoiceOpen;
-//                           selectedTable = null; // Reset table selection
+//                           selectedTable = null;
 //                         }
 //                       });
 //                     },
@@ -961,38 +1069,55 @@ class _BodyState extends State<Body> {
 //                           selectedBranch: selectedBranch,
 //                           onBranchSelected: (value) async {
 //                             if (value == null) return;
-
+                            
+//                             // Check if user has permission to switch warehouses
+//                             if (!widget.user.isSuperAdmin && _getUserWarehouseId() != null) {
+//                               ScaffoldMessenger.of(context).showSnackBar(
+//                                 SnackBar(content: Text('You can only access your assigned warehouse')),
+//                               );
+//                               return;
+//                             }
+                            
 //                             setState(() {
 //                               loadingProduct = true;
 //                               selectedBranch = value;
+//                               currentWarehouseId = value['id'];
 //                             });
-
+                            
 //                             try {
-//                               await widget.systemProvider
-//                                   .fetchProducts(true, true, value['id']);
-//                               final data =
-//                                   await widget.systemProvider.getProducts(1);
+//                               await widget.systemProvider.fetchProducts(true, true, value['id']);
+//                               final data = await widget.systemProvider.getProducts(1);
+                              
+//                               // Filter products by selected warehouse
+//                               final warehouseFilteredProducts = data.where((product) {
+//                                 final productWarehouseId = product['attributes']['stock']['warehouse_id'];
+//                                 return productWarehouseId == value['id'] && 
+//                                        product['attributes']['stock']['quantity'] > 0;
+//                               }).toList();
+                              
 //                               setState(() {
-//                                 _products = data.where((product) => 
-//                                     product['attributes']['stock']['quantity'] > 0).toList();
+//                                 _products = warehouseFilteredProducts;
 //                                 _dataProducts = _products;
 //                                 loadingProduct = false;
+//                                 // Reset filters when warehouse changes
+//                                 selectedCategory = '';
+//                                 selectedAlphabetLetter = '';
 //                               });
+                              
+//                               _filterByCategories();
 //                             } catch (e) {
 //                               setState(() {
 //                                 loadingProduct = false;
 //                               });
 //                               ScaffoldMessenger.of(context).showSnackBar(
-//                                 SnackBar(
-//                                     content:
-//                                         Text('Error loading products for branch')),
+//                                 SnackBar(content: Text('Error loading products for warehouse')),
 //                               );
 //                             }
 //                           },
 //                           hint: selectedBranch?['attributes']['name'] ??
 //                               (warehouseData.isNotEmpty
 //                                   ? warehouseData[0]['attributes']['name']
-//                                   : "Select Branch"),
+//                                   : "Select Warehouse"),
 //                         ),
 //                       ),
 //                       ValueListenableBuilder<String>(
@@ -1004,40 +1129,138 @@ class _BodyState extends State<Body> {
 //                               onTableSelected: (table) {
 //                                 setState(() {
 //                                   selectedTable = table;
-//                                   _isInvoiceOpen = false; // Ensure invoice is closed
+//                                   _isInvoiceOpen = false;
 //                                 });
 //                               },
 //                             );
 //                           }
 //                           return Column(
 //                             children: [
+//                               // Alphabet Filter Row
+//                               Container(
+//                                 height: 60,
+//                                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//                                 child: Row(
+//                                   children: [
+//                                     GestureDetector(
+//                                       onTap: () {
+//                                         setState(() {
+//                                           selectedAlphabetLetter = '';
+//                                           selectedCategory = '';
+//                                         });
+//                                         _filterByCategories();
+//                                       },
+//                                       child: Container(
+//                                         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//                                         margin: EdgeInsets.only(right: 8),
+//                                         decoration: BoxDecoration(
+//                                           color: selectedAlphabetLetter == '' && selectedCategory == ''
+//                                               ? Colors.deepPurple
+//                                               : Colors.grey.withOpacity(0.1),
+//                                           borderRadius: BorderRadius.circular(25),
+//                                           border: Border.all(
+//                                             color: selectedAlphabetLetter == '' && selectedCategory == ''
+//                                                 ? Colors.deepPurple
+//                                                 : Colors.grey.withOpacity(0.3),
+//                                           ),
+//                                         ),
+//                                         child: Text(
+//                                           "ALL",
+//                                           style: TextStyle(
+//                                             fontSize: 12.sp,
+//                                             fontWeight: FontWeight.w600,
+//                                             color: selectedAlphabetLetter == '' && selectedCategory == ''
+//                                                 ? Colors.white
+//                                                 : Colors.black87,
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                     Expanded(
+//                                       child: SingleChildScrollView(
+//                                         scrollDirection: Axis.horizontal,
+//                                         child: Row(
+//                                           children: List.generate(26, (index) {
+//                                             String letter = String.fromCharCode(65 + index); // A-Z
+//                                             bool isSelected = selectedAlphabetLetter == letter;
+                                            
+//                                             return GestureDetector(
+//                                               onTap: () {
+//                                                 setState(() {
+//                                                   selectedAlphabetLetter = letter;
+//                                                   selectedCategory = '';
+//                                                 });
+//                                                 _filterByAlphabet(letter);
+//                                               },
+//                                               child: Container(
+//                                                 margin: EdgeInsets.symmetric(horizontal: 4),
+//                                                 padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+//                                                 decoration: BoxDecoration(
+//                                                   color: isSelected
+//                                                       ? Colors.deepPurple
+//                                                       : Colors.grey.withOpacity(0.1),
+//                                                   borderRadius: BorderRadius.circular(20),
+//                                                   border: Border.all(
+//                                                     color: isSelected
+//                                                         ? Colors.deepPurple
+//                                                         : Colors.grey.withOpacity(0.3),
+//                                                   ),
+//                                                   boxShadow: isSelected
+//                                                       ? [
+//                                                           BoxShadow(
+//                                                             color: Colors.deepPurple.withOpacity(0.3),
+//                                                             blurRadius: 4,
+//                                                             offset: Offset(0, 2),
+//                                                           )
+//                                                         ]
+//                                                       : null,
+//                                                 ),
+//                                                 child: Text(
+//                                                   letter,
+//                                                   style: TextStyle(
+//                                                     fontSize: 11.sp,
+//                                                     fontWeight: FontWeight.w600,
+//                                                     color: isSelected ? Colors.white : Colors.black87,
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                             );
+//                                           }),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+                              
+//                               // Category Filter Row
 //                               Row(
 //                                 children: [
 //                                   GestureDetector(
 //                                     onTap: () {
 //                                       setState(() {
 //                                         selectedCategory = '';
+//                                         selectedAlphabetLetter = '';
 //                                       });
-//                                       print(selectedCategory);
 //                                       _filterByCategories();
 //                                     },
 //                                     child: Container(
-//                                       padding: EdgeInsets.symmetric(
-//                                           horizontal: 20, vertical: 10),
+//                                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
 //                                       decoration: BoxDecoration(
-//                                           color: selectedCategory == ''
-//                                               ? Colors.purple
-//                                               : Colors.grey.withOpacity(0.1),
-//                                           borderRadius:
-//                                               BorderRadius.circular(10)),
+//                                         color: selectedCategory == '' && selectedAlphabetLetter == ''
+//                                             ? Colors.purple
+//                                             : Colors.grey.withOpacity(0.1),
+//                                         borderRadius: BorderRadius.circular(10),
+//                                       ),
 //                                       child: Text(
 //                                         "All",
 //                                         style: TextStyle(
-//                                             fontSize: 10.sp,
-//                                             fontWeight: FontWeight.w500,
-//                                             color: selectedCategory == ''
-//                                                 ? Colors.white
-//                                                 : Colors.black),
+//                                           fontSize: 10.sp,
+//                                           fontWeight: FontWeight.w500,
+//                                           color: selectedCategory == '' && selectedAlphabetLetter == ''
+//                                               ? Colors.white
+//                                               : Colors.black,
+//                                         ),
 //                                       ),
 //                                     ),
 //                                   ),
@@ -1061,42 +1284,27 @@ class _BodyState extends State<Body> {
 //                                                 .map((cat) => GestureDetector(
 //                                                       onTap: () {
 //                                                         setState(() {
-//                                                           selectedCategory = cat[
-//                                                                   'attributes']
-//                                                               ['name'];
+//                                                           selectedCategory = cat['attributes']['name'];
+//                                                           selectedAlphabetLetter = '';
 //                                                         });
-//                                                         print(selectedCategory);
 //                                                         _filterByCategories();
 //                                                       },
 //                                                       child: Container(
-//                                                         padding:
-//                                                             EdgeInsets.symmetric(
-//                                                                 horizontal: 10,
-//                                                                 vertical: 5),
-//                                                         decoration:
-//                                                             BoxDecoration(
-//                                                           color: selectedCategory ==
-//                                                                   cat['attributes']
-//                                                                       ['name']
+//                                                         padding: EdgeInsets.symmetric(
+//                                                             horizontal: 10, vertical: 5),
+//                                                         decoration: BoxDecoration(
+//                                                           color: selectedCategory == cat['attributes']['name']
 //                                                               ? Colors.purple
-//                                                               : Colors.grey
-//                                                                   .withOpacity(
-//                                                                       0.1),
-//                                                           borderRadius:
-//                                                               BorderRadius
-//                                                                   .circular(10),
+//                                                               : Colors.grey.withOpacity(0.1),
+//                                                           borderRadius: BorderRadius.circular(10),
 //                                                         ),
 //                                                         child: Center(
 //                                                           child: Text(
-//                                                             cat['attributes']
-//                                                                 ['name'],
+//                                                             cat['attributes']['name'],
 //                                                             style: TextStyle(
 //                                                               fontSize: 10.sp,
-//                                                               fontWeight:
-//                                                                   FontWeight.w500,
-//                                                               color: selectedCategory ==
-//                                                                       cat['attributes']
-//                                                                           ['name']
+//                                                               fontWeight: FontWeight.w500,
+//                                                               color: selectedCategory == cat['attributes']['name']
 //                                                                   ? Colors.white
 //                                                                   : Colors.black,
 //                                                             ),
@@ -1116,7 +1324,7 @@ class _BodyState extends State<Body> {
 //                                 tapInvoiceOpen: () {
 //                                   setState(() {
 //                                     _isInvoiceOpen = !_isInvoiceOpen;
-//                                     selectedTable = null; // Reset table selection
+//                                     selectedTable = null;
 //                                   });
 //                                 },
 //                                 dataProducts: _foundProducts!,
@@ -1140,19 +1348,13 @@ class _BodyState extends State<Body> {
 //                                             childAspectRatio: 1.5,
 //                                           ),
 //                                           itemBuilder: (context, index) {
-//                                             var product = _foundProducts![index]
-//                                                 ['attributes'];
+//                                             var product = _foundProducts![index]['attributes'];
 //                                             return Consumer<CartProvider>(
-//                                               builder: (context, value, child) =>
-//                                                   InkWell(
+//                                               builder: (context, value, child) => InkWell(
 //                                                 onTap: () {
 //                                                   print("tapped");
 //                                                   tappedIndex = index;
-//                                                   print(
-//                                                       "Selected index === $index");
-//                                                   if (product['stock']
-//                                                           ['quantity'] ==
-//                                                       0) {
+//                                                   if (product['stock']['quantity'] == 0) {
 //                                                     Dialogs.alertDialog(
 //                                                         context,
 //                                                         "Warning",
@@ -1163,23 +1365,20 @@ class _BodyState extends State<Body> {
 //                                                   } else {
 //                                                     if (_isInvoiceOpen) {
 //                                                       setState(() {
-//                                                         _isInvoiceOpen =
-//                                                             !_isInvoiceOpen;
+//                                                         _isInvoiceOpen = !_isInvoiceOpen;
 //                                                       });
 //                                                     }
 //                                                     value.add(
 //                                                         product,
 //                                                         index,
 //                                                         generateRandomStringForInvoice(12),
-//                                                         product[
-//                                                             'product_price'],
+//                                                         product['product_price'],
 //                                                         1,
 //                                                         product['product_code']);
 //                                                     playSound();
 //                                                   }
 //                                                 },
-//                                                 child: ProductDetails(
-//                                                     product: product),
+//                                                 child: ProductDetails(product: product),
 //                                               ),
 //                                             );
 //                                           },
@@ -1188,8 +1387,7 @@ class _BodyState extends State<Body> {
 //                                     )
 //                                   : Padding(
 //                                       padding: const EdgeInsets.only(top: 30),
-//                                       child: Center(
-//                                           child: CircularProgressIndicator()),
+//                                       child: Center(child: CircularProgressIndicator()),
 //                                     ),
 //                             ],
 //                           );
@@ -1199,8 +1397,7 @@ class _BodyState extends State<Body> {
 //                   ),
 //                 ),
 //                 Padding(
-//                   padding: const EdgeInsets.symmetric(
-//                       vertical: 10, horizontal: 10),
+//                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
 //                   child: ValueListenableBuilder<String>(
 //                     valueListenable: _activeItem,
 //                     builder: (context, activeItem, child) {
@@ -1217,10 +1414,9 @@ class _BodyState extends State<Body> {
 //                           registerInfo: _registerInfo,
 //                           user: widget.user,
 //                           closeInvoice: () {
-//                             print("------------- close invoice -----------");
 //                             setState(() {
 //                               _isInvoiceOpen = !_isInvoiceOpen;
-//                               selectedTable = null; // Reset table selection
+//                               selectedTable = null;
 //                             });
 //                           },
 //                         );
@@ -1247,7 +1443,8 @@ class _BodyState extends State<Body> {
 //     print("Onchanged called");
 //     setState(() {
 //       selectedCategory = '';
-//       selectedTable = null; // Reset table selection when searching
+//       selectedAlphabetLetter = '';
+//       selectedTable = null;
 //     });
 //     if (_barcodeController.text.isEmpty) {
 //       setState(() {
@@ -1279,8 +1476,9 @@ class _BodyState extends State<Body> {
 //   void _filterByCategories() {
 //     print("Filter by category");
 //     setState(() {
-//       selectedTable = null; // Reset table selection when filtering
+//       selectedTable = null;
 //     });
+    
 //     if (selectedCategory == '') {
 //       setState(() {
 //         _categoryResult = _products;
@@ -1296,6 +1494,24 @@ class _BodyState extends State<Body> {
 //         _foundProducts = _categoryResult;
 //       });
 //     }
-//     debugPrint(_foundProducts.toString());
+//     debugPrint("Category filtered products: ${_foundProducts!.length}");
+//   }
+
+//   void _filterByAlphabet(String letter) {
+//     print("Filter by alphabet: $letter");
+//     setState(() {
+//       selectedTable = null;
+//     });
+    
+//     setState(() {
+//       _foundProducts = _products.where((product) {
+//         return product['attributes']['name']
+//             .toString()
+//             .toUpperCase()
+//             .startsWith(letter);
+//       }).toList();
+//     });
+    
+//     debugPrint("Alphabet filtered products: ${_foundProducts!.length}");
 //   }
 // }

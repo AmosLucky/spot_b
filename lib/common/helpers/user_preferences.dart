@@ -25,6 +25,11 @@ class UserPreferences {
     prefs.setInt("is_admin", user.isAdmin);
     prefs.setInt("is_super", user.isSuper);
     
+    // Save warehouse_id
+    if (user.warehouseId != null) {
+      prefs.setString("warehouse_id", user.warehouseId!);
+    }
+    
     // Save company and role information if they are not null
     if (user.company != null) {
       prefs.setString("company", jsonEncode(user.company!.toJson()));
@@ -41,6 +46,9 @@ class UserPreferences {
     box.write('last_name', user.lastName);
     box.write('is_admin', user.isAdmin);
     box.write('is_super', user.isSuper);
+    if (user.warehouseId != null) {
+      box.write('warehouse_id', user.warehouseId!);
+    }
     
     return prefs.commit();
   }
@@ -62,11 +70,14 @@ class UserPreferences {
     // Get the new fields with default values
     int isAdmin = prefs.getInt("is_admin") ?? 0;
     int isSuper = prefs.getInt("is_super") ?? 0;
+    String? warehouseId = prefs.getString("warehouse_id"); // Added: Get warehouse_id
     
     print(id);
     print(firstName);
     print("--- company ---");
     print(prefs.getString("company"));
+    print("--- warehouse_id ---");
+    print(warehouseId);
     
     //Retrieve company and role information
     Company? company;
@@ -104,8 +115,9 @@ class UserPreferences {
       status: status ?? 0,
       token: token ?? '',
       language: language ?? '',
-      isAdmin: isAdmin, // Add this line
-      isSuper: isSuper, // Add this line
+      isAdmin: isAdmin,
+      isSuper: isSuper,
+      warehouseId: warehouseId, // Added: Include warehouse_id
       company: company,
       role: role,
     );
@@ -124,8 +136,9 @@ class UserPreferences {
     prefs.remove("status");
     prefs.remove("language");
     prefs.remove("token");
-    prefs.remove("is_admin"); // Add this line
-    prefs.remove("is_super"); // Add this line
+    prefs.remove("is_admin");
+    prefs.remove("is_super");
+    prefs.remove("warehouse_id"); // Added: Remove warehouse_id
     prefs.remove("company");
     prefs.remove("role");
     
@@ -134,8 +147,9 @@ class UserPreferences {
     box.remove('email');
     box.remove('first_name');
     box.remove('last_name');
-    box.remove('is_admin'); // Add this line
-    box.remove('is_super'); // Add this line
+    box.remove('is_admin');
+    box.remove('is_super');
+    box.remove('warehouse_id'); // Added: Remove warehouse_id
   }
 
   Future<bool> isLoggedIn(String username, String password, String token) async {
@@ -161,11 +175,9 @@ class UserPreferences {
 
 
 // import 'dart:convert';
-
 // import 'package:get_storage/get_storage.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'dart:async';
-
 // import '../../data/models/user_details.dart';
 
 // final box = GetStorage();
@@ -173,7 +185,6 @@ class UserPreferences {
 // class UserPreferences {
 //   Future<bool> saveUser(UserDetails user) async {
 //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
 //     prefs.setInt("id", user.id);
 //     prefs.setString("first_name", user.firstName);
 //     prefs.setString("last_name", user.lastName);
@@ -185,7 +196,11 @@ class UserPreferences {
 //     prefs.setInt("status", user.status);
 //     prefs.setString("language", user.language);
 //     prefs.setString("token", user.token);
-
+    
+//     // Save the new fields
+//     prefs.setInt("is_admin", user.isAdmin);
+//     prefs.setInt("is_super", user.isSuper);
+    
 //     // Save company and role information if they are not null
 //     if (user.company != null) {
 //       prefs.setString("company", jsonEncode(user.company!.toJson()));
@@ -200,13 +215,14 @@ class UserPreferences {
 //     box.write('email', user.email);
 //     box.write('first_name', user.firstName);
 //     box.write('last_name', user.lastName);
-
+//     box.write('is_admin', user.isAdmin);
+//     box.write('is_super', user.isSuper);
+    
 //     return prefs.commit();
 //   }
 
 //   Future<UserDetails?> getUser() async {
 //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
 //     int? id = prefs.getInt("id");
 //     String? firstName = prefs.getString("first_name");
 //     String? lastName = prefs.getString("last_name");
@@ -218,18 +234,20 @@ class UserPreferences {
 //     int? status = prefs.getInt("status");
 //     String? language = prefs.getString("language");
 //     String? token = prefs.getString("token");
-
+    
+//     // Get the new fields with default values
+//     int isAdmin = prefs.getInt("is_admin") ?? 0;
+//     int isSuper = prefs.getInt("is_super") ?? 0;
+    
 //     print(id);
 //     print(firstName);
-
 //     print("--- company ---");
 //     print(prefs.getString("company"));
-
+    
 //     //Retrieve company and role information
 //     Company? company;
 //     String? companyString = prefs.getString("company");
 //     if (companyString != null) {
-//       // company = Company.fromJson(json.decode(companyString));
 //       try {
 //         company = Company.fromJson(json.decode(companyString));
 //       } catch (e) {
@@ -249,6 +267,7 @@ class UserPreferences {
 
 //     print("$id");
 //     print(firstName);
+    
 //     return UserDetails(
 //       id: id ?? 0,
 //       firstName: firstName ?? '',
@@ -261,6 +280,8 @@ class UserPreferences {
 //       status: status ?? 0,
 //       token: token ?? '',
 //       language: language ?? '',
+//       isAdmin: isAdmin, // Add this line
+//       isSuper: isSuper, // Add this line
 //       company: company,
 //       role: role,
 //     );
@@ -268,7 +289,6 @@ class UserPreferences {
 
 //   void removeUser() async {
 //     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
 //     prefs.remove("id");
 //     prefs.remove("first_name");
 //     prefs.remove("last_name");
@@ -280,18 +300,21 @@ class UserPreferences {
 //     prefs.remove("status");
 //     prefs.remove("language");
 //     prefs.remove("token");
+//     prefs.remove("is_admin"); // Add this line
+//     prefs.remove("is_super"); // Add this line
 //     prefs.remove("company");
 //     prefs.remove("role");
-
+    
 //     box.remove('token');
 //     box.remove('id');
 //     box.remove('email');
 //     box.remove('first_name');
 //     box.remove('last_name');
+//     box.remove('is_admin'); // Add this line
+//     box.remove('is_super'); // Add this line
 //   }
 
-//   Future<bool> isLoggedIn(
-//       String username, String password, String token) async {
+//   Future<bool> isLoggedIn(String username, String password, String token) async {
 //     final SharedPreferences prefs = await SharedPreferences.getInstance();
 //     if (token.isNotEmpty) {
 //       prefs.setBool("isLoggedIn", true);
