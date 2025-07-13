@@ -47,7 +47,13 @@ class _InvoiceListState extends State<InvoiceList> {
     var invoices = await getInvoices();
     if (mounted) {
       setState(() {
+        // **FIX 1: Sort invoices by lastUpdated in descending order (newest first)**
         _invoices = invoices;
+        _invoices.sort((a, b) {
+          String dateA = a['lastUpdated'] ?? '';
+          String dateB = b['lastUpdated'] ?? '';
+          return dateB.compareTo(dateA); // Descending order (newest first)
+        });
       });
       print("Invoices ==>> $_invoices");
     }
@@ -193,9 +199,9 @@ class _InvoiceListState extends State<InvoiceList> {
                                   Provider.of<CartProvider>(context,
                                           listen: false)
                                       .redoInvoice(
-                                        item['invoice'], 
-                                        item['id'], 
-                                        index,
+                                        item['invoice'],
+                                         item['id'],
+                                         index,
                                         originalReference: item['reference'],
                                         attendantId: item['attendantId'],
                                         customerName: item['customerName'],
@@ -206,10 +212,11 @@ class _InvoiceListState extends State<InvoiceList> {
                               IconButton(
                                 icon: Icon(MdiIcons.printer),
                                 onPressed: () {
+                                  // **FIX 1: Use the actual invoice ID instead of index for print selection**
                                   setState(() {
                                     selectedInvoiceIndex = index;
                                   });
-                                  printInvoice();
+                                  printInvoice(item); // Pass the actual item
                                 },
                               ),
                             ])),
@@ -231,15 +238,16 @@ class _InvoiceListState extends State<InvoiceList> {
     );
   }
 
-  printInvoice() async {
+  // **FIX 1: Modified printInvoice to accept the specific invoice item**
+  printInvoice(Map<String, dynamic> invoiceItem) async {
     List<dynamic> itemsData;
-    var invoiceData = jsonDecode(_invoices[selectedInvoiceIndex!]['invoice']);
-    var invoice = _invoices[selectedInvoiceIndex!];
+    var invoiceData = jsonDecode(invoiceItem['invoice']);
+    var invoice = invoiceItem;
     print(invoice);
     String invoiceId = invoice['reference'];
     List<Item> items = [];
     print("invoicess ==>> $invoiceData");
-
+    
     for (var itemData in invoiceData) {
       if (itemData is Map<String, dynamic>) {
         var product = itemData['product'];
@@ -256,7 +264,6 @@ class _InvoiceListState extends State<InvoiceList> {
         } else {
           totalAmount = 0.0;
         }
-
         Item item = Item(itemName, quantity, totalAmount);
         items.add(item);
       } else {
@@ -267,6 +274,7 @@ class _InvoiceListState extends State<InvoiceList> {
     double totalAmount = items.map((item) => item.price).reduce((a, b) => a + b);
     print("------------ items data -------------");
     print(items);
+    
     try {
       await printInvoiceDocument(
           invoice['amount'],
@@ -279,7 +287,7 @@ class _InvoiceListState extends State<InvoiceList> {
           DateTime.now(),
       invoice['reference'],
       invoice['lastUpdated'],
-          invoiceData[selectedInvoiceIndex]['product']['warehouse'][0]['name'],
+          invoiceData[0]['product']['warehouse'][0]['name'],
         widget.user.company!.name,
         widget.user.company!.address,
         invoice['customerName'] ?? "",
@@ -298,7 +306,6 @@ class _InvoiceListState extends State<InvoiceList> {
 
 
 // import 'dart:convert';
-
 // import 'package:spotstock_inventory/common/common.dart';
 // import 'package:spotstock_inventory/common/money.dart';
 // import 'package:spotstock_inventory/common/provider/cart_provider.dart';
@@ -307,7 +314,6 @@ class _InvoiceListState extends State<InvoiceList> {
 // import 'package:flutter/material.dart';
 // import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 // import 'package:provider/provider.dart';
-
 // import '../../../../data/models/user_details.dart';
 // import '../print_invoices.dart';
 // import '../printusb.dart';
@@ -344,7 +350,6 @@ class _InvoiceListState extends State<InvoiceList> {
 //     _loadInvoices();
 //   }
 
-//   // Load invoices when the widget initializes
 //   void _loadInvoices() async {
 //     var invoices = await getInvoices();
 //     if (mounted) {
@@ -355,7 +360,6 @@ class _InvoiceListState extends State<InvoiceList> {
 //     }
 //   }
 
-//   // Fetch invoices for the specified register
 //   Future<List<dynamic>> getInvoices() async {
 //     try {
 //       return await widget.systemProvider.getInvoices(widget.registerInfo['id']);
@@ -365,7 +369,6 @@ class _InvoiceListState extends State<InvoiceList> {
 //     }
 //   }
 
-//   // Delete a specific invoice by ID and remove it from the list
 //   Future<void> deleteInvoice(int id) async {
 //     try {
 //       await widget.systemProvider.deleteInvoice(id);
@@ -380,7 +383,6 @@ class _InvoiceListState extends State<InvoiceList> {
 //     }
 //   }
 
-//   // Clear all invoices for a specific register and update the list
 //   Future<void> clearInvoices() async {
 //     try {
 //       await widget.systemProvider.clearInvoices();
@@ -397,14 +399,13 @@ class _InvoiceListState extends State<InvoiceList> {
 
 //   @override
 //   void dispose() {
-//     // Perform any necessary cleanup here
 //     super.dispose();
 //   }
 
 //   @override
 //   Widget build(BuildContext context) {
 //     return Container(
-//       width: widget.mediaQuery.width * 0.3, // Adjust width based on screen size
+//       width: widget.mediaQuery.width * 0.3,
 //       constraints: BoxConstraints(
 //         maxHeight: widget.mediaQuery.height * 0.96,
 //       ),
@@ -474,6 +475,11 @@ class _InvoiceListState extends State<InvoiceList> {
 //                                   "Customer: ${item['customerName']}",
 //                                   style: TextStyle(color: grayColor),
 //                                 ),
+//                                 if (item['attendantId'] != null)
+//                                   Text(
+//                                     "Attendant ID: ${item['attendantId']}",
+//                                     style: TextStyle(color: grayColor, fontSize: 11),
+//                                   ),
 //                                 Row(
 //                                   mainAxisSize: MainAxisSize.min,
 //                                   children: [
@@ -490,13 +496,17 @@ class _InvoiceListState extends State<InvoiceList> {
 //                               IconButton(
 //                                 icon: Icon(MdiIcons.redoVariant),
 //                                 onPressed: () {
+//                                   // Updated redoInvoice call with additional parameters
 //                                   Provider.of<CartProvider>(context,
 //                                           listen: false)
-//                                       .redoInvoice(item['invoice'], item['id'], index);
-
-//                                   // deleteInvoice(item['id']);
-//                                   // Provider.of<CartProvider>(context,
-//                                   //     listen: false)._selectedInvoiceId = item['id'];
+//                                       .redoInvoice(
+//                                         item['invoice'], 
+//                                         item['id'], 
+//                                         index,
+//                                         originalReference: item['reference'],
+//                                         attendantId: item['attendantId'],
+//                                         customerName: item['customerName'],
+//                                       );
 //                                   widget.closeInvoice();
 //                                 },
 //                               ),
@@ -528,58 +538,42 @@ class _InvoiceListState extends State<InvoiceList> {
 //     );
 //   }
 
-
 //   printInvoice() async {
-//     //var othersData = json.decode(widget.transactionData['others']);
-
-//     // Ensure the items data is in the correct format
 //     List<dynamic> itemsData;
-
 //     var invoiceData = jsonDecode(_invoices[selectedInvoiceIndex!]['invoice']);
 //     var invoice = _invoices[selectedInvoiceIndex!];
 //     print(invoice);
 //     String invoiceId = invoice['reference'];
-
 //     List<Item> items = [];
-
 //     print("invoicess ==>> $invoiceData");
 
-//     // Parse the items
 //     for (var itemData in invoiceData) {
 //       if (itemData is Map<String, dynamic>) {
 //         var product = itemData['product'];
 //         print("productssss ==>> $product");
-
-//         // Check if product is a map
 //         String itemName = product['name'] as String;
 //         int quantity = itemData['quantity'] as int;
-
 //         double totalAmount;
 //         if (itemData['totalAmount'] is String) {
-//           totalAmount = double.tryParse(itemData['totalAmount']) ??
-//               0.0; // Handle String to double
+//           totalAmount = double.tryParse(itemData['totalAmount']) ?? 0.0;
 //         } else if (itemData['totalAmount'] is int) {
-//           totalAmount = (itemData['totalAmount'] as int)
-//               .toDouble(); // Convert int to double
+//           totalAmount = (itemData['totalAmount'] as int).toDouble();
 //         } else if (itemData['totalAmount'] is double) {
-//           totalAmount = itemData['totalAmount']; // Already a double
+//           totalAmount = itemData['totalAmount'];
 //         } else {
-//           totalAmount = 0.0; // Default value in case of unexpected type
+//           totalAmount = 0.0;
 //         }
 
 //         Item item = Item(itemName, quantity, totalAmount);
 //         items.add(item);
-//             } else {
+//       } else {
 //         print('Expected itemData to be a Map, but got: $itemData');
 //       }
 //     }
 
 //     double totalAmount = items.map((item) => item.price).reduce((a, b) => a + b);
-
 //     print("------------ items data -------------");
-
 //     print(items);
-
 //     try {
 //       await printInvoiceDocument(
 //           invoice['amount'],
@@ -599,7 +593,6 @@ class _InvoiceListState extends State<InvoiceList> {
 //         invoice['customerPhone'] ?? "",
 //         invoice['tableId'] ?? "",
 //       );
-
 //       print('Document sent to printer successfully.');
 //     } catch (e) {
 //       print('Error printing document: $e');

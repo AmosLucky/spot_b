@@ -57,7 +57,8 @@ class _OrderSummaryState extends State<OrderSummary> {
 
   Future<List<dynamic>> getInvoices() async {
     try {
-      invoices = await widget.systemProvider.getInvoices(widget.registerInfo['id']);
+      invoices =
+          await widget.systemProvider.getInvoices(widget.registerInfo['id']);
       logger.d('Fetched invoices: $invoices');
       return invoices;
     } catch (e) {
@@ -84,7 +85,7 @@ class _OrderSummaryState extends State<OrderSummary> {
   Future<void> _showPaymentDialog(BuildContext context, double subtotal) async {
     logger.i('Showing payment dialog with subtotal: $subtotal');
     await getInvoices();
-    
+
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     showDialog(
       context: context,
@@ -156,7 +157,8 @@ class _OrderSummaryState extends State<OrderSummary> {
   }
 
   void _editPrice(BuildContext context, String trackID, int currentPrice) {
-    logger.i('Editing price for trackID: $trackID, currentPrice: $currentPrice');
+    logger
+        .i('Editing price for trackID: $trackID, currentPrice: $currentPrice');
     final TextEditingController priceController = TextEditingController(
       text: currentPrice.toString(),
     );
@@ -359,31 +361,38 @@ class _OrderSummaryState extends State<OrderSummary> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   widget.registerInfo['id'] != null
-                      ? CustomButton(
+                      ?
+                      CustomButton(
                           label: "Hold List",
                           icon: MdiIcons.handBackLeft,
                           color: secondaryColor,
                           onTap: () async {
                             if (cart.totalCart > 0) {
-                              // Check if this is a redo operation
+                              // **FIX 2: Check if this is a redo operation**
                               if (cart.isRedoingInvoice) {
                                 // For redo operations, save directly without showing dialog
-                                logger.i('Saving redo invoice directly');
+                                logger.i(
+                                    'Saving redo invoice directly with preserved reference');
                                 var response = await cart.holdInvoice(
                                   context,
                                   widget.registerInfo['id'],
                                   cart.subTotal,
-                                  cart.currentCustomerName ?? '', // Use stored table
-                                  cart.currentCustomerName ?? 'Walk-in Customer', // Use stored customer
+                                  cart.currentCustomerName ??
+                                      '', // Use stored table
+                                  cart.currentCustomerName ??
+                                      'Walk-in Customer', // Use stored customer
                                   '', // Phone number
-                                  attendantId: cart.currentAttendantId, // Use stored attendant
+                                  attendantId: cart
+                                      .currentAttendantId, // Use stored attendant
                                 );
-                                
-                                // Delete the original invoice from the list
-                                if (cart.selectedInvoiceId > 0) {
+
+                                // **FIX 2: Delete the original invoice from the list after successful update**
+                                if (response['status'] == true &&
+                                    cart.selectedInvoiceId > 0) {
                                   await deleteInvoice(cart.selectedInvoiceId);
+                                  cart.deleteIndex(); // Reset the cart state
                                 }
-                                
+
                                 Dialogs.alertDialog(
                                   context,
                                   "Success!",
@@ -423,7 +432,7 @@ class _OrderSummaryState extends State<OrderSummary> {
                                                       : {},
                                                   onSubmit: (value) async {
                                                     logger.i(
-                                                        'Holding invoice with data: $value');
+                                                        'Holding new invoice with data: $value');
                                                     var response =
                                                         await cart.holdInvoice(
                                                       context,
@@ -433,9 +442,10 @@ class _OrderSummaryState extends State<OrderSummary> {
                                                       value['customerName'],
                                                       value[
                                                           'customerPhoneNumber'],
-                                                      attendantId: value['attendantId'],
+                                                      attendantId:
+                                                          value['attendantId'],
                                                     );
-                                                    
+
                                                     // Handle existing invoice deletion
                                                     for (var i in invoices) {
                                                       if (i['id'] ==
@@ -465,6 +475,113 @@ class _OrderSummaryState extends State<OrderSummary> {
                               }
                             }
                           })
+
+                      // CustomButton(
+                      //     label: "Hold List",
+                      //     icon: MdiIcons.handBackLeft,
+                      //     color: secondaryColor,
+                      //     onTap: () async {
+                      //       if (cart.totalCart > 0) {
+                      //         // Check if this is a redo operation
+                      //         if (cart.isRedoingInvoice) {
+                      //           // For redo operations, save directly without showing dialog
+                      //           logger.i('Saving redo invoice directly');
+                      //           var response = await cart.holdInvoice(
+                      //             context,
+                      //             widget.registerInfo['id'],
+                      //             cart.subTotal,
+                      //             cart.currentCustomerName ?? '', // Use stored table
+                      //             cart.currentCustomerName ?? 'Walk-in Customer', // Use stored customer
+                      //             '', // Phone number
+                      //             attendantId: cart.currentAttendantId, // Use stored attendant
+                      //           );
+
+                      //           // Delete the original invoice from the list
+                      //           if (cart.selectedInvoiceId > 0) {
+                      //             await deleteInvoice(cart.selectedInvoiceId);
+                      //           }
+
+                      //           Dialogs.alertDialog(
+                      //             context,
+                      //             "Success!",
+                      //             "Invoice updated successfully. Ref: ${response['reference']}",
+                      //             "OK",
+                      //             "",
+                      //             [],
+                      //           );
+                      //         } else {
+                      //           // For new invoices, show the dialog
+                      //           await getInvoices();
+                      //           showDialog(
+                      //               context: context,
+                      //               builder: (BuildContext context) {
+                      //                 return Consumer<CartProvider>(
+                      //                     builder: (context, cartProvider,
+                      //                             child) =>
+                      //                         PayFormInvoice(
+                      //                             data: cartProvider
+                      //                                         .selectedIndex !=
+                      //                                     null
+                      //                                 ? {
+                      //                                     "customerName": invoices[
+                      //                                             cartProvider
+                      //                                                 .selectedIndex!]
+                      //                                         ['customerName'],
+                      //                                     "customerPhoneNumber":
+                      //                                         invoices[cartProvider
+                      //                                                 .selectedIndex!]
+                      //                                             [
+                      //                                             'customerPhone'],
+                      //                                     "table": invoices[
+                      //                                             cartProvider
+                      //                                                 .selectedIndex!]
+                      //                                         ['tableId']
+                      //                                   }
+                      //                                 : {},
+                      //                             onSubmit: (value) async {
+                      //                               logger.i(
+                      //                                   'Holding invoice with data: $value');
+                      //                               var response =
+                      //                                   await cart.holdInvoice(
+                      //                                 context,
+                      //                                 widget.registerInfo['id'],
+                      //                                 cart.subTotal,
+                      //                                 value['table'],
+                      //                                 value['customerName'],
+                      //                                 value[
+                      //                                     'customerPhoneNumber'],
+                      //                                 attendantId: value['attendantId'],
+                      //                               );
+
+                      //                               // Handle existing invoice deletion
+                      //                               for (var i in invoices) {
+                      //                                 if (i['id'] ==
+                      //                                     cartProvider
+                      //                                         .selectedInvoiceId) {
+                      //                                   logger.i(
+                      //                                       'Deleting invoice ID: ${i['id']}');
+                      //                                   deleteInvoice(i['id']);
+                      //                                 }
+                      //                                 Provider.of<CartProvider>(
+                      //                                         context,
+                      //                                         listen: false)
+                      //                                     .deleteIndex();
+                      //                               }
+                      //                               Dialogs.alertDialog(
+                      //                                 context,
+                      //                                 "Success!",
+                      //                                 "Invoice moved to hold. Ref: ${response['reference']}",
+                      //                                 "OK",
+                      //                                 "",
+                      //                                 [],
+                      //                               );
+                      //                             },
+                      //                             systemProvider:
+                      //                                 widget.systemProvider));
+                      //               });
+                      //         }
+                      //       }
+                      //     })
                       : const SizedBox(),
                   CustomButton(
                     label: "Clear",

@@ -1791,28 +1791,56 @@ Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<Strin
     }
   }
 
-  Future<List<dynamic>> getInvoices(int registerId) async {
-    UserDetails user =
-        Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-    final store = await DatabaseEngine.instance.getStore();
-    final invoiceBox = store.box<Invoice>();
+  // Future<List<dynamic>> getInvoices(int registerId) async {
+  //   UserDetails user =
+  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  //   final store = await DatabaseEngine.instance.getStore();
+  //   final invoiceBox = store.box<Invoice>();
 
-    final invoices = invoiceBox
-        .query(Invoice_.userId
-            .equals(user.id.toString())
-            .and(Invoice_.companyId.equals(registerId.toString())))
-        .build()
-        .find();
+  //   final invoices = invoiceBox
+  //       .query(Invoice_.userId
+  //           .equals(user.id.toString())
+  //           .and(Invoice_.companyId.equals(registerId.toString())))
+  //       .build()
+  //       .find();
 
-    print("=========== invoices list ============");
-    print(invoices.length);
+  //   print("=========== invoices list ============");
+  //   print(invoices.length);
 
-    // Convert List<Invoice> to List<dynamic>
-    List<dynamic> dynamicInvoices =
-        invoices.map((invoice) => invoice.toMap()).toList();
+  //   // Convert List<Invoice> to List<dynamic>
+  //   List<dynamic> dynamicInvoices =
+  //       invoices.map((invoice) => invoice.toMap()).toList();
 
-    return dynamicInvoices;
-  }
+  //   return dynamicInvoices;
+  // }
+
+
+
+Future<List<dynamic>> getInvoices(int registerId) async {
+  UserDetails user =
+      Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  final store = await DatabaseEngine.instance.getStore();
+  final invoiceBox = store.box<Invoice>();
+  
+  // **FIX 1: Order invoices by lastUpdated in descending order (newest first)**
+  final invoices = invoiceBox
+      .query(Invoice_.userId
+          .equals(user.id.toString())
+          .and(Invoice_.companyId.equals(registerId.toString())))
+      .order(Invoice_.lastUpdated, flags: Order.descending) // Add ordering
+      .build()
+      .find();
+      
+  print("=========== invoices list ============");
+  print(invoices.length);
+  
+  // Convert List<Invoice> to List<dynamic>
+  List<dynamic> dynamicInvoices =
+      invoices.map((invoice) => invoice.toMap()).toList();
+  return dynamicInvoices;
+}
+
+
 
   Future<bool> deleteInvoice(int id) async {
     final store = await DatabaseEngine.instance.getStore();
@@ -2399,57 +2427,114 @@ Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<Strin
     return data ?? {};
   }
 
-  Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
-    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-    final store = await DatabaseEngine.instance.getStore();
-    final orderBox = store.box<Orders>();
+  // Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
+  //   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  //   final store = await DatabaseEngine.instance.getStore();
+  //   final orderBox = store.box<Orders>();
 
-    var txnID = generateRandomString(12);
+  //   var txnID = generateRandomString(12);
 
-    String paymentStatus;
-    switch (paymentData['paymentStatus']) {
-      case 'Paid':
-        paymentStatus = 'Paid';
-        break;
-      case 'Unpaid':
-        paymentStatus = 'Unpaid';
-        break;
-      case 'Partial':
-        paymentStatus = 'Partial';
-        break;
-      default:
-        paymentStatus = 'Unpaid';
-    }
+  //   String paymentStatus;
+  //   switch (paymentData['paymentStatus']) {
+  //     case 'Paid':
+  //       paymentStatus = 'Paid';
+  //       break;
+  //     case 'Unpaid':
+  //       paymentStatus = 'Unpaid';
+  //       break;
+  //     case 'Partial':
+  //       paymentStatus = 'Partial';
+  //       break;
+  //     default:
+  //       paymentStatus = 'Unpaid';
+  //   }
 
-    Orders newOrder = Orders(
-      billerId: user.id,
-      customerName: paymentData['customerName'] ?? 'Walk-in Customer',
-      trxId: txnID,
-      amount: total,
-      quantity: 1,
-      sync: 0,
-      status: 1,
-      productId: 0,
-      createdAt: DateTime.now(),
-      searchDate: searchDate(DateTime.now()),
-      paymentMethod: paymentData['paymentType'] ?? 'Cash',
-      paymentStatus: paymentStatus,
-      items: data,
-      others: jsonEncode(paymentData),
-      companyId: user.company!.id.toString(),
-      register: paymentData['registerId'].toString(),
-      tableId: paymentData['table'],
-      partialAmount: paymentData['partialAmount']?.toDouble(),
-      receivedAmount: paymentData['receivedAmount']?.toDouble(),
-      // attendantId: paymentData['attendantId'], // Store attendant ID 
-      attendantId: paymentData['attendantId']?.toString(),
-      invoiceReference: paymentData['invoiceReference'], // Store invoice reference
-    );
+  //   Orders newOrder = Orders(
+  //     billerId: user.id,
+  //     customerName: paymentData['customerName'] ?? 'Walk-in Customer',
+  //     trxId: txnID,
+  //     amount: total,
+  //     quantity: 1,
+  //     sync: 0,
+  //     status: 1,
+  //     productId: 0,
+  //     createdAt: DateTime.now(),
+  //     searchDate: searchDate(DateTime.now()),
+  //     paymentMethod: paymentData['paymentType'] ?? 'Cash',
+  //     paymentStatus: paymentStatus,
+  //     items: data,
+  //     others: jsonEncode(paymentData),
+  //     companyId: user.company!.id.toString(),
+  //     register: paymentData['registerId'].toString(),
+  //     tableId: paymentData['table'],
+  //     partialAmount: paymentData['partialAmount']?.toDouble(),
+  //     receivedAmount: paymentData['receivedAmount']?.toDouble(),
+  //     // attendantId: paymentData['attendantId'], // Store attendant ID 
+  //     attendantId: paymentData['attendantId']?.toString(),
+  //     invoiceReference: paymentData['invoiceReference'], // Store invoice reference
+  //   );
 
-    orderBox.put(newOrder, mode: PutMode.insert);
+  //   orderBox.put(newOrder, mode: PutMode.insert);
 
-    return {'status': true, 'txnID': txnID};
+  //   return {'status': true, 'txnID': txnID};
+  // }
+
+
+Future<Map<String, dynamic>> checkout(
+    Map<String, dynamic> paymentData, 
+    total, 
+    data, 
+    {String? txnID}) async { // **FIX 2: Accept optional txnID parameter**
+  UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  final store = await DatabaseEngine.instance.getStore();
+  final orderBox = store.box<Orders>();
+  
+  // **FIX 2: Use provided txnID or generate new one**
+  var transactionId = txnID ?? generateRandomString(12);
+  
+  String paymentStatus;
+  switch (paymentData['paymentStatus']) {
+    case 'Paid':
+      paymentStatus = 'Paid';
+      break;
+    case 'Unpaid':
+      paymentStatus = 'Unpaid';
+      break;
+    case 'Partial':
+      paymentStatus = 'Partial';
+      break;
+    default:
+      paymentStatus = 'Unpaid';
   }
+
+  Orders newOrder = Orders(
+    billerId: user.id,
+    customerName: paymentData['customerName'] ?? 'Walk-in Customer',
+    trxId: transactionId, // **FIX 2: Use the transaction ID (existing or new)**
+    amount: total,
+    quantity: 1,
+    sync: 0,
+    status: 1,
+    productId: 0,
+    createdAt: DateTime.now(),
+    searchDate: searchDate(DateTime.now()),
+    paymentMethod: paymentData['paymentType'] ?? 'Cash',
+    paymentStatus: paymentStatus,
+    items: data,
+    others: jsonEncode(paymentData),
+    companyId: user.company!.id.toString(),
+    register: paymentData['registerId'].toString(),
+    tableId: paymentData['table'],
+    partialAmount: paymentData['partialAmount']?.toDouble(),
+    receivedAmount: paymentData['receivedAmount']?.toDouble(),
+    attendantId: paymentData['attendantId']?.toString(),
+    invoiceReference: paymentData['invoiceReference'],
+  );
+
+  orderBox.put(newOrder, mode: PutMode.insert);
+  return {'status': true, 'txnID': transactionId}; // **FIX 2: Return the used transaction ID**
+}
+
 
   Future<Map<String, dynamic>> checkoutBooking(
     Map<String, dynamic> paymentData,

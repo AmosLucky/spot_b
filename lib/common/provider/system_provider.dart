@@ -1455,33 +1455,3 @@ Future<bool> _checkInternetConnection() async {
   }
 
 }
-
-
-
-  // Future<Map<String, dynamic>> syncAllTransactions(
-  //   UserDetails user,
-  // ) async {
-  //   try {
-  //     var response =
-  //         await SystemRepo(refresh: false, online: false).syncAllTransactions(
-  //       user,
-  //     );
-  //     return response;
-  //   } catch (error) {
-  //     return {};
-  //     // throw (error);
-  //   }
-  // }
-
-
-
-  // Future<List<Booking>> getHotelTransactionsByRegister(String? registerId) async {
-  //   try {
-  //     var response = await SystemRepo(refresh: false, online: false)
-  //         .getHotelTransactionsByRegister(registerId: registerId);
-  //     return response;
-  //   } catch (error) {
-  //     return [];
-  //     // throw (error);
-  //   }
-  // }
