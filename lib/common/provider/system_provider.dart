@@ -1453,5 +1453,4 @@ Future<bool> _checkInternetConnection() async {
   UserDetails _getCurrentUser() {
     return Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
   }
-
 }

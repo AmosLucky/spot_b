@@ -130,46 +130,6 @@ class SystemRepo extends ApiClient {
   }
 
 
-
-  // // **NEW: Store synced sale locally for immediate display**
-  // Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<String, dynamic> originalData) async {
-  //   try {
-  //     final store = await dbHelper.getStore();
-  //     final saleBox = store.box<SaleEntity>();
-      
-  //     // Create a sale entity from the API response
-  //     final saleEntity = SaleEntity(
-  //       originalId: apiResponse['data']?['id'] ?? DateTime.now().millisecondsSinceEpoch,
-  //       referenceCode: originalData['reference_code'] ?? '',
-  //       date: DateTime.now(),
-  //       customerName: originalData['offline_customer_name'] ?? 'Walk-in Customer',
-  //       attendantName: originalData['attendant_name'] ?? '',
-  //       attendantId: originalData['attendant_id']?.toString() ?? '',
-  //       warehouseName: '', // Will be populated from warehouse data
-  //       grandTotal: double.tryParse(originalData['grand_total']?.toString() ?? '0') ?? 0.0,
-  //       paymentStatus: originalData['payment_status'] ?? 1,
-  //       paidAmount: double.tryParse(originalData['received_amount']?.toString() ?? '0') ?? 0.0,
-  //       status: originalData['status'] ?? 1,
-  //       type: '',
-  //       createdAt: DateTime.now(),
-  //     );
-
-  //     // Check if sale already exists
-  //     final existingSale = saleBox
-  //         .query(SaleEntity_.originalId.equals(saleEntity.originalId))
-  //         .build()
-  //         .findFirst();
-
-  //     if (existingSale == null) {
-  //       saleBox.put(saleEntity);
-  //       print('✅ Stored synced sale locally for immediate display');
-  //     }
-  //   } catch (e) {
-  //     print('❌ Error storing synced sale locally: $e');
-  //   }
-  // }
-
-
 // **UPDATED: Store synced sale locally for immediate display**
 Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<String, dynamic> originalData) async {
   try {
@@ -2427,59 +2387,6 @@ Future<List<dynamic>> getInvoices(int registerId) async {
     return data ?? {};
   }
 
-  // Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
-  //   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-  //   final store = await DatabaseEngine.instance.getStore();
-  //   final orderBox = store.box<Orders>();
-
-  //   var txnID = generateRandomString(12);
-
-  //   String paymentStatus;
-  //   switch (paymentData['paymentStatus']) {
-  //     case 'Paid':
-  //       paymentStatus = 'Paid';
-  //       break;
-  //     case 'Unpaid':
-  //       paymentStatus = 'Unpaid';
-  //       break;
-  //     case 'Partial':
-  //       paymentStatus = 'Partial';
-  //       break;
-  //     default:
-  //       paymentStatus = 'Unpaid';
-  //   }
-
-  //   Orders newOrder = Orders(
-  //     billerId: user.id,
-  //     customerName: paymentData['customerName'] ?? 'Walk-in Customer',
-  //     trxId: txnID,
-  //     amount: total,
-  //     quantity: 1,
-  //     sync: 0,
-  //     status: 1,
-  //     productId: 0,
-  //     createdAt: DateTime.now(),
-  //     searchDate: searchDate(DateTime.now()),
-  //     paymentMethod: paymentData['paymentType'] ?? 'Cash',
-  //     paymentStatus: paymentStatus,
-  //     items: data,
-  //     others: jsonEncode(paymentData),
-  //     companyId: user.company!.id.toString(),
-  //     register: paymentData['registerId'].toString(),
-  //     tableId: paymentData['table'],
-  //     partialAmount: paymentData['partialAmount']?.toDouble(),
-  //     receivedAmount: paymentData['receivedAmount']?.toDouble(),
-  //     // attendantId: paymentData['attendantId'], // Store attendant ID 
-  //     attendantId: paymentData['attendantId']?.toString(),
-  //     invoiceReference: paymentData['invoiceReference'], // Store invoice reference
-  //   );
-
-  //   orderBox.put(newOrder, mode: PutMode.insert);
-
-  //   return {'status': true, 'txnID': txnID};
-  // }
-
-
 Future<Map<String, dynamic>> checkout(
     Map<String, dynamic> paymentData, 
     total, 
@@ -2685,6 +2592,97 @@ Future<Map<String, dynamic>> checkout(
 }
 
 
+
+  // Future<Map<String, dynamic>> checkout(Map<String, dynamic> paymentData, total, data) async {
+  //   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  //   final store = await DatabaseEngine.instance.getStore();
+  //   final orderBox = store.box<Orders>();
+
+  //   var txnID = generateRandomString(12);
+
+  //   String paymentStatus;
+  //   switch (paymentData['paymentStatus']) {
+  //     case 'Paid':
+  //       paymentStatus = 'Paid';
+  //       break;
+  //     case 'Unpaid':
+  //       paymentStatus = 'Unpaid';
+  //       break;
+  //     case 'Partial':
+  //       paymentStatus = 'Partial';
+  //       break;
+  //     default:
+  //       paymentStatus = 'Unpaid';
+  //   }
+
+  //   Orders newOrder = Orders(
+  //     billerId: user.id,
+  //     customerName: paymentData['customerName'] ?? 'Walk-in Customer',
+  //     trxId: txnID,
+  //     amount: total,
+  //     quantity: 1,
+  //     sync: 0,
+  //     status: 1,
+  //     productId: 0,
+  //     createdAt: DateTime.now(),
+  //     searchDate: searchDate(DateTime.now()),
+  //     paymentMethod: paymentData['paymentType'] ?? 'Cash',
+  //     paymentStatus: paymentStatus,
+  //     items: data,
+  //     others: jsonEncode(paymentData),
+  //     companyId: user.company!.id.toString(),
+  //     register: paymentData['registerId'].toString(),
+  //     tableId: paymentData['table'],
+  //     partialAmount: paymentData['partialAmount']?.toDouble(),
+  //     receivedAmount: paymentData['receivedAmount']?.toDouble(),
+  //     // attendantId: paymentData['attendantId'], // Store attendant ID 
+  //     attendantId: paymentData['attendantId']?.toString(),
+  //     invoiceReference: paymentData['invoiceReference'], // Store invoice reference
+  //   );
+
+  //   orderBox.put(newOrder, mode: PutMode.insert);
+
+  //   return {'status': true, 'txnID': txnID};
+  // }
+
+
+  // // **NEW: Store synced sale locally for immediate display**
+  // Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<String, dynamic> originalData) async {
+  //   try {
+  //     final store = await dbHelper.getStore();
+  //     final saleBox = store.box<SaleEntity>();
+      
+  //     // Create a sale entity from the API response
+  //     final saleEntity = SaleEntity(
+  //       originalId: apiResponse['data']?['id'] ?? DateTime.now().millisecondsSinceEpoch,
+  //       referenceCode: originalData['reference_code'] ?? '',
+  //       date: DateTime.now(),
+  //       customerName: originalData['offline_customer_name'] ?? 'Walk-in Customer',
+  //       attendantName: originalData['attendant_name'] ?? '',
+  //       attendantId: originalData['attendant_id']?.toString() ?? '',
+  //       warehouseName: '', // Will be populated from warehouse data
+  //       grandTotal: double.tryParse(originalData['grand_total']?.toString() ?? '0') ?? 0.0,
+  //       paymentStatus: originalData['payment_status'] ?? 1,
+  //       paidAmount: double.tryParse(originalData['received_amount']?.toString() ?? '0') ?? 0.0,
+  //       status: originalData['status'] ?? 1,
+  //       type: '',
+  //       createdAt: DateTime.now(),
+  //     );
+
+  //     // Check if sale already exists
+  //     final existingSale = saleBox
+  //         .query(SaleEntity_.originalId.equals(saleEntity.originalId))
+  //         .build()
+  //         .findFirst();
+
+  //     if (existingSale == null) {
+  //       saleBox.put(saleEntity);
+  //       print('✅ Stored synced sale locally for immediate display');
+  //     }
+  //   } catch (e) {
+  //     print('❌ Error storing synced sale locally: $e');
+  //   }
+  // }
 
 
 

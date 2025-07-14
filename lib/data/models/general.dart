@@ -12,8 +12,8 @@ class HotelCategoryModel {
       throw ArgumentError('Invalid map: attributes key is missing');
     }
     return HotelCategoryModel(
-      label: attributes['name'] ?? '', // Fallback to empty string if null
-      value: attributes['id'] ?? '', // Fallback to empty string if null
+      label: attributes['name'] ?? '', 
+      value: attributes['id'] ?? '', 
     );
   }
 

@@ -213,7 +213,7 @@ Future<Map<String, dynamic>> checkout(
     // For new transactions, generate new IDs
     txnID = generateRandomString(12);
     invoiceReference = _generateUniqueInvoiceReference(
-      paymentData['attendantId'], 
+      paymentData['attendantId'],  
       paymentData['customerName'] ?? 'Walk-in Customer'
     );
     print("========= Generated new transaction ID: $txnID =============");
