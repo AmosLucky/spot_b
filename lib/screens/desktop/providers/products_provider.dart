@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:spotstock_inventory/common/provider/system_provider.dart';
-
 import '../model/product_model.dart';
 import '../services/products_service.dart';
+// import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/data/models/product.dart';
 // import 'package:spotstock_inventory/data/services/products_service.dart';
 

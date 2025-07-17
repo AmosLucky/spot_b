@@ -28,7 +28,7 @@ class UserDetails {
   final String language;
   final int isAdmin;
   final int isSuper;
-  final String? warehouseId; // Added: Store warehouse_id from login response
+  final String? warehouseId;
   final Company? company;
   final Role? role;
 
@@ -46,29 +46,30 @@ class UserDetails {
     required this.language,
     this.isAdmin = 0,
     this.isSuper = 0,
-    this.warehouseId, // Added: warehouse_id field
+    this.warehouseId,
     required this.company,
     required this.role,
   });
 
   factory UserDetails.fromJson(Map<String, dynamic> json) {
+    // Add null safety checks and provide default values
     return UserDetails(
-      id: json['id'],
-      firstName: json['first_name'],
-      lastName: json['last_name'],
-      email: json['email'],
-      phone: json['phone'],
-      defaultPassword: json['default_password'] ?? "",
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      status: json['status'],
-      language: json['language'],
+      id: json['id'] ?? 0,
+      firstName: json['first_name']?.toString() ?? '',
+      lastName: json['last_name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      defaultPassword: json['default_password']?.toString() ?? '',
+      createdAt: json['created_at']?.toString() ?? '',
+      updatedAt: json['updated_at']?.toString() ?? '',
+      status: json['status'] ?? 0,
+      language: json['language']?.toString() ?? 'en',
       isAdmin: json['is_admin'] ?? 0,
       isSuper: json['is_super'] ?? 0,
-      warehouseId: json['warehouse_id']?.toString(), // Added: Parse warehouse_id
+      warehouseId: json['warehouse_id']?.toString(),
       company: json['company'] != null ? Company.fromJson(json['company']) : null,
       role: json['role'] != null ? Role.fromJson(json['role']) : null,
-      token: json['token'],
+      token: json['token']?.toString() ?? '',
     );
   }
 
@@ -86,22 +87,20 @@ class UserDetails {
       'language': language,
       'is_admin': isAdmin,
       'is_super': isSuper,
-      'warehouse_id': warehouseId, // Added: Include warehouse_id in JSON
+      'warehouse_id': warehouseId,
       'company': company?.toJson(),
       'role': role?.toJson(),
       'token': token
     };
   }
 
-  // Helper method to get warehouse IDs as a list
   List<int> get warehouseIds {
     if (warehouseId == null || warehouseId!.isEmpty) return [];
-    
+        
     try {
-      // Remove brackets and parse the comma-separated values
       String cleanString = warehouseId!.replaceAll('[', '').replaceAll(']', '');
       if (cleanString.isEmpty) return [];
-      
+            
       return cleanString
           .split(',')
           .map((id) => int.tryParse(id.trim()) ?? 0)
@@ -135,12 +134,12 @@ class Company {
 
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone'],
-      address: json['address'],
-      logo: json['logo'],
+      id: json['id'] ?? 0,
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      logo: json['logo']?.toString() ?? '',
       amount: json['amount']?.toDouble(),
     );
   }
@@ -172,14 +171,14 @@ class Role {
   });
 
   factory Role.fromJson(Map<String, dynamic> json) {
-    var permissionsFromJson = json['permissions'] as List;
+    var permissionsFromJson = json['permissions'] as List? ?? [];
     List<PermissionModel> permissionsList =
         permissionsFromJson.map((i) => PermissionModel.fromJson(i)).toList();
 
     return Role(
-      id: json['id'],
-      name: json['name'],
-      displayName: json['display_name'],
+      id: json['id'] ?? 0,
+      name: json['name']?.toString() ?? '',
+      displayName: json['display_name']?.toString() ?? '',
       permissions: permissionsList,
     );
   }
@@ -207,9 +206,9 @@ class PermissionModel {
 
   factory PermissionModel.fromJson(Map<String, dynamic> json) {
     return PermissionModel(
-      id: json['id'],
-      name: json['name'],
-      displayName: json['display_name'],
+      id: json['id'] ?? 0,
+      name: json['name']?.toString() ?? '',
+      displayName: json['display_name']?.toString() ?? '',
     );
   }
 
@@ -257,6 +256,7 @@ class PermissionModel {
 //   final String language;
 //   final int isAdmin;
 //   final int isSuper;
+//   final String? warehouseId; // Added: Store warehouse_id from login response
 //   final Company? company;
 //   final Role? role;
 
@@ -274,6 +274,7 @@ class PermissionModel {
 //     required this.language,
 //     this.isAdmin = 0,
 //     this.isSuper = 0,
+//     this.warehouseId, // Added: warehouse_id field
 //     required this.company,
 //     required this.role,
 //   });
@@ -292,6 +293,7 @@ class PermissionModel {
 //       language: json['language'],
 //       isAdmin: json['is_admin'] ?? 0,
 //       isSuper: json['is_super'] ?? 0,
+//       warehouseId: json['warehouse_id']?.toString(), // Added: Parse warehouse_id
 //       company: json['company'] != null ? Company.fromJson(json['company']) : null,
 //       role: json['role'] != null ? Role.fromJson(json['role']) : null,
 //       token: json['token'],
@@ -312,10 +314,31 @@ class PermissionModel {
 //       'language': language,
 //       'is_admin': isAdmin,
 //       'is_super': isSuper,
+//       'warehouse_id': warehouseId, // Added: Include warehouse_id in JSON
 //       'company': company?.toJson(),
 //       'role': role?.toJson(),
 //       'token': token
 //     };
+//   }
+
+//   // Helper method to get warehouse IDs as a list
+//   List<int> get warehouseIds {
+//     if (warehouseId == null || warehouseId!.isEmpty) return [];
+    
+//     try {
+//       // Remove brackets and parse the comma-separated values
+//       String cleanString = warehouseId!.replaceAll('[', '').replaceAll(']', '');
+//       if (cleanString.isEmpty) return [];
+      
+//       return cleanString
+//           .split(',')
+//           .map((id) => int.tryParse(id.trim()) ?? 0)
+//           .where((id) => id > 0)
+//           .toList();
+//     } catch (e) {
+//       print("Error parsing warehouse IDs: $e");
+//       return [];
+//     }
 //   }
 // }
 

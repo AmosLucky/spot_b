@@ -4,8 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/utils/toast_utils.dart';
 import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/data/repository/auth_repo.dart';
-// import 'package:spotstock_inventory/utils/toast_utils.dart';
-// import '../../../data/models/user_details.dart';
 import '../../helpers/user_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:convert';
@@ -20,16 +18,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   UserDetails? userDetails;
-
   bool _isRegisterDone = false;
   bool get isRegisterDone => _isRegisterDone;
-
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-
   int _current_step = 1;
   int get currentStep => _current_step;
-
   String _loggedInToken = "";
   String get loggedInToken => _loggedInToken;
 
@@ -40,7 +34,7 @@ class AuthProvider extends ChangeNotifier {
         print('No internet connection detected.');
         return false;
       }
-      // Verify actual connectivity by pinging a reliable server
+      
       final result = await InternetAddress.lookup('google.com').timeout(Duration(seconds: 3));
       final isConnected = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
       print('Internet connection check: $isConnected');
@@ -51,7 +45,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Online user login
   Future<Map<String, dynamic>> userLogin(
       String email, String password, BuildContext context) async {
     bool hasInternet = await _checkInternetConnection();
@@ -67,20 +60,31 @@ class AuthProvider extends ChangeNotifier {
     try {
       print('Attempting online login with email: $email');
       Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
+      
       if (response['status'] == true) {
         UserDetails user = response['data'];
-        // Cache credentials and user details
-        await _storage.write('cached_email', email);
-        await _storage.write('cached_password', password);
-        await _storage.write('cached_user', jsonEncode(user.toJson()));
-        print('Cached credentials: email=$email, user=${user.toJson()}');
+        
+        // Cache credentials and user details with better error handling
+        try {
+          await _storage.write('cached_email', email);
+          await _storage.write('cached_password', password);
+          await _storage.write('cached_user', jsonEncode(user.toJson()));
+          print('Cached credentials successfully');
+        } catch (e) {
+          print('Error caching credentials: $e');
+          // Continue with login even if caching fails
+        }
+
         UserPreferences().saveUser(user);
         UserPreferences().isLoggedIn(email, password, response['token']);
+        
         await sharedPreferences.setString('offline_email', email);
         await sharedPreferences.setString('offline_password', password);
+        
         notifyListeners();
         return response;
       }
+      
       print('Online login failed: ${response['message']}');
       return response;
     } catch (e) {
@@ -93,7 +97,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Offline user login
   Future<Map<String, dynamic>> offlineLogin(
       String email, String password, BuildContext context) async {
     print('Attempting offline login with email: $email');
@@ -101,7 +104,7 @@ class AuthProvider extends ChangeNotifier {
       String? cachedEmail = _storage.read('cached_email');
       String? cachedPassword = _storage.read('cached_password');
       String? cachedUserJson = _storage.read('cached_user');
-
+      
       print('Cached credentials: email=$cachedEmail, has_user=${cachedUserJson != null}');
 
       if (cachedEmail == null || cachedPassword == null || cachedUserJson == null) {
@@ -113,13 +116,21 @@ class AuthProvider extends ChangeNotifier {
       }
 
       if (cachedEmail == email && cachedPassword == password) {
-        UserDetails user = UserDetails.fromJson(jsonDecode(cachedUserJson));
-        print('Offline login successful for email: $email');
-        return {
-          'status': true,
-          'message': 'Offline login successful',
-          'data': user,
-        };
+        try {
+          UserDetails user = UserDetails.fromJson(jsonDecode(cachedUserJson));
+          print('Offline login successful for email: $email');
+          return {
+            'status': true,
+            'message': 'Offline login successful',
+            'data': user,
+          };
+        } catch (e) {
+          print('Error parsing cached user data: $e');
+          return {
+            'status': false,
+            'message': 'Error loading cached user data: $e',
+          };
+        }
       } else {
         print('Offline login failed: Invalid credentials');
         return {
@@ -136,12 +147,10 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Logout
   Future<void> logout(BuildContext context) async {
     print('Logging out user.');
     await sharedPreferences.remove('isLoggedIn');
     await sharedPreferences.remove('loggedInToken');
-    // Cached credentials in GetStorage are not removed
     notifyListeners();
     ToastUtils.showSuccessToast(context, 'Logout Successful', 'You have been logged out.');
   }
@@ -199,17 +208,23 @@ class AuthProvider extends ChangeNotifier {
 
 
 
-// ===========================================================
-// =================original auth_provider ====================
-// import 'package:spotstock_inventory/data/repository/auth_repo.dart';
-// import 'package:flutter/material.dart';
-// import '../../../data/models/userdetails.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
+// import 'package:flutter/material.dart';
+// import 'package:get_storage/get_storage.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:spotstock_inventory/common/utils/toast_utils.dart';
+// import 'package:spotstock_inventory/data/models/user_details.dart';
+// import 'package:spotstock_inventory/data/repository/auth_repo.dart';
+// // import 'package:spotstock_inventory/utils/toast_utils.dart';
+// // import '../../../data/models/user_details.dart';
 // import '../../helpers/user_preferences.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'dart:convert';
+// import 'dart:io';
 
 // class AuthProvider extends ChangeNotifier {
 //   final SharedPreferences sharedPreferences;
+//   final GetStorage _storage = GetStorage();
 
 //   AuthProvider({required this.sharedPreferences}) {
 //     _getToken();
@@ -229,16 +244,117 @@ class AuthProvider extends ChangeNotifier {
 //   String _loggedInToken = "";
 //   String get loggedInToken => _loggedInToken;
 
-//   // user Login
-//   Future<Map<String, dynamic>> userLogin(String email, String password) async {
-//     Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
-//     if (response['status'] == true) {
-//       UserPreferences().saveUser(response['data']);
-//       UserPreferences().isLoggedIn(email, password, response['token']);
-//       notifyListeners();
-//       return response;
+//   Future<bool> _checkInternetConnection() async {
+//     try {
+//       var connectivityResult = await Connectivity().checkConnectivity();
+//       if (connectivityResult == ConnectivityResult.none) {
+//         print('No internet connection detected.');
+//         return false;
+//       }
+//       // Verify actual connectivity by pinging a reliable server
+//       final result = await InternetAddress.lookup('google.com').timeout(Duration(seconds: 3));
+//       final isConnected = result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+//       print('Internet connection check: $isConnected');
+//       return isConnected;
+//     } catch (e) {
+//       print('Connectivity check failed: $e');
+//       return false;
 //     }
-//     return response;
+//   }
+
+//   // Online user login
+//   Future<Map<String, dynamic>> userLogin(
+//       String email, String password, BuildContext context) async {
+//     bool hasInternet = await _checkInternetConnection();
+//     if (!hasInternet) {
+//       print('No internet for userLogin, should use offlineLogin instead.');
+//       ToastUtils.showErrorToast(context, 'Error', 'No internet connection. Try offline login.');
+//       return {
+//         'status': false,
+//         'message': 'No internet connection for online login',
+//       };
+//     }
+
+//     try {
+//       print('Attempting online login with email: $email');
+//       Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
+//       if (response['status'] == true) {
+//         UserDetails user = response['data'];
+//         // Cache credentials and user details
+//         await _storage.write('cached_email', email);
+//         await _storage.write('cached_password', password);
+//         await _storage.write('cached_user', jsonEncode(user.toJson()));
+//         print('Cached credentials: email=$email, user=${user.toJson()}');
+//         UserPreferences().saveUser(user);
+//         UserPreferences().isLoggedIn(email, password, response['token']);
+//         await sharedPreferences.setString('offline_email', email);
+//         await sharedPreferences.setString('offline_password', password);
+//         notifyListeners();
+//         return response;
+//       }
+//       print('Online login failed: ${response['message']}');
+//       return response;
+//     } catch (e) {
+//       print('Online login error: $e');
+//       ToastUtils.showErrorToast(context, 'Error', 'Login failed: $e');
+//       return {
+//         'status': false,
+//         'message': 'Login failed: $e',
+//       };
+//     }
+//   }
+
+//   // Offline user login
+//   Future<Map<String, dynamic>> offlineLogin(
+//       String email, String password, BuildContext context) async {
+//     print('Attempting offline login with email: $email');
+//     try {
+//       String? cachedEmail = _storage.read('cached_email');
+//       String? cachedPassword = _storage.read('cached_password');
+//       String? cachedUserJson = _storage.read('cached_user');
+
+//       print('Cached credentials: email=$cachedEmail, has_user=${cachedUserJson != null}');
+
+//       if (cachedEmail == null || cachedPassword == null || cachedUserJson == null) {
+//         print('No cached credentials found.');
+//         return {
+//           'status': false,
+//           'message': 'No cached credentials available. Please log in online first.',
+//         };
+//       }
+
+//       if (cachedEmail == email && cachedPassword == password) {
+//         UserDetails user = UserDetails.fromJson(jsonDecode(cachedUserJson));
+//         print('Offline login successful for email: $email');
+//         return {
+//           'status': true,
+//           'message': 'Offline login successful',
+//           'data': user,
+//         };
+//       } else {
+//         print('Offline login failed: Invalid credentials');
+//         return {
+//           'status': false,
+//           'message': 'Invalid credentials',
+//         };
+//       }
+//     } catch (e) {
+//       print('Offline login error: $e');
+//       return {
+//         'status': false,
+//         'message': 'Offline login error: $e',
+//       };
+//     }
+//   }
+
+//   // Logout
+//   Future<void> logout(BuildContext context) async {
+//     print('Logging out user.');
+//     await sharedPreferences.remove('isLoggedIn');
+//     await sharedPreferences.remove('loggedInToken');
+//     // Cached credentials in GetStorage are not removed
+//     notifyListeners();
+//     ToastUtils.showSuccessToast(context, 'Logout Successful', 'You have been logged out.');
 //   }
 
 //   void _getToken() async {
@@ -261,7 +377,6 @@ class AuthProvider extends ChangeNotifier {
 
 //   void startLoading() {
 //     _isLoading = true;
-//     // notifyListeners();
 //   }
 
 //   void nextStep(int value) {
@@ -282,7 +397,6 @@ class AuthProvider extends ChangeNotifier {
 //     notifyListeners();
 //   }
 
-//   // for user authentication
 //   Future<String> get isLoggedInToken async {
 //     final prefs = sharedPreferences;
 //     return prefs.getString(loggedInToken) ?? "";
@@ -290,244 +404,6 @@ class AuthProvider extends ChangeNotifier {
 
 //   void setLoggedIn(String value) async {
 //     final prefs = sharedPreferences;
-//     prefs.setString(loggedInToken, value);
-//   }
-// }
-
-// ===========================================================
-// ================= end original auth_provider ====================
-
-
-
-// class AuthProvider extends ChangeNotifier {
-//   final SharedPreferences sharedPreferences;
-  
-//   // Token keys
-//   static const String _accessTokenKey = 'access_token';
-//   static const String _refreshTokenKey = 'refresh_token';
-//   static const String _tokenExpiryKey = 'token_expiry';
-//   static const String _isLoggedInKey = 'isLoggedIn';
-//   static const String _userEmailKey = 'email';
-//   static const String _userPasswordKey = 'password';
-  
-//   UserDetails? userDetails;
-//   bool _isRegisterDone = false;
-//   bool get isRegisterDone => _isRegisterDone;
-//   bool _isLoading = false;
-//   bool get isLoading => _isLoading;
-//   int _current_step = 1;
-//   int get currentStep => _current_step;
-  
-//   String _accessToken = "";
-//   String _refreshToken = "";
-//   DateTime? _tokenExpiry;
-  
-//   String get accessToken => _accessToken;
-//   bool get isTokenExpired => _tokenExpiry?.isBefore(DateTime.now()) ?? true;
-//   bool get isAuthenticated => !isTokenExpired && _accessToken.isNotEmpty;
-  
-//   AuthProvider({required this.sharedPreferences}) {
-//     _loadTokens();
-//   }
-  
-//   // Load tokens from shared preferences
-//   Future<void> _loadTokens() async {
-//     _accessToken = sharedPreferences.getString(_accessTokenKey) ?? "";
-//     _refreshToken = sharedPreferences.getString(_refreshTokenKey) ?? "";
-//     final expiryString = sharedPreferences.getString(_tokenExpiryKey);
-    
-//     if (expiryString != null) {
-//       _tokenExpiry = DateTime.parse(expiryString);
-//     }
-    
-//     notifyListeners();
-//   }
-  
-//   // Save tokens to shared preferences
-//   Future<void> _saveTokens({
-//     required String accessToken,
-//     required String refreshToken,
-//     DateTime? expiry,
-//   }) async {
-//     await sharedPreferences.setString(_accessTokenKey, accessToken);
-//     await sharedPreferences.setString(_refreshTokenKey, refreshToken);
-    
-//     if (expiry != null) {
-//       await sharedPreferences.setString(_tokenExpiryKey, expiry.toIso8601String());
-//       _tokenExpiry = expiry;
-//     }
-    
-//     _accessToken = accessToken;
-//     _refreshToken = refreshToken;
-    
-//     notifyListeners();
-//   }
-  
-//   // User login method
-//   Future<Map<String, dynamic>> userLogin(String email, String password) async {
-//     startLoading();
-    
-//     try {
-//       Map<String, dynamic> response = await AuthRepo().loginAPI(email, password);
-      
-//       if (response['status'] == true) {
-//         // Save user data
-//         UserPreferences().saveUser(response['data']);
-        
-//         // Save credentials
-//         await sharedPreferences.setString(_userEmailKey, email);
-//         await sharedPreferences.setString(_userPasswordKey, password);
-//         await sharedPreferences.setBool(_isLoggedInKey, true);
-        
-//         // Extract tokens - adjust keys based on your API response
-//         final accessToken = response['token'];
-//         final refreshToken = response['refresh_token'] ?? ""; // Update based on your API
-        
-//         // Calculate expiry (typically 1 hour, adjust as needed)
-//         final expiry = DateTime.now().add(Duration(hours: 1));
-        
-//         // Save tokens
-//         await _saveTokens(
-//           accessToken: accessToken,
-//           refreshToken: refreshToken,
-//           expiry: expiry,
-//         );
-//       }
-      
-//       doneLoading();
-//       return response;
-//     } catch (e) {
-//       doneLoading();
-//       return {
-//         'status': false,
-//         'message': 'Login failed: ${e.toString()}'
-//       };
-//     }
-//   }
-  
-//   // Refresh token method
-//   Future<Map<String, dynamic>> refreshToken() async {
-//     try {
-//       if (_refreshToken.isEmpty) {
-//         return {
-//           'status': false,
-//           'message': 'No refresh token available'
-//         };
-//       }
-      
-//       Map<String, dynamic> response = await AuthRepo().refreshTokenAPI(_refreshToken);
-      
-//       if (response['status'] == true) {
-//         // Extract tokens - adjust based on your API response
-//         final accessToken = response['token'];
-//         final refreshToken = response['refresh_token'] ?? _refreshToken;
-        
-//         // Calculate expiry (typically 1 hour, adjust as needed)
-//         final expiry = DateTime.now().add(Duration(hours: 1));
-        
-//         // Save tokens
-//         await _saveTokens(
-//           accessToken: accessToken, 
-//           refreshToken: refreshToken,
-//           expiry: expiry,
-//         );
-        
-//         return {
-//           'status': true,
-//           'message': 'Token refreshed successfully'
-//         };
-//       }
-      
-//       return response;
-//     } catch (e) {
-//       return {
-//         'status': false,
-//         'message': 'Failed to refresh token: ${e.toString()}'
-//       };
-//     }
-//   }
-  
-//   // Check and refresh token if needed
-//   Future<String> getValidToken() async {
-//     if (isTokenExpired && _refreshToken.isNotEmpty) {
-//       final result = await refreshToken();
-      
-//       if (result['status'] != true) {
-//         // If refresh failed, try to perform a silent login
-//         return await _performSilentLogin();
-//       }
-//     }
-    
-//     return _accessToken;
-//   }
-  
-//   // Silent login with saved credentials
-//   Future<String> _performSilentLogin() async {
-//     final email = sharedPreferences.getString(_userEmailKey);
-//     final password = sharedPreferences.getString(_userPasswordKey);
-    
-//     if (email != null && password != null) {
-//       final response = await userLogin(email, password);
-      
-//       if (response['status'] == true) {
-//         return _accessToken;
-//       }
-//     }
-    
-//     // If silent login fails, clear auth state
-//     await logout();
-//     return "";
-//   }
-  
-//   // Logout method
-//   Future<void> logout() async {
-//     await sharedPreferences.remove(_accessTokenKey);
-//     await sharedPreferences.remove(_refreshTokenKey);
-//     await sharedPreferences.remove(_tokenExpiryKey);
-//     await sharedPreferences.setBool(_isLoggedInKey, false);
-    
-//     _accessToken = "";
-//     _refreshToken = "";
-//     _tokenExpiry = null;
-    
-//     notifyListeners();
-//   }
-  
-//   // Existing methods
-//   void doneRegister(int value) {
-//     if (value == 4) {
-//       _isRegisterDone = true;
-//     } else {
-//       _isRegisterDone = false;
-//     }
-//     notifyListeners();
-//   }
-  
-//   void doneLoading() {
-//     _isLoading = false;
-//     notifyListeners();
-//   }
-  
-//   void startLoading() {
-//     _isLoading = true;
-//     notifyListeners();
-//   }
-  
-//   void nextStep(int value) {
-//     if (_current_step < 4) {
-//       _current_step++;
-//     }
-//     print("######### next step registration ###############");
-//     print(_current_step);
-//     notifyListeners();
-//   }
-  
-//   void prevStep() {
-//     if (_current_step > 1) {
-//       _current_step--;
-//     }
-//     print("######### previous step registration ###############");
-//     print(_current_step);
-//     notifyListeners();
+//     await prefs.setString(loggedInToken, value);
 //   }
 // }
