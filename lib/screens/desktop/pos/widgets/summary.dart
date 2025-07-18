@@ -475,6 +475,99 @@ class _OrderSummaryState extends State<OrderSummary> {
                               }
                             }
                           })
+                      : const SizedBox(),
+                  CustomButton(
+                    label: "Clear",
+                    icon: MdiIcons.close,
+                    color: Colors.red,
+                    onTap: () {
+                      logger.i('Clearing cart');
+                      cart.removeAll();
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              CustomButton(
+                label: "Pay",
+                icon: MdiIcons.cash,
+                color: Colors.green,
+                onTap: () {
+                  if (cart.totalCart > 0) {
+                    _showPaymentDialog(context, cart.subTotal);
+                  } else {
+                    logger.w('Attempted to pay with empty cart');
+                    Dialogs.alertDialog(
+                      context,
+                      "Empty Cart",
+                      "Please add items to the cart before proceeding to payment.",
+                      "OK",
+                      "",
+                      [],
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+
+  void _editQuantity(BuildContext context, int index, int currentQuantity) {
+    logger.i(
+        'Editing quantity for index: $index, currentQuantity: $currentQuantity');
+    final TextEditingController quantityController = TextEditingController(
+      text: currentQuantity.toString(),
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Quantity"),
+          content: TextField(
+            controller: quantityController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: "Quantity"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                final newQuantity = int.tryParse(quantityController.text);
+                if (newQuantity != null) {
+                  logger.i('Updating quantity to: $newQuantity');
+                  Provider.of<CartProvider>(context, listen: false)
+                      .updateQuantity(index, newQuantity);
+                  Navigator.of(context).pop();
+                } else {
+                  logger.w(
+                      'Invalid quantity entered: ${quantityController.text}');
+                  Dialogs.alertDialog(
+                    context,
+                    "Invalid Quantity",
+                    "Please enter a valid quantity.",
+                    "OK",
+                    "",
+                    [],
+                  );
+                }
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 
                       // CustomButton(
                       //     label: "Hold List",
@@ -582,100 +675,6 @@ class _OrderSummaryState extends State<OrderSummary> {
                       //         }
                       //       }
                       //     })
-                      : const SizedBox(),
-                  CustomButton(
-                    label: "Clear",
-                    icon: MdiIcons.close,
-                    color: Colors.red,
-                    onTap: () {
-                      logger.i('Clearing cart');
-                      cart.removeAll();
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              CustomButton(
-                label: "Pay",
-                icon: MdiIcons.cash,
-                color: Colors.green,
-                onTap: () {
-                  if (cart.totalCart > 0) {
-                    _showPaymentDialog(context, cart.subTotal);
-                  } else {
-                    logger.w('Attempted to pay with empty cart');
-                    Dialogs.alertDialog(
-                      context,
-                      "Empty Cart",
-                      "Please add items to the cart before proceeding to payment.",
-                      "OK",
-                      "",
-                      [],
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
-      ]),
-    );
-  }
-
-  void _editQuantity(BuildContext context, int index, int currentQuantity) {
-    logger.i(
-        'Editing quantity for index: $index, currentQuantity: $currentQuantity');
-    final TextEditingController quantityController = TextEditingController(
-      text: currentQuantity.toString(),
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Edit Quantity"),
-          content: TextField(
-            controller: quantityController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: "Quantity"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                final newQuantity = int.tryParse(quantityController.text);
-                if (newQuantity != null) {
-                  logger.i('Updating quantity to: $newQuantity');
-                  Provider.of<CartProvider>(context, listen: false)
-                      .updateQuantity(index, newQuantity);
-                  Navigator.of(context).pop();
-                } else {
-                  logger.w(
-                      'Invalid quantity entered: ${quantityController.text}');
-                  Dialogs.alertDialog(
-                    context,
-                    "Invalid Quantity",
-                    "Please enter a valid quantity.",
-                    "OK",
-                    "",
-                    [],
-                  );
-                }
-              },
-              child: const Text("Save"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-
 
 
 

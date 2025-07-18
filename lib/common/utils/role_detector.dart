@@ -7,6 +7,7 @@ class RoleDetector {
   static const String ROLE_HOTEL_STAFF = 'hotel_staff';
   static const String ROLE_STORE_STAFF = 'store_staff';
 
+
   /// Primary method to determine user role with improved logic
   static String determineUserRole(UserDetails user) {
     print('=== ROLE DETECTION DEBUG ===');

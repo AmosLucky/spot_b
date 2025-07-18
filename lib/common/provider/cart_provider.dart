@@ -3,7 +3,6 @@ import 'package:spotstock_inventory/data/models/cart.dart';
 import 'package:spotstock_inventory/data/repository/system_repo.dart';
 import 'package:spotstock_inventory/screens/mobile/pos/summary_mobile.dart';
 import 'package:flutter/material.dart';
-import 'package:spotstock_inventory/widgets/custom_widgets.dart';
 import 'system_provider.dart';
 
 class CartProvider with ChangeNotifier {
@@ -162,93 +161,35 @@ class CartProvider with ChangeNotifier {
     _subTotal = getTotalPrice();
   }
 
-  // Future<Map<String, dynamic>> checkout(
-  //     BuildContext context, subTotal, paymentData) async {
-  //   var json = jsonEncode(items.map((e) => e.toJson()).toList());
-  //   print("========= final item =============");
-  //   print(json);
+  Future<Map<String, dynamic>> checkout(
+      BuildContext context, subTotal, paymentData) async {
+    var json = jsonEncode(items.map((e) => e.toJson()).toList());
+    print("========= final item =============");
+    print(json);
     
-  //   // Generate or use existing invoice reference
-  //   final invoiceReference = _generateUniqueInvoiceReference(
-  //     paymentData['attendantId'], 
-  //     paymentData['customerName'] ?? 'Walk-in Customer'
-  //   );
-  //   paymentData['invoiceReference'] = invoiceReference;
-    
-  //   var response = await SystemRepo(refresh: false, online: false)
-  //       .checkout(paymentData, subTotal, json);
-    
-  //   if (response['status'] == true) {
-  //     // **NEW: Immediately sync the transaction to sales API**
-  //     try {
-  //       await _syncTransactionToSales(response['txnID'], paymentData, subTotal, json);
-  //     } catch (e) {
-  //       print('Warning: Failed to sync transaction to sales: $e');
-  //       // Don't fail the checkout if sync fails
-  //     }
-      
-  //     removeAll();
-  //   }
-  //   return response;
-  // }
-
-
-// **FIX 2: Updated checkout method to preserve transaction ID for redo operations**
-Future<Map<String, dynamic>> checkout(
-    BuildContext context, subTotal, paymentData) async {
-  var json = jsonEncode(items.map((e) => e.toJson()).toList());
-  print("========= final item =============");
-  print(json);
-  
-  String invoiceReference;
-  String txnID;
-  
-  // **FIX 2: Check if this is a redo operation and preserve transaction ID**
-  if (_isRedoingInvoice && _currentInvoiceReference != null) {
-    // For redo operations, use the existing reference as transaction ID
-    invoiceReference = _currentInvoiceReference!;
-    txnID = _currentInvoiceReference!; // Use same reference as transaction ID
-    print("========= Using existing transaction ID for redo: $txnID =============");
-  } else {
-    // For new transactions, generate new IDs
-    txnID = generateRandomString(12);
-    invoiceReference = _generateUniqueInvoiceReference(
-      paymentData['attendantId'],  
+    // Generate or use existing invoice reference
+    final invoiceReference = _generateUniqueInvoiceReference(
+      paymentData['attendantId'], 
       paymentData['customerName'] ?? 'Walk-in Customer'
     );
-    print("========= Generated new transaction ID: $txnID =============");
-  }
-  
-  paymentData['invoiceReference'] = invoiceReference;
-  
-  var response = await SystemRepo(refresh: false, online: false)
-      .checkout(paymentData, subTotal, json, txnID: txnID); // Pass txnID
+    paymentData['invoiceReference'] = invoiceReference;
+    
+    var response = await SystemRepo(refresh: false, online: false)
+        .checkout(paymentData, subTotal, json);
+    
+    if (response['status'] == true) {
+      // **NEW: Immediately sync the transaction to sales API**
+      try {
+        await _syncTransactionToSales(response['txnID'], paymentData, subTotal, json);
+      } catch (e) {
+        print('Warning: Failed to sync transaction to sales: $e');
+        // Don't fail the checkout if sync fails
+      }
       
-  if (response['status'] == true) {
-    // **NEW: Immediately sync the transaction to sales API**
-    try {
-      await _syncTransactionToSales(response['txnID'], paymentData, subTotal, json);
-    } catch (e) {
-      print('Warning: Failed to sync transaction to sales: $e');
-      // Don't fail the checkout if sync fails
+      removeAll();
     }
-    
-    // **FIX 2: Reset redo state after successful checkout**
-    if (_isRedoingInvoice) {
-      _isRedoingInvoice = false;
-      _currentInvoiceReference = null;
-      _currentAttendantId = null;
-      _currentCustomerName = null;
-      _selectedInvoiceId = 0;
-      _selectedIndex = null;
-    }
-    
-    removeAll();
+    return response;
   }
-  return response;
-}
-
-
 
   // **NEW: Method to sync transaction to sales API immediately**
   Future<void> _syncTransactionToSales(String txnID, Map<String, dynamic> paymentData, double subTotal, String itemsJson) async {
@@ -327,88 +268,40 @@ Future<Map<String, dynamic>> checkout(
   }
 
   // In cart_provider.dart, when calling holdInvoice, ensure attendantId is passed as String
-  // Future<Map<String, dynamic>> holdInvoice(
-  //     BuildContext context,
-  //     registerId,
-  //     subTotal,
-  //     table,
-  //     customerName,
-  //     customerPhone,
-  //     {String? attendantId}) async { // Parameter is already String? which is correct
-  //   var json = jsonEncode(items.map((e) => e.toJson()).toList());
-  //   print("========= final item =============");
-  //   print(json);
+  Future<Map<String, dynamic>> holdInvoice(
+      BuildContext context,
+      registerId,
+      subTotal,
+      table,
+      customerName,
+      customerPhone,
+      {String? attendantId}) async { // Parameter is already String? which is correct
+    var json = jsonEncode(items.map((e) => e.toJson()).toList());
+    print("========= final item =============");
+    print(json);
 
-  //   String invoiceReference;
-  //   if (_isRedoingInvoice && _currentInvoiceReference != null) {
-  //     // Use existing reference for redo operations
-  //     invoiceReference = _currentInvoiceReference!;
-  //     // Update existing invoice instead of creating new one
-  //     var response = await SystemRepo(refresh: false, online: false)
-  //         .updateInvoice(_selectedInvoiceId, subTotal, json, table, customerName, customerPhone, attendantId);
-  //     if (response['status'] == true) {
-  //       removeAll();
-  //     }
-  //     return response;
-  //   } else {
-  //     // Generate new reference for new invoices
-  //     invoiceReference = _generateUniqueInvoiceReference(attendantId, customerName ?? 'Walk-in Customer');
-  //     var response = await SystemRepo(refresh: false, online: false)
-  //         .holdInvoice(subTotal, registerId, json, table, customerName, customerPhone, attendantId, invoiceReference);
-  //     if (response['status'] == true) {
-  //       removeAll();
-  //     }
-  //     return response;
-  //   }
-  // }
-
-Future<Map<String, dynamic>> holdInvoice(
-    BuildContext context,
-    registerId,
-    subTotal,
-    table,
-    customerName,
-    customerPhone,
-    {String? attendantId}) async {
-  var json = jsonEncode(items.map((e) => e.toJson()).toList());
-  print("========= final item =============");
-  print(json);
-  
-  String invoiceReference;
-  if (_isRedoingInvoice && _currentInvoiceReference != null) {
-    // **FIX 2: Use existing reference for redo operations**
-    invoiceReference = _currentInvoiceReference!;
-    print("========= Using existing reference for redo: $invoiceReference =============");
-    
-    // Update existing invoice instead of creating new one
-    var response = await SystemRepo(refresh: false, online: false)
-        .updateInvoice(_selectedInvoiceId, subTotal, json, table, customerName, customerPhone, attendantId);
-    if (response['status'] == true) {
-      // **FIX 2: Reset redo state after successful update**
-      _isRedoingInvoice = false;
-      _currentInvoiceReference = null;
-      _currentAttendantId = null;
-      _currentCustomerName = null;
-      _selectedInvoiceId = 0;
-      _selectedIndex = null;
-      removeAll();
+    String invoiceReference;
+    if (_isRedoingInvoice && _currentInvoiceReference != null) {
+      // Use existing reference for redo operations
+      invoiceReference = _currentInvoiceReference!;
+      // Update existing invoice instead of creating new one
+      var response = await SystemRepo(refresh: false, online: false)
+          .updateInvoice(_selectedInvoiceId, subTotal, json, table, customerName, customerPhone, attendantId);
+      if (response['status'] == true) {
+        removeAll();
+      }
+      return response;
+    } else {
+      // Generate new reference for new invoices
+      invoiceReference = _generateUniqueInvoiceReference(attendantId, customerName ?? 'Walk-in Customer');
+      var response = await SystemRepo(refresh: false, online: false)
+          .holdInvoice(subTotal, registerId, json, table, customerName, customerPhone, attendantId, invoiceReference);
+      if (response['status'] == true) {
+        removeAll();
+      }
+      return response;
     }
-    return response;
-  } else {
-    // Generate new reference for new invoices
-    invoiceReference = _generateUniqueInvoiceReference(attendantId, customerName ?? 'Walk-in Customer');
-    print("========= Generated new reference: $invoiceReference =============");
-    
-    var response = await SystemRepo(refresh: false, online: false)
-        .holdInvoice(subTotal, registerId, json, table, customerName, customerPhone, attendantId, invoiceReference);
-    if (response['status'] == true) {
-      removeAll();
-    }
-    return response;
   }
-}
-
-
 
   summary(BuildContext context, SystemProvider systemProvider, String customer,
       data) {

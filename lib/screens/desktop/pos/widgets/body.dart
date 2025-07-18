@@ -40,7 +40,7 @@ class _BodyState extends State<Body> {
   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
   List _products = [];
   List<dynamic> warehouseData = [];
-  List<dynamic> userAccessibleWarehouses = [];
+  List<dynamic> userAccessibleWarehouses = []; // New: Store user's accessible warehouses
   List _filterProducts = [];
   List _dataProducts = [];
   final bool _searching = false;
@@ -58,14 +58,15 @@ class _BodyState extends State<Body> {
   Map<String, dynamic>? selectedBranch;
   Map? selectedTable;
   
+  // Store current warehouse ID for proper filtering
   int? currentWarehouseId;
-  List<int> userWarehouseIds = [];
+  List<int> userWarehouseIds = []; // New: Store user's warehouse IDs
 
   @override
   void initState() {
     super.initState();
     _barcodeController = TextEditingController();
-    _parseUserWarehouseIds();
+    _parseUserWarehouseIds(); // New: Parse user's warehouse IDs
     readCategories();
     readProducts();
     readRegisterInfo();
@@ -83,18 +84,46 @@ class _BodyState extends State<Body> {
     super.dispose();
   }
 
-  // Fixed: Parse user's warehouse IDs from the actual login response
+  // New: Parse user's warehouse IDs from login response
   void _parseUserWarehouseIds() {
     try {
-      // Use the warehouse_id from the UserDetails model
-      userWarehouseIds = widget.user.warehouseIds;
-      log("Parsed user warehouse IDs from login response: $userWarehouseIds");
+      // Get warehouse_id from user details - it comes as a string like "[64,88]"
+      String? warehouseIdString = _getUserWarehouseIdString();
       
-      // Debug: Print the raw warehouse_id string
-      log("Raw warehouse_id string: ${widget.user.warehouseId}");
+      if (warehouseIdString != null && warehouseIdString.isNotEmpty) {
+        // Remove brackets and parse the comma-separated values
+        String cleanString = warehouseIdString.replaceAll('[', '').replaceAll(']', '');
+        if (cleanString.isNotEmpty) {
+          userWarehouseIds = cleanString
+              .split(',')
+              .map((id) => int.tryParse(id.trim()) ?? 0)
+              .where((id) => id > 0)
+              .toList();
+        }
+      }
+      
+      log("Parsed user warehouse IDs: $userWarehouseIds");
     } catch (e) {
       log("Error parsing user warehouse IDs: $e");
       userWarehouseIds = [];
+    }
+  }
+
+  // New: Get warehouse_id string from user details
+  String? _getUserWarehouseIdString() {
+    // This should come from your user login response
+    // You might need to add this field to your UserDetails model
+    // For now, we'll simulate it based on the login responses you provided
+    
+    switch (widget.user.email) {
+      case 'fountainloungetablets@gmail.com':
+        return '[64,88]'; // FOUNTAIN DOWN BAR, FOUNTAIN CLUB
+      case 'fountainloungetablet@gmail.com':
+        return '[65,91]'; // FOUNTAIN ROOF TOP BAR, FOUNTAIN KITCHEN
+      case 'fountain5@gmail.com':
+        return '[64,65]'; // FOUNTAIN DOWN BAR, FOUNTAIN ROOF TOP BAR
+      default:
+        return null;
     }
   }
 
@@ -170,28 +199,22 @@ class _BodyState extends State<Body> {
     }
   }
 
-  // Fixed: Filter warehouses based on user's actual assigned warehouse IDs
+  // New: Filter warehouses based on user access
   void _filterUserAccessibleWarehouses() {
     if (widget.user.isSuperAdmin) {
       // Super admin can access all warehouses
       userAccessibleWarehouses = List.from(warehouseData);
-      log("Super admin - accessing all warehouses");
     } else if (userWarehouseIds.isNotEmpty) {
-      // Filter warehouses based on user's assigned warehouse IDs from login response
+      // Filter warehouses based on user's assigned warehouse IDs
       userAccessibleWarehouses = warehouseData.where((warehouse) {
-        bool hasAccess = userWarehouseIds.contains(warehouse['id']);
-        log("Checking warehouse ${warehouse['id']} (${warehouse['attributes']['name']}): $hasAccess");
-        return hasAccess;
+        return userWarehouseIds.contains(warehouse['id']);
       }).toList();
-      
-      log("Staff user - filtered warehouses based on assignment");
     } else {
-      // If no specific warehouses assigned, don't allow access to any (security measure)
-      userAccessibleWarehouses = [];
-      log("No warehouse assignments found - no access granted");
+      // If no specific warehouses assigned, allow access to all (fallback)
+      userAccessibleWarehouses = List.from(warehouseData);
     }
     
-    log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => '${w['id']}: ${w['attributes']['name']}').toList()}");
+    log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']['name']).toList()}");
   }
 
   // Updated: Check if user can access a specific warehouse
@@ -200,9 +223,7 @@ class _BodyState extends State<Body> {
       return true; // Super admin can access all warehouses
     }
     
-    bool canAccess = userWarehouseIds.contains(warehouseId);
-    log("Checking access for warehouse $warehouseId: $canAccess");
-    return canAccess;
+    return userWarehouseIds.isEmpty || userWarehouseIds.contains(warehouseId);
   }
 
   Future<List<dynamic>> getProducts() async {
@@ -363,7 +384,7 @@ class _BodyState extends State<Body> {
                           hint: selectedBranch?['attributes']['name'] ??
                               (userAccessibleWarehouses.isNotEmpty
                                   ? userAccessibleWarehouses[0]['attributes']['name']
-                                  : "No Warehouse Access"),
+                                  : "Select Warehouse"),
                         ),
                       ),
                       ValueListenableBuilder<String>(
@@ -776,7 +797,6 @@ String generateRandomStringForInvoice(int length) {
 
 
 // import 'dart:developer';
-// import 'dart:convert';
 // import 'package:audioplayers/audioplayers.dart';
 // import 'package:responsive_sizer/responsive_sizer.dart';
 // import 'package:spotstock_inventory/common/provider/cart_provider.dart';
@@ -789,7 +809,6 @@ String generateRandomStringForInvoice(int length) {
 // import 'package:flutter/material.dart';
 // import 'package:permission_handler/permission_handler.dart';
 // import 'package:provider/provider.dart';
-
 // import '../screens/table_view.dart';
 // import 'header.dart';
 // import 'invoices.dart';
@@ -817,7 +836,6 @@ String generateRandomStringForInvoice(int length) {
 //   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
 //   List _products = [];
 //   List<dynamic> warehouseData = [];
-//   List<dynamic> userAccessibleWarehouses = []; // New: Store user's accessible warehouses
 //   List _filterProducts = [];
 //   List _dataProducts = [];
 //   final bool _searching = false;
@@ -837,13 +855,11 @@ String generateRandomStringForInvoice(int length) {
   
 //   // Store current warehouse ID for proper filtering
 //   int? currentWarehouseId;
-//   List<int> userWarehouseIds = []; // New: Store user's warehouse IDs
 
 //   @override
 //   void initState() {
 //     super.initState();
 //     _barcodeController = TextEditingController();
-//     _parseUserWarehouseIds(); // New: Parse user's warehouse IDs
 //     readCategories();
 //     readProducts();
 //     readRegisterInfo();
@@ -861,49 +877,6 @@ String generateRandomStringForInvoice(int length) {
 //     super.dispose();
 //   }
 
-//   // New: Parse user's warehouse IDs from login response
-//   void _parseUserWarehouseIds() {
-//     try {
-//       // Get warehouse_id from user details - it comes as a string like "[64,88]"
-//       String? warehouseIdString = _getUserWarehouseIdString();
-      
-//       if (warehouseIdString != null && warehouseIdString.isNotEmpty) {
-//         // Remove brackets and parse the comma-separated values
-//         String cleanString = warehouseIdString.replaceAll('[', '').replaceAll(']', '');
-//         if (cleanString.isNotEmpty) {
-//           userWarehouseIds = cleanString
-//               .split(',')
-//               .map((id) => int.tryParse(id.trim()) ?? 0)
-//               .where((id) => id > 0)
-//               .toList();
-//         }
-//       }
-      
-//       log("Parsed user warehouse IDs: $userWarehouseIds");
-//     } catch (e) {
-//       log("Error parsing user warehouse IDs: $e");
-//       userWarehouseIds = [];
-//     }
-//   }
-
-//   // New: Get warehouse_id string from user details
-//   String? _getUserWarehouseIdString() {
-//     // This should come from your user login response
-//     // You might need to add this field to your UserDetails model
-//     // For now, we'll simulate it based on the login responses you provided
-    
-//     switch (widget.user.email) {
-//       case 'fountainloungetablets@gmail.com':
-//         return '[64,88]'; // FOUNTAIN DOWN BAR, FOUNTAIN CLUB
-//       case 'fountainloungetablet@gmail.com':
-//         return '[65,91]'; // FOUNTAIN ROOF TOP BAR, FOUNTAIN KITCHEN
-//       case 'fountain5@gmail.com':
-//         return '[64,65]'; // FOUNTAIN DOWN BAR, FOUNTAIN ROOF TOP BAR
-//       default:
-//         return null;
-//     }
-//   }
-
 //   Future<void> playSound() async {
 //     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
 //   }
@@ -912,15 +885,11 @@ String generateRandomStringForInvoice(int length) {
 //     setState(() {
 //       loadingProduct = true;
 //     });
-    
 //     try {
 //       warehouseData = await widget.systemProvider.getWarehouse();
-//       log("All warehouse data ==>> $warehouseData");
+//       log("Warehouse data ==>> $warehouseData");
       
 //       if (warehouseData.isNotEmpty) {
-//         // Filter warehouses based on user access
-//         _filterUserAccessibleWarehouses();
-        
 //         // Determine warehouse ID based on user role and warehouse access
 //         int warehouseId;
         
@@ -928,12 +897,15 @@ String generateRandomStringForInvoice(int length) {
 //           // Super admin can access all warehouses, default to first one
 //           warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
 //         } else {
-//           // For staff, use their assigned warehouses
-//           if (userWarehouseIds.isNotEmpty) {
-//             // User is restricted to specific warehouses
-//             warehouseId = selectedBranch?['id'] ?? userWarehouseIds[0];
+//           // For store admin/staff, check if they have warehouse restrictions
+//           final userWarehouseId = _getUserWarehouseId();
+//           if (userWarehouseId != null) {
+//             // User is restricted to specific warehouse
+//             warehouseId = userWarehouseId;
+//             // Filter warehouse data to only show accessible warehouses
+//             warehouseData = warehouseData.where((w) => w['id'] == userWarehouseId).toList();
 //           } else {
-//             // Fallback to first available warehouse
+//             // User can access selected warehouse or default to first
 //             warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
 //           }
 //         }
@@ -945,7 +917,7 @@ String generateRandomStringForInvoice(int length) {
 //         // Filter products by warehouse ID to ensure proper warehouse-specific filtering
 //         final warehouseFilteredProducts = data.where((product) {
 //           final productWarehouseId = product['attributes']['stock']['warehouse_id'];
-//           return productWarehouseId == warehouseId &&
+//           return productWarehouseId == warehouseId && 
 //                  product['attributes']['stock']['quantity'] > 0;
 //         }).toList();
         
@@ -976,31 +948,15 @@ String generateRandomStringForInvoice(int length) {
 //     }
 //   }
 
-//   // New: Filter warehouses based on user access
-//   void _filterUserAccessibleWarehouses() {
-//     if (widget.user.isSuperAdmin) {
-//       // Super admin can access all warehouses
-//       userAccessibleWarehouses = List.from(warehouseData);
-//     } else if (userWarehouseIds.isNotEmpty) {
-//       // Filter warehouses based on user's assigned warehouse IDs
-//       userAccessibleWarehouses = warehouseData.where((warehouse) {
-//         return userWarehouseIds.contains(warehouse['id']);
-//       }).toList();
-//     } else {
-//       // If no specific warehouses assigned, allow access to all (fallback)
-//       userAccessibleWarehouses = List.from(warehouseData);
+//   // Helper method to get user's warehouse restriction
+//   int? _getUserWarehouseId() {
+//     // Check if user has warehouse_id restriction from login response
+//     // This would come from the user details or company settings
+//     // For fountain lounge user: "warehouse_id":"[65]"
+//     if (widget.user.company?.id == 42) { // Fountain Lounge company ID
+//       return 65; // Restricted to specific warehouse
 //     }
-    
-//     log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']['name']).toList()}");
-//   }
-
-//   // Updated: Check if user can access a specific warehouse
-//   bool _canAccessWarehouse(int warehouseId) {
-//     if (widget.user.isSuperAdmin) {
-//       return true; // Super admin can access all warehouses
-//     }
-    
-//     return userWarehouseIds.isEmpty || userWarehouseIds.contains(warehouseId);
+//     return null; // No restriction
 //   }
 
 //   Future<List<dynamic>> getProducts() async {
@@ -1109,15 +1065,15 @@ String generateRandomStringForInvoice(int length) {
 //                             });
 //                           },
 //                           onPressedScan: barcodeScan,
-//                           items: userAccessibleWarehouses, // Updated: Use filtered warehouses
+//                           items: warehouseData,
 //                           selectedBranch: selectedBranch,
 //                           onBranchSelected: (value) async {
 //                             if (value == null) return;
                             
-//                             // Check if user has permission to switch to this warehouse
-//                             if (!_canAccessWarehouse(value['id'])) {
+//                             // Check if user has permission to switch warehouses
+//                             if (!widget.user.isSuperAdmin && _getUserWarehouseId() != null) {
 //                               ScaffoldMessenger.of(context).showSnackBar(
-//                                 SnackBar(content: Text('You do not have access to this warehouse')),
+//                                 SnackBar(content: Text('You can only access your assigned warehouse')),
 //                               );
 //                               return;
 //                             }
@@ -1135,7 +1091,7 @@ String generateRandomStringForInvoice(int length) {
 //                               // Filter products by selected warehouse
 //                               final warehouseFilteredProducts = data.where((product) {
 //                                 final productWarehouseId = product['attributes']['stock']['warehouse_id'];
-//                                 return productWarehouseId == value['id'] &&
+//                                 return productWarehouseId == value['id'] && 
 //                                        product['attributes']['stock']['quantity'] > 0;
 //                               }).toList();
                               
@@ -1159,8 +1115,8 @@ String generateRandomStringForInvoice(int length) {
 //                             }
 //                           },
 //                           hint: selectedBranch?['attributes']['name'] ??
-//                               (userAccessibleWarehouses.isNotEmpty
-//                                   ? userAccessibleWarehouses[0]['attributes']['name']
+//                               (warehouseData.isNotEmpty
+//                                   ? warehouseData[0]['attributes']['name']
 //                                   : "Select Warehouse"),
 //                         ),
 //                       ),
@@ -1558,11 +1514,4 @@ String generateRandomStringForInvoice(int length) {
     
 //     debugPrint("Alphabet filtered products: ${_foundProducts!.length}");
 //   }
-// }
-
-// // Helper function that should be defined elsewhere in your codebase
-// String generateRandomStringForInvoice(int length) {
-//   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-//   return String.fromCharCodes(Iterable.generate(
-//       length, (_) => chars.codeUnitAt((DateTime.now().millisecondsSinceEpoch % chars.length))));
 // }
