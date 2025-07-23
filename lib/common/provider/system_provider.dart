@@ -75,6 +75,72 @@ void updateOrder(Orders updatedOrder) {
 }
 
 
+  // Add paid invoice to storage
+  Future<void> addPaidInvoice(Map<String, dynamic> transactionData) async {
+    try {
+      final store = await DatabaseEngine.instance.getStore();
+      final paidInvoiceBox = store.box<PaidInvoice>();
+      
+      PaidInvoice paidInvoice = PaidInvoice(
+        reference: transactionData['trxId'] ?? '',
+        customerName: transactionData['customerName'] ?? '',
+        attendantName: transactionData['attendantName'],
+        amount: transactionData['amount']?.toDouble() ?? 0.0,
+        paidAt: DateTime.now().toIso8601String(),
+        userId: _getCurrentUser().id.toString(),
+        companyId: _getCurrentUser().company?.id.toString() ?? '',
+        originalInvoiceData: jsonEncode(transactionData),
+      );
+      
+      paidInvoiceBox.put(paidInvoice);
+      print('Paid invoice added successfully: ${paidInvoice.reference}');
+    } catch (e) {
+      print('Error adding paid invoice: $e');
+      throw e;
+    }
+  }
+
+  // Get paid invoices
+  Future<List<dynamic>> getPaidInvoices() async {
+    try {
+      final store = await DatabaseEngine.instance.getStore();
+      final paidInvoiceBox = store.box<PaidInvoice>();
+      final user = _getCurrentUser();
+      
+      final paidInvoices = paidInvoiceBox
+          .query(PaidInvoice_.userId.equals(user.id.toString()))
+          .order(PaidInvoice_.paidAt, flags: Order.descending)
+          .build()
+          .find();
+      
+      return paidInvoices.map((invoice) => invoice.toMap()).toList();
+    } catch (e) {
+      print('Error getting paid invoices: $e');
+      return [];
+    }
+  }
+
+  // Clear paid invoices
+  Future<void> clearPaidInvoices() async {
+    try {
+      final store = await DatabaseEngine.instance.getStore();
+      final paidInvoiceBox = store.box<PaidInvoice>();
+      final user = _getCurrentUser();
+      
+      final paidInvoices = paidInvoiceBox
+          .query(PaidInvoice_.userId.equals(user.id.toString()))
+          .build()
+          .find();
+      
+      paidInvoiceBox.removeMany(paidInvoices.map((invoice) => invoice.id).toList());
+      print('Paid invoices cleared successfully');
+    } catch (e) {
+      print('Error clearing paid invoices: $e');
+      throw e;
+    }
+  }
+
+
   Future<dynamic> _getDashboardFeed() async {
     _responseState = ResponseState.loading;
     notifyListeners();

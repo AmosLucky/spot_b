@@ -1002,7 +1002,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(13, 7976920998866683740),
       name: 'SelectAttendantModel',
-      lastPropertyId: const obx_int.IdUid(9, 4003876650830016463),
+      lastPropertyId: const obx_int.IdUid(10, 1528062522666117053),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -1047,6 +1047,60 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(14, 5862019967752024413),
+      name: 'PaidInvoice',
+      lastPropertyId: const obx_int.IdUid(9, 8660464439538019158),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 5503504425363545979),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 5653718297679780510),
+            name: 'reference',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 2112285952946505033),
+            name: 'customerName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 1885126041559397790),
+            name: 'attendantName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3216606171674004710),
+            name: 'amount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 2402503441596687451),
+            name: 'paidAt',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 7697349323910047027),
+            name: 'userId',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 4628819167546739120),
+            name: 'companyId',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 8660464439538019158),
+            name: 'originalInvoiceData',
+            type: 9,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -1085,7 +1139,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(13, 7976920998866683740),
+      lastEntityId: const obx_int.IdUid(14, 5862019967752024413),
       lastIndexId: const obx_int.IdUid(0, 0),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -1121,7 +1175,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         6649215881229165045,
         4633140566523539235,
         5945536197580053257,
-        4003876650830016463
+        4003876650830016463,
+        1528062522666117053
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -2239,7 +2294,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final emailOffset = fbb.writeString(object.email);
           final phoneOffset = fbb.writeString(object.phone);
           final departmentOffset = fbb.writeString(object.department);
-          fbb.startTable(10);
+          fbb.startTable(11);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.apiId);
           fbb.addOffset(2, firstNameOffset);
@@ -2276,6 +2331,73 @@ obx_int.ModelDefinition getObjectBoxModel() {
               phone: phoneParam,
               department: departmentParam,
               hasPinSet: hasPinSetParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+          return object;
+        }),
+    PaidInvoice: obx_int.EntityDefinition<PaidInvoice>(
+        model: _entities[12],
+        toOneRelations: (PaidInvoice object) => [],
+        toManyRelations: (PaidInvoice object) => {},
+        getId: (PaidInvoice object) => object.id,
+        setId: (PaidInvoice object, int id) {
+          object.id = id;
+        },
+        objectToFB: (PaidInvoice object, fb.Builder fbb) {
+          final referenceOffset = fbb.writeString(object.reference);
+          final customerNameOffset = fbb.writeString(object.customerName);
+          final attendantNameOffset = object.attendantName == null
+              ? null
+              : fbb.writeString(object.attendantName!);
+          final paidAtOffset = fbb.writeString(object.paidAt);
+          final userIdOffset = fbb.writeString(object.userId);
+          final companyIdOffset = fbb.writeString(object.companyId);
+          final originalInvoiceDataOffset =
+              fbb.writeString(object.originalInvoiceData);
+          fbb.startTable(10);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, referenceOffset);
+          fbb.addOffset(2, customerNameOffset);
+          fbb.addOffset(3, attendantNameOffset);
+          fbb.addFloat64(4, object.amount);
+          fbb.addOffset(5, paidAtOffset);
+          fbb.addOffset(6, userIdOffset);
+          fbb.addOffset(7, companyIdOffset);
+          fbb.addOffset(8, originalInvoiceDataOffset);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final referenceParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 6, '');
+          final customerNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 8, '');
+          final attendantNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 10);
+          final amountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
+          final paidAtParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 14, '');
+          final userIdParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 16, '');
+          final companyIdParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 18, '');
+          final originalInvoiceDataParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 20, '');
+          final object = PaidInvoice(
+              reference: referenceParam,
+              customerName: customerNameParam,
+              attendantName: attendantNameParam,
+              amount: amountParam,
+              paidAt: paidAtParam,
+              userId: userIdParam,
+              companyId: companyIdParam,
+              originalInvoiceData: originalInvoiceDataParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
@@ -3054,4 +3176,43 @@ class SelectAttendantModel_ {
   /// See [SelectAttendantModel.hasPinSet].
   static final hasPinSet = obx.QueryBooleanProperty<SelectAttendantModel>(
       _entities[11].properties[7]);
+}
+
+/// [PaidInvoice] entity fields to define ObjectBox queries.
+class PaidInvoice_ {
+  /// See [PaidInvoice.id].
+  static final id =
+      obx.QueryIntegerProperty<PaidInvoice>(_entities[12].properties[0]);
+
+  /// See [PaidInvoice.reference].
+  static final reference =
+      obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[1]);
+
+  /// See [PaidInvoice.customerName].
+  static final customerName =
+      obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[2]);
+
+  /// See [PaidInvoice.attendantName].
+  static final attendantName =
+      obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[3]);
+
+  /// See [PaidInvoice.amount].
+  static final amount =
+      obx.QueryDoubleProperty<PaidInvoice>(_entities[12].properties[4]);
+
+  /// See [PaidInvoice.paidAt].
+  static final paidAt =
+      obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[5]);
+
+  /// See [PaidInvoice.userId].
+  static final userId =
+      obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[6]);
+
+  /// See [PaidInvoice.companyId].
+  static final companyId =
+      obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[7]);
+
+  /// See [PaidInvoice.originalInvoiceData].
+  static final originalInvoiceData =
+      obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[8]);
 }

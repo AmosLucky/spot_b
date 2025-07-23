@@ -1751,30 +1751,6 @@ Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<Strin
     }
   }
 
-  // Future<List<dynamic>> getInvoices(int registerId) async {
-  //   UserDetails user =
-  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-  //   final store = await DatabaseEngine.instance.getStore();
-  //   final invoiceBox = store.box<Invoice>();
-
-  //   final invoices = invoiceBox
-  //       .query(Invoice_.userId
-  //           .equals(user.id.toString())
-  //           .and(Invoice_.companyId.equals(registerId.toString())))
-  //       .build()
-  //       .find();
-
-  //   print("=========== invoices list ============");
-  //   print(invoices.length);
-
-  //   // Convert List<Invoice> to List<dynamic>
-  //   List<dynamic> dynamicInvoices =
-  //       invoices.map((invoice) => invoice.toMap()).toList();
-
-  //   return dynamicInvoices;
-  // }
-
-
 
 Future<List<dynamic>> getInvoices(int registerId) async {
   UserDetails user =
@@ -2590,6 +2566,31 @@ Future<Map<String, dynamic>> checkout(
     }
   }
 }
+
+
+
+  // Future<List<dynamic>> getInvoices(int registerId) async {
+  //   UserDetails user =
+  //       Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  //   final store = await DatabaseEngine.instance.getStore();
+  //   final invoiceBox = store.box<Invoice>();
+
+  //   final invoices = invoiceBox
+  //       .query(Invoice_.userId
+  //           .equals(user.id.toString())
+  //           .and(Invoice_.companyId.equals(registerId.toString())))
+  //       .build()
+  //       .find();
+
+  //   print("=========== invoices list ============");
+  //   print(invoices.length);
+
+  //   // Convert List<Invoice> to List<dynamic>
+  //   List<dynamic> dynamicInvoices =
+  //       invoices.map((invoice) => invoice.toMap()).toList();
+
+  //   return dynamicInvoices;
+  // }
 
 
 

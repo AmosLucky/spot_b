@@ -4,21 +4,20 @@ import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
+import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
+import 'package:spotstock_inventory/screens/desktop/services/select_attendant_service.dart';
 import '../../model/select_attendant_model.dart';
-import '../../providers/select_attendant_provider.dart';
-import '../../services/select_attendant_service.dart';
 import '../dialogs/select_attendant_pin.dart';
-// import 'package:spotstock_inventory/common/money.dart';
 
 class PayFormInvoice extends StatefulWidget {
   final SystemProvider systemProvider;
-  final Map data;
+  Map data;
   final Function(Map<String, dynamic>) onSubmit;
 
-  const PayFormInvoice({
+  PayFormInvoice({
     super.key,
-    required this.data,
     required this.onSubmit,
+    required this.data,
     required this.systemProvider,
   });
 
@@ -33,14 +32,8 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
   List<String> customers = [];
   List<String> tables = [];
   final TextEditingController customerNameController = TextEditingController();
-  final TextEditingController receivedAmountController = TextEditingController();
-  final TextEditingController partialAmountController = TextEditingController();
   final TextEditingController tableNameController = TextEditingController();
   final TextEditingController customerPhoneController = TextEditingController();
-
-  String paymentType = 'Cash';
-  String paymentStatus = 'Paid';
-  double change = 0.0;
   String? selectedCustomer;
   String? selectedTable;
   bool isCustomName = false;
@@ -64,12 +57,20 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
       if (mounted) {
         setState(() {
           this.customers = customers
-              .map((customer) => customer['attributes']['name'] as String)
+              .map((customer) => customer['attributes']['name'].toString())
               .toList();
+          if (this.customers.isEmpty) {
+            this.customers = ['Walk-in Customer'];
+          }
         });
       }
     } catch (e) {
-      print('Error fetching customers: $e');
+      debugPrint('Error loading customers: $e');
+      if (mounted) {
+        setState(() {
+          customers = ['Walk-in Customer'];
+        });
+      }
     }
   }
 
@@ -79,12 +80,12 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
       if (mounted) {
         setState(() {
           this.tables = tables
-              .map((customer) => customer['attributes']['name'] as String)
+              .map((table) => table['attributes']['name'].toString())
               .toList();
         });
       }
     } catch (e) {
-      print('Error fetching tables: $e');
+      debugPrint('Error loading tables: $e');
     }
   }
 
@@ -123,7 +124,6 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
                 _selectAttendantProvider.selectAttendant(null);
               }
             });
-
             if (verified) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -162,45 +162,19 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
     }
   }
 
-  bool _validateForm() {
-    final customerName = customerNameController.text.trim();
-    final table = selectedTable?.trim();
-
-    if (table == null && customerName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please select a table or enter customer details'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return false;
-    }
-
-    if (isCustomName && customerName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please enter a customer name'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return false;
-    }
-
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
-    bool isCustomerInputDisabled = false;
+    // Disable customer input controls when attendant is verified
+    bool isCustomerInputDisabled = _selectedAttendant != null && _attendantVerified;
 
     return AlertDialog(
-      title: const Text("Invoice"),
+      title: const Text("Hold Invoice"),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Attendant (Optional)'),
+            Text('Attendant'),
             Gap(3),
             GestureDetector(
               onTap: _attendantVerified ? null : _selectAttendant,
@@ -223,7 +197,7 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
                           : Icons.person,
                       color: _selectedAttendant != null && _attendantVerified
                           ? Colors.green
-                          : Colors.grey,
+                          : ColorsRes.grey,
                       size: 20,
                     ),
                     Text(
@@ -259,7 +233,7 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
               children: [
                 const Text("Customer: ", style: TextStyle(fontWeight: FontWeight.bold)),
                 Switch(
-                  activeColor: Colors.grey,
+                  activeColor: isCustomerInputDisabled ? Colors.grey.shade400 : Colors.grey,
                   inactiveThumbColor: Colors.grey,
                   inactiveTrackColor: Colors.grey[300],
                   value: isCustomName,
@@ -282,7 +256,15 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
             isCustomName
                 ? TextField(
                     controller: customerNameController,
-                    decoration: const InputDecoration(labelText: "Enter Customer Name"),
+                    decoration: InputDecoration(
+                      labelText: "Enter Customer Name",
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: isCustomerInputDisabled
+                            ? null
+                            : () => customerNameController.clear(),
+                      ),
+                    ),
                     enabled: !isCustomerInputDisabled,
                   )
                 : DropdownButton<String>(
@@ -308,12 +290,19 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
               TextField(
                 controller: customerPhoneController,
                 keyboardType: TextInputType.numberWithOptions(),
-                decoration: const InputDecoration(
-                  labelText: "Enter Customer Phone number (Optional)",
+                decoration: InputDecoration(
+                  labelText: "Enter Customer Phone number",
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: isCustomerInputDisabled
+                        ? null
+                        : () => customerPhoneController.clear(),
+                  ),
                 ),
                 enabled: !isCustomerInputDisabled,
               ),
             const SizedBox(height: 10),
+            // Table selection is always enabled
             DropdownButton<String>(
               isExpanded: true,
               value: selectedTable,
@@ -331,7 +320,6 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
                 });
               },
             ),
-            const SizedBox(height: 10),
           ],
         ),
       ),
@@ -339,23 +327,37 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
         TextButton(
           child: const Text("Cancel"),
           onPressed: () {
-            widget.data.clear();
+            widget.data = {};
             Navigator.of(context).pop();
           },
         ),
         TextButton(
-          child: Text("Save Invoice"),
+          child: const Text("Submit"),
           onPressed: () {
-            if (!_validateForm()) {
+            // Validate inputs
+            if (_selectedAttendant == null &&
+                customerNameController.text.trim().isEmpty &&
+                selectedCustomer == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please select an attendant or provide a customer name'),
+                  backgroundColor: Colors.red,
+                ),
+              );
               return;
             }
+
+            widget.data = {};
             Map<String, dynamic> invoiceData = {
-              'customerName': customerNameController.text,
+              'customerName': customerNameController.text.trim().isNotEmpty
+                  ? customerNameController.text.trim()
+                  : selectedCustomer ?? "Walk-in Customer",
               'customerPhoneNumber': customerPhoneController.text,
-              'table': selectedTable,
+              'table': selectedTable ?? tableNameController.text,
               'attendantId': _selectedAttendant?.apiId?.toString(),
-              // 'attendantId': _selectedAttendant?.id,
+              'attendantName': _selectedAttendant?.fullName,
             };
+
             widget.onSubmit(invoiceData);
             Navigator.of(context).pop();
           },
@@ -367,13 +369,13 @@ class _PayFormInvoiceState extends State<PayFormInvoice> {
   @override
   void dispose() {
     customerNameController.dispose();
-    receivedAmountController.dispose();
-    partialAmountController.dispose();
     tableNameController.dispose();
     customerPhoneController.dispose();
     super.dispose();
   }
 }
+
+
 
 class CreatePinDialog extends StatefulWidget {
   final SelectAttendantModel attendant;
@@ -579,21 +581,17 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 
 
 
-
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
 // import 'package:provider/provider.dart';
 // import 'package:spotstock_inventory/common/helpers/colors_res.dart';
-// import 'package:spotstock_inventory/common/money.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
 // import '../../model/select_attendant_model.dart';
 // import '../../providers/select_attendant_provider.dart';
 // import '../../services/select_attendant_service.dart';
 // import '../dialogs/select_attendant_pin.dart';
-// // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendant_pin.dart';
-// // import '..//../model/select_attendant_model.dart';
-// // import '../providers/select_attendant_provider.dart';
+// // import 'package:spotstock_inventory/common/money.dart';
 
 // class PayFormInvoice extends StatefulWidget {
 //   final SystemProvider systemProvider;
@@ -747,12 +745,10 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //     }
 //   }
 
-//   // New validation method
 //   bool _validateForm() {
 //     final customerName = customerNameController.text.trim();
 //     final table = selectedTable?.trim();
 
-//     // Check if either a table is selected or customer details are provided
 //     if (table == null && customerName.isEmpty) {
 //       ScaffoldMessenger.of(context).showSnackBar(
 //         SnackBar(
@@ -763,7 +759,6 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //       return false;
 //     }
 
-//     // If custom name is used, ensure customer name is not empty
 //     if (isCustomName && customerName.isEmpty) {
 //       ScaffoldMessenger.of(context).showSnackBar(
 //         SnackBar(
@@ -811,7 +806,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //                           : Icons.person,
 //                       color: _selectedAttendant != null && _attendantVerified
 //                           ? Colors.green
-//                           : ColorsRes.grey,
+//                           : Colors.grey,
 //                       size: 20,
 //                     ),
 //                     Text(
@@ -932,7 +927,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //           },
 //         ),
 //         TextButton(
-//           child: const Text("Save Invoice"),
+//           child: Text("Save Invoice"),
 //           onPressed: () {
 //             if (!_validateForm()) {
 //               return;
@@ -941,7 +936,8 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //               'customerName': customerNameController.text,
 //               'customerPhoneNumber': customerPhoneController.text,
 //               'table': selectedTable,
-//               'attendantId': _selectedAttendant?.id,
+//               'attendantId': _selectedAttendant?.apiId?.toString(),
+//               // 'attendantId': _selectedAttendant?.id,
 //             };
 //             widget.onSubmit(invoiceData);
 //             Navigator.of(context).pop();
@@ -1010,8 +1006,49 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //     try {
 //       final success = await SelectAttendantService().createPin(widget.attendant.apiId, pin);
 //       if (success) {
+//         setState(() {
+//           _isCreating = false;
+//         });
+//         Navigator.of(context).pop(); // Close CreatePinDialog
 //         widget.onPinCreated();
-//         Navigator.of(context).pop();
+
+//         // Create updated attendant model with hasPinSet: true
+//         final updatedAttendant = SelectAttendantModel(
+//           apiId: widget.attendant.apiId,
+//           firstName: widget.attendant.firstName,
+//           lastName: widget.attendant.lastName,
+//           email: widget.attendant.email,
+//           phone: widget.attendant.phone,
+//           department: widget.attendant.department,
+//           hasPinSet: true,
+//         );
+
+//         // Open SelectAttendantPinDialog to verify the new PIN
+//         showDialog(
+//           context: context,
+//           barrierDismissible: false,
+//           builder: (context) => SelectAttendantPinDialog(
+//             attendant: updatedAttendant,
+//             onPinVerified: (verified) {
+//               if (verified) {
+//                 ScaffoldMessenger.of(context).showSnackBar(
+//                   SnackBar(
+//                     content: Text('Welcome, ${updatedAttendant.fullName}!'),
+//                     backgroundColor: Colors.green,
+//                   ),
+//                 );
+//               } else {
+//                 ScaffoldMessenger.of(context).showSnackBar(
+//                   SnackBar(
+//                     content: Text('Invalid PIN entered'),
+//                     backgroundColor: Colors.red,
+//                   ),
+//                 );
+//               }
+//             },
+//           ),
+//         );
+
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           SnackBar(
 //             content: Text('PIN created successfully'),
@@ -1074,7 +1111,7 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
 //             ),
 //             Gap(10),
 //             const Text('Confirm PIN'),
-//             Gap(10),
+//             Gap(2),
 //             TextField(
 //               controller: _confirmPinController,
 //               keyboardType: TextInputType.number,

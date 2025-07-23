@@ -5,11 +5,10 @@ import 'package:spotstock_inventory/common/helpers/colors_res.dart';
 import 'package:spotstock_inventory/common/money.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
-import 'package:spotstock_inventory/screens/desktop/pos/widgets/payform_invoice.dart'; // Import for CreatePinDialog
+import 'package:spotstock_inventory/screens/desktop/pos/widgets/payform_invoice.dart';
 import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
 import '../../model/select_attendant_model.dart';
 import '../dialogs/select_attendant_pin.dart';
-// import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendant_pin.dart';
 
 class PaymentForm extends StatefulWidget {
   final String app;
@@ -44,7 +43,6 @@ class _PaymentFormState extends State<PaymentForm> {
   final TextEditingController partialAmountController = TextEditingController();
   final TextEditingController tableNameController = TextEditingController();
   final TextEditingController customerPhoneController = TextEditingController();
-
   String paymentType = 'Cash';
   String paymentStatus = 'Paid';
   double change = 0.0;
@@ -138,7 +136,6 @@ class _PaymentFormState extends State<PaymentForm> {
                 _selectAttendantProvider.selectAttendant(null);
               }
             });
-
             if (verified) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -179,6 +176,7 @@ class _PaymentFormState extends State<PaymentForm> {
 
   @override
   Widget build(BuildContext context) {
+    // Disable customer input controls when attendant is verified
     bool isCustomerInputDisabled = _selectedAttendant != null && _attendantVerified;
 
     return AlertDialog(
@@ -247,7 +245,7 @@ class _PaymentFormState extends State<PaymentForm> {
               children: [
                 const Text("Customer: ", style: TextStyle(fontWeight: FontWeight.bold)),
                 Switch(
-                  activeColor: Colors.grey,
+                  activeColor: isCustomerInputDisabled ? Colors.grey.shade400 : Colors.grey,
                   inactiveThumbColor: Colors.grey,
                   inactiveTrackColor: Colors.grey[300],
                   value: isCustomName,
@@ -425,13 +423,6 @@ class _PaymentFormState extends State<PaymentForm> {
         TextButton(
           child: const Text("Submit"),
           onPressed: () {
-            // Determine attendantName
-            String attendantName = _selectedAttendant != null && _attendantVerified
-                ? _selectedAttendant!.fullName
-                : customerNameController.text.trim().isNotEmpty
-                    ? customerNameController.text.trim()
-                    : "Walk-in Customer";
-
             // Validate inputs
             if (_selectedAttendant == null &&
                 customerNameController.text.trim().isEmpty &&
@@ -472,9 +463,9 @@ class _PaymentFormState extends State<PaymentForm> {
                   : null,
               'table': selectedTable,
               'attendantId': _selectedAttendant?.apiId?.toString(),
-              // 'attendantId': _selectedAttendant?.id,
-              'attendantName': attendantName,
+              'attendantName': _selectedAttendant?.fullName,
             };
+
             widget.onSubmit(paymentData);
             Navigator.of(context).pop();
           },
@@ -497,6 +488,7 @@ class _PaymentFormState extends State<PaymentForm> {
 
 
 
+
 // import 'package:flutter/material.dart';
 // import 'package:gap/gap.dart';
 // import 'package:provider/provider.dart';
@@ -504,9 +496,11 @@ class _PaymentFormState extends State<PaymentForm> {
 // import 'package:spotstock_inventory/common/money.dart';
 // import 'package:spotstock_inventory/common/provider/system_provider.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
+// import 'package:spotstock_inventory/screens/desktop/pos/widgets/payform_invoice.dart'; // Import for CreatePinDialog
 // import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
 // import '../../model/select_attendant_model.dart';
 // import '../dialogs/select_attendant_pin.dart';
+// // import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendant_pin.dart';
 
 // class PaymentForm extends StatefulWidget {
 //   final String app;
@@ -621,31 +615,57 @@ class _PaymentFormState extends State<PaymentForm> {
 //   }
 
 //   void _promptForPin(SelectAttendantModel attendant) {
-//     showDialog(
-//       context: context,
-//       barrierDismissible: false,
-//       builder: (context) => SelectAttendantPinDialog(
-//         attendant: attendant,
-//         onPinVerified: (verified) {
-//           setState(() {
-//             _attendantVerified = verified;
-//             if (!verified) {
-//               _selectedAttendant = null;
-//               _selectAttendantProvider.selectAttendant(null);
-//             }
-//           });
+//     if (attendant.hasPinSet) {
+//       showDialog(
+//         context: context,
+//         barrierDismissible: false,
+//         builder: (context) => SelectAttendantPinDialog(
+//           attendant: attendant,
+//           onPinVerified: (verified) {
+//             setState(() {
+//               _attendantVerified = verified;
+//               if (!verified) {
+//                 _selectedAttendant = null;
+//                 _selectAttendantProvider.selectAttendant(null);
+//               }
+//             });
 
-//           if (verified) {
-//             ScaffoldMessenger.of(context).showSnackBar(
-//               SnackBar(
-//                 content: Text('Welcome, ${attendant.fullName}!'),
-//                 backgroundColor: Colors.green,
-//               ),
-//             );
-//           }
-//         },
-//       ),
-//     );
+//             if (verified) {
+//               ScaffoldMessenger.of(context).showSnackBar(
+//                 SnackBar(
+//                   content: Text('Welcome, ${attendant.fullName}!'),
+//                   backgroundColor: Colors.green,
+//                 ),
+//               );
+//             }
+//           },
+//         ),
+//       );
+//     } else {
+//       showDialog(
+//         context: context,
+//         barrierDismissible: false,
+//         builder: (context) => CreatePinDialog(
+//           attendant: attendant,
+//           onPinCreated: () {
+//             setState(() {
+//               _selectedAttendant = attendant;
+//               _attendantVerified = false;
+//               _selectAttendantProvider.selectAttendant(attendant);
+//             });
+//             _promptForPin(SelectAttendantModel(
+//               apiId: attendant.apiId,
+//               firstName: attendant.firstName,
+//               lastName: attendant.lastName,
+//               email: attendant.email,
+//               phone: attendant.phone,
+//               department: attendant.department,
+//               hasPinSet: true,
+//             ));
+//           },
+//         ),
+//       );
+//     }
 //   }
 
 //   @override
@@ -702,6 +722,11 @@ class _PaymentFormState extends State<PaymentForm> {
 //                       TextButton(
 //                         onPressed: _selectAttendant,
 //                         child: Text('Edit'),
+//                       )
+//                     else if (_selectedAttendant != null && !_selectedAttendant!.hasPinSet)
+//                       TextButton(
+//                         onPressed: () => _promptForPin(_selectedAttendant!),
+//                         child: Text("Don't have a PIN? Create PIN"),
 //                       ),
 //                   ],
 //                 ),
@@ -873,8 +898,8 @@ class _PaymentFormState extends State<PaymentForm> {
 //             const SizedBox(height: 10),
 //             Text(
 //               change >= 0
-//                   ? "Balance: ${Money.format(change)}"
-//                   : "Change: ${Money.format(change.abs())}",
+//                   ? "change: ${Money.format(change)}"
+//                   : "Balance Due: ${Money.format(change.abs())}",
 //               style: const TextStyle(fontWeight: FontWeight.bold),
 //             ),
 //           ],
@@ -937,7 +962,8 @@ class _PaymentFormState extends State<PaymentForm> {
 //                   ? double.tryParse(partialAmountController.text) ?? 0.0
 //                   : null,
 //               'table': selectedTable,
-//               'attendantId': _selectedAttendant?.id,
+//               'attendantId': _selectedAttendant?.apiId?.toString(),
+//               // 'attendantId': _selectedAttendant?.id,
 //               'attendantName': attendantName,
 //             };
 //             widget.onSubmit(paymentData);

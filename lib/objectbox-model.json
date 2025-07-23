@@ -984,7 +984,7 @@
     },
     {
       "id": "13:7976920998866683740",
-      "lastPropertyId": "9:4003876650830016463",
+      "lastPropertyId": "10:1528062522666117053",
       "name": "SelectAttendantModel",
       "properties": [
         {
@@ -1030,9 +1030,63 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "14:5862019967752024413",
+      "lastPropertyId": "9:8660464439538019158",
+      "name": "PaidInvoice",
+      "properties": [
+        {
+          "id": "1:5503504425363545979",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5653718297679780510",
+          "name": "reference",
+          "type": 9
+        },
+        {
+          "id": "3:2112285952946505033",
+          "name": "customerName",
+          "type": 9
+        },
+        {
+          "id": "4:1885126041559397790",
+          "name": "attendantName",
+          "type": 9
+        },
+        {
+          "id": "5:3216606171674004710",
+          "name": "amount",
+          "type": 8
+        },
+        {
+          "id": "6:2402503441596687451",
+          "name": "paidAt",
+          "type": 9
+        },
+        {
+          "id": "7:7697349323910047027",
+          "name": "userId",
+          "type": 9
+        },
+        {
+          "id": "8:4628819167546739120",
+          "name": "companyId",
+          "type": 9
+        },
+        {
+          "id": "9:8660464439538019158",
+          "name": "originalInvoiceData",
+          "type": 9
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "13:7976920998866683740",
+  "lastEntityId": "14:5862019967752024413",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
@@ -1072,7 +1126,8 @@
     6649215881229165045,
     4633140566523539235,
     5945536197580053257,
-    4003876650830016463
+    4003876650830016463,
+    1528062522666117053
   ],
   "retiredRelationUids": [],
   "version": 1

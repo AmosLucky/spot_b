@@ -3,6 +3,48 @@ import 'package:spotstock_inventory/data/models/sales_models.dart';
 
 
 @Entity()
+class PaidInvoice {
+  @Id()
+  int id = 0;
+  
+  String reference;
+  String customerName;
+  String? attendantName;
+  double amount;
+  String paidAt;
+  String userId;
+  String companyId;
+  String originalInvoiceData; // Store the full transaction data as JSON
+  
+  PaidInvoice({
+    required this.reference,
+    required this.customerName,
+    this.attendantName,
+    required this.amount,
+    required this.paidAt,
+    required this.userId,
+    required this.companyId,
+    required this.originalInvoiceData,
+  });
+  
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'reference': reference,
+      'customerName': customerName,
+      'attendantName': attendantName,
+      'amount': amount,
+      'paidAt': paidAt,
+      'userId': userId,
+      'companyId': companyId,
+      'originalInvoiceData': originalInvoiceData,
+    };
+  }
+}
+
+
+
+@Entity()
 class Orders {
   @Id()
   int id = 0;

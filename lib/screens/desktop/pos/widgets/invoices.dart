@@ -10,6 +10,10 @@ import 'package:provider/provider.dart';
 import '../../../../data/models/user_details.dart';
 import '../print_invoices.dart';
 import '../printusb.dart';
+import 'select_attendantdialog.dart';
+import '../../model/select_attendant_model.dart';
+import '../../providers/select_attendant_provider.dart';
+import '../dialogs/select_attendant_pin.dart';
 
 class InvoiceList extends StatefulWidget {
   final List<dynamic> products;
@@ -36,10 +40,12 @@ class InvoiceList extends StatefulWidget {
 class _InvoiceListState extends State<InvoiceList> {
   List<dynamic> _invoices = [];
   int? selectedInvoiceIndex;
+  late SelectAttendantProvider _selectAttendantProvider;
 
   @override
   void initState() {
     super.initState();
+    _selectAttendantProvider = Provider.of<SelectAttendantProvider>(context, listen: false);
     _loadInvoices();
   }
 
@@ -47,12 +53,11 @@ class _InvoiceListState extends State<InvoiceList> {
     var invoices = await getInvoices();
     if (mounted) {
       setState(() {
-        // **FIX 1: Sort invoices by lastUpdated in descending order (newest first)**
         _invoices = invoices;
         _invoices.sort((a, b) {
           String dateA = a['lastUpdated'] ?? '';
           String dateB = b['lastUpdated'] ?? '';
-          return dateB.compareTo(dateA); // Descending order (newest first)
+          return dateB.compareTo(dateA);
         });
       });
       print("Invoices ==>> $_invoices");
@@ -96,9 +101,66 @@ class _InvoiceListState extends State<InvoiceList> {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  // Get attendant name by ID
+  Future<String?> _getAttendantNameById(String? attendantId) async {
+    if (attendantId == null || attendantId.isEmpty) return null;
+    
+    try {
+      final attendants = await _selectAttendantProvider.loadAttendants();
+      final attendant = _selectAttendantProvider.attendants.firstWhere(
+        (a) => a.apiId.toString() == attendantId,
+        orElse: () => throw Exception('Attendant not found'),
+      );
+      return attendant.fullName;
+    } catch (e) {
+      print('Error getting attendant name: $e');
+      return 'Unknown Attendant';
+    }
+  }
+
+  // Show attendant verification dialog for printing
+  void _showAttendantVerificationForPrint(Map<String, dynamic> invoiceItem) {
+    showDialog(
+      context: context,
+      builder: (context) => ChangeNotifierProvider.value(
+        value: _selectAttendantProvider,
+        child: SelectAttendantDialog(
+          onAttendantSelected: (attendant) {
+            _promptForPinVerification(attendant, invoiceItem);
+          },
+          previouslySelectedAttendant: null,
+        ),
+      ),
+    );
+  }
+
+  void _promptForPinVerification(SelectAttendantModel attendant, Map<String, dynamic> invoiceItem) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SelectAttendantPinDialog(
+        attendant: attendant,
+        onPinVerified: (verified) {
+          if (verified) {
+            // Print with attendant information
+            printInvoice(invoiceItem, attendant.fullName);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Printing authorized by ${attendant.fullName}'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Print authorization failed'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+      ),
+    );
   }
 
   @override
@@ -158,68 +220,83 @@ class _InvoiceListState extends State<InvoiceList> {
                         onDismissed: (direction) {
                           deleteInvoice(item['id']);
                         },
-                        child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 1, vertical: 1),
-                            title: Text(
-                              item['reference'],
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 13),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Customer: ${item['customerName']}",
-                                  style: TextStyle(color: grayColor),
-                                ),
-                                if (item['attendantId'] != null)
+                        child: FutureBuilder<String?>(
+                          future: _getAttendantNameById(item['attendantId']),
+                          builder: (context, snapshot) {
+                            String displayName;
+                            if (item['attendantId'] != null && item['attendantId'].isNotEmpty) {
+                              displayName = snapshot.data ?? 'Loading...';
+                            } else {
+                              displayName = item['customerName'] ?? 'Walk-in Customer';
+                            }
+
+                            return ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 1, vertical: 1),
+                              title: Text(
+                                item['reference'],
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    "Attendant ID: ${item['attendantId']}",
-                                    style: TextStyle(color: grayColor, fontSize: 11),
+                                    item['attendantId'] != null && item['attendantId'].isNotEmpty
+                                        ? "Attendant: $displayName"
+                                        : "Customer: $displayName",
+                                    style: TextStyle(color: grayColor),
                                   ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
+                                  if (item['attendantId'] != null && item['attendantId'].isNotEmpty)
                                     Text(
-                                      "Amount: ${Money.format(item['amount'])}",
-                                      style: TextStyle(color: grayColor),
+                                      "Attendant ID: ${item['attendantId']}",
+                                      style: TextStyle(color: grayColor, fontSize: 11),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            trailing:
-                                Row(mainAxisSize: MainAxisSize.min, children: [
-                              IconButton(
-                                icon: Icon(MdiIcons.redoVariant),
-                                onPressed: () {
-                                  // Updated redoInvoice call with additional parameters
-                                  Provider.of<CartProvider>(context,
-                                          listen: false)
-                                      .redoInvoice(
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Amount: ${Money.format(item['amount'])}",
+                                        style: TextStyle(color: grayColor),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(MdiIcons.redoVariant),
+                                    onPressed: () {
+                                      Provider.of<CartProvider>(context, listen: false)
+                                          .redoInvoice(
                                         item['invoice'],
-                                         item['id'],
-                                         index,
+                                        item['id'],
+                                        index,
                                         originalReference: item['reference'],
                                         attendantId: item['attendantId'],
                                         customerName: item['customerName'],
                                       );
-                                  widget.closeInvoice();
-                                },
+                                      widget.closeInvoice();
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(MdiIcons.printer),
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedInvoiceIndex = index;
+                                      });
+                                      // Show attendant verification dialog for printing
+                                      _showAttendantVerificationForPrint(item);
+                                    },
+                                  ),
+                                ]
                               ),
-                              IconButton(
-                                icon: Icon(MdiIcons.printer),
-                                onPressed: () {
-                                  // **FIX 1: Use the actual invoice ID instead of index for print selection**
-                                  setState(() {
-                                    selectedInvoiceIndex = index;
-                                  });
-                                  printInvoice(item); // Pass the actual item
-                                },
-                              ),
-                            ])),
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
@@ -238,8 +315,7 @@ class _InvoiceListState extends State<InvoiceList> {
     );
   }
 
-  // **FIX 1: Modified printInvoice to accept the specific invoice item**
-  printInvoice(Map<String, dynamic> invoiceItem) async {
+  printInvoice(Map<String, dynamic> invoiceItem, String? printingAttendantName) async {
     List<dynamic> itemsData;
     var invoiceData = jsonDecode(invoiceItem['invoice']);
     var invoice = invoiceItem;
@@ -247,7 +323,7 @@ class _InvoiceListState extends State<InvoiceList> {
     String invoiceId = invoice['reference'];
     List<Item> items = [];
     print("invoicess ==>> $invoiceData");
-    
+
     for (var itemData in invoiceData) {
       if (itemData is Map<String, dynamic>) {
         var product = itemData['product'];
@@ -274,25 +350,38 @@ class _InvoiceListState extends State<InvoiceList> {
     double totalAmount = items.map((item) => item.price).reduce((a, b) => a + b);
     print("------------ items data -------------");
     print(items);
+
+    // Determine customer/attendant display
+    String customerOrAttendantName;
+    bool hasAttendant = invoice['attendantId'] != null && invoice['attendantId'].isNotEmpty;
     
+    if (hasAttendant) {
+      String? attendantName = await _getAttendantNameById(invoice['attendantId']);
+      customerOrAttendantName = attendantName ?? 'Unknown Attendant';
+    } else {
+      customerOrAttendantName = invoice['customerName'] ?? 'Walk-in Customer';
+    }
+
     try {
       await printInvoiceDocument(
-          invoice['amount'],
-          items,
-          widget.user.company!.email,
-          widget.user.company!.phone,
-          widget.user.firstName,
-          0.00,
-          0.00,
-          DateTime.now(),
-      invoice['reference'],
-      invoice['lastUpdated'],
-          invoiceData[0]['product']['warehouse'][0]['name'],
+        invoice['amount'],
+        items,
+        widget.user.company!.email,
+        widget.user.company!.phone,
+        widget.user.firstName,
+        0.00,
+        0.00,
+        DateTime.now(),
+        invoice['reference'],
+        invoice['lastUpdated'],
+        invoiceData[0]['product']['warehouse'][0]['name'],
         widget.user.company!.name,
         widget.user.company!.address,
-        invoice['customerName'] ?? "",
+        customerOrAttendantName,
         invoice['customerPhone'] ?? "",
         invoice['tableId'] ?? "",
+        hasAttendant, // Pass flag to indicate if this is an attendant
+        printingAttendantName, // Pass the name of attendant who authorized the print
       );
       print('Document sent to printer successfully.');
     } catch (e) {
@@ -300,6 +389,7 @@ class _InvoiceListState extends State<InvoiceList> {
     }
   }
 }
+
 
 
 
@@ -354,7 +444,13 @@ class _InvoiceListState extends State<InvoiceList> {
 //     var invoices = await getInvoices();
 //     if (mounted) {
 //       setState(() {
+//         // **FIX 1: Sort invoices by lastUpdated in descending order (newest first)**
 //         _invoices = invoices;
+//         _invoices.sort((a, b) {
+//           String dateA = a['lastUpdated'] ?? '';
+//           String dateB = b['lastUpdated'] ?? '';
+//           return dateB.compareTo(dateA); // Descending order (newest first)
+//         });
 //       });
 //       print("Invoices ==>> $_invoices");
 //     }
@@ -500,9 +596,9 @@ class _InvoiceListState extends State<InvoiceList> {
 //                                   Provider.of<CartProvider>(context,
 //                                           listen: false)
 //                                       .redoInvoice(
-//                                         item['invoice'], 
-//                                         item['id'], 
-//                                         index,
+//                                         item['invoice'],
+//                                          item['id'],
+//                                          index,
 //                                         originalReference: item['reference'],
 //                                         attendantId: item['attendantId'],
 //                                         customerName: item['customerName'],
@@ -513,10 +609,11 @@ class _InvoiceListState extends State<InvoiceList> {
 //                               IconButton(
 //                                 icon: Icon(MdiIcons.printer),
 //                                 onPressed: () {
+//                                   // **FIX 1: Use the actual invoice ID instead of index for print selection**
 //                                   setState(() {
 //                                     selectedInvoiceIndex = index;
 //                                   });
-//                                   printInvoice();
+//                                   printInvoice(item); // Pass the actual item
 //                                 },
 //                               ),
 //                             ])),
@@ -538,15 +635,16 @@ class _InvoiceListState extends State<InvoiceList> {
 //     );
 //   }
 
-//   printInvoice() async {
+//   // **FIX 1: Modified printInvoice to accept the specific invoice item**
+//   printInvoice(Map<String, dynamic> invoiceItem) async {
 //     List<dynamic> itemsData;
-//     var invoiceData = jsonDecode(_invoices[selectedInvoiceIndex!]['invoice']);
-//     var invoice = _invoices[selectedInvoiceIndex!];
+//     var invoiceData = jsonDecode(invoiceItem['invoice']);
+//     var invoice = invoiceItem;
 //     print(invoice);
 //     String invoiceId = invoice['reference'];
 //     List<Item> items = [];
 //     print("invoicess ==>> $invoiceData");
-
+    
 //     for (var itemData in invoiceData) {
 //       if (itemData is Map<String, dynamic>) {
 //         var product = itemData['product'];
@@ -563,7 +661,6 @@ class _InvoiceListState extends State<InvoiceList> {
 //         } else {
 //           totalAmount = 0.0;
 //         }
-
 //         Item item = Item(itemName, quantity, totalAmount);
 //         items.add(item);
 //       } else {
@@ -574,6 +671,7 @@ class _InvoiceListState extends State<InvoiceList> {
 //     double totalAmount = items.map((item) => item.price).reduce((a, b) => a + b);
 //     print("------------ items data -------------");
 //     print(items);
+    
 //     try {
 //       await printInvoiceDocument(
 //           invoice['amount'],
@@ -586,7 +684,7 @@ class _InvoiceListState extends State<InvoiceList> {
 //           DateTime.now(),
 //       invoice['reference'],
 //       invoice['lastUpdated'],
-//           invoiceData[selectedInvoiceIndex]['product']['warehouse'][0]['name'],
+//           invoiceData[0]['product']['warehouse'][0]['name'],
 //         widget.user.company!.name,
 //         widget.user.company!.address,
 //         invoice['customerName'] ?? "",
