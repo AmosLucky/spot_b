@@ -1055,6 +1055,86 @@ void updateOrder(Orders updatedOrder) {
   }
 
 
+// Add this method to SystemProvider class
+
+Future<List<dynamic>> getUserWarehouses() async {
+  try {
+    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    
+    // Check internet connectivity
+    bool isConnected = await InternetUtils.isConnected();
+    
+    if (isConnected) {
+      // Fetch from API using the get-user-warehouses endpoint
+      var response = await SystemRepo(refresh: false, online: true).fetchUserWarehousesAPI();
+      
+      if (response.statusCode == 200) {
+        final warehouseData = response.data["data"];
+        
+        // Store in local database for offline access
+        StoreX warehouses = StoreX(
+          name: "user_warehouses",
+          value: jsonEncode(warehouseData),
+          billerId: user.id.toString(),
+          companyId: user.company!.id.toString(),
+          lastUpdated: DateTime.now().toIso8601String(),
+        );
+        
+        final store = await DatabaseEngine.instance.getStore();
+        final warehouseBox = store.box<StoreX>();
+        
+        final existingWarehouse = warehouseBox
+            .query(StoreX_.billerId
+                .equals(user.id.toString())
+                .and(StoreX_.name.equals("user_warehouses")))
+            .build()
+            .findFirst();
+        
+        if (existingWarehouse != null) {
+          warehouses.id = existingWarehouse.id;
+          warehouseBox.put(warehouses);
+        } else {
+          warehouseBox.put(warehouses);
+        }
+        
+        return warehouseData;
+      }
+    }
+    
+    // Fallback to local data if API fails or no internet
+    return await getLocalUserWarehouses();
+  } catch (error) {
+    print("Error fetching user warehouses: $error");
+    // Fallback to local data
+    return await getLocalUserWarehouses();
+  }
+}
+
+Future<List<dynamic>> getLocalUserWarehouses() async {
+  try {
+    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    final store = await DatabaseEngine.instance.getStore();
+    final warehouseBox = store.box<StoreX>();
+    
+    final warehouses = warehouseBox
+        .query(StoreX_.billerId
+            .equals(user.id.toString())
+            .and(StoreX_.name.equals("user_warehouses")))
+        .build()
+        .findFirst();
+    
+    if (warehouses != null) {
+      return jsonDecode(warehouses.value) ?? [];
+    }
+    
+    return [];
+  } catch (error) {
+    print("Error getting local user warehouses: $error");
+    return [];
+  }
+}
+
+
   
 
 

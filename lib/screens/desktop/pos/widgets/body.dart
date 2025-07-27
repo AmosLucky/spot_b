@@ -8,7 +8,6 @@ import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/paid_invoice_list.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
-// import 'package:spotstock_inventory/screens/desktop/pos/widgets/paid_invoices_summary.dart';
 import 'package:spotstock_inventory/widgets/dialogs.dart';
 import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +37,8 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   late TextEditingController _barcodeController;
   final AudioPlayer _audioPlayer = AudioPlayer();
-  final ValueNotifier<String> _activeItem =
-      ValueNotifier<String>("Dashboard");
+  final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
+  
   List _products = [];
   List<dynamic> warehouseData = [];
   List<dynamic> userAccessibleWarehouses = [];
@@ -59,7 +58,7 @@ class _BodyState extends State<Body> {
   bool isLoadingWarehouses = false;
   Map<String, dynamic>? selectedBranch;
   Map? selectedTable;
-
+  
   // Store current warehouse ID for proper filtering
   int? currentWarehouseId;
   List<int> userWarehouseIds = [];
@@ -89,10 +88,8 @@ class _BodyState extends State<Body> {
   void _parseUserWarehouseIds() {
     try {
       String? warehouseIdString = widget.user.warehouseId;
-
       if (warehouseIdString != null && warehouseIdString.isNotEmpty) {
-        String cleanString =
-            warehouseIdString.replaceAll('[', '').replaceAll(']', '');
+        String cleanString = warehouseIdString.replaceAll('[', '').replaceAll(']', '');
         if (cleanString.isNotEmpty) {
           userWarehouseIds = cleanString
               .split(',')
@@ -101,26 +98,12 @@ class _BodyState extends State<Body> {
               .toList();
         }
       }
-
       log("Parsed user warehouse IDs: $userWarehouseIds");
     } catch (e) {
       log("Error parsing user warehouse IDs: $e");
       userWarehouseIds = [];
     }
   }
-
-  // String? _getUserWarehouseIdString() {
-  //   switch (widget.user.email) {
-  //     case 'fountainloungetablets@gmail.com':
-  //       return '[64,88]';
-  //     case 'fountainloungetablet@gmail.com':
-  //       return '[65,91]';
-  //     case 'fountain5@gmail.com':
-  //       return '[64,65]';
-  //     default:
-  //       return null;
-  //   }
-  // }
 
   Future<void> playSound() async {
     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
@@ -130,48 +113,47 @@ class _BodyState extends State<Body> {
     setState(() {
       loadingProduct = true;
     });
-
     try {
       await _fetchWarehouses(); // Fetch warehouses based on user role
-
-      if (userAccessibleWarehouses.isNotEmpty) {
-        int warehouseId;
-
-        if (widget.user.isSuperAdmin) {
-          warehouseId =
-              selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
-        } else {
-          warehouseId =
-              selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
-        }
-
-        currentWarehouseId = warehouseId;
-        await widget.systemProvider
-            .fetchProducts(true, true, warehouseId); // Pass warehouseId
-        final data = await widget.systemProvider.getProducts(1);
-
-        final warehouseFilteredProducts = data.where((product) {
-          final productWarehouseId = product['attributes']['stock']['warehouse_id'];
-          return productWarehouseId == warehouseId &&
-              product['attributes']['stock']['quantity'] > 0;
-        }).toList();
-
+      
+      // **FIXED: Check if user has accessible warehouses before proceeding**
+      if (userAccessibleWarehouses.isEmpty) {
         setState(() {
-          _products = warehouseFilteredProducts;
-          _dataProducts = _products;
-          loadingProduct = false;
-        });
-
-        log("Filtered products for warehouse $warehouseId: ${_products.length}");
-        _filterByCategories();
-      } else {
-        setState(() {
+          _products = [];
+          _dataProducts = [];
           loadingProduct = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No warehouses available')),
+          SnackBar(content: Text('No warehouses assigned to this user')),
         );
+        return;
       }
+
+      int warehouseId;
+      if (widget.user.isSuperAdmin) {
+        warehouseId = selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
+      } else {
+        warehouseId = selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
+      }
+      
+      currentWarehouseId = warehouseId;
+      await widget.systemProvider.fetchProducts(true, true, warehouseId);
+      final data = await widget.systemProvider.getProducts(1);
+      
+      final warehouseFilteredProducts = data.where((product) {
+        final productWarehouseId = product['attributes']['stock']['warehouse_id'];
+        return productWarehouseId == warehouseId &&
+            product['attributes']['stock']['quantity'] > 0;
+      }).toList();
+
+      setState(() {
+        _products = warehouseFilteredProducts;
+        _dataProducts = _products;
+        loadingProduct = false;
+      });
+      
+      log("Filtered products for warehouse $warehouseId: ${_products.length}");
+      _filterByCategories();
     } catch (e) {
       setState(() {
         loadingProduct = false;
@@ -186,14 +168,14 @@ class _BodyState extends State<Body> {
   Future<void> _fetchWarehouses() async {
     try {
       List<dynamic> fetchedWarehouses;
+      
+      // **FIXED: Use different endpoints based on user role**
       if (widget.user.isStoreStaff || widget.user.isHotelStaff) {
         // For staff, use the get-user-warehouses endpoint
-        fetchedWarehouses =
-            await widget.systemProvider.getWarehouse();
+        fetchedWarehouses = await widget.systemProvider.getUserWarehouses();
       } else {
         // For admins and super admins, use the warehouses endpoint
-        fetchedWarehouses =
-            await widget.systemProvider.getWarehouse();
+        fetchedWarehouses = await widget.systemProvider.getWarehouse();
       }
 
       setState(() {
@@ -210,27 +192,36 @@ class _BodyState extends State<Body> {
 
   void _filterUserAccessibleWarehouses() {
     if (widget.user.isSuperAdmin) {
+      // Super admin can access all warehouses
       userAccessibleWarehouses = List.from(warehouseData);
     } else if (widget.user.isAdmin == 1) {
+      // Admin can access all warehouses in their company
       userAccessibleWarehouses = List.from(warehouseData);
-    }
-    else if (userWarehouseIds.isNotEmpty) {
-      userAccessibleWarehouses = warehouseData.where((warehouse) {
-        return userWarehouseIds.contains(warehouse['id']);
-      }).toList();
     } else {
-      userAccessibleWarehouses = List.from(warehouseData);
+      // **FIXED: Staff members can only access warehouses they're assigned to**
+      if (userWarehouseIds.isNotEmpty) {
+        userAccessibleWarehouses = warehouseData.where((warehouse) {
+          return userWarehouseIds.contains(warehouse['id']);
+        }).toList();
+      } else {
+        // **FIXED: If no warehouses assigned, return empty list instead of all warehouses**
+        userAccessibleWarehouses = [];
+        log("Staff user has no warehouses assigned");
+      }
     }
-
-    log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']['name']).toList()}");
+    
+    log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']?['name'] ?? w['name']).toList()}");
   }
 
   bool _canAccessWarehouse(int warehouseId) {
     if (widget.user.isSuperAdmin) {
       return true;
     }
-
-    return userWarehouseIds.isEmpty || userWarehouseIds.contains(warehouseId);
+    if (widget.user.isAdmin == 1) {
+      return true;
+    }
+    // **FIXED: Staff can only access warehouses they're assigned to**
+    return userWarehouseIds.isNotEmpty && userWarehouseIds.contains(warehouseId);
   }
 
   Future<List<dynamic>> getProducts() async {
@@ -342,7 +333,6 @@ class _BodyState extends State<Body> {
                           selectedBranch: selectedBranch,
                           onBranchSelected: (value) async {
                             if (value == null) return;
-
                             if (!_canAccessWarehouse(value['id'])) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -351,19 +341,16 @@ class _BodyState extends State<Body> {
                               );
                               return;
                             }
-
                             setState(() {
                               loadingProduct = true;
                               selectedBranch = value;
                               currentWarehouseId = value['id'];
                             });
-
                             try {
                               await widget.systemProvider.fetchProducts(
                                   true, true, value['id']);
                               final data =
                                   await widget.systemProvider.getProducts(1);
-
                               final warehouseFilteredProducts = data.where(
                                   (product) {
                                 final productWarehouseId = product['attributes']
@@ -372,7 +359,6 @@ class _BodyState extends State<Body> {
                                     product['attributes']['stock']['quantity'] >
                                         0;
                               }).toList();
-
                               setState(() {
                                 _products = warehouseFilteredProducts;
                                 _dataProducts = _products;
@@ -380,7 +366,6 @@ class _BodyState extends State<Body> {
                                 selectedCategory = '';
                                 selectedAlphabetLetter = '';
                               });
-
                               _filterByCategories();
                             } catch (e) {
                               setState(() {
@@ -393,11 +378,11 @@ class _BodyState extends State<Body> {
                               );
                             }
                           },
-                          hint: selectedBranch?['attributes']['name'] ??
-                              (userAccessibleWarehouses.isNotEmpty
-                                  ? userAccessibleWarehouses[0]['attributes']
-                                      ['name']
-                                  : "Select Warehouse"),
+                          hint: selectedBranch?['attributes']?['name'] ?? 
+                                selectedBranch?['name'] ??
+                                (userAccessibleWarehouses.isNotEmpty
+                                    ? userAccessibleWarehouses[0]['attributes']?['name']
+                                    : "No Warehouse Available": "No Valid Warehouse, ")
                         ),
                       ),
                       ValueListenableBuilder<String>(
@@ -414,6 +399,44 @@ class _BodyState extends State<Body> {
                               },
                             );
                           }
+                          
+                          // **FIXED: Show message when no warehouses are available**
+                          if (userAccessibleWarehouses.isEmpty) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.warehouse_outlined,
+                                      size: 64,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'No Warehouses Assigned',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Please contact your administrator to assign warehouses to your account.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                          
                           return Column(
                             children: [
                               // Alphabet Filter Row
@@ -470,7 +493,6 @@ class _BodyState extends State<Body> {
                                                 String.fromCharCode(65 + index);
                                             bool isSelected =
                                                 selectedAlphabetLetter == letter;
-
                                             return GestureDetector(
                                               onTap: () {
                                                 setState(() {
@@ -529,7 +551,6 @@ class _BodyState extends State<Body> {
                                   ],
                                 ),
                               ),
-
                               // Category Filter Row
                               Row(
                                 children: [
@@ -778,7 +799,6 @@ class _BodyState extends State<Body> {
       selectedAlphabetLetter = '';
       selectedTable = null;
     });
-
     if (_barcodeController.text.isEmpty) {
       setState(() {
         _productSearchResult = _products;
@@ -811,7 +831,6 @@ class _BodyState extends State<Body> {
     setState(() {
       selectedTable = null;
     });
-
     if (selectedCategory == '') {
       setState(() {
         _categoryResult = _products;
@@ -835,7 +854,6 @@ class _BodyState extends State<Body> {
     setState(() {
       selectedTable = null;
     });
-
     setState(() {
       _foundProducts = _products.where((product) {
         return product['attributes']['name']
@@ -844,7 +862,6 @@ class _BodyState extends State<Body> {
             .startsWith(letter);
       }).toList();
     });
-
     debugPrint("Alphabet filtered products: ${_foundProducts!.length}");
   }
 }
@@ -856,6 +873,8 @@ String generateRandomStringForInvoice(int length) {
       (_) =>
           chars.codeUnitAt((DateTime.now().millisecondsSinceEpoch % chars.length))));
 }
+
+
 
 
 
@@ -899,7 +918,8 @@ String generateRandomStringForInvoice(int length) {
 // class _BodyState extends State<Body> {
 //   late TextEditingController _barcodeController;
 //   final AudioPlayer _audioPlayer = AudioPlayer();
-//   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
+//   final ValueNotifier<String> _activeItem =
+//       ValueNotifier<String>("Dashboard");
 //   List _products = [];
 //   List<dynamic> warehouseData = [];
 //   List<dynamic> userAccessibleWarehouses = [];
@@ -919,7 +939,7 @@ String generateRandomStringForInvoice(int length) {
 //   bool isLoadingWarehouses = false;
 //   Map<String, dynamic>? selectedBranch;
 //   Map? selectedTable;
-  
+
 //   // Store current warehouse ID for proper filtering
 //   int? currentWarehouseId;
 //   List<int> userWarehouseIds = [];
@@ -948,10 +968,11 @@ String generateRandomStringForInvoice(int length) {
 
 //   void _parseUserWarehouseIds() {
 //     try {
-//       String? warehouseIdString = _getUserWarehouseIdString();
-      
+//       String? warehouseIdString = widget.user.warehouseId;
+
 //       if (warehouseIdString != null && warehouseIdString.isNotEmpty) {
-//         String cleanString = warehouseIdString.replaceAll('[', '').replaceAll(']', '');
+//         String cleanString =
+//             warehouseIdString.replaceAll('[', '').replaceAll(']', '');
 //         if (cleanString.isNotEmpty) {
 //           userWarehouseIds = cleanString
 //               .split(',')
@@ -960,7 +981,7 @@ String generateRandomStringForInvoice(int length) {
 //               .toList();
 //         }
 //       }
-      
+
 //       log("Parsed user warehouse IDs: $userWarehouseIds");
 //     } catch (e) {
 //       log("Error parsing user warehouse IDs: $e");
@@ -968,18 +989,18 @@ String generateRandomStringForInvoice(int length) {
 //     }
 //   }
 
-//   String? _getUserWarehouseIdString() {
-//     switch (widget.user.email) {
-//       case 'fountainloungetablets@gmail.com':
-//         return '[64,88]';
-//       case 'fountainloungetablet@gmail.com':
-//         return '[65,91]';
-//       case 'fountain5@gmail.com':
-//         return '[64,65]';
-//       default:
-//         return null;
-//     }
-//   }
+//   // String? _getUserWarehouseIdString() {
+//   //   switch (widget.user.email) {
+//   //     case 'fountainloungetablets@gmail.com':
+//   //       return '[64,88]';
+//   //     case 'fountainloungetablet@gmail.com':
+//   //       return '[65,91]';
+//   //     case 'fountain5@gmail.com':
+//   //       return '[64,65]';
+//   //     default:
+//   //       return null;
+//   //   }
+//   // }
 
 //   Future<void> playSound() async {
 //     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
@@ -989,42 +1010,38 @@ String generateRandomStringForInvoice(int length) {
 //     setState(() {
 //       loadingProduct = true;
 //     });
-    
+
 //     try {
-//       warehouseData = await widget.systemProvider.getWarehouse();
-//       log("All warehouse data ==>> $warehouseData");
-      
-//       if (warehouseData.isNotEmpty) {
-//         _filterUserAccessibleWarehouses();
-        
+//       await _fetchWarehouses(); // Fetch warehouses based on user role
+
+//       if (userAccessibleWarehouses.isNotEmpty) {
 //         int warehouseId;
-        
+
 //         if (widget.user.isSuperAdmin) {
-//           warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
+//           warehouseId =
+//               selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
 //         } else {
-//           if (userWarehouseIds.isNotEmpty) {
-//             warehouseId = selectedBranch?['id'] ?? userWarehouseIds[0];
-//           } else {
-//             warehouseId = selectedBranch?['id'] ?? warehouseData[0]['id'];
-//           }
+//           warehouseId =
+//               selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
 //         }
-        
+
 //         currentWarehouseId = warehouseId;
-//         await widget.systemProvider.fetchProducts(true, true, warehouseId);
+//         await widget.systemProvider
+//             .fetchProducts(true, true, warehouseId); // Pass warehouseId
 //         final data = await widget.systemProvider.getProducts(1);
-        
+
 //         final warehouseFilteredProducts = data.where((product) {
 //           final productWarehouseId = product['attributes']['stock']['warehouse_id'];
 //           return productWarehouseId == warehouseId &&
-//                  product['attributes']['stock']['quantity'] > 0;
+//               product['attributes']['stock']['quantity'] > 0;
 //         }).toList();
-        
+
 //         setState(() {
 //           _products = warehouseFilteredProducts;
 //           _dataProducts = _products;
 //           loadingProduct = false;
 //         });
-        
+
 //         log("Filtered products for warehouse $warehouseId: ${_products.length}");
 //         _filterByCategories();
 //       } else {
@@ -1046,17 +1063,45 @@ String generateRandomStringForInvoice(int length) {
 //     }
 //   }
 
+//   Future<void> _fetchWarehouses() async {
+//     try {
+//       List<dynamic> fetchedWarehouses;
+//       if (widget.user.isStoreStaff || widget.user.isHotelStaff) {
+//         // For staff, use the get-user-warehouses endpoint
+//         fetchedWarehouses =
+//             await widget.systemProvider.getWarehouse();
+//       } else {
+//         // For admins and super admins, use the warehouses endpoint
+//         fetchedWarehouses =
+//             await widget.systemProvider.getWarehouse();
+//       }
+
+//       setState(() {
+//         warehouseData = fetchedWarehouses;
+//         _filterUserAccessibleWarehouses();
+//       });
+//     } catch (e) {
+//       log("Error fetching warehouses: $e");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error fetching warehouses')),
+//       );
+//     }
+//   }
+
 //   void _filterUserAccessibleWarehouses() {
 //     if (widget.user.isSuperAdmin) {
 //       userAccessibleWarehouses = List.from(warehouseData);
-//     } else if (userWarehouseIds.isNotEmpty) {
+//     } else if (widget.user.isAdmin == 1) {
+//       userAccessibleWarehouses = List.from(warehouseData);
+//     }
+//     else if (userWarehouseIds.isNotEmpty) {
 //       userAccessibleWarehouses = warehouseData.where((warehouse) {
 //         return userWarehouseIds.contains(warehouse['id']);
 //       }).toList();
 //     } else {
 //       userAccessibleWarehouses = List.from(warehouseData);
 //     }
-    
+
 //     log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']['name']).toList()}");
 //   }
 
@@ -1064,7 +1109,7 @@ String generateRandomStringForInvoice(int length) {
 //     if (widget.user.isSuperAdmin) {
 //       return true;
 //     }
-    
+
 //     return userWarehouseIds.isEmpty || userWarehouseIds.contains(warehouseId);
 //   }
 
@@ -1177,30 +1222,37 @@ String generateRandomStringForInvoice(int length) {
 //                           selectedBranch: selectedBranch,
 //                           onBranchSelected: (value) async {
 //                             if (value == null) return;
-                            
+
 //                             if (!_canAccessWarehouse(value['id'])) {
 //                               ScaffoldMessenger.of(context).showSnackBar(
-//                                 SnackBar(content: Text('You do not have access to this warehouse')),
+//                                 SnackBar(
+//                                     content: Text(
+//                                         'You do not have access to this warehouse')),
 //                               );
 //                               return;
 //                             }
-                            
+
 //                             setState(() {
 //                               loadingProduct = true;
 //                               selectedBranch = value;
 //                               currentWarehouseId = value['id'];
 //                             });
-                            
+
 //                             try {
-//                               await widget.systemProvider.fetchProducts(true, true, value['id']);
-//                               final data = await widget.systemProvider.getProducts(1);
-                              
-//                               final warehouseFilteredProducts = data.where((product) {
-//                                 final productWarehouseId = product['attributes']['stock']['warehouse_id'];
+//                               await widget.systemProvider.fetchProducts(
+//                                   true, true, value['id']);
+//                               final data =
+//                                   await widget.systemProvider.getProducts(1);
+
+//                               final warehouseFilteredProducts = data.where(
+//                                   (product) {
+//                                 final productWarehouseId = product['attributes']
+//                                     ['stock']['warehouse_id'];
 //                                 return productWarehouseId == value['id'] &&
-//                                        product['attributes']['stock']['quantity'] > 0;
+//                                     product['attributes']['stock']['quantity'] >
+//                                         0;
 //                               }).toList();
-                              
+
 //                               setState(() {
 //                                 _products = warehouseFilteredProducts;
 //                                 _dataProducts = _products;
@@ -1208,20 +1260,23 @@ String generateRandomStringForInvoice(int length) {
 //                                 selectedCategory = '';
 //                                 selectedAlphabetLetter = '';
 //                               });
-                              
+
 //                               _filterByCategories();
 //                             } catch (e) {
 //                               setState(() {
 //                                 loadingProduct = false;
 //                               });
 //                               ScaffoldMessenger.of(context).showSnackBar(
-//                                 SnackBar(content: Text('Error loading products for warehouse')),
+//                                 SnackBar(
+//                                     content: Text(
+//                                         'Error loading products for warehouse')),
 //                               );
 //                             }
 //                           },
 //                           hint: selectedBranch?['attributes']['name'] ??
 //                               (userAccessibleWarehouses.isNotEmpty
-//                                   ? userAccessibleWarehouses[0]['attributes']['name']
+//                                   ? userAccessibleWarehouses[0]['attributes']
+//                                       ['name']
 //                                   : "Select Warehouse"),
 //                         ),
 //                       ),
@@ -1244,7 +1299,8 @@ String generateRandomStringForInvoice(int length) {
 //                               // Alphabet Filter Row
 //                               Container(
 //                                 height: 60,
-//                                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//                                 margin: EdgeInsets.symmetric(
+//                                     horizontal: 16, vertical: 8),
 //                                 child: Row(
 //                                   children: [
 //                                     GestureDetector(
@@ -1256,15 +1312,18 @@ String generateRandomStringForInvoice(int length) {
 //                                         _filterByCategories();
 //                                       },
 //                                       child: Container(
-//                                         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//                                         padding: EdgeInsets.symmetric(
+//                                             horizontal: 16, vertical: 8),
 //                                         margin: EdgeInsets.only(right: 8),
 //                                         decoration: BoxDecoration(
-//                                           color: selectedAlphabetLetter == '' && selectedCategory == ''
+//                                           color: selectedAlphabetLetter == '' &&
+//                                                   selectedCategory == ''
 //                                               ? Colors.deepPurple
 //                                               : Colors.grey.withOpacity(0.1),
 //                                           borderRadius: BorderRadius.circular(25),
 //                                           border: Border.all(
-//                                             color: selectedAlphabetLetter == '' && selectedCategory == ''
+//                                             color: selectedAlphabetLetter == '' &&
+//                                                     selectedCategory == ''
 //                                                 ? Colors.deepPurple
 //                                                 : Colors.grey.withOpacity(0.3),
 //                                           ),
@@ -1274,7 +1333,8 @@ String generateRandomStringForInvoice(int length) {
 //                                           style: TextStyle(
 //                                             fontSize: 12.sp,
 //                                             fontWeight: FontWeight.w600,
-//                                             color: selectedAlphabetLetter == '' && selectedCategory == ''
+//                                             color: selectedAlphabetLetter == '' &&
+//                                                     selectedCategory == ''
 //                                                 ? Colors.white
 //                                                 : Colors.black87,
 //                                           ),
@@ -1286,34 +1346,44 @@ String generateRandomStringForInvoice(int length) {
 //                                         scrollDirection: Axis.horizontal,
 //                                         child: Row(
 //                                           children: List.generate(26, (index) {
-//                                             String letter = String.fromCharCode(65 + index);
-//                                             bool isSelected = selectedAlphabetLetter == letter;
-                                            
+//                                             String letter =
+//                                                 String.fromCharCode(65 + index);
+//                                             bool isSelected =
+//                                                 selectedAlphabetLetter == letter;
+
 //                                             return GestureDetector(
 //                                               onTap: () {
 //                                                 setState(() {
-//                                                   selectedAlphabetLetter = letter;
+//                                                   selectedAlphabetLetter =
+//                                                       letter;
 //                                                   selectedCategory = '';
 //                                                 });
 //                                                 _filterByAlphabet(letter);
 //                                               },
 //                                               child: Container(
-//                                                 margin: EdgeInsets.symmetric(horizontal: 4),
-//                                                 padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+//                                                 margin: EdgeInsets.symmetric(
+//                                                     horizontal: 4),
+//                                                 padding: EdgeInsets.symmetric(
+//                                                     horizontal: 14, vertical: 8),
 //                                                 decoration: BoxDecoration(
 //                                                   color: isSelected
 //                                                       ? Colors.deepPurple
-//                                                       : Colors.grey.withOpacity(0.1),
-//                                                   borderRadius: BorderRadius.circular(20),
+//                                                       : Colors.grey.withOpacity(
+//                                                           0.1),
+//                                                   borderRadius:
+//                                                       BorderRadius.circular(20),
 //                                                   border: Border.all(
 //                                                     color: isSelected
 //                                                         ? Colors.deepPurple
-//                                                         : Colors.grey.withOpacity(0.3),
+//                                                         : Colors.grey.withOpacity(
+//                                                             0.3),
 //                                                   ),
 //                                                   boxShadow: isSelected
 //                                                       ? [
 //                                                           BoxShadow(
-//                                                             color: Colors.deepPurple.withOpacity(0.3),
+//                                                             color: Colors
+//                                                                 .deepPurple
+//                                                                 .withOpacity(0.3),
 //                                                             blurRadius: 4,
 //                                                             offset: Offset(0, 2),
 //                                                           )
@@ -1325,7 +1395,9 @@ String generateRandomStringForInvoice(int length) {
 //                                                   style: TextStyle(
 //                                                     fontSize: 11.sp,
 //                                                     fontWeight: FontWeight.w600,
-//                                                     color: isSelected ? Colors.white : Colors.black87,
+//                                                     color: isSelected
+//                                                         ? Colors.white
+//                                                         : Colors.black87,
 //                                                   ),
 //                                                 ),
 //                                               ),
@@ -1337,7 +1409,7 @@ String generateRandomStringForInvoice(int length) {
 //                                   ],
 //                                 ),
 //                               ),
-                              
+
 //                               // Category Filter Row
 //                               Row(
 //                                 children: [
@@ -1350,9 +1422,11 @@ String generateRandomStringForInvoice(int length) {
 //                                       _filterByCategories();
 //                                     },
 //                                     child: Container(
-//                                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+//                                       padding: EdgeInsets.symmetric(
+//                                           horizontal: 20, vertical: 10),
 //                                       decoration: BoxDecoration(
-//                                         color: selectedCategory == '' && selectedAlphabetLetter == ''
+//                                         color: selectedCategory == '' &&
+//                                                 selectedAlphabetLetter == ''
 //                                             ? Colors.purple
 //                                             : Colors.grey.withOpacity(0.1),
 //                                         borderRadius: BorderRadius.circular(10),
@@ -1362,7 +1436,8 @@ String generateRandomStringForInvoice(int length) {
 //                                         style: TextStyle(
 //                                           fontSize: 10.sp,
 //                                           fontWeight: FontWeight.w500,
-//                                           color: selectedCategory == '' && selectedAlphabetLetter == ''
+//                                           color: selectedCategory == '' &&
+//                                                   selectedAlphabetLetter == ''
 //                                               ? Colors.white
 //                                               : Colors.black,
 //                                         ),
@@ -1389,27 +1464,42 @@ String generateRandomStringForInvoice(int length) {
 //                                                 .map((cat) => GestureDetector(
 //                                                       onTap: () {
 //                                                         setState(() {
-//                                                           selectedCategory = cat['attributes']['name'];
-//                                                           selectedAlphabetLetter = '';
+//                                                           selectedCategory =
+//                                                               cat['attributes']
+//                                                                   ['name'];
+//                                                           selectedAlphabetLetter =
+//                                                               '';
 //                                                         });
 //                                                         _filterByCategories();
 //                                                       },
 //                                                       child: Container(
 //                                                         padding: EdgeInsets.symmetric(
-//                                                             horizontal: 10, vertical: 5),
+//                                                             horizontal: 10,
+//                                                             vertical: 5),
 //                                                         decoration: BoxDecoration(
-//                                                           color: selectedCategory == cat['attributes']['name']
+//                                                           color: selectedCategory ==
+//                                                                   cat['attributes']
+//                                                                       ['name']
 //                                                               ? Colors.purple
-//                                                               : Colors.grey.withOpacity(0.1),
-//                                                           borderRadius: BorderRadius.circular(10),
+//                                                               : Colors.grey
+//                                                                   .withOpacity(
+//                                                                       0.1),
+//                                                           borderRadius:
+//                                                               BorderRadius
+//                                                                   .circular(10),
 //                                                         ),
 //                                                         child: Center(
 //                                                           child: Text(
-//                                                             cat['attributes']['name'],
+//                                                             cat['attributes']
+//                                                                 ['name'],
 //                                                             style: TextStyle(
 //                                                               fontSize: 10.sp,
-//                                                               fontWeight: FontWeight.w500,
-//                                                               color: selectedCategory == cat['attributes']['name']
+//                                                               fontWeight:
+//                                                                   FontWeight
+//                                                                       .w500,
+//                                                               color: selectedCategory ==
+//                                                                       cat['attributes']
+//                                                                           ['name']
 //                                                                   ? Colors.white
 //                                                                   : Colors.black,
 //                                                             ),
@@ -1438,7 +1528,8 @@ String generateRandomStringForInvoice(int length) {
 //                                 mediaQuery: widget.mediaQuery,
 //                                 playSound: () => playSound(),
 //                               ),
-//                               _barcodeController.text.isEmpty && !loadingProduct
+//                               _barcodeController.text.isEmpty &&
+//                                       !loadingProduct
 //                                   ? Padding(
 //                                       padding: const EdgeInsets.all(16.0),
 //                                       child: SizedBox(
@@ -1453,13 +1544,17 @@ String generateRandomStringForInvoice(int length) {
 //                                             childAspectRatio: 1.5,
 //                                           ),
 //                                           itemBuilder: (context, index) {
-//                                             var product = _foundProducts![index]['attributes'];
+//                                             var product = _foundProducts![index]
+//                                                 ['attributes'];
 //                                             return Consumer<CartProvider>(
-//                                               builder: (context, value, child) => InkWell(
+//                                               builder: (context, value, child) =>
+//                                                   InkWell(
 //                                                 onTap: () {
 //                                                   print("tapped");
 //                                                   tappedIndex = index;
-//                                                   if (product['stock']['quantity'] == 0) {
+//                                                   if (product['stock']
+//                                                           ['quantity'] ==
+//                                                       0) {
 //                                                     Dialogs.alertDialog(
 //                                                         context,
 //                                                         "Warning",
@@ -1470,20 +1565,23 @@ String generateRandomStringForInvoice(int length) {
 //                                                   } else {
 //                                                     if (_isInvoiceOpen) {
 //                                                       setState(() {
-//                                                         _isInvoiceOpen = !_isInvoiceOpen;
+//                                                         _isInvoiceOpen =
+//                                                             !_isInvoiceOpen;
 //                                                       });
 //                                                     }
 //                                                     value.add(
 //                                                         product,
 //                                                         index,
-//                                                         generateRandomStringForInvoice(12),
+//                                                         generateRandomStringForInvoice(
+//                                                             12),
 //                                                         product['product_price'],
 //                                                         1,
 //                                                         product['product_code']);
 //                                                     playSound();
 //                                                   }
 //                                                 },
-//                                                 child: ProductDetails(product: product),
+//                                                 child: ProductDetails(
+//                                                     product: product),
 //                                               ),
 //                                             );
 //                                           },
@@ -1492,7 +1590,8 @@ String generateRandomStringForInvoice(int length) {
 //                                     )
 //                                   : Padding(
 //                                       padding: const EdgeInsets.only(top: 30),
-//                                       child: Center(child: CircularProgressIndicator()),
+//                                       child: Center(
+//                                           child: CircularProgressIndicator()),
 //                                     ),
 //                             ],
 //                           );
@@ -1502,7 +1601,8 @@ String generateRandomStringForInvoice(int length) {
 //                   ),
 //                 ),
 //                 Padding(
-//                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+//                   padding:
+//                       const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
 //                   child: ValueListenableBuilder<String>(
 //                     valueListenable: _activeItem,
 //                     builder: (context, activeItem, child) {
@@ -1525,7 +1625,8 @@ String generateRandomStringForInvoice(int length) {
 //                             });
 //                           },
 //                         );
-//                       } else if (activeItem == "Paid Invoices" && widget.user.isAnyAdmin) {
+//                       } else if (activeItem == "Paid Invoices" &&
+//                           widget.user.isAnyAdmin) {
 //                         return PaidInvoicesList(
 //                           systemProvider: widget.systemProvider,
 //                           user: widget.user,
@@ -1557,6 +1658,7 @@ String generateRandomStringForInvoice(int length) {
 //       selectedAlphabetLetter = '';
 //       selectedTable = null;
 //     });
+
 //     if (_barcodeController.text.isEmpty) {
 //       setState(() {
 //         _productSearchResult = _products;
@@ -1589,7 +1691,7 @@ String generateRandomStringForInvoice(int length) {
 //     setState(() {
 //       selectedTable = null;
 //     });
-    
+
 //     if (selectedCategory == '') {
 //       setState(() {
 //         _categoryResult = _products;
@@ -1613,7 +1715,7 @@ String generateRandomStringForInvoice(int length) {
 //     setState(() {
 //       selectedTable = null;
 //     });
-    
+
 //     setState(() {
 //       _foundProducts = _products.where((product) {
 //         return product['attributes']['name']
@@ -1622,7 +1724,7 @@ String generateRandomStringForInvoice(int length) {
 //             .startsWith(letter);
 //       }).toList();
 //     });
-    
+
 //     debugPrint("Alphabet filtered products: ${_foundProducts!.length}");
 //   }
 // }
@@ -1630,5 +1732,7 @@ String generateRandomStringForInvoice(int length) {
 // String generateRandomStringForInvoice(int length) {
 //   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 //   return String.fromCharCodes(Iterable.generate(
-//       length, (_) => chars.codeUnitAt((DateTime.now().millisecondsSinceEpoch % chars.length))));
+//       length,
+//       (_) =>
+//           chars.codeUnitAt((DateTime.now().millisecondsSinceEpoch % chars.length))));
 // }

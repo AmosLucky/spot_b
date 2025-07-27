@@ -315,6 +315,11 @@ Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<Strin
     return await _fetchData('warehouses?page[size]=0', refresh: refresh);
   }
 
+  Future<Response> fetchUserWarehousesAPI({bool refresh = false}) async {
+  print("Fetch user warehouses");
+  return await _fetchData('get-user-warehouses', refresh: refresh);
+}
+
   // Fetch Stock Alerts
   Future<Response> fetchStockAlertAPI({bool refresh = false}) async {
     return await _fetchData('product-stock-alerts?page[size]=0',
