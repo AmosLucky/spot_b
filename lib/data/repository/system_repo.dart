@@ -14,7 +14,8 @@ import 'package:spotstock_inventory/common/helpers/datetime.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
 import 'package:spotstock_inventory/common/provider/user_provider.dart';
 import 'package:spotstock_inventory/data/models/maintenance_model.dart';
-import 'package:spotstock_inventory/data/models/sales_models.dart';
+import 'package:spotstock_inventory/data/models/sales_models.dart' ;
+// import 'package:spotstock_inventory/data/models/sales_models.dart';
 import 'package:spotstock_inventory/data/models/schema.dart';
 import 'package:spotstock_inventory/data/models/user_details.dart';
 import 'package:spotstock_inventory/screens/desktop/home/widgets/body.dart';
@@ -24,6 +25,8 @@ import 'package:http/http.dart' as http;
 import '../api/api_client.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:spotstock_inventory/objectbox.g.dart';
+
+import '../models/hold_model.dart' as  HoldModels;
 
 Dio dio = Dio();
 
@@ -315,10 +318,21 @@ Future<void> _storeSyncedSaleLocally(Map<String, dynamic> apiResponse, Map<Strin
     return await _fetchData('warehouses?page[size]=0', refresh: refresh);
   }
 
-  Future<Response> fetchUserWarehousesAPI({bool refresh = false}) async {
-  print("Fetch user warehouses");
-  return await _fetchData('get-user-warehouses', refresh: refresh);
+Future<Response> fetchUserWarehousesAPI({bool refresh = false}) async {
+  print("🔄 Fetching user-specific warehouses from API");
+  try {
+    return await _fetchData('get-user-warehouses', refresh: refresh);
+  } catch (e) {
+    print("❌ Error fetching user warehouses from API: $e");
+    rethrow;
+  }
 }
+
+  // **NEW: Hold Records API methods**
+  Future<Response> fetchHoldRecordsAPI({bool refresh = false}) async {
+    return await _fetchData('holds?page[size]=0', refresh: refresh);
+  }
+
 
   // Fetch Stock Alerts
   Future<Response> fetchStockAlertAPI({bool refresh = false}) async {
@@ -2570,6 +2584,178 @@ Future<Map<String, dynamic>> checkout(
       };
     }
   }
+
+  Future<Map<String, dynamic>> createHoldRecordAPI(Map<String, dynamic> holdData) async {
+    try {
+      String token = await getToken();
+      
+      final response = await http.post(
+        Uri.parse('${baseUrl}holds'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(holdData),
+      );
+      
+      print('Hold creation response status: ${response.statusCode}');
+      print('Hold creation response body: ${response.body}');
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final jsonData = json.decode(response.body);
+        return {
+          'status': true,
+          'message': jsonData['message'] ?? 'Hold created successfully',
+          'data': jsonData
+        };
+      } else {
+        final jsonData = json.decode(response.body);
+        return {
+          'status': false,
+          'message': jsonData['message'] ?? 'Failed to create hold'
+        };
+      }
+    } catch (e) {
+      print('Error creating hold record: $e');
+      return {
+        'status': false,
+        'message': 'Network error: $e'
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteHoldRecordAPI(int holdId) async {
+    try {
+      String token = await getToken();
+      
+      final response = await http.delete(
+        Uri.parse('${baseUrl}holds/$holdId'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      
+      print('Hold deletion response status: ${response.statusCode}');
+      print('Hold deletion response body: ${response.body}');
+      
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return {
+          'status': true,
+          'message': 'Hold deleted successfully'
+        };
+      } else {
+        final jsonData = json.decode(response.body);
+        return {
+          'status': false,
+          'message': jsonData['message'] ?? 'Failed to delete hold'
+        };
+      }
+    } catch (e) {
+      print('Error deleting hold record: $e');
+      return {
+        'status': false,
+        'message': 'Network error: $e'
+      };
+    }
+  }
+
+  Future<List<HoldModels.HoldRecord>> getLocalHoldRecords() async {
+    try {
+      UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+      final store = await DatabaseEngine.instance.getStore();
+      final storeBox = store.box<StoreX>();
+      
+      final holdRecords = storeBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("hold_records")))
+          .build()
+          .findFirst();
+      
+      if (holdRecords != null) {
+        final List<dynamic> holdData = jsonDecode(holdRecords.value) ?? [];
+        return holdData.map((hold) => HoldModels.HoldRecord.fromJson(hold)).toList();
+      }
+      
+      return [];
+    } catch (error) {
+      print("Error getting local hold records: $error");
+      return [];
+    }
+  }
+
+  Future<void> storeHoldRecordLocally(Map<String, dynamic> holdData) async {
+    try {
+      UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+      final store = await DatabaseEngine.instance.getStore();
+      final holdBox = store.box<HoldRecordEntity>();
+      
+      // Create a local hold record entity
+      final holdEntity = HoldRecordEntity(
+        referenceCode: holdData['reference_code'] ?? '',
+        customerName: holdData['customer_name'] ?? '',
+        warehouseName: holdData['warehouse_name'] ?? '',
+        grandTotal: (holdData['grand_total'] as num?)?.toDouble() ?? 0.0,
+        holdData: jsonEncode(holdData),
+        userId: user.id.toString(),
+        companyId: user.company?.id.toString() ?? '',
+        createdAt: DateTime.now(),
+        synced: false,
+      );
+      
+      holdBox.put(holdEntity);
+      print('Hold record stored locally for later sync');
+    } catch (e) {
+      print('Error storing hold record locally: $e');
+    }
+  }
+
+  Future<void> deleteLocalHoldRecord(int holdId) async {
+    try {
+      UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+      final store = await DatabaseEngine.instance.getStore();
+      final storeBox = store.box<StoreX>();
+      
+      final holdRecords = storeBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("hold_records")))
+          .build()
+          .findFirst();
+      
+      if (holdRecords != null) {
+        List<dynamic> holdData = jsonDecode(holdRecords.value) ?? [];
+        holdData.removeWhere((hold) => hold['id'] == holdId);
+        
+        holdRecords.value = jsonEncode(holdData);
+        storeBox.put(holdRecords);
+        print('Hold record deleted from local storage');
+      }
+    } catch (e) {
+      print('Error deleting local hold record: $e');
+    }
+  }
+
+  Future<void> markHoldRecordForDeletion(int holdId) async {
+    try {
+      final store = await DatabaseEngine.instance.getStore();
+      final holdBox = store.box<HoldRecordEntity>();
+      
+      // Find the hold record and mark it for deletion
+      final holdEntity = holdBox.query(HoldRecordEntity_.id.equals(holdId)).build().findFirst();
+      if (holdEntity != null) {
+        holdEntity.markedForDeletion = true;
+        holdBox.put(holdEntity);
+        print('Hold record marked for deletion');
+      }
+    } catch (e) {
+      print('Error marking hold record for deletion: $e');
+    }
+  }
+
 }
 
 

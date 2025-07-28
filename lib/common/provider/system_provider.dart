@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotstock_inventory/objectbox.g.dart';
 
+import '../../data/models/hold_model.dart';
 import 'response_state.dart';
 import 'user_provider.dart';
 
@@ -55,6 +56,10 @@ List<Orders> get orders => _orders;
   //   return [..._items];
   // }
 
+    // **NEW: Hold records management**
+  List<HoldRecord> _holdRecords = [];
+  List<HoldRecord> get holdRecords => _holdRecords;
+
 
 Future<void> loadOrders() async {
   final store = await DatabaseEngine.instance.getStore();
@@ -74,6 +79,136 @@ void updateOrder(Orders updatedOrder) {
   }
 }
 
+
+  // **NEW: Hold records methods**
+  Future<List<HoldRecord>> getHoldRecords() async {
+    try {
+      // First try to fetch from API if online
+      bool isConnected = await InternetUtils.isConnected();
+      if (isConnected) {
+        await fetchHoldRecords(true, true);
+      }
+      
+      // Get from local storage
+      final holds = await SystemRepo(refresh: false, online: false).getLocalHoldRecords();
+      _holdRecords = holds;
+      notifyListeners();
+      return holds;
+    } catch (e) {
+      print('Error getting hold records: $e');
+      return [];
+    }
+  }
+
+  Future<bool> fetchHoldRecords(bool refresh, bool connectionStatus) async {
+    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    
+    try {
+      if (connectionStatus) {
+        _responseState = ResponseState.loading;
+        notifyListeners();
+        
+        Response response = await SystemRepo(refresh: refresh, online: connectionStatus).fetchHoldRecordsAPI();
+        
+        print("============= Hold Records API Response ===============");
+        print(response);
+        
+        if (response.statusCode == 200) {
+          final holdData = response.data["data"];
+          
+          // Store in local database
+          StoreX holdRecords = StoreX(
+            name: "hold_records",
+            value: jsonEncode(holdData),
+            billerId: user.id.toString(),
+            companyId: user.company!.id.toString(),
+            lastUpdated: DateTime.now().toIso8601String(),
+          );
+          
+          final store = await DatabaseEngine.instance.getStore();
+          final holdBox = store.box<StoreX>();
+          
+          final existingHolds = holdBox
+              .query(StoreX_.billerId
+                  .equals(user.id.toString())
+                  .and(StoreX_.name.equals("hold_records")))
+              .build()
+              .findFirst();
+          
+          if (existingHolds != null) {
+            holdRecords.id = existingHolds.id;
+            holdBox.put(holdRecords);
+            print('Hold records updated.');
+          } else {
+            holdBox.put(holdRecords);
+            print('New hold records inserted.');
+          }
+          
+          _responseState = ResponseState.done;
+          notifyListeners();
+          print('Successfully updated hold records.');
+          return true;
+        } else {
+          print('Request failed with status: ${response.statusCode}.');
+        }
+      }
+      
+      _responseState = ResponseState.error;
+      notifyListeners();
+      return false;
+    } catch (error) {
+      _responseState = ResponseState.error;
+      notifyListeners();
+      print(error);
+      return false;
+    }
+  }
+
+  Future<bool> createHoldRecord(Map<String, dynamic> holdData) async {
+    try {
+      bool isConnected = await InternetUtils.isConnected();
+      if (isConnected) {
+        final response = await SystemRepo(refresh: false, online: true).createHoldRecordAPI(holdData);
+        if (response['status'] == true) {
+          // Refresh local hold records
+          await fetchHoldRecords(true, true);
+          return true;
+        }
+      } else {
+        // Store locally for later sync
+        await SystemRepo(refresh: false, online: false).storeHoldRecordLocally(holdData);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error creating hold record: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteHoldRecord(int holdId) async {
+    try {
+      bool isConnected = await InternetUtils.isConnected();
+      if (isConnected) {
+        final response = await SystemRepo(refresh: false, online: true).deleteHoldRecordAPI(holdId);
+        if (response['status'] == true) {
+          // Remove from local storage
+          await SystemRepo(refresh: false, online: false).deleteLocalHoldRecord(holdId);
+          // Refresh hold records list
+          await getHoldRecords();
+          return true;
+        }
+      } else {
+        // Mark for deletion when online
+        await SystemRepo(refresh: false, online: false).markHoldRecordForDeletion(holdId);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error deleting hold record: $e');
+      return false;
+    }
+  }
 
   // Add paid invoice to storage
   Future<void> addPaidInvoice(Map<String, dynamic> transactionData) async {
@@ -1055,57 +1190,64 @@ void updateOrder(Orders updatedOrder) {
   }
 
 
-// Add this method to SystemProvider class
-
 Future<List<dynamic>> getUserWarehouses() async {
   try {
     UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
     
     // Check internet connectivity
-    bool isConnected = await InternetUtils.isConnected();
+    bool isConnected = await _checkInternetConnection();
     
     if (isConnected) {
-      // Fetch from API using the get-user-warehouses endpoint
-      var response = await SystemRepo(refresh: false, online: true).fetchUserWarehousesAPI();
-      
-      if (response.statusCode == 200) {
-        final warehouseData = response.data["data"];
+      try {
+        // Fetch from API using the get-user-warehouses endpoint
+        var response = await SystemRepo(refresh: false, online: true).fetchUserWarehousesAPI();
         
-        // Store in local database for offline access
-        StoreX warehouses = StoreX(
-          name: "user_warehouses",
-          value: jsonEncode(warehouseData),
-          billerId: user.id.toString(),
-          companyId: user.company!.id.toString(),
-          lastUpdated: DateTime.now().toIso8601String(),
-        );
-        
-        final store = await DatabaseEngine.instance.getStore();
-        final warehouseBox = store.box<StoreX>();
-        
-        final existingWarehouse = warehouseBox
-            .query(StoreX_.billerId
-                .equals(user.id.toString())
-                .and(StoreX_.name.equals("user_warehouses")))
-            .build()
-            .findFirst();
-        
-        if (existingWarehouse != null) {
-          warehouses.id = existingWarehouse.id;
-          warehouseBox.put(warehouses);
+        if (response.statusCode == 200) {
+          final warehouseData = response.data["data"] ?? [];
+          
+          // Store in local database for offline access
+          StoreX warehouses = StoreX(
+            name: "user_warehouses",
+            value: jsonEncode(warehouseData),
+            billerId: user.id.toString(),
+            companyId: user.company!.id.toString(),
+            lastUpdated: DateTime.now().toIso8601String(),
+          );
+          
+          final store = await DatabaseEngine.instance.getStore();
+          final warehouseBox = store.box<StoreX>();
+          
+          final existingWarehouse = warehouseBox
+              .query(StoreX_.billerId
+                  .equals(user.id.toString())
+                  .and(StoreX_.name.equals("user_warehouses")))
+              .build()
+              .findFirst();
+          
+          if (existingWarehouse != null) {
+            warehouses.id = existingWarehouse.id;
+            warehouseBox.put(warehouses);
+          } else {
+            warehouseBox.put(warehouses);
+          }
+          
+          print("✅ Successfully fetched user warehouses from API: ${warehouseData.length}");
+          return warehouseData;
         } else {
-          warehouseBox.put(warehouses);
+          print("⚠️ API returned status ${response.statusCode}, falling back to local data");
         }
-        
-        return warehouseData;
+      } catch (apiError) {
+        print("⚠️ API call failed: $apiError, falling back to local data");
       }
+    } else {
+      print("⚠️ No internet connection, using local data");
     }
     
     // Fallback to local data if API fails or no internet
     return await getLocalUserWarehouses();
   } catch (error) {
-    print("Error fetching user warehouses: $error");
-    // Fallback to local data
+    print("❌ Error in getUserWarehouses: $error");
+    // Final fallback to local data
     return await getLocalUserWarehouses();
   }
 }
@@ -1124,16 +1266,18 @@ Future<List<dynamic>> getLocalUserWarehouses() async {
         .findFirst();
     
     if (warehouses != null) {
-      return jsonDecode(warehouses.value) ?? [];
+      final List<dynamic> warehouseData = jsonDecode(warehouses.value) ?? [];
+      print("✅ Retrieved ${warehouseData.length} user warehouses from local storage");
+      return warehouseData;
     }
     
+    print("⚠️ No user warehouses found in local storage");
     return [];
   } catch (error) {
-    print("Error getting local user warehouses: $error");
+    print("❌ Error getting local user warehouses: $error");
     return [];
   }
 }
-
 
   
 
@@ -1526,6 +1670,7 @@ Future<bool> _checkInternetConnection() async {
   // Add this method to handle individual transaction sync
   Future<Map<String, dynamic>> syncTransaction(Orders transaction) async {
     try {
+
       // Convert single transaction to the format expected by the API
       var transactionData = _convertTransactionToSyncFormat(transaction);
       
@@ -1543,7 +1688,7 @@ Future<bool> _checkInternetConnection() async {
         
         notifyListeners();
       }
-      
+ 
       return response;
     } catch (error) {
       print('Error syncing single transaction: $error');
@@ -1599,4 +1744,41 @@ Future<bool> _checkInternetConnection() async {
   UserDetails _getCurrentUser() {
     return Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
   }
+
+// Method to get active bookings for folio payments
+Future<List<dynamic>> getActiveBookings() async {
+  try {
+    // This should call your API endpoint for active bookings
+    // For now, returning mock data structure
+    return [
+      {
+        'id': 1,
+        'booking_number': 'BK001',
+        'customer_name': 'John Doe',
+        'check_in': '2024-01-15',
+        'check_out': '2024-01-20',
+        'status': 'active',
+        'folio_balance': 5000.0,
+        'booked_rooms': [
+          {
+            'id': 1,
+            'room_id': 101,
+            'room_name': 'Room 101 - Deluxe',
+            'status': 'active',
+          },
+          {
+            'id': 2,
+            'room_id': 102,
+            'room_name': 'Room 102 - Standard',
+            'status': 'active',
+          },
+        ],
+      },
+      // Add more mock bookings as needed
+    ];
+  } catch (error) {
+    print("Error getting active bookings: $error");
+    return [];
+  }
+}
 }

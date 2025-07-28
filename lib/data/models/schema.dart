@@ -2,6 +2,54 @@ import 'package:objectbox/objectbox.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
 
 
+
+// **NEW: Hold Record Entity for local storage**
+@Entity()
+class HoldRecordEntity {
+  @Id()
+  int id = 0;
+  
+  String referenceCode;
+  String customerName;
+  String warehouseName;
+  double grandTotal;
+  String holdData; // JSON string of the complete hold data
+  String userId;
+  String companyId;
+  DateTime createdAt;
+  bool synced;
+  bool markedForDeletion;
+  
+  HoldRecordEntity({
+    required this.referenceCode,
+    required this.customerName,
+    required this.warehouseName,
+    required this.grandTotal,
+    required this.holdData,
+    required this.userId,
+    required this.companyId,
+    required this.createdAt,
+    this.synced = false,
+    this.markedForDeletion = false,
+  });
+  
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'referenceCode': referenceCode,
+      'customerName': customerName,
+      'warehouseName': warehouseName,
+      'grandTotal': grandTotal,
+      'holdData': holdData,
+      'userId': userId,
+      'companyId': companyId,
+      'createdAt': createdAt.toIso8601String(),
+      'synced': synced,
+      'markedForDeletion': markedForDeletion,
+    };
+  }
+}
+
 @Entity()
 class PaidInvoice {
   @Id()
@@ -41,7 +89,6 @@ class PaidInvoice {
     };
   }
 }
-
 
 
 @Entity()
@@ -121,6 +168,7 @@ class Orders {
     };
   }
 }
+
 
 @Entity()
 class StoreX {
@@ -954,6 +1002,128 @@ class SaleItemEntity {
   }
 }
 
+
+
+
+// @Entity()
+// class PaidInvoice {
+//   @Id()
+//   int id = 0;
+  
+//   String reference;
+//   String customerName;
+//   String? attendantName;
+//   double amount;
+//   String paidAt;
+//   String userId;
+//   String companyId;
+//   String originalInvoiceData; // Store the full transaction data as JSON
+  
+//   PaidInvoice({
+//     required this.reference,
+//     required this.customerName,
+//     this.attendantName,
+//     required this.amount,
+//     required this.paidAt,
+//     required this.userId,
+//     required this.companyId,
+//     required this.originalInvoiceData,
+//   });
+  
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'id': id,
+//       'reference': reference,
+//       'customerName': customerName,
+//       'attendantName': attendantName,
+//       'amount': amount,
+//       'paidAt': paidAt,
+//       'userId': userId,
+//       'companyId': companyId,
+//       'originalInvoiceData': originalInvoiceData,
+//     };
+//   }
+// }
+
+
+
+// @Entity()
+// class Orders {
+//   @Id()
+//   int id = 0;
+//   String customerName;
+//   String trxId;
+//   int productId;
+//   int quantity;
+//   double amount;
+//   String? paymentStatus;
+//   double? receivedAmount;
+//   double? partialAmount;
+//   DateTime createdAt;
+//   String searchDate;
+//   int billerId;
+//   String paymentMethod;
+//   String items;
+//   String others;
+//   String companyId;
+//   String register;
+//   int status;
+//   String? tableId;
+//   int sync;
+//   String? attendantId; // New field for attendant tracking
+//   String? invoiceReference; // New field for unique invoice reference
+
+//   Orders({
+//     required this.customerName,
+//     required this.trxId,
+//     required this.productId,
+//     required this.quantity,
+//     required this.amount,
+//     this.paymentStatus,
+//     this.receivedAmount,
+//     this.partialAmount,
+//     required this.createdAt,
+//     required this.searchDate,
+//     required this.billerId,
+//     required this.paymentMethod,
+//     required this.items,
+//     required this.others,
+//     required this.companyId,
+//     required this.register,
+//     this.status = 0,
+//     this.tableId,
+//     this.sync = 0,
+//     this.attendantId, // New parameter
+//     this.invoiceReference, // New parameter
+//   });
+
+//   Map<String, dynamic> toMap() {
+//     return {
+//       'id': id,
+//       'customerName': customerName,
+//       'trxId': trxId,
+//       'productId': productId,
+//       'quantity': quantity,
+//       'amount': amount,
+//       'paymentStatus': paymentStatus,
+//       'receivedAmount': receivedAmount,
+//       'partialAmount': partialAmount,
+//       'createdAt': createdAt.toIso8601String(),
+//       'searchDate': searchDate,
+//       'billerId': billerId,
+//       'paymentMethod': paymentMethod,
+//       'items': items,
+//       'others': others,
+//       'companyId': companyId,
+//       'register': register,
+//       'status': status,
+//       'tableId': tableId,
+//       'sync': sync,
+//       'attendantId': attendantId,
+//       'invoiceReference': invoiceReference,
+//     };
+//   }
+// }
 
 
 // @Entity()

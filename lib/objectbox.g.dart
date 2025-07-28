@@ -1002,7 +1002,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(13, 7976920998866683740),
       name: 'SelectAttendantModel',
-      lastPropertyId: const obx_int.IdUid(10, 1528062522666117053),
+      lastPropertyId: const obx_int.IdUid(11, 5348392202030750744),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -1101,6 +1101,70 @@ final _entities = <obx_int.ModelEntity>[
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(15, 6294346405747128870),
+      name: 'HoldRecordEntity',
+      lastPropertyId: const obx_int.IdUid(11, 6492428427894646879),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 6643862514712763495),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 6996224336029151679),
+            name: 'referenceCode',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 5180942125219520419),
+            name: 'customerName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 3244653622381927495),
+            name: 'warehouseName',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 4237249814098539767),
+            name: 'grandTotal',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 5348133144301932),
+            name: 'holdData',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 8407004676419596347),
+            name: 'userId',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 7112924665614249475),
+            name: 'companyId',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 7393255759349913269),
+            name: 'createdAt',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 8004413341742834058),
+            name: 'synced',
+            type: 1,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 6492428427894646879),
+            name: 'markedForDeletion',
+            type: 1,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -1139,7 +1203,7 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(14, 5862019967752024413),
+      lastEntityId: const obx_int.IdUid(15, 6294346405747128870),
       lastIndexId: const obx_int.IdUid(0, 0),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
@@ -1176,7 +1240,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         4633140566523539235,
         5945536197580053257,
         4003876650830016463,
-        1528062522666117053
+        1528062522666117053,
+        5348392202030750744
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -2294,7 +2359,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final emailOffset = fbb.writeString(object.email);
           final phoneOffset = fbb.writeString(object.phone);
           final departmentOffset = fbb.writeString(object.department);
-          fbb.startTable(11);
+          fbb.startTable(12);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.apiId);
           fbb.addOffset(2, firstNameOffset);
@@ -2398,6 +2463,77 @@ obx_int.ModelDefinition getObjectBoxModel() {
               userId: userIdParam,
               companyId: companyIdParam,
               originalInvoiceData: originalInvoiceDataParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+
+          return object;
+        }),
+    HoldRecordEntity: obx_int.EntityDefinition<HoldRecordEntity>(
+        model: _entities[13],
+        toOneRelations: (HoldRecordEntity object) => [],
+        toManyRelations: (HoldRecordEntity object) => {},
+        getId: (HoldRecordEntity object) => object.id,
+        setId: (HoldRecordEntity object, int id) {
+          object.id = id;
+        },
+        objectToFB: (HoldRecordEntity object, fb.Builder fbb) {
+          final referenceCodeOffset = fbb.writeString(object.referenceCode);
+          final customerNameOffset = fbb.writeString(object.customerName);
+          final warehouseNameOffset = fbb.writeString(object.warehouseName);
+          final holdDataOffset = fbb.writeString(object.holdData);
+          final userIdOffset = fbb.writeString(object.userId);
+          final companyIdOffset = fbb.writeString(object.companyId);
+          fbb.startTable(12);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, referenceCodeOffset);
+          fbb.addOffset(2, customerNameOffset);
+          fbb.addOffset(3, warehouseNameOffset);
+          fbb.addFloat64(4, object.grandTotal);
+          fbb.addOffset(5, holdDataOffset);
+          fbb.addOffset(6, userIdOffset);
+          fbb.addOffset(7, companyIdOffset);
+          fbb.addInt64(8, object.createdAt.millisecondsSinceEpoch);
+          fbb.addBool(9, object.synced);
+          fbb.addBool(10, object.markedForDeletion);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final referenceCodeParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 6, '');
+          final customerNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 8, '');
+          final warehouseNameParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGet(buffer, rootOffset, 10, '');
+          final grandTotalParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 12, 0);
+          final holdDataParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 14, '');
+          final userIdParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 16, '');
+          final companyIdParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 18, '');
+          final createdAtParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 20, 0));
+          final syncedParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 22, false);
+          final markedForDeletionParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 24, false);
+          final object = HoldRecordEntity(
+              referenceCode: referenceCodeParam,
+              customerName: customerNameParam,
+              warehouseName: warehouseNameParam,
+              grandTotal: grandTotalParam,
+              holdData: holdDataParam,
+              userId: userIdParam,
+              companyId: companyIdParam,
+              createdAt: createdAtParam,
+              synced: syncedParam,
+              markedForDeletion: markedForDeletionParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
 
           return object;
@@ -3215,4 +3351,51 @@ class PaidInvoice_ {
   /// See [PaidInvoice.originalInvoiceData].
   static final originalInvoiceData =
       obx.QueryStringProperty<PaidInvoice>(_entities[12].properties[8]);
+}
+
+/// [HoldRecordEntity] entity fields to define ObjectBox queries.
+class HoldRecordEntity_ {
+  /// See [HoldRecordEntity.id].
+  static final id =
+      obx.QueryIntegerProperty<HoldRecordEntity>(_entities[13].properties[0]);
+
+  /// See [HoldRecordEntity.referenceCode].
+  static final referenceCode =
+      obx.QueryStringProperty<HoldRecordEntity>(_entities[13].properties[1]);
+
+  /// See [HoldRecordEntity.customerName].
+  static final customerName =
+      obx.QueryStringProperty<HoldRecordEntity>(_entities[13].properties[2]);
+
+  /// See [HoldRecordEntity.warehouseName].
+  static final warehouseName =
+      obx.QueryStringProperty<HoldRecordEntity>(_entities[13].properties[3]);
+
+  /// See [HoldRecordEntity.grandTotal].
+  static final grandTotal =
+      obx.QueryDoubleProperty<HoldRecordEntity>(_entities[13].properties[4]);
+
+  /// See [HoldRecordEntity.holdData].
+  static final holdData =
+      obx.QueryStringProperty<HoldRecordEntity>(_entities[13].properties[5]);
+
+  /// See [HoldRecordEntity.userId].
+  static final userId =
+      obx.QueryStringProperty<HoldRecordEntity>(_entities[13].properties[6]);
+
+  /// See [HoldRecordEntity.companyId].
+  static final companyId =
+      obx.QueryStringProperty<HoldRecordEntity>(_entities[13].properties[7]);
+
+  /// See [HoldRecordEntity.createdAt].
+  static final createdAt =
+      obx.QueryDateProperty<HoldRecordEntity>(_entities[13].properties[8]);
+
+  /// See [HoldRecordEntity.synced].
+  static final synced =
+      obx.QueryBooleanProperty<HoldRecordEntity>(_entities[13].properties[9]);
+
+  /// See [HoldRecordEntity.markedForDeletion].
+  static final markedForDeletion =
+      obx.QueryBooleanProperty<HoldRecordEntity>(_entities[13].properties[10]);
 }

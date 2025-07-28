@@ -984,7 +984,7 @@
     },
     {
       "id": "13:7976920998866683740",
-      "lastPropertyId": "10:1528062522666117053",
+      "lastPropertyId": "11:5348392202030750744",
       "name": "SelectAttendantModel",
       "properties": [
         {
@@ -1084,9 +1084,73 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "15:6294346405747128870",
+      "lastPropertyId": "11:6492428427894646879",
+      "name": "HoldRecordEntity",
+      "properties": [
+        {
+          "id": "1:6643862514712763495",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6996224336029151679",
+          "name": "referenceCode",
+          "type": 9
+        },
+        {
+          "id": "3:5180942125219520419",
+          "name": "customerName",
+          "type": 9
+        },
+        {
+          "id": "4:3244653622381927495",
+          "name": "warehouseName",
+          "type": 9
+        },
+        {
+          "id": "5:4237249814098539767",
+          "name": "grandTotal",
+          "type": 8
+        },
+        {
+          "id": "6:5348133144301932",
+          "name": "holdData",
+          "type": 9
+        },
+        {
+          "id": "7:8407004676419596347",
+          "name": "userId",
+          "type": 9
+        },
+        {
+          "id": "8:7112924665614249475",
+          "name": "companyId",
+          "type": 9
+        },
+        {
+          "id": "9:7393255759349913269",
+          "name": "createdAt",
+          "type": 10
+        },
+        {
+          "id": "10:8004413341742834058",
+          "name": "synced",
+          "type": 1
+        },
+        {
+          "id": "11:6492428427894646879",
+          "name": "markedForDeletion",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "14:5862019967752024413",
+  "lastEntityId": "15:6294346405747128870",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
@@ -1127,7 +1191,8 @@
     4633140566523539235,
     5945536197580053257,
     4003876650830016463,
-    1528062522666117053
+    1528062522666117053,
+    5348392202030750744
   ],
   "retiredRelationUids": [],
   "version": 1

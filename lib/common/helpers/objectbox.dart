@@ -1,10 +1,9 @@
 import 'package:spotstock_inventory/data/models/schema.dart' hide SelectAttendantModel;
 import 'package:spotstock_inventory/objectbox.g.dart';
-import 'package:spotstock_inventory/screens/desktop/model/select_attendant_model.dart' ;
+import 'package:spotstock_inventory/screens/desktop/model/select_attendant_model.dart';
 
 class ObjectBox {
   late final Store store;
-
   late final Box<Orders> orderBox;
   late final Box<StoreX> storeXBox;
   late final Box<TableList> tableListBox;
@@ -12,6 +11,7 @@ class ObjectBox {
   late final Box<Invoice> invoiceBox;
   late final Box<BookingX> bookingBox;
   late final Box<SelectAttendantModel> attendantBox; // Added attendantBox
+  late final Box<HoldRecordEntity> holdRecordBox; // **NEW: Added holdRecordBox**
 
   ObjectBox._create(this.store) {
     orderBox = store.box<Orders>();
@@ -21,6 +21,7 @@ class ObjectBox {
     invoiceBox = store.box<Invoice>();
     bookingBox = store.box<BookingX>();
     attendantBox = store.box<SelectAttendantModel>(); // Initialize attendantBox
+    holdRecordBox = store.box<HoldRecordEntity>(); // **NEW: Initialize holdRecordBox**
   }
 
   static Future<ObjectBox> create() async {
@@ -35,8 +36,10 @@ class ObjectBox {
 
 
 
-// import 'package:spotstock_inventory/data/models/schema.dart';
+
+// import 'package:spotstock_inventory/data/models/schema.dart' hide SelectAttendantModel;
 // import 'package:spotstock_inventory/objectbox.g.dart';
+// import 'package:spotstock_inventory/screens/desktop/model/select_attendant_model.dart' ;
 
 // class ObjectBox {
 //   late final Store store;
@@ -47,6 +50,7 @@ class ObjectBox {
 //   late final Box<Register> registerBox;
 //   late final Box<Invoice> invoiceBox;
 //   late final Box<BookingX> bookingBox;
+//   late final Box<SelectAttendantModel> attendantBox; // Added attendantBox
 
 //   ObjectBox._create(this.store) {
 //     orderBox = store.box<Orders>();
@@ -55,6 +59,7 @@ class ObjectBox {
 //     registerBox = store.box<Register>();
 //     invoiceBox = store.box<Invoice>();
 //     bookingBox = store.box<BookingX>();
+//     attendantBox = store.box<SelectAttendantModel>(); // Initialize attendantBox
 //   }
 
 //   static Future<ObjectBox> create() async {

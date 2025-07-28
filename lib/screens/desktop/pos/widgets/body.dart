@@ -5,14 +5,17 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/provider/cart_provider.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/user_details.dart';
+// import 'package:spotstock_inventory/data/models/hold_models.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/paid_invoice_list.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/screens/desktop_pos_hold_sales_record.dart';
 import 'package:spotstock_inventory/widgets/dialogs.dart';
 import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import '../../../../data/models/hold_model.dart';
 import '../screens/table_view.dart';
 import 'header.dart';
 import 'invoices.dart';
@@ -167,15 +170,23 @@ class _BodyState extends State<Body> {
 
   Future<void> _fetchWarehouses() async {
     try {
-      List<dynamic> fetchedWarehouses;
+      List<dynamic> fetchedWarehouses = [];
       
-      // **FIXED: Use different endpoints based on user role**
+      // **FIXED: Use the correct method calls and handle the response properly**
       if (widget.user.isStoreStaff || widget.user.isHotelStaff) {
-        // For staff, use the get-user-warehouses endpoint
-        fetchedWarehouses = await widget.systemProvider.getUserWarehouses();
+        // For staff, try to get user-specific warehouses first
+        try {
+          fetchedWarehouses = await widget.systemProvider.getUserWarehouses();
+          log("Fetched user-specific warehouses for staff: ${fetchedWarehouses.length}");
+        } catch (e) {
+          log("Error fetching user warehouses, falling back to general warehouses: $e");
+          // Fallback to general warehouses if user-specific fails
+          fetchedWarehouses = await widget.systemProvider.getWarehouse();
+        }
       } else {
-        // For admins and super admins, use the warehouses endpoint
+        // For admins and super admins, use the general warehouses endpoint
         fetchedWarehouses = await widget.systemProvider.getWarehouse();
+        log("Fetched general warehouses for admin: ${fetchedWarehouses.length}");
       }
 
       setState(() {
@@ -184,8 +195,12 @@ class _BodyState extends State<Body> {
       });
     } catch (e) {
       log("Error fetching warehouses: $e");
+      // Fallback to existing warehouse data if available
+      setState(() {
+        _filterUserAccessibleWarehouses();
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching warehouses')),
+        SnackBar(content: Text('Error fetching warehouses: ${e.toString()}')),
       );
     }
   }
@@ -194,15 +209,20 @@ class _BodyState extends State<Body> {
     if (widget.user.isSuperAdmin) {
       // Super admin can access all warehouses
       userAccessibleWarehouses = List.from(warehouseData);
+      log("Super admin - accessible warehouses: ${userAccessibleWarehouses.length}");
     } else if (widget.user.isAdmin == 1) {
       // Admin can access all warehouses in their company
       userAccessibleWarehouses = List.from(warehouseData);
+      log("Admin - accessible warehouses: ${userAccessibleWarehouses.length}");
     } else {
       // **FIXED: Staff members can only access warehouses they're assigned to**
       if (userWarehouseIds.isNotEmpty) {
         userAccessibleWarehouses = warehouseData.where((warehouse) {
-          return userWarehouseIds.contains(warehouse['id']);
+          // Handle both API response formats
+          int warehouseId = warehouse['id'] ?? warehouse['attributes']?['id'] ?? 0;
+          return userWarehouseIds.contains(warehouseId);
         }).toList();
+        log("Staff with assigned warehouses - accessible: ${userAccessibleWarehouses.length}");
       } else {
         // **FIXED: If no warehouses assigned, return empty list instead of all warehouses**
         userAccessibleWarehouses = [];
@@ -210,7 +230,11 @@ class _BodyState extends State<Body> {
       }
     }
     
-    log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']?['name'] ?? w['name']).toList()}");
+    // Log the accessible warehouse names for debugging
+    final warehouseNames = userAccessibleWarehouses.map((w) {
+      return w['attributes']?['name'] ?? w['name'] ?? 'Unknown';
+    }).toList();
+    log("User accessible warehouses: $warehouseNames");
   }
 
   bool _canAccessWarehouse(int warehouseId) {
@@ -276,6 +300,45 @@ class _BodyState extends State<Body> {
     }
   }
 
+  // **NEW: Handle hold record retrieval**
+  void _handleHoldRecordRetrieved(HoldRecord? holdRecord) {
+    if (holdRecord != null) {
+      // Process the retrieved hold record
+      // Convert hold items to cart items and populate the POS
+      final cartProvider = Provider.of<CartProvider>(context, listen: false);
+      
+      // Clear current cart
+      cartProvider.removeAll(); // **FIXED: Use removeAll() instead of clearCart()
+      
+      // Add hold items to cart
+      for (final holdItem in holdRecord.holdItems) {
+        // Find the product in the current products list
+        final product = _products.firstWhere(
+          (p) => p['attributes']['stock']['product_id'] == holdItem.productId,
+          orElse: () => null,
+        );
+        
+        if (product != null) {
+          cartProvider.add(
+            product['attributes'],
+            holdItem.productId,
+            generateRandomStringForInvoice(12),
+            holdItem.productPrice.toInt(), // **FIXED: Convert double to int
+            holdItem.quantity,
+            product['attributes']['product_code'],
+          );
+        }
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Hold record "${holdRecord.referenceCode}" loaded successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -333,7 +396,11 @@ class _BodyState extends State<Body> {
                           selectedBranch: selectedBranch,
                           onBranchSelected: (value) async {
                             if (value == null) return;
-                            if (!_canAccessWarehouse(value['id'])) {
+                            
+                            // Handle both API response formats for warehouse ID
+                            int warehouseId = value['id'] ?? value['attributes']?['id'] ?? 0;
+                            
+                            if (!_canAccessWarehouse(warehouseId)) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                     content: Text(
@@ -341,24 +408,28 @@ class _BodyState extends State<Body> {
                               );
                               return;
                             }
+
                             setState(() {
                               loadingProduct = true;
                               selectedBranch = value;
-                              currentWarehouseId = value['id'];
+                              currentWarehouseId = warehouseId;
                             });
+
                             try {
                               await widget.systemProvider.fetchProducts(
-                                  true, true, value['id']);
+                                  true, true, warehouseId);
                               final data =
                                   await widget.systemProvider.getProducts(1);
+
                               final warehouseFilteredProducts = data.where(
                                   (product) {
                                 final productWarehouseId = product['attributes']
                                     ['stock']['warehouse_id'];
-                                return productWarehouseId == value['id'] &&
+                                return productWarehouseId == warehouseId &&
                                     product['attributes']['stock']['quantity'] >
                                         0;
                               }).toList();
+
                               setState(() {
                                 _products = warehouseFilteredProducts;
                                 _dataProducts = _products;
@@ -366,6 +437,7 @@ class _BodyState extends State<Body> {
                                 selectedCategory = '';
                                 selectedAlphabetLetter = '';
                               });
+
                               _filterByCategories();
                             } catch (e) {
                               setState(() {
@@ -378,11 +450,7 @@ class _BodyState extends State<Body> {
                               );
                             }
                           },
-                          hint: selectedBranch?['attributes']?['name'] ?? 
-                                selectedBranch?['name'] ??
-                                (userAccessibleWarehouses.isNotEmpty
-                                    ? userAccessibleWarehouses[0]['attributes']?['name']
-                                    : "No Warehouse Available": "No Valid Warehouse, ")
+                          hint: _getWarehouseDisplayName(),
                         ),
                       ),
                       ValueListenableBuilder<String>(
@@ -397,6 +465,16 @@ class _BodyState extends State<Body> {
                                   _isInvoiceOpen = false;
                                 });
                               },
+                            );
+                          }
+                          
+                          // **NEW: Handle Hold List Record navigation**
+                          if (activeItem == "Hold List Record") {
+                            return DesktopPosHoldSalesRecord(
+                              user: widget.user,
+                              systemProvider: widget.systemProvider,
+                              mediaQuery: widget.mediaQuery,
+                              activeItem: _activeItem,
                             );
                           }
                           
@@ -792,6 +870,24 @@ class _BodyState extends State<Body> {
     );
   }
 
+  // **ADDED: Helper method to get warehouse display name**
+  String _getWarehouseDisplayName() {
+    if (selectedBranch != null) {
+      return selectedBranch!['attributes']?['name'] ??
+              selectedBranch!['name'] ??
+              'Selected Warehouse';
+    }
+        
+    if (userAccessibleWarehouses.isNotEmpty) {
+      final firstWarehouse = userAccessibleWarehouses[0];
+      return firstWarehouse['attributes']?['name'] ??
+              firstWarehouse['name'] ??
+              'Select Warehouse';
+    }
+        
+    return "No Warehouse Available";
+  }
+
   void _searchProducts(String? value) {
     print("Onchanged called");
     setState(() {
@@ -799,6 +895,7 @@ class _BodyState extends State<Body> {
       selectedAlphabetLetter = '';
       selectedTable = null;
     });
+
     if (_barcodeController.text.isEmpty) {
       setState(() {
         _productSearchResult = _products;
@@ -831,6 +928,7 @@ class _BodyState extends State<Body> {
     setState(() {
       selectedTable = null;
     });
+
     if (selectedCategory == '') {
       setState(() {
         _categoryResult = _products;
@@ -854,6 +952,7 @@ class _BodyState extends State<Body> {
     setState(() {
       selectedTable = null;
     });
+
     setState(() {
       _foundProducts = _products.where((product) {
         return product['attributes']['name']
@@ -888,7 +987,6 @@ String generateRandomStringForInvoice(int length) {
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/paid_invoice_list.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/product_detail.dart';
 // import 'package:spotstock_inventory/screens/desktop/pos/widgets/summary.dart';
-// // import 'package:spotstock_inventory/screens/desktop/pos/widgets/paid_invoices_summary.dart';
 // import 'package:spotstock_inventory/widgets/dialogs.dart';
 // import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 // import 'package:flutter/material.dart';
@@ -918,8 +1016,8 @@ String generateRandomStringForInvoice(int length) {
 // class _BodyState extends State<Body> {
 //   late TextEditingController _barcodeController;
 //   final AudioPlayer _audioPlayer = AudioPlayer();
-//   final ValueNotifier<String> _activeItem =
-//       ValueNotifier<String>("Dashboard");
+//   final ValueNotifier<String> _activeItem = ValueNotifier<String>("Dashboard");
+  
 //   List _products = [];
 //   List<dynamic> warehouseData = [];
 //   List<dynamic> userAccessibleWarehouses = [];
@@ -939,7 +1037,7 @@ String generateRandomStringForInvoice(int length) {
 //   bool isLoadingWarehouses = false;
 //   Map<String, dynamic>? selectedBranch;
 //   Map? selectedTable;
-
+  
 //   // Store current warehouse ID for proper filtering
 //   int? currentWarehouseId;
 //   List<int> userWarehouseIds = [];
@@ -969,10 +1067,8 @@ String generateRandomStringForInvoice(int length) {
 //   void _parseUserWarehouseIds() {
 //     try {
 //       String? warehouseIdString = widget.user.warehouseId;
-
 //       if (warehouseIdString != null && warehouseIdString.isNotEmpty) {
-//         String cleanString =
-//             warehouseIdString.replaceAll('[', '').replaceAll(']', '');
+//         String cleanString = warehouseIdString.replaceAll('[', '').replaceAll(']', '');
 //         if (cleanString.isNotEmpty) {
 //           userWarehouseIds = cleanString
 //               .split(',')
@@ -981,26 +1077,12 @@ String generateRandomStringForInvoice(int length) {
 //               .toList();
 //         }
 //       }
-
 //       log("Parsed user warehouse IDs: $userWarehouseIds");
 //     } catch (e) {
 //       log("Error parsing user warehouse IDs: $e");
 //       userWarehouseIds = [];
 //     }
 //   }
-
-//   // String? _getUserWarehouseIdString() {
-//   //   switch (widget.user.email) {
-//   //     case 'fountainloungetablets@gmail.com':
-//   //       return '[64,88]';
-//   //     case 'fountainloungetablet@gmail.com':
-//   //       return '[65,91]';
-//   //     case 'fountain5@gmail.com':
-//   //       return '[64,65]';
-//   //     default:
-//   //       return null;
-//   //   }
-//   // }
 
 //   Future<void> playSound() async {
 //     await _audioPlayer.play(AssetSource('images/Heater-4_1.mp3'));
@@ -1010,48 +1092,47 @@ String generateRandomStringForInvoice(int length) {
 //     setState(() {
 //       loadingProduct = true;
 //     });
-
 //     try {
 //       await _fetchWarehouses(); // Fetch warehouses based on user role
-
-//       if (userAccessibleWarehouses.isNotEmpty) {
-//         int warehouseId;
-
-//         if (widget.user.isSuperAdmin) {
-//           warehouseId =
-//               selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
-//         } else {
-//           warehouseId =
-//               selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
-//         }
-
-//         currentWarehouseId = warehouseId;
-//         await widget.systemProvider
-//             .fetchProducts(true, true, warehouseId); // Pass warehouseId
-//         final data = await widget.systemProvider.getProducts(1);
-
-//         final warehouseFilteredProducts = data.where((product) {
-//           final productWarehouseId = product['attributes']['stock']['warehouse_id'];
-//           return productWarehouseId == warehouseId &&
-//               product['attributes']['stock']['quantity'] > 0;
-//         }).toList();
-
+      
+//       // **FIXED: Check if user has accessible warehouses before proceeding**
+//       if (userAccessibleWarehouses.isEmpty) {
 //         setState(() {
-//           _products = warehouseFilteredProducts;
-//           _dataProducts = _products;
-//           loadingProduct = false;
-//         });
-
-//         log("Filtered products for warehouse $warehouseId: ${_products.length}");
-//         _filterByCategories();
-//       } else {
-//         setState(() {
+//           _products = [];
+//           _dataProducts = [];
 //           loadingProduct = false;
 //         });
 //         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text('No warehouses available')),
+//           SnackBar(content: Text('No warehouses assigned to this user')),
 //         );
+//         return;
 //       }
+
+//       int warehouseId;
+//       if (widget.user.isSuperAdmin) {
+//         warehouseId = selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
+//       } else {
+//         warehouseId = selectedBranch?['id'] ?? userAccessibleWarehouses[0]['id'];
+//       }
+      
+//       currentWarehouseId = warehouseId;
+//       await widget.systemProvider.fetchProducts(true, true, warehouseId);
+//       final data = await widget.systemProvider.getProducts(1);
+      
+//       final warehouseFilteredProducts = data.where((product) {
+//         final productWarehouseId = product['attributes']['stock']['warehouse_id'];
+//         return productWarehouseId == warehouseId &&
+//             product['attributes']['stock']['quantity'] > 0;
+//       }).toList();
+
+//       setState(() {
+//         _products = warehouseFilteredProducts;
+//         _dataProducts = _products;
+//         loadingProduct = false;
+//       });
+      
+//       log("Filtered products for warehouse $warehouseId: ${_products.length}");
+//       _filterByCategories();
 //     } catch (e) {
 //       setState(() {
 //         loadingProduct = false;
@@ -1065,15 +1146,23 @@ String generateRandomStringForInvoice(int length) {
 
 //   Future<void> _fetchWarehouses() async {
 //     try {
-//       List<dynamic> fetchedWarehouses;
+//       List<dynamic> fetchedWarehouses = [];
+      
+//       // **FIXED: Use the correct method calls and handle the response properly**
 //       if (widget.user.isStoreStaff || widget.user.isHotelStaff) {
-//         // For staff, use the get-user-warehouses endpoint
-//         fetchedWarehouses =
-//             await widget.systemProvider.getWarehouse();
+//         // For staff, try to get user-specific warehouses first
+//         try {
+//           fetchedWarehouses = await widget.systemProvider.getUserWarehouses();
+//           log("Fetched user-specific warehouses for staff: ${fetchedWarehouses.length}");
+//         } catch (e) {
+//           log("Error fetching user warehouses, falling back to general warehouses: $e");
+//           // Fallback to general warehouses if user-specific fails
+//           fetchedWarehouses = await widget.systemProvider.getWarehouse();
+//         }
 //       } else {
-//         // For admins and super admins, use the warehouses endpoint
-//         fetchedWarehouses =
-//             await widget.systemProvider.getWarehouse();
+//         // For admins and super admins, use the general warehouses endpoint
+//         fetchedWarehouses = await widget.systemProvider.getWarehouse();
+//         log("Fetched general warehouses for admin: ${fetchedWarehouses.length}");
 //       }
 
 //       setState(() {
@@ -1082,35 +1171,57 @@ String generateRandomStringForInvoice(int length) {
 //       });
 //     } catch (e) {
 //       log("Error fetching warehouses: $e");
+//       // Fallback to existing warehouse data if available
+//       setState(() {
+//         _filterUserAccessibleWarehouses();
+//       });
 //       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Error fetching warehouses')),
+//         SnackBar(content: Text('Error fetching warehouses: ${e.toString()}')),
 //       );
 //     }
 //   }
 
 //   void _filterUserAccessibleWarehouses() {
 //     if (widget.user.isSuperAdmin) {
+//       // Super admin can access all warehouses
 //       userAccessibleWarehouses = List.from(warehouseData);
+//       log("Super admin - accessible warehouses: ${userAccessibleWarehouses.length}");
 //     } else if (widget.user.isAdmin == 1) {
+//       // Admin can access all warehouses in their company
 //       userAccessibleWarehouses = List.from(warehouseData);
-//     }
-//     else if (userWarehouseIds.isNotEmpty) {
-//       userAccessibleWarehouses = warehouseData.where((warehouse) {
-//         return userWarehouseIds.contains(warehouse['id']);
-//       }).toList();
+//       log("Admin - accessible warehouses: ${userAccessibleWarehouses.length}");
 //     } else {
-//       userAccessibleWarehouses = List.from(warehouseData);
+//       // **FIXED: Staff members can only access warehouses they're assigned to**
+//       if (userWarehouseIds.isNotEmpty) {
+//         userAccessibleWarehouses = warehouseData.where((warehouse) {
+//           // Handle both API response formats
+//           int warehouseId = warehouse['id'] ?? warehouse['attributes']?['id'] ?? 0;
+//           return userWarehouseIds.contains(warehouseId);
+//         }).toList();
+//         log("Staff with assigned warehouses - accessible: ${userAccessibleWarehouses.length}");
+//       } else {
+//         // **FIXED: If no warehouses assigned, return empty list instead of all warehouses**
+//         userAccessibleWarehouses = [];
+//         log("Staff user has no warehouses assigned");
+//       }
 //     }
-
-//     log("User accessible warehouses: ${userAccessibleWarehouses.map((w) => w['attributes']['name']).toList()}");
+    
+//     // Log the accessible warehouse names for debugging
+//     final warehouseNames = userAccessibleWarehouses.map((w) {
+//       return w['attributes']?['name'] ?? w['name'] ?? 'Unknown';
+//     }).toList();
+//     log("User accessible warehouses: $warehouseNames");
 //   }
 
 //   bool _canAccessWarehouse(int warehouseId) {
 //     if (widget.user.isSuperAdmin) {
 //       return true;
 //     }
-
-//     return userWarehouseIds.isEmpty || userWarehouseIds.contains(warehouseId);
+//     if (widget.user.isAdmin == 1) {
+//       return true;
+//     }
+//     // **FIXED: Staff can only access warehouses they're assigned to**
+//     return userWarehouseIds.isNotEmpty && userWarehouseIds.contains(warehouseId);
 //   }
 
 //   Future<List<dynamic>> getProducts() async {
@@ -1222,8 +1333,11 @@ String generateRandomStringForInvoice(int length) {
 //                           selectedBranch: selectedBranch,
 //                           onBranchSelected: (value) async {
 //                             if (value == null) return;
-
-//                             if (!_canAccessWarehouse(value['id'])) {
+                            
+//                             // Handle both API response formats for warehouse ID
+//                             int warehouseId = value['id'] ?? value['attributes']?['id'] ?? 0;
+                            
+//                             if (!_canAccessWarehouse(warehouseId)) {
 //                               ScaffoldMessenger.of(context).showSnackBar(
 //                                 SnackBar(
 //                                     content: Text(
@@ -1231,28 +1345,24 @@ String generateRandomStringForInvoice(int length) {
 //                               );
 //                               return;
 //                             }
-
 //                             setState(() {
 //                               loadingProduct = true;
 //                               selectedBranch = value;
-//                               currentWarehouseId = value['id'];
+//                               currentWarehouseId = warehouseId;
 //                             });
-
 //                             try {
 //                               await widget.systemProvider.fetchProducts(
-//                                   true, true, value['id']);
+//                                   true, true, warehouseId);
 //                               final data =
 //                                   await widget.systemProvider.getProducts(1);
-
 //                               final warehouseFilteredProducts = data.where(
 //                                   (product) {
 //                                 final productWarehouseId = product['attributes']
 //                                     ['stock']['warehouse_id'];
-//                                 return productWarehouseId == value['id'] &&
+//                                 return productWarehouseId == warehouseId &&
 //                                     product['attributes']['stock']['quantity'] >
 //                                         0;
 //                               }).toList();
-
 //                               setState(() {
 //                                 _products = warehouseFilteredProducts;
 //                                 _dataProducts = _products;
@@ -1260,7 +1370,6 @@ String generateRandomStringForInvoice(int length) {
 //                                 selectedCategory = '';
 //                                 selectedAlphabetLetter = '';
 //                               });
-
 //                               _filterByCategories();
 //                             } catch (e) {
 //                               setState(() {
@@ -1273,11 +1382,7 @@ String generateRandomStringForInvoice(int length) {
 //                               );
 //                             }
 //                           },
-//                           hint: selectedBranch?['attributes']['name'] ??
-//                               (userAccessibleWarehouses.isNotEmpty
-//                                   ? userAccessibleWarehouses[0]['attributes']
-//                                       ['name']
-//                                   : "Select Warehouse"),
+//                           hint: _getWarehouseDisplayName(),
 //                         ),
 //                       ),
 //                       ValueListenableBuilder<String>(
@@ -1294,6 +1399,44 @@ String generateRandomStringForInvoice(int length) {
 //                               },
 //                             );
 //                           }
+                          
+//                           // **FIXED: Show message when no warehouses are available**
+//                           if (userAccessibleWarehouses.isEmpty) {
+//                             return Center(
+//                               child: Padding(
+//                                 padding: const EdgeInsets.all(20.0),
+//                                 child: Column(
+//                                   mainAxisAlignment: MainAxisAlignment.center,
+//                                   children: [
+//                                     Icon(
+//                                       Icons.warehouse_outlined,
+//                                       size: 64,
+//                                       color: Colors.grey,
+//                                     ),
+//                                     SizedBox(height: 16),
+//                                     Text(
+//                                       'No Warehouses Assigned',
+//                                       style: TextStyle(
+//                                         fontSize: 18,
+//                                         fontWeight: FontWeight.bold,
+//                                         color: Colors.grey[700],
+//                                       ),
+//                                     ),
+//                                     SizedBox(height: 8),
+//                                     Text(
+//                                       'Please contact your administrator to assign warehouses to your account.',
+//                                       textAlign: TextAlign.center,
+//                                       style: TextStyle(
+//                                         fontSize: 14,
+//                                         color: Colors.grey[600],
+//                                       ),
+//                                     ),
+//                                   ],
+//                                 ),
+//                               ),
+//                             );
+//                           }
+                          
 //                           return Column(
 //                             children: [
 //                               // Alphabet Filter Row
@@ -1350,7 +1493,6 @@ String generateRandomStringForInvoice(int length) {
 //                                                 String.fromCharCode(65 + index);
 //                                             bool isSelected =
 //                                                 selectedAlphabetLetter == letter;
-
 //                                             return GestureDetector(
 //                                               onTap: () {
 //                                                 setState(() {
@@ -1409,7 +1551,6 @@ String generateRandomStringForInvoice(int length) {
 //                                   ],
 //                                 ),
 //                               ),
-
 //                               // Category Filter Row
 //                               Row(
 //                                 children: [
@@ -1651,6 +1792,24 @@ String generateRandomStringForInvoice(int length) {
 //     );
 //   }
 
+//   // **ADDED: Helper method to get warehouse display name**
+//   String _getWarehouseDisplayName() {
+//     if (selectedBranch != null) {
+//       return selectedBranch!['attributes']?['name'] ?? 
+//              selectedBranch!['name'] ?? 
+//              'Selected Warehouse';
+//     }
+    
+//     if (userAccessibleWarehouses.isNotEmpty) {
+//       final firstWarehouse = userAccessibleWarehouses[0];
+//       return firstWarehouse['attributes']?['name'] ?? 
+//              firstWarehouse['name'] ?? 
+//              'Select Warehouse';
+//     }
+    
+//     return "No Warehouse Available";
+//   }
+
 //   void _searchProducts(String? value) {
 //     print("Onchanged called");
 //     setState(() {
@@ -1658,7 +1817,6 @@ String generateRandomStringForInvoice(int length) {
 //       selectedAlphabetLetter = '';
 //       selectedTable = null;
 //     });
-
 //     if (_barcodeController.text.isEmpty) {
 //       setState(() {
 //         _productSearchResult = _products;
@@ -1691,7 +1849,6 @@ String generateRandomStringForInvoice(int length) {
 //     setState(() {
 //       selectedTable = null;
 //     });
-
 //     if (selectedCategory == '') {
 //       setState(() {
 //         _categoryResult = _products;
@@ -1715,7 +1872,6 @@ String generateRandomStringForInvoice(int length) {
 //     setState(() {
 //       selectedTable = null;
 //     });
-
 //     setState(() {
 //       _foundProducts = _products.where((product) {
 //         return product['attributes']['name']
@@ -1724,7 +1880,6 @@ String generateRandomStringForInvoice(int length) {
 //             .startsWith(letter);
 //       }).toList();
 //     });
-
 //     debugPrint("Alphabet filtered products: ${_foundProducts!.length}");
 //   }
 // }
