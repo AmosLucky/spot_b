@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:developer';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
@@ -980,76 +981,73 @@ void updateOrder(Orders updatedOrder) {
     }
   }
 
-  Future<bool> fetchProducts(
-      bool refresh, bool connectionStatus, int? warehouseId) async {
-    print("Fetching products");
-    UserDetails user =
-        Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-    try {
-      if (connectionStatus) {
-        _responseState = ResponseState.loading;
-        notifyListeners();
+// Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId) async {
+//   print("Fetching products for warehouse: $warehouseId");
+//   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  
+//   try {
+//     if (connectionStatus) {
+//       _responseState = ResponseState.loading;
+//       notifyListeners();
+      
+//       // **FIXED: Always fetch all products, then filter locally**
+//       Response response = await SystemRepo(refresh: refresh, online: connectionStatus)
+//           .fetchProductsAPI(id: null); // Fetch all products
+      
+//       print("Response ==>> $response");
+//       print("============= system Repo Result Product ===============");
+      
+//       if (response.statusCode == 200) {
+//         final productData = response.data["data"];
+        
+//         StoreX products = StoreX(
+//           name: "products",
+//           value: jsonEncode(productData),
+//           billerId: user.id.toString(),
+//           companyId: user.company!.id.toString(),
+//           lastUpdated: DateTime.now().toIso8601String(),
+//         );
+        
+//         final store = await DatabaseEngine.instance.getStore();
+//         final productBox = store.box<StoreX>();
+        
+//         final existingProduct = productBox
+//             .query(StoreX_.billerId
+//                 .equals(user.id.toString())
+//                 .and(StoreX_.name.equals("products")))
+//             .build()
+//             .findFirst();
+        
+//         if (existingProduct != null) {
+//           products.id = existingProduct.id;
+//           productBox.put(products);
+//           print('Product record updated.');
+//         } else {
+//           productBox.put(products);
+//           print('New Product record inserted.');
+//         }
+        
+//         _responseState = ResponseState.done;
+//         notifyListeners();
+//         print('Successfully updated product records.');
+//         return true;
+//       } else {
+//         print('Request failed with status: ${response.statusCode}.');
+//       }
+//     }
+    
+//     _responseState = ResponseState.error;
+//     notifyListeners();
+//     return false;
+//   } catch (error) {
+//     _responseState = ResponseState.error;
+//     notifyListeners();
+//     print(error);
+//     return false;
+//   }
+// }
 
-        Response response =
-            await SystemRepo(refresh: refresh, online: connectionStatus)
-                .fetchProductsAPI(id: warehouseId);
-        print("Response ==>> $response");
-        print("============= system Repo Result Product ===============");
 
-        if (response.statusCode == 200) {
-          final productData = response.data["data"];
-
-          StoreX products = StoreX(
-            name: "products",
-            value: jsonEncode(productData),
-            billerId: user.id.toString(),
-            companyId: user.company!.id.toString(),
-            lastUpdated: DateTime.now().toIso8601String(),
-          );
-
-          final store = await DatabaseEngine.instance.getStore();
-          final productBox = store.box<StoreX>();
-
-          // Check if the product record already exists
-          final existingProduct = productBox
-              .query(StoreX_.billerId
-                  .equals(user.id.toString())
-                  .and(StoreX_.name.equals("products")))
-              .build()
-              .findFirst(); // Find first matching record
-
-          if (existingProduct != null) {
-            // Record exists, update it
-            products.id =
-                existingProduct.id; // Ensure it has the same ID for updating
-            productBox.put(products); // This will update the existing record
-            print('Product record updated.');
-          } else {
-            // No record exists, insert new
-            productBox.put(products); // This will insert a new record
-            print('New Product record inserted.');
-          }
-
-          // productBox.removeAll(); // Clear existing products
-
-          _responseState = ResponseState.done;
-          notifyListeners();
-          print('Successfully updated product records.');
-          return true;
-        } else {
-          print('Request failed with status: ${response.statusCode}.');
-        }
-      }
-      _responseState = ResponseState.error;
-      notifyListeners();
-      return false;
-    } catch (error) {
-      _responseState = ResponseState.error;
-      notifyListeners();
-      print(error);
-      return false;
-    }
-  }
 
   Future<List<dynamic>> getCustomers() async {
     try {
@@ -1279,6 +1277,250 @@ Future<List<dynamic>> getLocalUserWarehouses() async {
   }
 }
 
+
+// **NEW: Method to get products by warehouse ID using the API**
+Future<List<dynamic>> getProductsByWarehouse(int warehouseId) async {
+  try {
+    log("Fetching products for warehouse ID: $warehouseId from API");
+    
+    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    
+    // **FIXED: Use the warehouse-specific API endpoint**
+    final String apiUrl = 'https://app.spotstockinventory.com/api/products?warehouse_id=$warehouseId';
+    
+    final response = await Dio().get(
+      apiUrl,
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${user.token}', // Make sure to use the user's token
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final data = response.data;
+      final products = data['data'] as List<dynamic>;
+      
+      log("Successfully fetched ${products.length} products for warehouse $warehouseId");
+      
+      // **FIXED: Cache the products locally for offline access**
+      await _cacheWarehouseProducts(warehouseId, products);
+      
+      return products;
+    } else {
+      log("Failed to fetch products for warehouse $warehouseId: ${response.statusCode}");
+      
+      // **FIXED: Try to get cached products if API fails**
+      return await _getCachedWarehouseProducts(warehouseId);
+    }
+  } catch (error) {
+    log("Error fetching products for warehouse $warehouseId: $error");
+    
+    // **FIXED: Fallback to cached products if API fails**
+    return await _getCachedWarehouseProducts(warehouseId);
+  }
+}
+
+// **NEW: Cache warehouse products locally**
+Future<void> _cacheWarehouseProducts(int warehouseId, List<dynamic> products) async {
+  try {
+    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    final store = await DatabaseEngine.instance.getStore();
+    final storeBox = store.box<StoreX>();
+    
+    StoreX warehouseProducts = StoreX(
+      name: "warehouse_products_$warehouseId",
+      value: jsonEncode(products),
+      billerId: user.id.toString(),
+      companyId: user.company!.id.toString(),
+      lastUpdated: DateTime.now().toIso8601String(),
+    );
+    
+    final existingRecord = storeBox
+        .query(StoreX_.billerId
+            .equals(user.id.toString())
+            .and(StoreX_.name.equals("warehouse_products_$warehouseId")))
+        .build()
+        .findFirst();
+    
+    if (existingRecord != null) {
+      warehouseProducts.id = existingRecord.id;
+      storeBox.put(warehouseProducts);
+      log('Updated cached products for warehouse $warehouseId');
+    } else {
+      storeBox.put(warehouseProducts);
+      log('Cached new products for warehouse $warehouseId');
+    }
+  } catch (error) {
+    log("Error caching products for warehouse $warehouseId: $error");
+  }
+}
+
+// **NEW: Get cached warehouse products**
+Future<List<dynamic>> _getCachedWarehouseProducts(int warehouseId) async {
+  try {
+    UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+    final store = await DatabaseEngine.instance.getStore();
+    final storeBox = store.box<StoreX>();
+    
+    final cachedProducts = storeBox
+        .query(StoreX_.billerId
+            .equals(user.id.toString())
+            .and(StoreX_.name.equals("warehouse_products_$warehouseId")))
+        .build()
+        .findFirst();
+
+    if (cachedProducts != null) {
+      final List<dynamic> products = jsonDecode(cachedProducts.value) ?? [];
+      log("Retrieved ${products.length} cached products for warehouse $warehouseId");
+      return products;
+    } else {
+      log("No cached products found for warehouse $warehouseId");
+      return [];
+    }
+  } catch (error) {
+    log("Error retrieving cached products for warehouse $warehouseId: $error");
+    return [];
+  }
+}
+
+// **UPDATED: Modify the existing fetchProducts method to support warehouse-specific fetching**
+Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId) async {
+  log("Fetching products - refresh: $refresh, online: $connectionStatus, warehouseId: $warehouseId");
+  UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  
+  try {
+    if (connectionStatus) {
+      _responseState = ResponseState.loading;
+      notifyListeners();
+      
+      Response response;
+      
+      if (warehouseId != null) {
+        // **NEW: Fetch products for specific warehouse**
+        final String apiUrl = 'https://app.spotstockinventory.com/api/products?warehouse_id=$warehouseId';
+        
+        response = await Dio().get(
+          apiUrl,
+          options: Options(
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${user.token}',
+            },
+          ),
+        );
+      } else {
+        // **EXISTING: Fetch all products**
+        response = await SystemRepo(refresh: refresh, online: connectionStatus)
+            .fetchProductsAPI(id: null);
+      }
+      
+      log("Response ==>> $response");
+      log("============= system Repo Result Product ===============");
+      
+      if (response.statusCode == 200) {
+        final productData = response.data["data"];
+        
+        String storeName = warehouseId != null ? "warehouse_products_$warehouseId" : "products";
+        
+        StoreX products = StoreX(
+          name: storeName,
+          value: jsonEncode(productData),
+          billerId: user.id.toString(),
+          companyId: user.company!.id.toString(),
+          lastUpdated: DateTime.now().toIso8601String(),
+        );
+        
+        final store = await DatabaseEngine.instance.getStore();
+        final productBox = store.box<StoreX>();
+        
+        final existingProduct = productBox
+            .query(StoreX_.billerId
+                .equals(user.id.toString())
+                .and(StoreX_.name.equals(storeName)))
+            .build()
+            .findFirst();
+        
+        if (existingProduct != null) {
+          products.id = existingProduct.id;
+          productBox.put(products);
+          log('Product record updated for $storeName.');
+        } else {
+          productBox.put(products);
+          log('New Product record inserted for $storeName.');
+        }
+        
+        _responseState = ResponseState.done;
+        notifyListeners();
+        log('Successfully updated product records for $storeName.');
+        return true;
+      } else {
+        log('Request failed with status: ${response.statusCode}.');
+      }
+    }
+    
+    _responseState = ResponseState.error;
+    notifyListeners();
+    return false;
+  } catch (error) {
+    _responseState = ResponseState.error;
+    notifyListeners();
+    log("Error in fetchProducts: $error");
+    return false;
+  }
+}
+
+
+// Future<List<dynamic>> getProductsByWarehouse(int warehouseId) async {
+//   try {
+//     UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+//     final store = await DatabaseEngine.instance.getStore();
+//     final storeBox = store.box<StoreX>();
+    
+//     final products = storeBox
+//         .query(StoreX_.billerId
+//             .equals(user.id.toString())
+//             .and(StoreX_.name.equals('products')))
+//         .build()
+//         .findFirst();
+
+//     if (products == null) {
+//       print("No products found in local storage");
+//       return [];
+//     }
+
+//     final List<dynamic> allProducts = jsonDecode(products.value) ?? [];
+    
+//     // Filter products by warehouse ID and stock availability
+//     final filteredProducts = allProducts.where((product) {
+//       try {
+//         if (product == null || product['attributes'] == null) return false;
+        
+//         final attributes = product['attributes'];
+//         final stock = attributes['stock'];
+        
+//         if (stock == null) return false;
+        
+//         final productWarehouseId = stock['warehouse_id'];
+//         final quantity = stock['quantity'] ?? 0;
+        
+//         return productWarehouseId == warehouseId && quantity > 0;
+//       } catch (e) {
+//         print("Error filtering product: $e");
+//         return false;
+//       }
+//     }).toList();
+
+//     print("Filtered ${filteredProducts.length} products for warehouse $warehouseId");
+//     return filteredProducts;
+//   } catch (error) {
+//     print("Error getting products by warehouse: $error");
+//     return [];
+//   }
+// }
   
 
 
