@@ -29,7 +29,7 @@ Future<Uint8List> generateSamplePdf(
   DateTime createdAt,
   String companyName,
   String companyAddress,
-  String? attendantName,
+  String? attendantName, // Add attendantName parameter
 ) async {
   final pdf = pw.Document();
   pdf.addPage(
@@ -99,10 +99,9 @@ Future<Uint8List> generateSamplePdf(
                   : pw.SizedBox(),
               pw.Text('Sold By: ${staffName.isNotEmpty ? staffName : 'N/A'}',
                   style: pw.TextStyle(fontSize: 8)),
-              attendantName != null && attendantName.isNotEmpty
-                  ? pw.Text('Attendant: $attendantName',
-                      style: pw.TextStyle(fontSize: 8))
-                  : pw.SizedBox(),
+              if (attendantName != null && attendantName.isNotEmpty) // Add attendant name
+                pw.Text('Attendant: $attendantName',
+                    style: pw.TextStyle(fontSize: 8)),
               tableId.isNotEmpty
                   ? pw.Text('Table: $tableId',
                       style: pw.TextStyle(fontSize: 8))
@@ -352,7 +351,7 @@ Future<void> printSampleDocument(
   DateTime createdAt,
   String companyName,
   String companyAddress,
-  String? attendantName,
+  String? attendantName, // Add attendantName parameter
 ) async {
   try {
     await Printing.layoutPdf(
@@ -427,6 +426,8 @@ Future<void> printSampleDocument(
 
 
 
+
+
 // import 'dart:typed_data';
 // import 'dart:io';
 // import 'package:pdf/pdf.dart';
@@ -458,7 +459,7 @@ Future<void> printSampleDocument(
 //   DateTime createdAt,
 //   String companyName,
 //   String companyAddress,
-//   String? attendantName,
+//   String? attendantName, // Add attendantName parameter
 // ) async {
 //   final pdf = pw.Document();
 //   pdf.addPage(
@@ -529,7 +530,7 @@ Future<void> printSampleDocument(
 //               pw.Text('Sold By: ${staffName.isNotEmpty ? staffName : 'N/A'}',
 //                   style: pw.TextStyle(fontSize: 8)),
 //               attendantName != null && attendantName.isNotEmpty
-//                   ? pw.Text('Attendant: $attendantName',
+//                   ? pw.Text('Attendant: $attendantName', // Display attendant name
 //                       style: pw.TextStyle(fontSize: 8))
 //                   : pw.SizedBox(),
 //               tableId.isNotEmpty
@@ -613,11 +614,13 @@ Future<void> printSampleDocument(
 //                         children: [
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerLeft,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('Subtotal:',
 //                                 style: pw.TextStyle(fontSize: 8)),
 //                           ),
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerRight,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text(
 //                                 'NGN${subtotal.toStringAsFixed(2)}',
 //                                 style: pw.TextStyle(
@@ -630,11 +633,13 @@ Future<void> printSampleDocument(
 //                         children: [
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerLeft,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('Discount:',
 //                                 style: pw.TextStyle(fontSize: 8)),
 //                           ),
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerRight,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('NGN0.00',
 //                                 style: pw.TextStyle(
 //                                     fontSize: 8,
@@ -646,11 +651,13 @@ Future<void> printSampleDocument(
 //                         children: [
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerLeft,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child:
 //                                 pw.Text('Tax:', style: pw.TextStyle(fontSize: 8)),
 //                           ),
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerRight,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('NGN0.00',
 //                                 style: pw.TextStyle(
 //                                     fontSize: 8,
@@ -662,11 +669,13 @@ Future<void> printSampleDocument(
 //                         children: [
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerLeft,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('Grand Total:',
 //                                 style: pw.TextStyle(fontSize: 8)),
 //                           ),
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerRight,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('NGN${total.toStringAsFixed(2)}',
 //                                 style: pw.TextStyle(
 //                                     fontSize: 8,
@@ -678,11 +687,13 @@ Future<void> printSampleDocument(
 //                         children: [
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerLeft,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('Paid by:',
 //                                 style: pw.TextStyle(fontSize: 8)),
 //                           ),
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerRight,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text(
 //                                 paymentMethod.isNotEmpty ? paymentMethod : 'N/A',
 //                                 style: pw.TextStyle(
@@ -695,11 +706,13 @@ Future<void> printSampleDocument(
 //                         children: [
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerLeft,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text('Amount paid:',
 //                                 style: pw.TextStyle(fontSize: 8)),
 //                           ),
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerRight,
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
 //                             child: pw.Text(
 //                                 'NGN${receivedAmount.toStringAsFixed(2)}',
 //                                 style: pw.TextStyle(
@@ -712,12 +725,16 @@ Future<void> printSampleDocument(
 //                         children: [
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerLeft,
-//                             child: pw.Text('Change:',
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
+//                             child: pw.Text(
+//                                 change >= 0 ? 'Balance:' : 'Change:',
 //                                 style: pw.TextStyle(fontSize: 8)),
 //                           ),
 //                           pw.Container(
 //                             alignment: pw.Alignment.centerRight,
-//                             child: pw.Text('NGN${change.toStringAsFixed(2)}',
+//                             padding: pw.EdgeInsets.symmetric(horizontal: 8),
+//                             child: pw.Text(
+//                                 'NGN${change >= 0 ? change.toStringAsFixed(2) : change.abs().toStringAsFixed(2)}',
 //                                 style: pw.TextStyle(
 //                                     fontSize: 8,
 //                                     fontWeight: pw.FontWeight.bold)),
@@ -765,7 +782,7 @@ Future<void> printSampleDocument(
 //   DateTime createdAt,
 //   String companyName,
 //   String companyAddress,
-//   String? attendantName,
+//   String? attendantName, // Add attendantName parameter
 // ) async {
 //   try {
 //     await Printing.layoutPdf(
@@ -794,7 +811,7 @@ Future<void> printSampleDocument(
 //             createdAt,
 //             companyName,
 //             companyAddress,
-//             attendantName,
+//             attendantName, // Pass attendantName to generateSamplePdf
 //           );
 //         } catch (e) {
 //           print('Error generating PDF: $e');
@@ -827,7 +844,7 @@ Future<void> printSampleDocument(
 //       createdAt,
 //       companyName,
 //       companyAddress,
-//       attendantName,
+//       attendantName, // Pass attendantName to generateSamplePdf
 //     );
 //     final dir = await getTemporaryDirectory();
 //     final file = File('${dir.path}/receipt_${transactionId.isNotEmpty ? transactionId : 'unknown'}.pdf');

@@ -5,9 +5,18 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/provider/system_provider.dart';
 import 'package:spotstock_inventory/data/models/user_details.dart';
+import 'package:spotstock_inventory/screens/desktop/model/select_attendant_model.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/printusb.dart';
 import 'package:spotstock_inventory/widgets/sidebar_pos.dart';
 import 'package:spotstock_inventory/widgets/dialogs.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:spotstock_inventory/screens/desktop/pos/list_printers.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/widgets/select_attendantdialog.dart';
+import 'package:spotstock_inventory/screens/desktop/pos/dialogs/select_attendant_pin.dart';
+import 'package:spotstock_inventory/screens/desktop/providers/select_attendant_provider.dart';
 import '../../../../data/models/hold_model.dart';
 
 class DesktopPosHoldSalesRecord extends StatefulWidget {
@@ -103,7 +112,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
   int get _totalPages => (_filteredHoldRecords.length / _itemsPerPage).ceil();
 
   void _retrieveHold(HoldRecord hold) {
-    // Navigate back to POS with hold data
     Navigator.pop(context, hold);
   }
 
@@ -149,12 +157,93 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
     return NumberFormat.currency(symbol: '₦', decimalDigits: 2).format(amount);
   }
 
+  void _selectAttendant(BuildContext context, Function(SelectAttendantModel) onAttendantSelected) {
+    showDialog(
+      context: context,
+      builder: (context) => ChangeNotifierProvider.value(
+        value: Provider.of<SelectAttendantProvider>(context, listen: false),
+        child: SelectAttendantDialog(
+          onAttendantSelected: (attendant) {
+            Navigator.of(context).pop();
+            _promptForPin(context, attendant, onAttendantSelected);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _promptForPin(BuildContext context, SelectAttendantModel attendant, Function(SelectAttendantModel) onAttendantSelected) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SelectAttendantPinDialog(
+        attendant: attendant,
+        onPinVerified: (verified) {
+          Navigator.of(context).pop(); // Close PIN dialog
+          if (verified) {
+            onAttendantSelected(attendant);
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> _printHoldReceipt(HoldRecord hold, String attendantName) async {
+    try {
+      List<Item> items = hold.holdItems.map((item) => Item(
+        item.productName,
+        item.quantity,
+        item.netUnitPrice,
+      )).toList();
+
+      await printSampleDocument(
+        hold.grandTotal,
+        items,
+        [],
+        '',
+        '',
+        widget.user.company?.email ?? 'N/A',
+        widget.user.company?.phone ?? 'N/A',
+        widget.user.firstName ?? 'N/A',
+        'N/A', // customerPhoneNumber
+        hold.warehouseName,
+        'On Hold',
+        'N/A', // tableId
+        hold.customerName,
+        hold.referenceCode,
+        hold.grandTotal,
+        0.0, // receivedAmount
+        0.0, // change
+        'N/A', // paymentMethod
+        hold.createdAt,
+        widget.user.company?.name ?? 'N/A',
+        widget.user.company?.address ?? 'N/A',
+        attendantName,
+      );
+      setState(() {
+        _showPrintDialog = false; // Close print preview dialog
+        _selectedHoldForPrint = null;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Receipt printed successfully!')),
+      );
+    } catch (e) {
+      log('Error printing hold receipt: $e');
+      setState(() {
+        _showPrintDialog = false; // Close print preview dialog on error
+        _selectedHoldForPrint = null;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to print receipt: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold( // **FIX: Wrap everything in Scaffold to provide Material foundation**
+    return Scaffold(
       body: Row(
         children: [
-          // Sidebar
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: widget.mediaQuery.height,
@@ -166,18 +255,14 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
               mediaQuery: widget.mediaQuery,
               systemProvider: widget.systemProvider,
               activeItem: widget.activeItem,
-              openInvoice: () {
-                // Handle invoice opening if needed
-              },
+              openInvoice: () {},
             ),
           ),
-          // Main Content
           Expanded(
             child: Stack(
               children: [
                 Column(
                   children: [
-                    // Header
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -250,7 +335,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          // Search Bar
                           Row(
                             children: [
                               Expanded(
@@ -289,7 +373,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                         ],
                       ),
                     ),
-                    // Content
                     Expanded(
                       child: _isLoading
                           ? const Center(
@@ -336,7 +419,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                                 )
                               : Column(
                                   children: [
-                                    // Table
                                     Expanded(
                                       child: Container(
                                         margin: const EdgeInsets.all(20),
@@ -354,7 +436,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                                         ),
                                         child: Column(
                                           children: [
-                                            // Table Header
                                             Container(
                                               padding: const EdgeInsets.all(16),
                                               decoration: BoxDecoration(
@@ -451,7 +532,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                                                 ],
                                               ),
                                             ),
-                                            // Table Body
                                             Expanded(
                                               child: ListView.builder(
                                                 itemCount: _getPaginatedHolds().length,
@@ -608,7 +688,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                                         ),
                                       ),
                                     ),
-                                    // Pagination
                                     if (_totalPages > 1)
                                       Container(
                                         padding: const EdgeInsets.all(20),
@@ -653,12 +732,11 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                     ),
                   ],
                 ),
-                // Delete Confirmation Dialog
                 if (_showDeleteDialog && _selectedHoldForDelete != null)
                   Container(
                     color: Colors.black54,
                     child: Center(
-                      child: Material( // **FIX: Wrap dialog content in Material widget**
+                      child: Material(
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           width: 400,
@@ -743,12 +821,11 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                       ),
                     ),
                   ),
-                // Print Preview Dialog
                 if (_showPrintDialog && _selectedHoldForPrint != null)
                   Container(
                     color: Colors.black54,
                     child: Center(
-                      child: Material( // **FIX: Wrap dialog content in Material widget**
+                      child: Material(
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
                           width: 600,
@@ -809,10 +886,9 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
                                   const SizedBox(width: 8),
                                   ElevatedButton.icon(
                                     onPressed: () {
-                                      // Implement actual printing logic here
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Print functionality not implemented yet')),
-                                      );
+                                      _selectAttendant(context, (attendant) {
+                                        _printHoldReceipt(_selectedHoldForPrint!, attendant.fullName);
+                                      });
                                     },
                                     icon: const Icon(Icons.print),
                                     label: const Text('Print'),
@@ -841,7 +917,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
         Center(
           child: Column(
             children: [
@@ -863,7 +938,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
           ),
         ),
         const SizedBox(height: 24),
-        // Details
         Row(
           children: [
             Expanded(
@@ -889,7 +963,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
           ],
         ),
         const SizedBox(height: 24),
-        // Items Table
         Container(
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey[300]!),
@@ -933,7 +1006,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
           ),
         ),
         const SizedBox(height: 16),
-        // Total
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -977,8 +1049,6 @@ class _DesktopPosHoldSalesRecordState extends State<DesktopPosHoldSalesRecord> {
     );
   }
 }
-
-
 
 
 

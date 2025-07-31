@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotstock_inventory/common/helpers/database_engine.dart';
 import 'package:spotstock_inventory/common/helpers/internet_connectivity.dart';
 import 'package:spotstock_inventory/common/navigation.dart';
@@ -60,6 +61,10 @@ List<Orders> get orders => _orders;
     // **NEW: Hold records management**
   List<HoldRecord> _holdRecords = [];
   List<HoldRecord> get holdRecords => _holdRecords;
+
+  // **NEW: Product analytics data**
+  Map<String, dynamic> _productAnalytics = {};
+  Map<String, dynamic> get productAnalytics => _productAnalytics;
 
 
 Future<void> loadOrders() async {
@@ -289,43 +294,69 @@ void updateOrder(Orders updatedOrder) {
     notifyListeners();
   }
 
+  // Future<dynamic> _refreshData() async {
+  //   bool isConnected = await InternetUtils.isConnected();
+  //   print("============ current connection state 2 ==============");
+  //   print(isConnected);
+  //   _getDashboardFeed();
+  //   fetchWarehouses(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchCategories(true, isConnected // _connectionStatus
+  //       );
+  //   fetchHotelCategories(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchHotelAmenities(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchHotelRooms(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   // fetchHotelReservations(true, isConnected
+  //   //     // _connectionStatus
+  //   //     );
+  //   fetchCustomers(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchStockAlerts(true, isConnected
+  //       //_connectionStatus
+  //       );
+  //   fetchProducts(true, isConnected, null
+  //       // _connectionStatus
+  //       );
+  //   await fetchStaffs(true, isConnected);
+
+  //   print("Fetching Data");
+  //   fetchTables(true, isConnected);
+  //   _responseState = ResponseState.done;
+  // }
+
+  // **UPDATED: Enhanced refresh method**
   Future<dynamic> _refreshData() async {
     bool isConnected = await InternetUtils.isConnected();
-    print("============ current connection state 2 ==============");
-    print(isConnected);
+    log("============ current connection state 2 ==============");
+    log(isConnected as String);
+    
     _getDashboardFeed();
-    fetchWarehouses(true, isConnected
-        // _connectionStatus
-        );
-    fetchCategories(true, isConnected // _connectionStatus
-        );
-    fetchHotelCategories(true, isConnected
-        // _connectionStatus
-        );
-    fetchHotelAmenities(true, isConnected
-        // _connectionStatus
-        );
-    fetchHotelRooms(true, isConnected
-        // _connectionStatus
-        );
-    // fetchHotelReservations(true, isConnected
-    //     // _connectionStatus
-    //     );
-    fetchCustomers(true, isConnected
-        // _connectionStatus
-        );
-    fetchStockAlerts(true, isConnected
-        //_connectionStatus
-        );
-    fetchProducts(true, isConnected, null
-        // _connectionStatus
-        );
+    
+    // **NEW: Refresh product analytics**
+    await fetchProductsWithAnalytics(forceRefresh: true);
+    
+    fetchWarehouses(true, isConnected);
+    fetchCategories(true, isConnected);
+    fetchHotelCategories(true, isConnected);
+    fetchHotelAmenities(true, isConnected);
+    fetchHotelRooms(true, isConnected);
+    fetchCustomers(true, isConnected);
+    fetchStockAlerts(true, isConnected);
+    fetchProducts(true, isConnected, null);
     await fetchStaffs(true, isConnected);
-
-    print("Fetching Data");
     fetchTables(true, isConnected);
+    
     _responseState = ResponseState.done;
   }
+
 
   Future<dynamic> forcefulRefresh(connectionResult) async {
     print("============ current connection state 3 force ==============");
@@ -981,73 +1012,6 @@ void updateOrder(Orders updatedOrder) {
     }
   }
 
-// Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId) async {
-//   print("Fetching products for warehouse: $warehouseId");
-//   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-  
-//   try {
-//     if (connectionStatus) {
-//       _responseState = ResponseState.loading;
-//       notifyListeners();
-      
-//       // **FIXED: Always fetch all products, then filter locally**
-//       Response response = await SystemRepo(refresh: refresh, online: connectionStatus)
-//           .fetchProductsAPI(id: null); // Fetch all products
-      
-//       print("Response ==>> $response");
-//       print("============= system Repo Result Product ===============");
-      
-//       if (response.statusCode == 200) {
-//         final productData = response.data["data"];
-        
-//         StoreX products = StoreX(
-//           name: "products",
-//           value: jsonEncode(productData),
-//           billerId: user.id.toString(),
-//           companyId: user.company!.id.toString(),
-//           lastUpdated: DateTime.now().toIso8601String(),
-//         );
-        
-//         final store = await DatabaseEngine.instance.getStore();
-//         final productBox = store.box<StoreX>();
-        
-//         final existingProduct = productBox
-//             .query(StoreX_.billerId
-//                 .equals(user.id.toString())
-//                 .and(StoreX_.name.equals("products")))
-//             .build()
-//             .findFirst();
-        
-//         if (existingProduct != null) {
-//           products.id = existingProduct.id;
-//           productBox.put(products);
-//           print('Product record updated.');
-//         } else {
-//           productBox.put(products);
-//           print('New Product record inserted.');
-//         }
-        
-//         _responseState = ResponseState.done;
-//         notifyListeners();
-//         print('Successfully updated product records.');
-//         return true;
-//       } else {
-//         print('Request failed with status: ${response.statusCode}.');
-//       }
-//     }
-    
-//     _responseState = ResponseState.error;
-//     notifyListeners();
-//     return false;
-//   } catch (error) {
-//     _responseState = ResponseState.error;
-//     notifyListeners();
-//     print(error);
-//     return false;
-//   }
-// }
-
-
 
   Future<List<dynamic>> getCustomers() async {
     try {
@@ -1472,56 +1436,6 @@ Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId
     return false;
   }
 }
-
-
-// Future<List<dynamic>> getProductsByWarehouse(int warehouseId) async {
-//   try {
-//     UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
-//     final store = await DatabaseEngine.instance.getStore();
-//     final storeBox = store.box<StoreX>();
-    
-//     final products = storeBox
-//         .query(StoreX_.billerId
-//             .equals(user.id.toString())
-//             .and(StoreX_.name.equals('products')))
-//         .build()
-//         .findFirst();
-
-//     if (products == null) {
-//       print("No products found in local storage");
-//       return [];
-//     }
-
-//     final List<dynamic> allProducts = jsonDecode(products.value) ?? [];
-    
-//     // Filter products by warehouse ID and stock availability
-//     final filteredProducts = allProducts.where((product) {
-//       try {
-//         if (product == null || product['attributes'] == null) return false;
-        
-//         final attributes = product['attributes'];
-//         final stock = attributes['stock'];
-        
-//         if (stock == null) return false;
-        
-//         final productWarehouseId = stock['warehouse_id'];
-//         final quantity = stock['quantity'] ?? 0;
-        
-//         return productWarehouseId == warehouseId && quantity > 0;
-//       } catch (e) {
-//         print("Error filtering product: $e");
-//         return false;
-//       }
-//     }).toList();
-
-//     print("Filtered ${filteredProducts.length} products for warehouse $warehouseId");
-//     return filteredProducts;
-//   } catch (error) {
-//     print("Error getting products by warehouse: $error");
-//     return [];
-//   }
-// }
-  
 
 
 // Add this method to check internet connectivity (similar to AuthProvider)
@@ -2023,4 +1937,376 @@ Future<List<dynamic>> getActiveBookings() async {
     return [];
   }
 }
+
+ // **UPDATED: Enhanced method to fetch products with analytics**
+  Future<Map<String, dynamic>> fetchProductsWithAnalytics({bool forceRefresh = false}) async {
+    try {
+      UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+      
+      // Check if we should use cached data
+      if (!forceRefresh) {
+        final cachedData = await _getCachedProductAnalytics();
+        if (cachedData != null) {
+          _productAnalytics = cachedData;
+          notifyListeners();
+          return cachedData;
+        }
+      }
+
+      // Check internet connectivity
+      bool isConnected = await InternetUtils.isConnected();
+      
+      if (isConnected) {
+        _responseState = ResponseState.loading;
+        notifyListeners();
+
+        try {
+          // **FIXED: Fetch from the correct API endpoint with analytics**
+          final response = await Dio().get(
+            'https://app.spotstockinventory.com/api/products',
+            options: Options(
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ${user.token}',
+              },
+            ),
+          );
+
+          if (response.statusCode == 200) {
+            final responseData = response.data;
+            
+            // **FIXED: Extract analytics and meta data from API response**
+            final analytics = responseData['analytics'] ?? {};
+            final meta = responseData['meta'] ?? {};
+            final products = responseData['data'] ?? [];
+
+            final productAnalyticsData = {
+              'meta': {
+                'total': meta['total'] ?? products.length,
+                'current_page': meta['current_page'] ?? 1,
+                'last_page': meta['last_page'] ?? 1,
+                'per_page': meta['per_page'] ?? 10,
+              },
+              'analytics': {
+                'in_stock': analytics['in_stock'] ?? 0,
+                'out_of_stock': analytics['out_of_stock'] ?? 0,
+                'total_stock_value': analytics['total_stock_value'] ?? 0.0,
+              },
+              'products': products,
+              'last_updated': DateTime.now().toIso8601String(),
+            };
+
+            // **NEW: Cache the analytics data locally**
+            await _cacheProductAnalytics(productAnalyticsData);
+            
+            // **NEW: Also cache products in the existing format for compatibility**
+            await _cacheProducts(products);
+
+            _productAnalytics = productAnalyticsData;
+            _responseState = ResponseState.done;
+            notifyListeners();
+
+            log('✅ Successfully fetched product analytics from API');
+            log('📊 Total Products: ${productAnalyticsData['meta']['total']}');
+            log('📈 In Stock: ${productAnalyticsData['analytics']['in_stock']}');
+            log('📉 Out of Stock: ${productAnalyticsData['analytics']['out_of_stock']}');
+
+            return productAnalyticsData;
+          } else {
+            log('⚠️ API returned status ${response.statusCode}');
+            throw Exception('Failed to fetch products: ${response.statusCode}');
+          }
+        } catch (apiError) {
+          log('❌ API call failed: $apiError');
+          // Fallback to cached data
+          final cachedData = await _getCachedProductAnalytics();
+          if (cachedData != null) {
+            _productAnalytics = cachedData;
+            _responseState = ResponseState.done;
+            notifyListeners();
+            return cachedData;
+          }
+          throw apiError;
+        }
+      } else {
+        log('⚠️ No internet connection, using cached data');
+        final cachedData = await _getCachedProductAnalytics();
+        if (cachedData != null) {
+          _productAnalytics = cachedData;
+          notifyListeners();
+          return cachedData;
+        } else {
+          throw Exception('No internet connection and no cached data available');
+        }
+      }
+    } catch (error) {
+      _responseState = ResponseState.error;
+      notifyListeners();
+      log('❌ Error in fetchProductsWithAnalytics: $error');
+      
+      // Final fallback - return empty analytics
+      final fallbackData = {
+        'meta': {'total': 0},
+        'analytics': {
+          'in_stock': 0,
+          'out_of_stock': 0,
+          'total_stock_value': 0.0,
+        },
+        'products': [],
+        'last_updated': DateTime.now().toIso8601String(),
+      };
+      
+      _productAnalytics = fallbackData;
+      return fallbackData;
+    }
+  }
+
+  // **NEW: Cache product analytics data**
+  Future<void> _cacheProductAnalytics(Map<String, dynamic> analyticsData) async {
+    try {
+      UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+      final store = await DatabaseEngine.instance.getStore();
+      final storeBox = store.box<StoreX>();
+
+      StoreX analyticsStore = StoreX(
+        name: "product_analytics",
+        value: jsonEncode(analyticsData),
+        billerId: user.id.toString(),
+        companyId: user.company!.id.toString(),
+        lastUpdated: DateTime.now().toIso8601String(),
+      );
+
+      final existingAnalytics = storeBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("product_analytics")))
+          .build()
+          .findFirst();
+
+      if (existingAnalytics != null) {
+        analyticsStore.id = existingAnalytics.id;
+        storeBox.put(analyticsStore);
+        log('✅ Updated cached product analytics');
+      } else {
+        storeBox.put(analyticsStore);
+        log('✅ Cached new product analytics');
+      }
+    } catch (error) {
+      log('❌ Error caching product analytics: $error');
+    }
+  }
+
+  // **NEW: Get cached product analytics data**
+  Future<Map<String, dynamic>?> _getCachedProductAnalytics() async {
+    try {
+      UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+      final store = await DatabaseEngine.instance.getStore();
+      final storeBox = store.box<StoreX>();
+
+      final cachedAnalytics = storeBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("product_analytics")))
+          .build()
+          .findFirst();
+
+      if (cachedAnalytics != null) {
+        final analyticsData = jsonDecode(cachedAnalytics.value) as Map<String, dynamic>;
+        
+        // Check if cache is not too old (e.g., less than 1 hour)
+        final lastUpdated = DateTime.parse(analyticsData['last_updated'] ?? DateTime.now().toIso8601String());
+        final cacheAge = DateTime.now().difference(lastUpdated);
+        
+        if (cacheAge.inHours < 1) {
+          log('✅ Using cached product analytics (${cacheAge.inMinutes} minutes old)');
+          return analyticsData;
+        } else {
+          log('⚠️ Cached analytics is ${cacheAge.inHours} hours old, will refresh');
+        }
+      }
+
+      return null;
+    } catch (error) {
+      log('❌ Error getting cached product analytics: $error');
+      return null;
+    }
+  }
+
+  // **NEW: Cache products in existing format for compatibility**
+  Future<void> _cacheProducts(List<dynamic> products) async {
+    try {
+      UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+      final store = await DatabaseEngine.instance.getStore();
+      final storeBox = store.box<StoreX>();
+
+      StoreX productsStore = StoreX(
+        name: "products",
+        value: jsonEncode(products),
+        billerId: user.id.toString(),
+        companyId: user.company!.id.toString(),
+        lastUpdated: DateTime.now().toIso8601String(),
+      );
+
+      final existingProducts = storeBox
+          .query(StoreX_.billerId
+              .equals(user.id.toString())
+              .and(StoreX_.name.equals("products")))
+          .build()
+          .findFirst();
+
+      if (existingProducts != null) {
+        productsStore.id = existingProducts.id;
+        storeBox.put(productsStore);
+      } else {
+        storeBox.put(productsStore);
+      }
+
+      log('✅ Cached ${products.length} products for compatibility');
+    } catch (error) {
+      log('❌ Error caching products: $error');
+    }
+  }
+
+
+
+  // **NEW: Get out of stock products**
+  Future<List<dynamic>> getOutOfStockProducts() async {
+    try {
+      final analyticsData = await fetchProductsWithAnalytics();
+      final products = analyticsData['products'] as List<dynamic>;
+      
+      final outOfStockProducts = products.where((product) {
+        if (product != null && product['attributes'] != null) {
+          final inStock = product['attributes']['in_stock'] ?? 0;
+          return inStock == 0;
+        }
+        return false;
+      }).toList();
+
+      log('📉 Found ${outOfStockProducts.length} out of stock products');
+      return outOfStockProducts;
+    } catch (error) {
+      log('❌ Error getting out of stock products: $error');
+      return [];
+    }
+  }
 }
+
+
+
+// Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId) async {
+//   print("Fetching products for warehouse: $warehouseId");
+//   UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+  
+//   try {
+//     if (connectionStatus) {
+//       _responseState = ResponseState.loading;
+//       notifyListeners();
+      
+//       // **FIXED: Always fetch all products, then filter locally**
+//       Response response = await SystemRepo(refresh: refresh, online: connectionStatus)
+//           .fetchProductsAPI(id: null); // Fetch all products
+      
+//       print("Response ==>> $response");
+//       print("============= system Repo Result Product ===============");
+      
+//       if (response.statusCode == 200) {
+//         final productData = response.data["data"];
+        
+//         StoreX products = StoreX(
+//           name: "products",
+//           value: jsonEncode(productData),
+//           billerId: user.id.toString(),
+//           companyId: user.company!.id.toString(),
+//           lastUpdated: DateTime.now().toIso8601String(),
+//         );
+        
+//         final store = await DatabaseEngine.instance.getStore();
+//         final productBox = store.box<StoreX>();
+        
+//         final existingProduct = productBox
+//             .query(StoreX_.billerId
+//                 .equals(user.id.toString())
+//                 .and(StoreX_.name.equals("products")))
+//             .build()
+//             .findFirst();
+        
+//         if (existingProduct != null) {
+//           products.id = existingProduct.id;
+//           productBox.put(products);
+//           print('Product record updated.');
+//         } else {
+//           productBox.put(products);
+//           print('New Product record inserted.');
+//         }
+        
+//         _responseState = ResponseState.done;
+//         notifyListeners();
+//         print('Successfully updated product records.');
+//         return true;
+//       } else {
+//         print('Request failed with status: ${response.statusCode}.');
+//       }
+//     }
+    
+//     _responseState = ResponseState.error;
+//     notifyListeners();
+//     return false;
+//   } catch (error) {
+//     _responseState = ResponseState.error;
+//     notifyListeners();
+//     print(error);
+//     return false;
+//   }
+// }
+
+
+// Future<List<dynamic>> getProductsByWarehouse(int warehouseId) async {
+//   try {
+//     UserDetails user = Provider.of<UserProvider>(Navigation.getContext(), listen: false).user;
+//     final store = await DatabaseEngine.instance.getStore();
+//     final storeBox = store.box<StoreX>();
+    
+//     final products = storeBox
+//         .query(StoreX_.billerId
+//             .equals(user.id.toString())
+//             .and(StoreX_.name.equals('products')))
+//         .build()
+//         .findFirst();
+
+//     if (products == null) {
+//       print("No products found in local storage");
+//       return [];
+//     }
+
+//     final List<dynamic> allProducts = jsonDecode(products.value) ?? [];
+    
+//     // Filter products by warehouse ID and stock availability
+//     final filteredProducts = allProducts.where((product) {
+//       try {
+//         if (product == null || product['attributes'] == null) return false;
+        
+//         final attributes = product['attributes'];
+//         final stock = attributes['stock'];
+        
+//         if (stock == null) return false;
+        
+//         final productWarehouseId = stock['warehouse_id'];
+//         final quantity = stock['quantity'] ?? 0;
+        
+//         return productWarehouseId == warehouseId && quantity > 0;
+//       } catch (e) {
+//         print("Error filtering product: $e");
+//         return false;
+//       }
+//     }).toList();
+
+//     print("Filtered ${filteredProducts.length} products for warehouse $warehouseId");
+//     return filteredProducts;
+//   } catch (error) {
+//     print("Error getting products by warehouse: $error");
+//     return [];
+//   }
+// }
+  
