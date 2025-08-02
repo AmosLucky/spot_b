@@ -294,44 +294,6 @@ void updateOrder(Orders updatedOrder) {
     notifyListeners();
   }
 
-  // Future<dynamic> _refreshData() async {
-  //   bool isConnected = await InternetUtils.isConnected();
-  //   print("============ current connection state 2 ==============");
-  //   print(isConnected);
-  //   _getDashboardFeed();
-  //   fetchWarehouses(true, isConnected
-  //       // _connectionStatus
-  //       );
-  //   fetchCategories(true, isConnected // _connectionStatus
-  //       );
-  //   fetchHotelCategories(true, isConnected
-  //       // _connectionStatus
-  //       );
-  //   fetchHotelAmenities(true, isConnected
-  //       // _connectionStatus
-  //       );
-  //   fetchHotelRooms(true, isConnected
-  //       // _connectionStatus
-  //       );
-  //   // fetchHotelReservations(true, isConnected
-  //   //     // _connectionStatus
-  //   //     );
-  //   fetchCustomers(true, isConnected
-  //       // _connectionStatus
-  //       );
-  //   fetchStockAlerts(true, isConnected
-  //       //_connectionStatus
-  //       );
-  //   fetchProducts(true, isConnected, null
-  //       // _connectionStatus
-  //       );
-  //   await fetchStaffs(true, isConnected);
-
-  //   print("Fetching Data");
-  //   fetchTables(true, isConnected);
-  //   _responseState = ResponseState.done;
-  // }
-
   // **UPDATED: Enhanced refresh method**
   Future<dynamic> _refreshData() async {
     bool isConnected = await InternetUtils.isConnected();
@@ -2193,6 +2155,44 @@ Future<List<dynamic>> getActiveBookings() async {
   }
 }
 
+
+  // Future<dynamic> _refreshData() async {
+  //   bool isConnected = await InternetUtils.isConnected();
+  //   print("============ current connection state 2 ==============");
+  //   print(isConnected);
+  //   _getDashboardFeed();
+  //   fetchWarehouses(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchCategories(true, isConnected // _connectionStatus
+  //       );
+  //   fetchHotelCategories(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchHotelAmenities(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchHotelRooms(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   // fetchHotelReservations(true, isConnected
+  //   //     // _connectionStatus
+  //   //     );
+  //   fetchCustomers(true, isConnected
+  //       // _connectionStatus
+  //       );
+  //   fetchStockAlerts(true, isConnected
+  //       //_connectionStatus
+  //       );
+  //   fetchProducts(true, isConnected, null
+  //       // _connectionStatus
+  //       );
+  //   await fetchStaffs(true, isConnected);
+
+  //   print("Fetching Data");
+  //   fetchTables(true, isConnected);
+  //   _responseState = ResponseState.done;
+  // }
 
 
 // Future<bool> fetchProducts(bool refresh, bool connectionStatus, int? warehouseId) async {
