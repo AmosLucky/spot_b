@@ -506,6 +506,12 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "go_router",
+      "rootUri": "file:///Users/tobeokoli/.pub-cache/hosted/pub.dev/go_router-16.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
       "name": "google_fonts",
       "rootUri": "file:///Users/tobeokoli/.pub-cache/hosted/pub.dev/google_fonts-6.2.1",
       "packageUri": "lib/",
