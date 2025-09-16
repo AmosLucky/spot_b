@@ -16,4 +16,7 @@ class PlatformService {
     }
     throw UnsupportedError(SpotstockStrings.UNKNOWN_PLATFORM);
   }
+
+  bool get isMobile => currentPlatform == AppPlatform.mobile;
+  bool get isDesktop => currentPlatform == AppPlatform.desktop;
 }
