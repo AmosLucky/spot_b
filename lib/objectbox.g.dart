@@ -14,7 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
-import 'data/models/schema.dart' hide SelectAttendantModel;
+import 'data/models/schema.dart';
 import 'screens/desktop/model/select_attendant_model.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -1002,7 +1002,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(13, 7976920998866683740),
       name: 'SelectAttendantModel',
-      lastPropertyId: const obx_int.IdUid(11, 5348392202030750744),
+      lastPropertyId: const obx_int.IdUid(15, 4201190392842894937),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -1241,7 +1241,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
         5945536197580053257,
         4003876650830016463,
         1528062522666117053,
-        5348392202030750744
+        5348392202030750744,
+        7000704205867979859,
+        5805666732123881942,
+        1248814692729266323,
+        4201190392842894937
       ],
       retiredRelationUids: const [],
       modelVersion: 5,
@@ -2359,7 +2363,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final emailOffset = fbb.writeString(object.email);
           final phoneOffset = fbb.writeString(object.phone);
           final departmentOffset = fbb.writeString(object.department);
-          fbb.startTable(12);
+          fbb.startTable(16);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.apiId);
           fbb.addOffset(2, firstNameOffset);
