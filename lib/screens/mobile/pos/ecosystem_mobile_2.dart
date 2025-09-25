@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_scanner_devxhub/flutter_scanner_devxhub.dart';
+// import 'package:flutter_scanner_devxhub/flutter_scanner_devxhub.dart';
 //import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:spotstock_inventory/common/common.dart';
@@ -29,10 +29,7 @@ class EcosystemMobile2Screen extends StatefulWidget {
   final int? id;
 
   const EcosystemMobile2Screen(
-      {super.key,
-      required this.systemProvider,
-      required this.category,
-      this.id = 0});
+      {super.key, required this.systemProvider, required this.category, this.id = 0});
 
   @override
   State<EcosystemMobile2Screen> createState() => _EcosystemMobile2ScreenState();
@@ -46,14 +43,14 @@ List _productSearchResult = [];
 List? _foundProducts;
 bool _searching = false;
 bool loadingProduct = false;
-Map?  selectedBranch;
+Map? selectedBranch;
 String selectedCategory = '';
 List _categoryResult = [];
 List categoryData = [];
 
 final List<Map<String, dynamic>> branches = [
-  {"label" : "Branch 1", "id" : "15"},
-  {"label" : "sdfd", "id" : "27"}
+  {"label": "Branch 1", "id": "15"},
+  {"label": "sdfd", "id": "27"}
 ];
 
 class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
@@ -63,8 +60,8 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
   void initState() {
     super.initState();
     //initBarCodeScanner();
-    _barcodeController = TextEditingController(
-        text: widget.category['id'] == 0 ? '' : widget.category['name']);
+    _barcodeController =
+        TextEditingController(text: widget.category['id'] == 0 ? '' : widget.category['name']);
     readCategories();
     readProducts();
     _filterByCategories();
@@ -100,7 +97,7 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
       setState(() {
         warehouseData = value;
       });
-      await systemProvider.fetchProducts(true, true, warehouseData[0]['id']);
+      await systemProvider.fetchProducts(true, true, warehouseData[0]?['id'] ?? 1);
     });
     setState(() {
       _products = data;
@@ -133,33 +130,32 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
     }
   }
 
-
   Future barcodeScan() async {
     _requestCameraPermission();
     //await Permission.camera.request();
-    String? barcode = await FlutterScanner.scanBarcode(
-        lineColor: '#ff6666',
-        cancelButtonText: 'Cancel',
-        isShowFlashIcon: true,
-        scanMode: ScanMode.QR,
-        isOrientationLandscape: false,
-        isNeedLengthCondition: true,
-        isNeedOnlyDigitCondition: true,
-        minimunLengthMinusOne: 10,
-        maximunLengthPlusOne: 50,
-        iconSize: 50,
-        fontSize: 20,);
+    // String? barcode = await FlutterScanner.scanBarcode(
+    //   lineColor: '#ff6666',
+    //   cancelButtonText: 'Cancel',
+    //   isShowFlashIcon: true,
+    //   scanMode: ScanMode.QR,
+    //   isOrientationLandscape: false,
+    //   isNeedLengthCondition: true,
+    //   isNeedOnlyDigitCondition: true,
+    //   minimunLengthMinusOne: 10,
+    //   maximunLengthPlusOne: 50,
+    //   iconSize: 50,
+    //   fontSize: 20,
+    // );
 
-    if (barcode == '-1') {
-      print('nothing return.');
-      setState(() {
-        barcode = '';
-      });
-      Dialogs.alertDialog(
-          context, "Warning", "Nothing was found!", "cancel", "save", []);
-    } else {
-      _barcodeController!.text = barcode;
-    }
+    // if (barcode == '-1') {
+    //   print('nothing return.');
+    //   setState(() {
+    //     barcode = '';
+    //   });
+    //   Dialogs.alertDialog(context, "Warning", "Nothing was found!", "cancel", "save", []);
+    // } else {
+    //   _barcodeController!.text = barcode;
+    // }
   }
 
   @override
@@ -167,7 +163,7 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
     return Scaffold(
         backgroundColor: backgroundColor,
         appBar: AppBar(
-            surfaceTintColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: () => Navigator.of(context).pop(),
@@ -229,44 +225,50 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5),
                   child: SecondaryCustomDropDown(
                       color: Colors.grey.withOpacity(0.3),
-                      hintText: selectedBranch == null ? "${warehouseData[0]['attributes']['name'] ?? "Select Branch"}" : selectedBranch?['attributes']['name'],
-                      titleText: "", onTap: () {
-                    showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
-                        barrierColor: Colors.black.withOpacity(0.5),
-                        isDismissible: true,
-                        context: context,
-                        builder: (context) {
-                          return CustomSelectorBottomSheet3(
-                            height: 40.h,
-                            onSelect: (value, index) async {
-                              _barcodeController?.clear();
-                              setState(() {
-                                selectedBranch = value;
-                                _productSearchResult = [];
-                                _foundProducts = _productSearchResult;
-                                loadingProduct = true;
-                              });
-                              await systemProvider.fetchProducts(true, true, selectedBranch?['id']);
-                              var data = await widget.systemProvider.getProducts(1);
-                              setState(() {
-                                _products = data;
-                                _dataProducts = data;
-                                loadingProduct = false;
-                              });
-                              debugPrint("valueeee ===>> $selectedBranch");
-                            },
-                            items: warehouseData,);
-                        });
-                  }),
+                      hintText: selectedBranch == null
+                          ? "${warehouseData[0]['attributes']['name'] ?? "Select Branch"}"
+                          : selectedBranch?['attributes']['name'],
+                      titleText: "",
+                      onTap: () {
+                        showModalBottomSheet(
+                            backgroundColor: Colors.transparent,
+                            barrierColor: Colors.black.withOpacity(0.5),
+                            isDismissible: true,
+                            context: context,
+                            builder: (context) {
+                              return CustomSelectorBottomSheet3(
+                                height: 40.h,
+                                onSelect: (value, index) async {
+                                  _barcodeController?.clear();
+                                  setState(() {
+                                    selectedBranch = value;
+                                    _productSearchResult = [];
+                                    _foundProducts = _productSearchResult;
+                                    loadingProduct = true;
+                                  });
+                                  await systemProvider.fetchProducts(
+                                      true, true, selectedBranch?['id']);
+                                  var data = await widget.systemProvider.getProducts(1);
+                                  setState(() {
+                                    _products = data;
+                                    _dataProducts = data;
+                                    loadingProduct = false;
+                                  });
+                                  debugPrint("valueeee ===>> $selectedBranch");
+                                },
+                                items: warehouseData,
+                              );
+                            });
+                      }),
                 ),
 
-                SizedBox(height: 1.h,),
+                SizedBox(
+                  height: 1.h,
+                ),
 
                 // CustomDropdown<Map<String, dynamic>>(
                 //   items: warehouseData,
@@ -384,15 +386,12 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
-
                       Padding(
                         padding: const EdgeInsets.only(left: 5),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
                             GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -405,22 +404,25 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                 width: MediaQuery.of(context).size.width * 0.4,
                                 decoration: BoxDecoration(
-                                    color: selectedCategory == '' ? Colors.purple : Colors.grey.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
+                                    color: selectedCategory == ''
+                                        ? Colors.purple
+                                        : Colors.grey.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10)),
                                 child: Center(
-                                  child: Text("All", style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: selectedCategory == '' ? Colors.white : Colors.black
-                                    ),
+                                  child: Text(
+                                    "All",
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color:
+                                            selectedCategory == '' ? Colors.white : Colors.black),
                                   ),
                                 ),
                               ),
                             ),
-
-                            SizedBox(height: 1.h,),
-
+                            SizedBox(
+                              height: 1.h,
+                            ),
                             SizedBox(
                               height: MediaQuery.of(context).size.height * 0.55,
                               width: MediaQuery.of(context).size.width * 0.4,
@@ -433,43 +435,55 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                                   mainAxisSpacing: 10,
                                   childAspectRatio: 1,
                                   padding: EdgeInsets.zero,
-                                  children:  categoryData.isEmpty ? [SizedBox()] : categoryData.map((cat) =>  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedCategory = cat['attributes']['name'];
-                                      });
-                                      print(selectedCategory);
-                                      _filterByCategories();
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                                      decoration: BoxDecoration(
-                                          color: selectedCategory == cat['attributes']['name'] ? Colors.purple : Colors.grey.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      child: Center(
-                                        child: Text(cat['attributes']['name'], style: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: selectedCategory == cat['attributes']['name'] ? Colors.white : Colors.black
-                                        ),),
-                                      ),
-                                    ),
-                                  )).toSet().toList()),
+                                  children: categoryData.isEmpty
+                                      ? [SizedBox()]
+                                      : categoryData
+                                          .map((cat) => GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedCategory = cat['attributes']['name'];
+                                                  });
+                                                  print(selectedCategory);
+                                                  _filterByCategories();
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 10, vertical: 0),
+                                                  decoration: BoxDecoration(
+                                                      color: selectedCategory ==
+                                                              cat['attributes']['name']
+                                                          ? Colors.purple
+                                                          : Colors.grey.withOpacity(0.1),
+                                                      borderRadius: BorderRadius.circular(10)),
+                                                  child: Center(
+                                                    child: Text(
+                                                      cat['attributes']['name'],
+                                                      style: TextStyle(
+                                                          fontSize: 12.sp,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: selectedCategory ==
+                                                                  cat['attributes']['name']
+                                                              ? Colors.white
+                                                              : Colors.black),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ))
+                                          .toSet()
+                                          .toList()),
                             ),
                           ],
                         ),
                       ),
-
-                      SizedBox(width: 1.w,),
-
+                      SizedBox(
+                        width: 1.w,
+                      ),
                       Expanded(
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.width* 0.6,
+                          width: MediaQuery.of(context).size.width * 0.6,
                           height: MediaQuery.of(context).size.height * 0.6,
-                          child: _foundProducts!.isNotEmpty
-                              ? searchView(_foundProducts)
-                               : SizedBox(),
+                          child:
+                              _foundProducts!.isNotEmpty ? searchView(_foundProducts) : SizedBox(),
                         ),
                       ),
                     ],
@@ -492,8 +506,6 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                 //   systemProvider: widget.systemProvider,
                 //   user: widget.,
                 // )
-
-
               ],
             ),
           ),
@@ -543,15 +555,12 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                 ),
                 child: Column(
                   children: [
-
                     Expanded(
                       child: Text(
                         capitalize(product['name']),
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            color: Colors.yellow,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15.sp),
+                            color: Colors.yellow, fontWeight: FontWeight.bold, fontSize: 15.sp),
                       ),
                     ),
                     Column(
@@ -562,16 +571,12 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                             product['product_price'],
                           ),
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold),
+                              color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "Qty: ${product['stock']['quantity']}",
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold),
+                              color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
                         )
                       ],
                     ),
@@ -583,8 +588,8 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                     GestureDetector(
                       onTap: () {
                         if (product['stock']['quantity'] == 0) {
-                          Dialogs.alertDialog(context, "Warning",
-                              "Product is out of stock!", "cancel", "save", []);
+                          Dialogs.alertDialog(
+                              context, "Warning", "Product is out of stock!", "cancel", "save", []);
                         } else {
                           Provider.of<CartProvider>(context, listen: false).add(
                               product,
@@ -602,16 +607,14 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
                         }
                       },
                       child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                           color: Colors.deepPurple,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
                           "Add to cart",
-                          style:
-                              TextStyle(color: Colors.white, fontSize: 13.sp),
+                          style: TextStyle(color: Colors.white, fontSize: 13.sp),
                         ),
                       ),
                     ),
@@ -708,12 +711,11 @@ class _EcosystemMobile2ScreenState extends State<EcosystemMobile2Screen> {
 }
 
 class TekFlutterScannerConfig {
-  const TekFlutterScannerConfig({
-    required this.showAppBar,
-    required this.appBarTitle,
-    required this.appBarColor,
-    required this.description
-  });
+  const TekFlutterScannerConfig(
+      {required this.showAppBar,
+      required this.appBarTitle,
+      required this.appBarColor,
+      required this.description});
 
   final bool showAppBar;
   final String appBarTitle;

@@ -1,14 +1,12 @@
 import 'package:objectbox/objectbox.dart';
 import 'package:spotstock_inventory/data/models/sales_models.dart';
 
-
-
 // **NEW: Hold Record Entity for local storage**
 @Entity()
 class HoldRecordEntity {
   @Id()
   int id = 0;
-  
+
   String referenceCode;
   String customerName;
   String warehouseName;
@@ -19,7 +17,7 @@ class HoldRecordEntity {
   DateTime createdAt;
   bool synced;
   bool markedForDeletion;
-  
+
   HoldRecordEntity({
     required this.referenceCode,
     required this.customerName,
@@ -32,7 +30,7 @@ class HoldRecordEntity {
     this.synced = false,
     this.markedForDeletion = false,
   });
-  
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -54,7 +52,7 @@ class HoldRecordEntity {
 class PaidInvoice {
   @Id()
   int id = 0;
-  
+
   String reference;
   String customerName;
   String? attendantName;
@@ -63,7 +61,7 @@ class PaidInvoice {
   String userId;
   String companyId;
   String originalInvoiceData; // Store the full transaction data as JSON
-  
+
   PaidInvoice({
     required this.reference,
     required this.customerName,
@@ -74,7 +72,7 @@ class PaidInvoice {
     required this.companyId,
     required this.originalInvoiceData,
   });
-  
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -89,7 +87,6 @@ class PaidInvoice {
     };
   }
 }
-
 
 @Entity()
 class Orders {
@@ -168,7 +165,6 @@ class Orders {
     };
   }
 }
-
 
 @Entity()
 class StoreX {
@@ -314,61 +310,59 @@ class Invoice {
   }
 }
 
+// @Entity()
+// class SelectAttendantModel {
+//   @Id()
+//   int id = 0;
 
-@Entity()
-class SelectAttendantModel {
-  @Id()
-  int id = 0;
-  
-  int apiId; // Store the original API ID
-  String firstName;
-  String lastName;
-  String email;
-  String phone;
-  String department;
-  bool hasPinSet;
-  String? pin;
+//   int apiId; // Store the original API ID
+//   String firstName;
+//   String lastName;
+//   String email;
+//   String phone;
+//   String department;
+//   bool hasPinSet;
+//   String? pin;
 
-  SelectAttendantModel({
-    required this.apiId,
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.phone,
-    required this.department,
-    required this.hasPinSet,
-    this.pin,
-  });
+//   SelectAttendantModel({
+//     required this.apiId,
+//     required this.firstName,
+//     required this.lastName,
+//     required this.email,
+//     required this.phone,
+//     required this.department,
+//     required this.hasPinSet,
+//     this.pin,
+//   });
 
-  String get fullName => '$firstName $lastName';
+//   String get fullName => '$firstName $lastName';
 
-  factory SelectAttendantModel.fromJson(Map<String, dynamic> json) {
-    return SelectAttendantModel(
-      apiId: json['id'],
-      firstName: json['first_name'] ?? '',
-      lastName: json['last_name'] ?? '',
-      email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
-      department: json['department'] ?? '',
-      hasPinSet: json['pin_set'] ?? false,
-      pin: json['pin'],
-    );
-  }
+//   factory SelectAttendantModel.fromJson(Map<String, dynamic> json) {
+//     return SelectAttendantModel(
+//       apiId: json['id'],
+//       firstName: json['first_name'] ?? '',
+//       lastName: json['last_name'] ?? '',
+//       email: json['email'] ?? '',
+//       phone: json['phone'] ?? '',
+//       department: json['department'] ?? '',
+//       hasPinSet: json['pin_set'] ?? false,
+//       pin: json['pin'],
+//     );
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': apiId,
-      'first_name': firstName,
-      'last_name': lastName,
-      'email': email,
-      'phone': phone,
-      'department': department,
-      'pin_set': hasPinSet,
-      'pin': pin,
-    };
-  }
-}
-
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'id': apiId,
+//       'first_name': firstName,
+//       'last_name': lastName,
+//       'email': email,
+//       'phone': phone,
+//       'department': department,
+//       'pin_set': hasPinSet,
+//       'pin': pin,
+//     };
+//   }
+// }
 
 @Entity()
 class Users {
@@ -574,9 +568,6 @@ class FolioX {
   }
 }
 
-
-
-
 @Entity()
 class MaintenanceRoom {
   @Id()
@@ -634,7 +625,8 @@ class MaintenanceRoom {
     required this.roomTypeName,
     required this.roomTypeFare,
     required this.roomTypeTotalAdult,
-    required this.roomTypeTotalChild, required id,
+    required this.roomTypeTotalChild,
+    required id,
   });
 
   // Add fromJson factory constructor
@@ -646,9 +638,8 @@ class MaintenanceRoom {
       roomNumber: json['room_number'],
       status: json['status'],
       maintenanceNote: json['maintenance_note'],
-      maintenanceDate: json['maintenance_date'] != null 
-          ? DateTime.parse(json['maintenance_date']) 
-          : null,
+      maintenanceDate:
+          json['maintenance_date'] != null ? DateTime.parse(json['maintenance_date']) : null,
       maintenanceExpectedEndDate: json['maintenance_expected_end_date'] != null
           ? DateTime.parse(json['maintenance_expected_end_date'])
           : null,
@@ -661,7 +652,6 @@ class MaintenanceRoom {
     );
   }
 }
-
 
 @Entity()
 class SaleEntity {
@@ -693,7 +683,7 @@ class SaleEntity {
   String barcodeUrl;
   int isOffline;
   String? offlineCustomerName;
-  
+
   // **NEW: Added attendant fields**
   String? attendantName;
   String? attendantId;
@@ -726,7 +716,7 @@ class SaleEntity {
     required this.barcodeUrl,
     required this.isOffline,
     this.offlineCustomerName,
-    
+
     // **NEW: Added attendant parameters**
     this.attendantName,
     this.attendantId,
@@ -762,11 +752,11 @@ class SaleEntity {
       barcodeUrl: sale.barcodeUrl,
       isOffline: sale.isOffline,
       offlineCustomerName: sale.offlineCustomerName,
-      
+
       // **NEW: Map attendant fields if they exist in Sale model**
       // Note: You may need to add these fields to your Sale model too
       attendantName: null, // Update this if Sale model has attendantName
-      attendantId: null,   // Update this if Sale model has attendantId
+      attendantId: null, // Update this if Sale model has attendantId
     );
   }
 
@@ -833,14 +823,13 @@ class SaleEntity {
       'barcodeUrl': barcodeUrl,
       'isOffline': isOffline,
       'offlineCustomerName': offlineCustomerName,
-      
+
       // **NEW: Include attendant fields in map**
       'attendantName': attendantName,
       'attendantId': attendantId,
     };
   }
 }
-
 
 @Entity()
 class SaleItemEntity {
