@@ -49,7 +49,7 @@ dependencies:
   skeleton_text: ^3.0.1
   sqflite_common_ffi: ^2.3.3+1
   win32: ^5.9.0
-  flutter_scanner_devxhub: ^1.0.3
+  # flutter_scanner_devxhub: ^1.0.3
   chip_list: ^3.1.0
   gap: ^3.0.1
   retry: ^3.1.2
@@ -61,6 +61,11 @@ dependencies:
   fl_chart: ^0.71.0
   crypto: ^3.0.6
   go_router: ^16.2.1
+  flutter_secure_storage: ^9.2.2
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+  webview_flutter: ^4.13.0
+  get_it: ^8.2.0
 
 # Force specific versions to resolve compatibility issues
 dependency_overrides:
@@ -75,6 +80,8 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   build_runner: ^2.4.13
   objectbox_generator: ^4.0.2
+  freezed: ^2.4.6
+  json_serializable: ^6.7.1
 
 flutter_native_splash:
   image: assets/images/logo.png
