@@ -34,13 +34,13 @@ class _WebviewState extends State<Webview> {
             children: [
               SpotstockAppbar(
                 title: SpotstockStrings.spotstock,
-                // trailing: SpotstockIconButton(
-                //   tooltip: SpotstockStrings.logout,
-                //   icon: Icon(Icons.logout, color: Colors.white, size: SpotstockSizes.s20),
-                //   onPressed: () {
-                //     widget.viewModel.logoutCommand.execute(context);
-                //   },
-                // ),
+                trailing: SpotstockIconButton(
+                  tooltip: SpotstockStrings.logout,
+                  icon: Icon(Icons.logout, color: Colors.white, size: SpotstockSizes.s20),
+                  onPressed: () {
+                    widget.viewModel.logoutCommand.execute(context);
+                  },
+                ),
               ),
               Expanded(
                 child: WebViewWidget(

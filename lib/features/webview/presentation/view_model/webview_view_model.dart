@@ -28,7 +28,7 @@ class WebviewViewModel extends SpotstockViewModel {
     logoutCommand = Command1<void, BuildContext>(_logout);
     _webviewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.black)
+      ..setBackgroundColor(Colors.white)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {},
