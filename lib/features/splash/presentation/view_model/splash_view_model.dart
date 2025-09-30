@@ -68,23 +68,19 @@ class SplashViewModel extends SpotstockViewModel {
 
   Future<Result<void>> _navigateIntoApp(BuildContext context) async {
     await Future.delayed(SpotstockDurations.splashScreenDisplayTime);
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      SpotstockNavigation.goTo(SpotstockMobileRoutes.webview, context);
-    });
+    if (_token != null &&
+        _spotstockUser != null &&
+        _lastLoginTime != null &&
+        !_hasElapsedSessionTime(_lastLoginTime!)) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        SpotstockNavigation.goTo(SpotstockMobileRoutes.home, context);
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        SpotstockNavigation.goTo(SpotstockMobileRoutes.login, context);
+      });
+    }
     return Result.success(null);
-    // if (_token != null &&
-    //     _spotstockUser != null &&
-    //     _lastLoginTime != null &&
-    //     !_hasElapsedSessionTime(_lastLoginTime!)) {
-    //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //     SpotstockNavigation.goTo(SpotstockMobileRoutes.webview, context);
-    //   });
-    // } else {
-    //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //     SpotstockNavigation.goTo(SpotstockMobileRoutes.login, context);
-    //   });
-    // }
-    // return Result.success(null);
   }
 
   bool _hasElapsedSessionTime(DateTime lastLoginTime) {
