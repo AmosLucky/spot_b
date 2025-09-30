@@ -25,6 +25,7 @@ import '../../features/auth/domain/usecases/save_last_login_time.dart';
 import '../../features/auth/domain/usecases/save_spotstock_user.dart';
 import '../../features/auth/domain/usecases/save_token.dart';
 import '../../features/auth/presentation/view_model/login_view_model.dart';
+import '../../features/home/presentation/view_model/home_view_model.dart';
 import '../../features/platform/platform_service.dart';
 import '../../features/splash/presentation/view_model/splash_view_model.dart';
 import '../../features/webview/presentation/view_model/webview_view_model.dart';
@@ -35,17 +36,21 @@ final GetIt getIt = GetIt.instance;
 
 Future<void> setupServiceLocator() async {
   // ============ CORE DEPENDENCIES ============
-  final sharedPreferences = await SharedPreferences.getInstance();
-  getIt.registerSingleton<SharedPreferences>(sharedPreferences);
+  getIt.registerLazySingletonAsync<SharedPreferences>(() async {
+    return await SharedPreferences.getInstance();
+  });
   getIt.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
 
   // ============ SERVICES ============
   getIt.registerLazySingleton<PlatformService>(() => PlatformService());
   getIt.registerLazySingleton<DioClient>(() => DioClient());
-  getIt.registerLazySingleton<LocalStorageClient>(() => LocalStorageClient(
-        sharedPreferences: getIt<SharedPreferences>(),
-        secureStorage: getIt<FlutterSecureStorage>(),
-      ));
+  getIt.registerSingletonAsync<LocalStorageClient>(() async {
+    final prefs = await getIt.getAsync<SharedPreferences>();
+    return LocalStorageClient(
+      sharedPreferences: prefs,
+      secureStorage: getIt<FlutterSecureStorage>(),
+    );
+  });
 
   // ============ DATASOURCES ============
   getIt.registerLazySingleton<LoginDatasource>(() => LoginDatasource(getIt<DioClient>()));
@@ -110,4 +115,8 @@ Future<void> setupServiceLocator() async {
         getIt<RemoveToken>(),
         getIt<RemoveSpotstockUser>(),
       ));
+
+  getIt.registerFactory<HomeViewModel>(() => HomeViewModel());
+
+  await getIt.allReady();
 }
