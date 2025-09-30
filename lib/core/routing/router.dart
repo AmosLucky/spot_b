@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/view/login.dart';
 import '../../features/auth/presentation/view_model/login_view_model.dart';
+import '../../features/home/presentation/view/home.dart';
+import '../../features/home/presentation/view_model/home_view_model.dart';
 import '../../features/splash/presentation/view/mobile/splash.dart';
 import '../../features/splash/presentation/view_model/splash_view_model.dart';
 import '../../features/webview/presentation/view/webview.dart';
@@ -12,6 +14,7 @@ class SpotstockMobileRoutes {
   static const String splash = '/';
   static const String login = '/mobile/login';
   static const String webview = '/mobile/webview';
+  static const String home = '/mobile/home';
 }
 
 class SpotstockDesktopRoutes {
@@ -44,6 +47,13 @@ class SpotstockRouter {
         builder: (context, state) {
           final viewModel = getIt<WebviewViewModel>();
           return Webview(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.home,
+        builder: (context, state) {
+          final viewModel = getIt<HomeViewModel>();
+          return Home(viewModel: viewModel);
         },
       ),
     ],
