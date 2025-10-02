@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   audioplayers: ^6.1.0
+  flutter_svg: ^2.2.1
   bluetooth_print_plus: ^2.3.4
   cached_network_image: ^3.4.1
   connectivity_plus: ^6.0.5
@@ -120,6 +121,7 @@ flutter:
     - assets/images/
     - assets/logo/
     - assets/icons/
+    - assets/symbols/
 
   # add fonts
   fonts:
