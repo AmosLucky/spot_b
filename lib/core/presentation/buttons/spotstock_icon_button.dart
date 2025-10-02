@@ -17,19 +17,19 @@ class SpotstockIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget iconButton = Material(
-      shape: CircleBorder(),
-      color: Colors.transparent,
-      child: InkWell(
-        customBorder: CircleBorder(),
-        onTap: onPressed,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: SpotstockSizes.s4,
-            vertical: SpotstockSizes.s7,
+    Widget iconButton = SizedBox(
+      width: SpotstockSizes.s25,
+      height: SpotstockSizes.s25,
+      child: Material(
+        shape: CircleBorder(),
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: CircleBorder(),
+          onTap: onPressed,
+          child: Container(
+            decoration: BoxDecoration(shape: BoxShape.circle),
+            child: icon,
           ),
-          decoration: BoxDecoration(shape: BoxShape.circle),
-          child: icon,
         ),
       ),
     );

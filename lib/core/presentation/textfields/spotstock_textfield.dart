@@ -6,38 +6,40 @@ import '../../constants/sizes/spotstock_sizes.dart';
 class SpotstockInputDecorations {
   SpotstockInputDecorations();
 
-  static InputDecoration defaultInputDecoration({
+  static InputDecoration defaultInputDecoration(
+    BuildContext context, {
     String? hintText,
     Widget? prefixIcon,
     Widget? suffixIcon,
     String? errorText,
     String? counterText,
   }) {
+    final ThemeData theme = Theme.of(context);
     return InputDecoration(
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(SpotstockSizes.s5),
-        borderSide: BorderSide(color: Colors.deepPurple.shade200),
+        borderSide: BorderSide(color: theme.colorScheme.primary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(SpotstockSizes.s5),
-        borderSide: const BorderSide(color: Colors.deepPurple),
+        borderSide: BorderSide(color: theme.colorScheme.primary),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(SpotstockSizes.s5),
-        borderSide: BorderSide(color: Colors.deepPurple.shade100),
+        borderSide: BorderSide(color: theme.colorScheme.primary),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(SpotstockSizes.s5),
-        borderSide: const BorderSide(color: Colors.redAccent, width: SpotstockSizes.s1_2),
+        borderSide: BorderSide(color: theme.colorScheme.error, width: SpotstockSizes.s1_2),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(SpotstockSizes.s5),
-        borderSide: const BorderSide(color: Colors.redAccent),
+        borderSide: BorderSide(color: theme.colorScheme.error),
       ),
-      errorStyle: const TextStyle(
+      errorStyle: TextStyle(
         fontSize: SpotstockSizes.s12,
         fontWeight: FontWeight.w700,
-        color: Colors.redAccent,
+        color: theme.colorScheme.error,
       ),
       errorMaxLines: 1,
       isDense: true,
@@ -45,13 +47,13 @@ class SpotstockInputDecorations {
         horizontal: SpotstockSizes.s10,
         vertical: SpotstockSizes.s16,
       ),
-      fillColor: Colors.deepPurple.shade50,
+      fillColor: theme.colorScheme.surfaceContainerHighest,
       filled: true,
       hintText: hintText,
       hintStyle: TextStyle(
         fontSize: SpotstockSizes.s12,
         fontWeight: FontWeight.w500,
-        color: Colors.deepPurple.shade300,
+        color: theme.colorScheme.onSurface,
       ),
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
@@ -105,15 +107,16 @@ class SpotstockTextField extends StatelessWidget {
       inputFormatters: inputFormatters,
       onChanged: onChanged,
       style: style ??
-          const TextStyle(
+          TextStyle(
             fontSize: SpotstockSizes.s16,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
-      cursorColor: Colors.deepPurple,
+      cursorColor: Theme.of(context).colorScheme.primary,
       cursorWidth: SpotstockSizes.s1,
       cursorHeight: SpotstockSizes.s20,
       decoration: SpotstockInputDecorations.defaultInputDecoration(
+        context,
         hintText: hintText,
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,

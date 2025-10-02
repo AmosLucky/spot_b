@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:spotstock_inventory/core/presentation/buttons/spotstock_icon_button.dart';
 
-import '../../constants/colors/spotstock_colors.dart';
 import '../../constants/sizes/spotstock_sizes.dart';
+import '../../constants/strings/spotstock_strings.dart';
+import '../../routing/navigation.dart';
 
 class SpotstockAppbar extends StatelessWidget {
   final String title;
   final Widget? trailing;
-  const SpotstockAppbar({super.key, required this.title, this.trailing});
+  final Color? backgroundColor;
+  final bool? withBackButton;
+  const SpotstockAppbar({
+    super.key,
+    required this.title,
+    this.trailing,
+    this.backgroundColor,
+    this.withBackButton = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: SpotstockColors.c4D2B5B),
+      decoration: BoxDecoration(color: backgroundColor ?? Theme.of(context).colorScheme.primary),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: SpotstockSizes.s16),
         child: Column(
@@ -19,17 +29,37 @@ class SpotstockAppbar extends StatelessWidget {
           children: [
             SizedBox(height: SpotstockSizes.topSpacing(context)),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: SpotstockSizes.s20,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                if (withBackButton == true) ...[
+                  SpotstockIconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      size: SpotstockSizes.s18,
+                    ),
+                    onPressed: () {
+                      SpotstockNavigation.goBack(context);
+                    },
+                    tooltip: SpotstockStrings.back,
+                  ),
+                  SizedBox(width: SpotstockSizes.s16),
+                ],
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: SpotstockSizes.s18,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      ),
+                      trailing ?? SizedBox(width: SpotstockSizes.s25, height: SpotstockSizes.s25),
+                    ],
                   ),
                 ),
-                trailing ?? const SizedBox.shrink(),
               ],
             ),
             SizedBox(height: SpotstockSizes.s8),
