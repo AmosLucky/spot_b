@@ -23,6 +23,7 @@ class SpotstockInventory extends StatelessWidget {
     return MaterialApp.router(
       title: SpotstockStrings.spotstockInventory,
       routerConfig: isMobile ? SpotstockRouter.mobileRouter : SpotstockRouter.desktopRouter,
+      // theme: ThemeData.dark(),
     );
   }
 }
