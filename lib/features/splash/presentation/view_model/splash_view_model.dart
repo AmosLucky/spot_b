@@ -31,7 +31,7 @@ class SplashViewModel extends SpotstockViewModel {
   late Command1<void, BuildContext> navigateIntoAppCommand;
 
   @override
-  Future<void> bind(BuildContext context) async {
+  void bind(BuildContext context) async {
     navigateIntoAppCommand = Command1<void, BuildContext>(_navigateIntoApp);
     final tokenResult = await getToken();
     final spotstockUserResult = await getSpotstockUser();
@@ -72,13 +72,13 @@ class SplashViewModel extends SpotstockViewModel {
         _spotstockUser != null &&
         _lastLoginTime != null &&
         !_hasElapsedSessionTime(_lastLoginTime!)) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        SpotstockNavigation.goTo(SpotstockMobileRoutes.home, context);
-      });
+      if (context.mounted) {
+        SpotstockNavigation.replace(SpotstockMobileRoutes.root, context);
+      }
     } else {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        SpotstockNavigation.goTo(SpotstockMobileRoutes.login, context);
-      });
+      if (context.mounted) {
+        SpotstockNavigation.replace(SpotstockMobileRoutes.login, context);
+      }
     }
     return Result.success(null);
   }

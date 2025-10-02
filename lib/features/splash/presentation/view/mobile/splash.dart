@@ -2,9 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../core/assets/spotstock_assets.dart';
-import '../../../../../core/constants/colors/spotstock_colors.dart';
-import '../../../../../core/constants/sizes/spotstock_sizes.dart';
+import '../../../../../core/presentation/logo/spotstock_logo.dart';
 import '../../../../../core/presentation/views/spotstock_view.dart';
 import '../../view_model/splash_view_model.dart';
 
@@ -20,9 +18,7 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await widget.viewModel.bind(context);
-    });
+    widget.viewModel.bind(context);
   }
 
   @override
@@ -36,21 +32,15 @@ class _SplashState extends State<Splash> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    SpotstockColors.cF2FCFE,
-                    SpotstockColors.cFAF1FE,
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.primaryContainer,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
               ),
               child: Center(
-                child: Image.asset(
-                  SpotstockAssets.logo,
-                  width: SpotstockSizes.s250,
-                  height: SpotstockSizes.s200,
-                  color: SpotstockColors.c473069,
-                  colorBlendMode: BlendMode.srcIn,
-                ),
+                child: SpotstockLogo(),
               ),
             ),
           ),
