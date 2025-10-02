@@ -1,10 +1,13 @@
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/apps/presentation/view/select_app.dart';
+import '../../features/apps/presentation/view_model/select_app_view_model.dart';
 import '../../features/auth/presentation/view/login.dart';
 import '../../features/auth/presentation/view_model/login_view_model.dart';
 import '../../features/home/presentation/view/home.dart';
-import '../../features/home/presentation/view_model/home_view_model.dart';
+import '../../features/home/presentation/view/root.dart';
+import '../../features/home/presentation/view_model/root_view_model.dart';
 import '../../features/splash/presentation/view/mobile/splash.dart';
 import '../../features/splash/presentation/view_model/splash_view_model.dart';
 import '../../features/webview/presentation/view/webview.dart';
@@ -15,6 +18,8 @@ class SpotstockMobileRoutes {
   static const String login = '/mobile/login';
   static const String webview = '/mobile/webview';
   static const String home = '/mobile/home';
+  static const String root = '/mobile/root';
+  static const String selectApp = '/mobile/select-app';
 }
 
 class SpotstockDesktopRoutes {
@@ -50,10 +55,23 @@ class SpotstockRouter {
         },
       ),
       GoRoute(
+        path: SpotstockMobileRoutes.root,
+        builder: (context, state) {
+          final viewModel = getIt<RootViewModel>();
+          return Root(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
         path: SpotstockMobileRoutes.home,
         builder: (context, state) {
-          final viewModel = getIt<HomeViewModel>();
-          return Home(viewModel: viewModel);
+          return Home();
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.selectApp,
+        builder: (context, state) {
+          final viewModel = getIt<SelectAppViewModel>();
+          return SelectApp(viewModel: viewModel);
         },
       ),
     ],
