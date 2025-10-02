@@ -6,6 +6,7 @@ import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/presentation/buttons/spotstock_primary_button.dart';
 import '../../../../core/presentation/input_validation/spotstock_input_validation.dart';
+import '../../../../core/presentation/logo/spotstock_logo.dart';
 import '../../../../core/presentation/textfields/spotstock_textfield.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
 import '../view_model/login_view_model.dart';
@@ -48,19 +49,14 @@ class _LoginState extends State<Login> with SpotstockInputValidationMixin {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Container(
-                          width: SpotstockSizes.s130,
-                          height: SpotstockSizes.s130,
                           alignment: Alignment.center,
                           child: Center(
-                            child: Image.asset(
-                              SpotstockAssets.logo,
-                              width: SpotstockSizes.s250,
-                              height: SpotstockSizes.s200,
-                              color: SpotstockColors.c473069,
-                              colorBlendMode: BlendMode.srcIn,
+                            child: SpotstockLogo(
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ),
+                        const SizedBox(height: SpotstockSizes.s15),
                         Center(
                           child: Text(SpotstockStrings.pleaseLoginToContinue),
                         ),

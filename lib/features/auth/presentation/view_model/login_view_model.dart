@@ -88,7 +88,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
         _formKey.currentState?.reset();
         _emailController.clear();
         _passwordController.clear();
-        SpotstockNavigation.replace(SpotstockMobileRoutes.webview, context);
+        SpotstockNavigation.replace(SpotstockMobileRoutes.root, context);
       },
       onFailure: (error) {
         addError(
@@ -97,7 +97,9 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
             code: error.code,
             originalError: error.originalError,
             title: error.message,
-            subtitle: SpotstockStrings.loginErrorSubtitle,
+            subtitle: error.message == SpotstockStrings.somethingWentWrong
+                ? SpotstockStrings.pleaseCheckYourInternetConnectionAndTryAgain
+                : SpotstockStrings.loginErrorSubtitle,
           ),
         );
       },
