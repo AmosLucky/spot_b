@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../../../../core/constants/sizes/spotstock_sizes.dart';
+import '../../../../core/constants/colors/spotstock_colors.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/presentation/appbars/spotstock_appbar.dart';
-import '../../../../core/presentation/buttons/spotstock_icon_button.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
 import '../view_model/webview_view_model.dart';
 
@@ -34,13 +33,7 @@ class _WebviewState extends State<Webview> {
             children: [
               SpotstockAppbar(
                 title: SpotstockStrings.spotstock,
-                trailing: SpotstockIconButton(
-                  tooltip: SpotstockStrings.logout,
-                  icon: Icon(Icons.logout, color: Colors.white, size: SpotstockSizes.s20),
-                  onPressed: () {
-                    widget.viewModel.logoutCommand.execute(context);
-                  },
-                ),
+                backgroundColor: SpotstockColors.c4D2B5B,
               ),
               Expanded(
                 child: WebViewWidget(
