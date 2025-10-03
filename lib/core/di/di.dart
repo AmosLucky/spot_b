@@ -35,6 +35,7 @@ import '../../features/network_info/domain/usecases/listen_for_network_change.da
 import '../../features/network_info/network_info_service.dart';
 import '../../features/network_info/presentation/view_model/spotstock_network_aware_view_model.dart';
 import '../../features/platform/platform_service.dart';
+import '../../features/pos/data/datasources/remote/bar_tables_remote_datasource.dart';
 import '../../features/profile/presentation/view_model/profile_view_model.dart';
 import '../../features/splash/presentation/view_model/splash_view_model.dart';
 import '../../features/summary/presentation/view_model/summary_view_model.dart';
@@ -74,6 +75,9 @@ Future<void> setupServiceLocator() async {
   );
   getIt.registerLazySingleton<UserDatasource>(
     () => UserDatasource(getIt<LocalStorageClient>()),
+  );
+  getIt.registerLazySingleton<BarTablesRemoteDatasource>(
+    () => BarTablesRemoteDatasource(getIt<DioClient>()),
   );
 
   // ============ REPOSITORIES ============

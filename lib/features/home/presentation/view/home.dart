@@ -6,8 +6,8 @@ import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/presentation/appbars/spotstock_appbar.dart';
 import '../../../../core/presentation/buttons/spotstock_floating_action_button.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
+import '../../../pos/data/datasources/remote/bar_tables_remote_datasource.dart';
 import '../view_model/home_view_model.dart';
-import '../widgets/spotstock_dashboard_card.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -40,15 +40,6 @@ class Home extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: SpotstockSizes.s16),
-                      // SpotstockDashboardCard(
-                      //   title: SpotstockStrings.todaysSales,
-                      //   value: 100.0,
-                      //   icon: Icon(
-                      //     Icons.shopping_bag,
-                      //     color: Theme.of(context).colorScheme.onSurface,
-                      //     size: SpotstockSizes.s18,
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -56,7 +47,8 @@ class Home extends StatelessWidget {
             ),
             floatingActionButton: SpotstockFloatingActionButton(
               onPressed: () {
-                viewModel.navigateToSelectAppCommand.execute(context);
+                // viewModel.navigateToSelectAppCommand.execute(context);
+                getIt<BarTablesRemoteDatasource>().getBarTables();
               },
               icon: Icon(
                 Icons.storefront,
