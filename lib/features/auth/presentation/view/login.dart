@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/assets/spotstock_assets.dart';
-import '../../../../core/constants/colors/spotstock_colors.dart';
 import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/presentation/buttons/spotstock_primary_button.dart';

@@ -17,7 +17,7 @@ class NairaSymbol extends StatelessWidget {
         width: size,
         height: size,
         child: SvgPicture.asset(
-          SpotstockAssets.nairaSymbol,
+          SpotstockIconAssets.nairaSymbol,
           width: size,
           height: size,
           colorFilter: ColorFilter.mode(

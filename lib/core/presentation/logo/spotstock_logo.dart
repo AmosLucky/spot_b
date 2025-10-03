@@ -19,7 +19,7 @@ class SpotstockLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
-      SpotstockAssets.logo,
+      SpotstockIconAssets.logo,
       width: width,
       height: height,
       colorFilter:

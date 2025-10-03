@@ -7,6 +7,7 @@ import '../../../../core/constants/strings/spotstock_strings.dart';
 const double _shadowBlurRadius = 12;
 const double _shadowOffset = -4;
 const int _shadowOpacity = 64;
+const int _unselectedIconAlpha = 128;
 
 const int _homeIndex = 0;
 const int _productsIndex = 1;
@@ -118,7 +119,9 @@ class SpotstockBottomNavBarItem extends StatelessWidget {
                   height: SpotstockSizes.s24,
                   child: Icon(
                     icon,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onPrimary.withAlpha(_unselectedIconAlpha),
                     size: isSelected ? SpotstockSizes.s24 : SpotstockSizes.s20,
                   ),
                 ),
@@ -133,7 +136,9 @@ class SpotstockBottomNavBarItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: isSelected ? SpotstockSizes.s11 : SpotstockSizes.s10,
                 fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onPrimary.withAlpha(_unselectedIconAlpha),
               ),
             ),
           ),

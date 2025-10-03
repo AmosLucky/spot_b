@@ -36,14 +36,14 @@ class SelectApp extends StatelessWidget {
                         children: [
                           SpotstockAppWidget(
                             name: SpotstockStrings.pointOfSale,
-                            iconPath: SpotstockAssets.pointOfSale,
+                            iconPath: SpotstockIconAssets.pointOfSale,
                             onTap: () {
                               print('point of sale');
                             },
                           ),
                           SpotstockAppWidget(
                             name: SpotstockStrings.hotel,
-                            iconPath: SpotstockAssets.hotel,
+                            iconPath: SpotstockIconAssets.hotel,
                             onTap: () {
                               print('hotel');
                             },
