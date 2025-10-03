@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 
+import '../../features/auth/domain/repositories/token_repository.dart';
 import '../constants/durations/spotstock_durations.dart';
+import '../di/di.dart';
+import 'interceptors/spotstock_token_interceptor.dart';
 import 'spotstock_api_constants.dart';
 
 class DioClient {
@@ -23,6 +26,7 @@ class DioClient {
     );
     dio.interceptors.addAll([
       LogInterceptor(request: true, responseBody: true),
+      SpotstockTokenInterceptor(getIt<TokenRepository>()),
     ]);
     _instance = DioClient._internal(dio);
     return _instance!;
