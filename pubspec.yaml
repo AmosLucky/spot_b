@@ -122,6 +122,7 @@ flutter:
     - assets/logo/
     - assets/icons/
     - assets/symbols/
+    - assets/fonts/
 
   # add fonts
   fonts:
@@ -141,3 +142,22 @@ flutter:
         - asset: assets/fonts/Inter-Medium.ttf
         - asset: assets/fonts/Inter-Regular.ttf
         - asset: assets/fonts/Inter-SemiBold.ttf
+    - family: VastagoGrotesk
+      fonts:
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-Regular.otf
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-Bold.otf
+          weight: 700
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-Light.otf
+          weight: 300
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-Medium.otf
+          weight: 500
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-Heavy.otf
+          weight: 800
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-Black.otf
+          weight: 900
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-Thin.otf
+          weight: 100
+        - asset: assets/fonts/vastago-grotesk-fonts/VastagoGrotesk-ExtraLight.otf
+          weight: 200
