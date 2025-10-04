@@ -24,7 +24,7 @@ mixin _$BarTable {
   int? get chairsNo => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
-  String get link => throw _privateConstructorUsedError;
+  String? get link => throw _privateConstructorUsedError;
 
   /// Create a copy of BarTable
   /// with the given fields replaced by the non-null parameter values.
@@ -44,7 +44,7 @@ abstract class $BarTableCopyWith<$Res> {
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'chairs_no') int? chairsNo,
       @JsonKey(name: 'created_at') DateTime? createdAt,
-      String link});
+      String? link});
 }
 
 /// @nodoc
@@ -67,7 +67,7 @@ class _$BarTableCopyWithImpl<$Res, $Val extends BarTable>
     Object? companyId = freezed,
     Object? chairsNo = freezed,
     Object? createdAt = freezed,
-    Object? link = null,
+    Object? link = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -90,10 +90,10 @@ class _$BarTableCopyWithImpl<$Res, $Val extends BarTable>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      link: null == link
+      link: freezed == link
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ) as $Val);
   }
 }
@@ -112,7 +112,7 @@ abstract class _$$BarTableImplCopyWith<$Res>
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'chairs_no') int? chairsNo,
       @JsonKey(name: 'created_at') DateTime? createdAt,
-      String link});
+      String? link});
 }
 
 /// @nodoc
@@ -133,7 +133,7 @@ class __$$BarTableImplCopyWithImpl<$Res>
     Object? companyId = freezed,
     Object? chairsNo = freezed,
     Object? createdAt = freezed,
-    Object? link = null,
+    Object? link = freezed,
   }) {
     return _then(_$BarTableImpl(
       id: freezed == id
@@ -156,10 +156,10 @@ class __$$BarTableImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      link: null == link
+      link: freezed == link
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ));
   }
 }
@@ -173,7 +173,7 @@ class _$BarTableImpl implements _BarTable {
       @JsonKey(name: 'company_id') this.companyId,
       @JsonKey(name: 'chairs_no') this.chairsNo,
       @JsonKey(name: 'created_at') this.createdAt,
-      required this.link});
+      this.link});
 
   @override
   final int? id;
@@ -189,7 +189,7 @@ class _$BarTableImpl implements _BarTable {
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
   @override
-  final String link;
+  final String? link;
 
   @override
   String toString() {
@@ -232,7 +232,7 @@ abstract class _BarTable implements BarTable {
       @JsonKey(name: 'company_id') final int? companyId,
       @JsonKey(name: 'chairs_no') final int? chairsNo,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
-      required final String link}) = _$BarTableImpl;
+      final String? link}) = _$BarTableImpl;
 
   @override
   int? get id;
@@ -248,7 +248,7 @@ abstract class _BarTable implements BarTable {
   @JsonKey(name: 'created_at')
   DateTime? get createdAt;
   @override
-  String get link;
+  String? get link;
 
   /// Create a copy of BarTable
   /// with the given fields replaced by the non-null parameter values.

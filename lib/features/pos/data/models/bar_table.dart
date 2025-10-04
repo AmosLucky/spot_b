@@ -12,7 +12,7 @@ class BarTable with _$BarTable {
     @JsonKey(name: 'company_id') int? companyId,
     @JsonKey(name: 'chairs_no') int? chairsNo,
     @JsonKey(name: 'created_at') DateTime? createdAt,
-    required String link,
+    String? link,
   }) = _BarTable;
 
   factory BarTable.fromJson(Map<String, dynamic> json) {

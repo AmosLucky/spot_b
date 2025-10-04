@@ -48,7 +48,7 @@ class Home extends StatelessWidget {
             floatingActionButton: SpotstockFloatingActionButton(
               onPressed: () {
                 // viewModel.navigateToSelectAppCommand.execute(context);
-                getIt<BarTablesRemoteDatasource>().getBarTables();
+                getIt<BarTablesRemoteDatasource>().getBarTables(pageNumber: 2, pageSize: 10);
               },
               icon: Icon(
                 Icons.storefront,

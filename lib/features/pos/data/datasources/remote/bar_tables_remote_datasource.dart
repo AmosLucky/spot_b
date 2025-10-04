@@ -36,12 +36,16 @@ class BarTablesRemoteDatasource {
     );
   }
 
-  Future<Result<SpotstockApiResponse<List<BarTable>>>> getBarTables({int? page}) async {
+  Future<Result<SpotstockApiResponse<List<BarTable>>>> getBarTables({
+    int? pageNumber,
+    int? pageSize,
+  }) async {
     try {
       final response = await dioClient.dio.get(
         SpotstockApiPaths.barTables,
         queryParameters: {
-          'page': page,
+          'page[number]': pageNumber,
+          'page[size]': pageSize,
         },
       );
       if (response.statusCode == SpotstockStatusCode.success) {
