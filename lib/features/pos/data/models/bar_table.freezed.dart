@@ -14,16 +14,17 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-BarTable _$BarTableFromJson(Map<String, dynamic> json) {
-  return _BarTable.fromJson(json);
-}
-
 /// @nodoc
 mixin _$BarTable {
   int? get id => throw _privateConstructorUsedError;
-
-  /// Serializes this BarTable to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'company_id')
+  int? get companyId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'chairs_no')
+  int? get chairsNo => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  String get link => throw _privateConstructorUsedError;
 
   /// Create a copy of BarTable
   /// with the given fields replaced by the non-null parameter values.
@@ -37,7 +38,13 @@ abstract class $BarTableCopyWith<$Res> {
   factory $BarTableCopyWith(BarTable value, $Res Function(BarTable) then) =
       _$BarTableCopyWithImpl<$Res, BarTable>;
   @useResult
-  $Res call({int? id});
+  $Res call(
+      {int? id,
+      String? name,
+      @JsonKey(name: 'company_id') int? companyId,
+      @JsonKey(name: 'chairs_no') int? chairsNo,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      String link});
 }
 
 /// @nodoc
@@ -56,12 +63,37 @@ class _$BarTableCopyWithImpl<$Res, $Val extends BarTable>
   @override
   $Res call({
     Object? id = freezed,
+    Object? name = freezed,
+    Object? companyId = freezed,
+    Object? chairsNo = freezed,
+    Object? createdAt = freezed,
+    Object? link = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      companyId: freezed == companyId
+          ? _value.companyId
+          : companyId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      chairsNo: freezed == chairsNo
+          ? _value.chairsNo
+          : chairsNo // ignore: cast_nullable_to_non_nullable
+              as int?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      link: null == link
+          ? _value.link
+          : link // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -74,7 +106,13 @@ abstract class _$$BarTableImplCopyWith<$Res>
       __$$BarTableImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int? id});
+  $Res call(
+      {int? id,
+      String? name,
+      @JsonKey(name: 'company_id') int? companyId,
+      @JsonKey(name: 'chairs_no') int? chairsNo,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      String link});
 }
 
 /// @nodoc
@@ -91,30 +129,71 @@ class __$$BarTableImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? name = freezed,
+    Object? companyId = freezed,
+    Object? chairsNo = freezed,
+    Object? createdAt = freezed,
+    Object? link = null,
   }) {
     return _then(_$BarTableImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      companyId: freezed == companyId
+          ? _value.companyId
+          : companyId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      chairsNo: freezed == chairsNo
+          ? _value.chairsNo
+          : chairsNo // ignore: cast_nullable_to_non_nullable
+              as int?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      link: null == link
+          ? _value.link
+          : link // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$BarTableImpl implements _BarTable {
-  const _$BarTableImpl({this.id});
 
-  factory _$BarTableImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BarTableImplFromJson(json);
+class _$BarTableImpl implements _BarTable {
+  const _$BarTableImpl(
+      {this.id,
+      this.name,
+      @JsonKey(name: 'company_id') this.companyId,
+      @JsonKey(name: 'chairs_no') this.chairsNo,
+      @JsonKey(name: 'created_at') this.createdAt,
+      required this.link});
 
   @override
   final int? id;
+  @override
+  final String? name;
+  @override
+  @JsonKey(name: 'company_id')
+  final int? companyId;
+  @override
+  @JsonKey(name: 'chairs_no')
+  final int? chairsNo;
+  @override
+  @JsonKey(name: 'created_at')
+  final DateTime? createdAt;
+  @override
+  final String link;
 
   @override
   String toString() {
-    return 'BarTable(id: $id)';
+    return 'BarTable(id: $id, name: $name, companyId: $companyId, chairsNo: $chairsNo, createdAt: $createdAt, link: $link)';
   }
 
   @override
@@ -122,12 +201,20 @@ class _$BarTableImpl implements _BarTable {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$BarTableImpl &&
-            (identical(other.id, id) || other.id == id));
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.companyId, companyId) ||
+                other.companyId == companyId) &&
+            (identical(other.chairsNo, chairsNo) ||
+                other.chairsNo == chairsNo) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.link, link) || other.link == link));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id);
+  int get hashCode =>
+      Object.hash(runtimeType, id, name, companyId, chairsNo, createdAt, link);
 
   /// Create a copy of BarTable
   /// with the given fields replaced by the non-null parameter values.
@@ -136,23 +223,32 @@ class _$BarTableImpl implements _BarTable {
   @pragma('vm:prefer-inline')
   _$$BarTableImplCopyWith<_$BarTableImpl> get copyWith =>
       __$$BarTableImplCopyWithImpl<_$BarTableImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BarTableImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _BarTable implements BarTable {
-  const factory _BarTable({final int? id}) = _$BarTableImpl;
-
-  factory _BarTable.fromJson(Map<String, dynamic> json) =
-      _$BarTableImpl.fromJson;
+  const factory _BarTable(
+      {final int? id,
+      final String? name,
+      @JsonKey(name: 'company_id') final int? companyId,
+      @JsonKey(name: 'chairs_no') final int? chairsNo,
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      required final String link}) = _$BarTableImpl;
 
   @override
   int? get id;
+  @override
+  String? get name;
+  @override
+  @JsonKey(name: 'company_id')
+  int? get companyId;
+  @override
+  @JsonKey(name: 'chairs_no')
+  int? get chairsNo;
+  @override
+  @JsonKey(name: 'created_at')
+  DateTime? get createdAt;
+  @override
+  String get link;
 
   /// Create a copy of BarTable
   /// with the given fields replaced by the non-null parameter values.

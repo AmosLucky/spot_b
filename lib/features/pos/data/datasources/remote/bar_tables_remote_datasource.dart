@@ -1,23 +1,52 @@
+import '../../../../../core/networking/api_response/spotstock_api_data_item.dart';
+import '../../../../../core/networking/api_response/spotstock_api_response.dart';
 import '../../../../../core/networking/dio_client.dart';
 import '../../../../../core/networking/spotstock_api_error.dart';
 import '../../../../../core/networking/spotstock_api_error_handler.dart';
 import '../../../../../core/networking/spotstock_api_paths.dart';
 import '../../../../../core/networking/spotstock_status_code.dart';
 import '../../../../../core/shared/result.dart';
-import '../../../domain/datasources/bar_tables_datasource.dart';
 import '../../models/bar_table.dart';
 
-class BarTablesRemoteDatasource implements BarTablesDatasource {
+class BarTablesRemoteDatasource {
   final DioClient dioClient;
 
   BarTablesRemoteDatasource(this.dioClient);
 
-  @override
-  Future<Result<List<BarTable>>> getBarTables() async {
+  SpotstockApiResponse<List<BarTable>> _createApiResponse(Map<String, dynamic> responseData) {
+    final List<SpotstockApiDataItem> apiDataItems = (responseData['data'] as List)
+        .map((item) => SpotstockApiDataItem.fromJson(item as Map<String, dynamic>))
+        .toList();
+
+    final List<BarTable> barTables = apiDataItems
+        .map((item) => BarTable.fromJson({
+              'id': item.id,
+              'attributes': item.attributes,
+              'links': item.links,
+            }))
+        .toList();
+
+    return SpotstockApiResponse(
+      data: barTables,
+      links: responseData['links'] != null ? ApiLinks.fromJson(responseData['links']) : null,
+      meta: responseData['meta'] != null ? ApiMeta.fromJson(responseData['meta']) : null,
+      message: responseData['message'] as String?,
+      success: responseData['success'] as bool?,
+      rawResponse: responseData,
+    );
+  }
+
+  Future<Result<SpotstockApiResponse<List<BarTable>>>> getBarTables({int? page}) async {
     try {
-      final response = await dioClient.dio.get(SpotstockApiPaths.barTables);
+      final response = await dioClient.dio.get(
+        SpotstockApiPaths.barTables,
+        queryParameters: {
+          'page': page,
+        },
+      );
       if (response.statusCode == SpotstockStatusCode.success) {
-        return Result.success(response.data.map((e) => BarTable.fromJson(e)).toList());
+        final apiResponse = _createApiResponse(response.data);
+        return Result.success(apiResponse);
       } else {
         return Result.failure(
           SpotstockApiError(

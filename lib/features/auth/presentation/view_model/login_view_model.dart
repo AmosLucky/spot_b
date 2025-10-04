@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/error_handling/app_error.dart';
+import '../../../../core/networking/spotstock_api_error.dart';
 import '../../../../core/networking/spotstock_status_code.dart';
 import '../../../../core/presentation/snackbars/spotstock_snackbar.dart';
 import '../../../../core/presentation/view_models/spotstock_view_model.dart';
@@ -82,8 +83,8 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
     result.when(
       onSuccess: (response) {
         _validateResponse(response.data);
-        saveToken(response.data!.token!);
-        saveSpotstockUser(_createSpotstockUser(response.data!.user, response.data!.role));
+        saveToken(response.data.token!);
+        saveSpotstockUser(_createSpotstockUser(response.data.user, response.data.role));
         saveLastLoginTime(DateTime.now());
         _formKey.currentState?.reset();
         _emailController.clear();

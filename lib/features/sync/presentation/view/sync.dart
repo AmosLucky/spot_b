@@ -6,7 +6,6 @@ import '../../../../core/di/di.dart';
 import '../../../../core/presentation/appbars/spotstock_appbar.dart';
 import '../../../../core/presentation/buttons/spotstock_floating_action_button.dart';
 import '../../../../core/presentation/buttons/spotstock_icon_button.dart';
-import '../../../../core/presentation/buttons/spotstock_primary_button.dart';
 import '../../../../core/presentation/textfields/spotstock_textfield.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
 import '../view_model/sync_view_model.dart';
@@ -61,13 +60,6 @@ class Sync extends StatelessWidget {
             ),
             floatingActionButton: SpotstockFloatingActionButton(
               onPressed: () {},
-              // icon: Padding(
-              //   padding: EdgeInsets.all(SpotstockSizes.s16),
-              //   child: CircularProgressIndicator(
-              //     color: Theme.of(context).colorScheme.onPrimary,
-              //     strokeWidth: SpotstockSizes.s2,
-              //   ),
-              // ),
               icon: Icon(
                 Icons.sync,
                 color: Theme.of(context).colorScheme.onPrimary,

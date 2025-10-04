@@ -1,4 +1,4 @@
-import '../../../../core/networking/spotstock_api_response.dart';
+import '../../../../core/networking/api_response/spotstock_api_response.dart';
 import '../../../../core/shared/result.dart';
 import '../../domain/repositories/login_repository.dart';
 import '../datasources/remote/login_datasource.dart';
