@@ -54,4 +54,6 @@ class SpotstockStrings {
   static const String back = 'Back';
   static const String welcomeWithComma = 'Welcome,';
   static const String todaysSales = 'Today\'s sales';
+  static const String failedToWriteData = 'Failed to write data';
+  static const String failedToReadData = 'Failed to read data';
 }

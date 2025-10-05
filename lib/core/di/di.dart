@@ -35,12 +35,19 @@ import '../../features/network_info/domain/usecases/listen_for_network_change.da
 import '../../features/network_info/network_info_service.dart';
 import '../../features/network_info/presentation/view_model/spotstock_network_aware_view_model.dart';
 import '../../features/platform/platform_service.dart';
+import '../../features/pos/data/datasources/local/attendant_local_datasource.dart';
+import '../../features/pos/data/datasources/remote/attendant_remote_datasource.dart';
 import '../../features/pos/data/datasources/remote/bar_tables_remote_datasource.dart';
+import '../../features/pos/data/datasources/remote/customers_remote_datasource.dart';
+import '../../features/pos/data/datasources/remote/product_categories_remote_datasource.dart';
+import '../../features/pos/data/datasources/remote/products_remote_datasource.dart';
+import '../../features/pos/data/datasources/remote/warehouse_remote_datasource.dart';
 import '../../features/profile/presentation/view_model/profile_view_model.dart';
 import '../../features/splash/presentation/view_model/splash_view_model.dart';
 import '../../features/summary/presentation/view_model/summary_view_model.dart';
 import '../../features/sync/presentation/view_model/sync_view_model.dart';
 import '../../features/webview/presentation/view_model/webview_view_model.dart';
+import '../database/database_client.dart';
 import '../local_storage/local_storage_client.dart';
 import '../networking/dio_client.dart';
 
@@ -63,6 +70,7 @@ Future<void> setupServiceLocator() async {
       secureStorage: getIt<FlutterSecureStorage>(),
     );
   });
+  getIt.registerLazySingleton<DatabaseClient>(() => DatabaseClient());
   getIt.registerLazySingleton<NetworkInfoService>(() => NetworkInfoService()..start());
 
   // ============ DATASOURCES ============
@@ -78,6 +86,24 @@ Future<void> setupServiceLocator() async {
   );
   getIt.registerLazySingleton<BarTablesRemoteDatasource>(
     () => BarTablesRemoteDatasource(getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<WarehouseRemoteDatasource>(
+    () => WarehouseRemoteDatasource(getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<ProductsRemoteDatasource>(
+    () => ProductsRemoteDatasource(getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<ProductCategoriesRemoteDatasource>(
+    () => ProductCategoriesRemoteDatasource(getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<CustomersRemoteDatasource>(
+    () => CustomersRemoteDatasource(getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<AttendantRemoteDatasource>(
+    () => AttendantRemoteDatasource(getIt<DioClient>()),
+  );
+  getIt.registerLazySingleton<AttendantLocalDatasource>(
+    () => AttendantLocalDatasource(getIt<DatabaseClient>()),
   );
 
   // ============ REPOSITORIES ============

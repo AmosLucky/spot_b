@@ -16,16 +16,17 @@ class BarTable with _$BarTable {
   }) = _BarTable;
 
   factory BarTable.fromJson(Map<String, dynamic> json) {
-    final attributes = json['attributes'] as Map<String, dynamic>;
-    final links = json['links'] as Map<String, dynamic>;
+    final attributes = json['attributes'];
+    final links = json['links'];
 
     return BarTable(
-      id: int.parse(json['id'].toString()),
-      name: attributes['name'] as String,
-      companyId: attributes['company_id'] as int,
-      chairsNo: attributes['chairs_no'] as int,
-      createdAt: DateTime.parse(attributes['created_at'] as String),
-      link: links['self'] as String,
+      id: int.tryParse(json['id'].toString()),
+      name: attributes['name'],
+      companyId: attributes['company_id'],
+      chairsNo: attributes['chairs_no'],
+      createdAt:
+          attributes['created_at'] != null ? DateTime.tryParse(attributes['created_at']) : null,
+      link: links['self'],
     );
   }
 }

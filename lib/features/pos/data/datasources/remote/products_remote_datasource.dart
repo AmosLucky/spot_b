@@ -8,59 +8,57 @@ import '../../../../../core/networking/spotstock_api_error_handler.dart';
 import '../../../../../core/networking/spotstock_api_paths.dart';
 import '../../../../../core/networking/spotstock_status_code.dart';
 import '../../../../../core/shared/result.dart';
-import '../../models/bar_table.dart';
+import '../../models/product.dart';
 
-class BarTablesRemoteDatasource {
+class ProductsRemoteDatasource {
   final DioClient dioClient;
 
-  BarTablesRemoteDatasource(this.dioClient);
+  ProductsRemoteDatasource(this.dioClient);
 
-  SpotstockApiResponse<List<BarTable>> _createApiResponse(Map<String, dynamic> responseData) {
+  SpotstockApiResponse<List<Product>> _createApiResponse(Map<String, dynamic> responseData) {
     final List<SpotstockApiDataItem> apiDataItems = (responseData['data'] as List<dynamic>)
         .map((item) => SpotstockApiDataItem.fromJson(item as Map<String, dynamic>))
         .toList();
-
-    final List<BarTable> barTables = apiDataItems
-        .map((item) => BarTable.fromJson({
-              'id': item.id,
-              'attributes': item.attributes,
-              'links': item.links,
-            }))
-        .toList();
-
+    final List<Product> products = apiDataItems.map((item) {
+      return Product.fromJson({
+        'id': item.id,
+        'attributes': item.attributes,
+        'links': item.links,
+      });
+    }).toList();
     return SpotstockApiResponse(
-      data: barTables,
+      data: products,
       links: responseData['links'] != null ? ApiLinks.fromJson(responseData['links']) : null,
       meta: responseData['meta'] != null ? ApiMeta.fromJson(responseData['meta']) : null,
       rawResponse: responseData,
     );
   }
 
-  Future<Result<SpotstockApiResponse<List<BarTable>>>> getBarTables({
+  Future<Result<SpotstockApiResponse<List<Product>>>> getProducts({
     int? pageNumber,
     int? pageSize = SpotstockApiConstants.pageSize,
+    int? warehouseId,
   }) async {
     try {
       final response = await dioClient.dio.get(
-        SpotstockApiPaths.barTables,
+        SpotstockApiPaths.products,
         queryParameters: {
           'page[number]': pageNumber,
           'page[size]': pageSize,
+          'warehouse_id': warehouseId,
         },
       );
       if (response.statusCode == SpotstockStatusCode.success) {
         final apiResponse = _createApiResponse(response.data);
         return Result.success(apiResponse);
       } else {
-        return Result.failure(
-          SpotstockApiError(
-            message: response.data['message'] ?? SpotstockStrings.somethingWentWrong,
-            code: response.statusCode.toString(),
-            success: response.data['success'] ?? false,
-            rawResponse: response.data,
-            originalError: response.data,
-          ),
-        );
+        return Result.failure(SpotstockApiError(
+          message: response.data['message'] ?? SpotstockStrings.somethingWentWrong,
+          code: response.statusCode.toString(),
+          success: response.data['success'] ?? false,
+          rawResponse: response.data,
+          originalError: response.data,
+        ));
       }
     } catch (e) {
       return Result.failure(handleSpotstockApiError(e));
