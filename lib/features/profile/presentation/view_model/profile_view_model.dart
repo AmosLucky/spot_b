@@ -43,7 +43,7 @@ class ProfileViewModel extends SpotstockViewModel with SpotstockDialogMixin {
   }
 
   Future<Result<void>> _logout(BuildContext context) async {
-    showSpotstockDialog(
+    showSpotstockInformationDialog(
       context,
       icon: Icon(Icons.logout),
       title: SpotstockStrings.logout,
@@ -58,7 +58,7 @@ class ProfileViewModel extends SpotstockViewModel with SpotstockDialogMixin {
           onPressed: () {
             removeLastLoginTime();
             removeToken();
-            SpotstockNavigation.replace(SpotstockMobileRoutes.login, context);
+            SpotstockNavigation.replace(SpotstockMobileRoutes.login);
           },
         ),
         SizedBox(height: SpotstockSizes.s16),

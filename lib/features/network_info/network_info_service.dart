@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 
-class NetworkInfoService {
+class NetworkInfoService extends ChangeNotifier {
   final Connectivity _connectivity = Connectivity();
   final StreamController<bool> _networkChangeController = StreamController<bool>.broadcast();
 
@@ -18,11 +19,13 @@ class NetworkInfoService {
     final isOnline = initialResult.any((result) => result != ConnectivityResult.none);
     _isConnected = isOnline;
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateNetworkStatus);
+    notifyListeners();
   }
 
   Future<void> stop() async {
     _connectivitySubscription?.cancel();
     _connectivitySubscription = null;
+    notifyListeners();
   }
 
   void _updateNetworkStatus(List<ConnectivityResult> result) {
@@ -30,11 +33,25 @@ class NetworkInfoService {
     if (isOnline != _isConnected) {
       _isConnected = isOnline;
       _networkChangeController.add(isOnline);
-    } else {}
+      notifyListeners();
+    } else {
+      _networkChangeController.add(isOnline);
+      notifyListeners();
+    }
   }
 
+  Future<void> checkAndUpdateNetworkStatus() async {
+    final networkStatus = await _connectivity.checkConnectivity();
+    final isOnline = networkStatus.any((result) => result != ConnectivityResult.none);
+    _isConnected = isOnline;
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateNetworkStatus);
+    notifyListeners();
+  }
+
+  @override
   void dispose() {
     stop();
     _networkChangeController.close();
+    super.dispose();
   }
 }

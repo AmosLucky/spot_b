@@ -26,6 +26,7 @@ mixin _$Product {
   double? get productCost => throw _privateConstructorUsedError;
   double? get productPrice => throw _privateConstructorUsedError;
   bool? get isActive => throw _privateConstructorUsedError;
+  Stock? get stock => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   int? get inStock => throw _privateConstructorUsedError;
   String? get link => throw _privateConstructorUsedError;
@@ -52,9 +53,12 @@ abstract class $ProductCopyWith<$Res> {
       double? productCost,
       double? productPrice,
       bool? isActive,
+      Stock? stock,
       DateTime? createdAt,
       int? inStock,
       String? link});
+
+  $StockCopyWith<$Res>? get stock;
 }
 
 /// @nodoc
@@ -82,6 +86,7 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
     Object? productCost = freezed,
     Object? productPrice = freezed,
     Object? isActive = freezed,
+    Object? stock = freezed,
     Object? createdAt = freezed,
     Object? inStock = freezed,
     Object? link = freezed,
@@ -127,6 +132,10 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
           ? _value.isActive
           : isActive // ignore: cast_nullable_to_non_nullable
               as bool?,
+      stock: freezed == stock
+          ? _value.stock
+          : stock // ignore: cast_nullable_to_non_nullable
+              as Stock?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -140,6 +149,20 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
           : link // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
+  }
+
+  /// Create a copy of Product
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $StockCopyWith<$Res>? get stock {
+    if (_value.stock == null) {
+      return null;
+    }
+
+    return $StockCopyWith<$Res>(_value.stock!, (value) {
+      return _then(_value.copyWith(stock: value) as $Val);
+    });
   }
 }
 
@@ -161,9 +184,13 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
       double? productCost,
       double? productPrice,
       bool? isActive,
+      Stock? stock,
       DateTime? createdAt,
       int? inStock,
       String? link});
+
+  @override
+  $StockCopyWith<$Res>? get stock;
 }
 
 /// @nodoc
@@ -189,6 +216,7 @@ class __$$ProductImplCopyWithImpl<$Res>
     Object? productCost = freezed,
     Object? productPrice = freezed,
     Object? isActive = freezed,
+    Object? stock = freezed,
     Object? createdAt = freezed,
     Object? inStock = freezed,
     Object? link = freezed,
@@ -234,6 +262,10 @@ class __$$ProductImplCopyWithImpl<$Res>
           ? _value.isActive
           : isActive // ignore: cast_nullable_to_non_nullable
               as bool?,
+      stock: freezed == stock
+          ? _value.stock
+          : stock // ignore: cast_nullable_to_non_nullable
+              as Stock?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -264,6 +296,7 @@ class _$ProductImpl implements _Product {
       this.productCost,
       this.productPrice,
       this.isActive,
+      this.stock,
       this.createdAt,
       this.inStock,
       this.link});
@@ -289,6 +322,8 @@ class _$ProductImpl implements _Product {
   @override
   final bool? isActive;
   @override
+  final Stock? stock;
+  @override
   final DateTime? createdAt;
   @override
   final int? inStock;
@@ -297,7 +332,7 @@ class _$ProductImpl implements _Product {
 
   @override
   String toString() {
-    return 'Product(id: $id, name: $name, companyId: $companyId, code: $code, expiryDate: $expiryDate, mainProductId: $mainProductId, productCategoryId: $productCategoryId, productCost: $productCost, productPrice: $productPrice, isActive: $isActive, createdAt: $createdAt, inStock: $inStock, link: $link)';
+    return 'Product(id: $id, name: $name, companyId: $companyId, code: $code, expiryDate: $expiryDate, mainProductId: $mainProductId, productCategoryId: $productCategoryId, productCost: $productCost, productPrice: $productPrice, isActive: $isActive, stock: $stock, createdAt: $createdAt, inStock: $inStock, link: $link)';
   }
 
   @override
@@ -322,6 +357,7 @@ class _$ProductImpl implements _Product {
                 other.productPrice == productPrice) &&
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
+            (identical(other.stock, stock) || other.stock == stock) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.inStock, inStock) || other.inStock == inStock) &&
@@ -341,6 +377,7 @@ class _$ProductImpl implements _Product {
       productCost,
       productPrice,
       isActive,
+      stock,
       createdAt,
       inStock,
       link);
@@ -366,6 +403,7 @@ abstract class _Product implements Product {
       final double? productCost,
       final double? productPrice,
       final bool? isActive,
+      final Stock? stock,
       final DateTime? createdAt,
       final int? inStock,
       final String? link}) = _$ProductImpl;
@@ -390,6 +428,8 @@ abstract class _Product implements Product {
   double? get productPrice;
   @override
   bool? get isActive;
+  @override
+  Stock? get stock;
   @override
   DateTime? get createdAt;
   @override

@@ -5,9 +5,12 @@ import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/presentation/buttons/spotstock_primary_button.dart';
 import '../../../../core/presentation/input_validation/spotstock_input_validation.dart';
 import '../../../../core/presentation/logo/spotstock_logo.dart';
+import '../../../../core/presentation/progress_indicators/spotstock_progress_indicator.dart';
 import '../../../../core/presentation/textfields/spotstock_textfield.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
 import '../view_model/login_view_model.dart';
+
+const int maxLines = 1;
 
 class Login extends StatefulWidget {
   final LoginViewModel viewModel;
@@ -62,13 +65,26 @@ class _LoginState extends State<Login> with SpotstockInputValidationMixin {
                         SpotstockTextField(
                           hintText: SpotstockStrings.email,
                           controller: widget.viewModel.emailController,
+                          prefixIcon: Icon(Icons.email),
                           validator: (value) => isValidEmail(value),
                         ),
                         const SizedBox(height: SpotstockSizes.s15),
                         SpotstockTextField(
-                          obscureText: true,
+                          maxLines: maxLines,
+                          obscureText: widget.viewModel.obscurePassword,
                           hintText: SpotstockStrings.password,
                           controller: widget.viewModel.passwordController,
+                          prefixIcon: Icon(Icons.lock),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              widget.viewModel.toggleObscurePasswordCommand.execute(context);
+                            },
+                            child: Icon(
+                              widget.viewModel.obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                          ),
                           validator: (value) => isValidPassword(value),
                         ),
                         const SizedBox(height: SpotstockSizes.s15),
@@ -81,14 +97,11 @@ class _LoginState extends State<Login> with SpotstockInputValidationMixin {
                             }
                           },
                           child: widget.viewModel.loginCommand.running
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: SpotstockSizes.s2,
-                                )
+                              ? SpotstockProgressIndicator()
                               : Text(
                                   SpotstockStrings.login,
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onPrimary,
                                     fontSize: SpotstockSizes.s16,
                                     fontWeight: FontWeight.w700,
                                   ),

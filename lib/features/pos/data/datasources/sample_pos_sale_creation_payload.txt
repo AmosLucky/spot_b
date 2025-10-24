@@ -1,1 +1,442 @@
-{"reference_code":null,"date":"2025-10-04 13:19:36.373Z","customer_id":1,"warehouse_id":5,"tax_rate":0,"tax_amount":0,"discount":0,"discount_amount":0,"shipping":0,"grand_total":79000,"status":1,"payment_status":1,"payment_type":1,"received_amount":79000,"paid_amount":79000,"payments":[{"payment_type":1,"amount":79000}],"notes":"test note Tobe","sale_items":[{"product_id":21509,"table_id":null,"product_price":25000,"net_unit_price":25000,"tax_type":1,"tax_value":0,"tax_amount":0,"discount_type":2,"discount_value":0,"discount_amount":0,"sale_unit":null,"quantity":1,"sub_total":25000},{"product_id":20963,"table_id":null,"product_price":27000,"net_unit_price":27000,"tax_type":1,"tax_value":0,"tax_amount":0,"discount_type":2,"discount_value":0,"discount_amount":0,"sale_unit":null,"quantity":1,"sub_total":27000},{"product_id":20962,"table_id":null,"product_price":2000,"net_unit_price":2000,"tax_type":1,"tax_value":0,"tax_amount":0,"discount_type":2,"discount_value":0,"discount_amount":0,"sale_unit":null,"quantity":1,"sub_total":2000},{"product_id":20968,"table_id":null,"product_price":25000,"net_unit_price":25000,"tax_type":1,"tax_value":0,"tax_amount":0,"discount_type":2,"discount_value":0,"discount_amount":0,"sale_unit":null,"quantity":1,"sub_total":25000}],"note":"test note Tobe","partial_payment_amount":null,"partial_payment_method":null,"staff_id":276,"staff_name":"Pascal Chinonso","attendant_id":null,"attendant_name":"","roomDetails":null,"is_offline":0}
+// Test call 1 payload
+
+{
+  "reference_code": null,
+  "date": "2025-10-04 13:19:36.373Z",
+  "customer_id": 1,
+  "warehouse_id": 5,
+  "tax_rate": 0,
+  "tax_amount": 0,
+  "discount": 0,
+  "discount_amount": 0,
+  "shipping": 0,
+  "grand_total": 79000,
+  "status": 1,
+  "payment_status": 1,
+  "payment_type": 1,
+  "received_amount": 79000,
+  "paid_amount": 79000,
+  "payments": [
+    {
+      "payment_type": 1,
+      "amount": 79000
+    }
+  ],
+  "notes": "test note Tobe",
+  "sale_items": [
+    {
+      "product_id": 21509,
+      "table_id": null,
+      "product_price": 25000,
+      "net_unit_price": 25000,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 1,
+      "sub_total": 25000
+    },
+    {
+      "product_id": 20963,
+      "table_id": null,
+      "product_price": 27000,
+      "net_unit_price": 27000,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 1,
+      "sub_total": 27000
+    },
+    {
+      "product_id": 20962,
+      "table_id": null,
+      "product_price": 2000,
+      "net_unit_price": 2000,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 1,
+      "sub_total": 2000
+    },
+    {
+      "product_id": 20968,
+      "table_id": null,
+      "product_price": 25000,
+      "net_unit_price": 25000,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 1,
+      "sub_total": 25000
+    }
+  ],
+  "note": "test note Tobe",
+  "partial_payment_amount": null,
+  "partial_payment_method": null,
+  "staff_id": 276,
+  "staff_name": "Pascal Chinonso",
+  "attendant_id": null,
+  "attendant_name": "",
+  "roomDetails": null,
+  "is_offline": 0
+}
+
+
+
+// Test call 2 payload
+
+{
+  "reference_code": null,
+  "date": "2025-10-09 12:15:26.642Z",
+  "customer_id": 1,
+  "warehouse_id": 5,
+  "tax_rate": 0,
+  "tax_amount": 0,
+  "discount": 0,
+  "discount_amount": 0,
+  "shipping": 2000,
+  "grand_total": 190000,
+  "status": 1,
+  "payment_status": 1,
+  "payment_type": 1,
+  "received_amount": 150000,
+  "paid_amount": 150000,
+  "payments": [
+    {
+      "payment_type": 1,
+      "amount": 30000
+    },
+    {
+      "payment_type": 2,
+      "amount": 30000
+    },
+    {
+      "payment_type": 3,
+      "amount": 30000
+    },
+    {
+      "payment_type": 5,
+      "amount": 30000
+    },
+    {
+      "payment_type": 5,
+      "amount": 30000
+    }
+  ],
+  "notes": "testing, mic check",
+  "sale_items": [
+    {
+      "product_id": 20968,
+      "table_id": null,
+      "product_price": 25000,
+      "net_unit_price": 25000,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 5,
+      "sub_total": 125000
+    },
+    {
+      "product_id": 22053,
+      "table_id": null,
+      "product_price": 7500,
+      "net_unit_price": 7500,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 2,
+      "sub_total": 15000
+    },
+    {
+      "product_id": 21530,
+      "table_id": null,
+      "product_price": 40000,
+      "net_unit_price": 40000,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 1,
+      "sub_total": 40000
+    },
+    {
+      "product_id": 20962,
+      "table_id": null,
+      "product_price": 2000,
+      "net_unit_price": 2000,
+      "tax_type": 1,
+      "tax_value": 0,
+      "tax_amount": 0,
+      "discount_type": 2,
+      "discount_value": 0,
+      "discount_amount": 0,
+      "sale_unit": null,
+      "quantity": 4,
+      "sub_total": 8000
+    }
+  ],
+  "note": "testing, mic check",
+  "partial_payment_amount": null,
+  "partial_payment_method": null,
+  "staff_id": 360,
+  "staff_name": "Norah Eze",
+  "attendant_id": null,
+  "attendant_name": "",
+  "roomDetails": null,
+  "is_offline": 0
+}
+
+
+// Test response 1
+
+{
+    "data": {
+        "type": "sales",
+        "id": 13221,
+        "attributes": {
+            "date": "2025-10-09T00:00:00.000000Z",
+            "is_return": null,
+            "customer_id": 1,
+            "company_id": 20,
+            "logged_user": {
+                "id": 22,
+                "first_name": "SPOT STOCK MANAGER",
+                "last_name": null,
+                "dob": null,
+                "salary_date": null,
+                "email": "247okolo@gmail.com",
+                "phone": "08073764488",
+                "email_verified_at": null,
+                "default_password": "667ea451792e3",
+                "created_at": "2024-06-28T12:53:53.000000Z",
+                "updated_at": "2025-10-09T14:50:45.000000Z",
+                "status": 1,
+                "language": "en",
+                "company_id": 20,
+                "is_admin": 1,
+                "is_super": 0,
+                "warehouse_id": null,
+                "branch_id": null,
+                "type": "A",
+                "salary_amount": 0,
+                "balance": 0,
+                "date_employed": null,
+                "note": null,
+                "is_attendant": 0,
+                "image_url": "",
+                "media": []
+            },
+            "customer_name": "walk-in-customer",
+            "staff_name": "Norah Eze",
+            "warehouse_id": 5,
+            "warehouse_name": "Calabar Branch",
+            "tax_rate": 0,
+            "tax_amount": 0,
+            "discount": 0,
+            "shipping": 5000,
+            "grand_total": 207000,
+            "received_amount": 207000,
+            "paid_amount": 207000,
+            "partial_amount": null,
+            "due_amount": 0,
+            "payment_type": 1,
+            "note": "minister",
+            "status": 1,
+            "payment_status": 1,
+            "reference_code": "INV-1760021691",
+            "sale_items": [
+                {
+                    "product_id": 20990,
+                    "product_name": "Kimberley Mckenzie",
+                    "company_id": null,
+                    "net_unit_price": 15000,
+                    "product_price": 15000,
+                    "tax_type": 1,
+                    "tax_value": 0,
+                    "tax_amount": 0,
+                    "discount_type": 2,
+                    "discount_value": 0,
+                    "discount_amount": 0,
+                    "sale_unit": {
+                        "id": 18,
+                        "name": "piece",
+                        "short_name": "piece",
+                        "base_unit": 26,
+                        "created_at": "2024-07-05T14:31:38.000000Z",
+                        "updated_at": "2024-07-05T14:31:38.000000Z",
+                        "company_id": 20
+                    },
+                    "quantity": 4,
+                    "sub_total": 60000
+                },
+                {
+                    "product_id": 21509,
+                    "product_name": "Idole Papaya Soap",
+                    "company_id": null,
+                    "net_unit_price": 25000,
+                    "product_price": 25000,
+                    "tax_type": 1,
+                    "tax_value": 0,
+                    "tax_amount": 0,
+                    "discount_type": 2,
+                    "discount_value": 0,
+                    "discount_amount": 0,
+                    "sale_unit": {
+                        "id": 18,
+                        "name": "piece",
+                        "short_name": "piece",
+                        "base_unit": 26,
+                        "created_at": "2024-07-05T14:31:38.000000Z",
+                        "updated_at": "2024-07-05T14:31:38.000000Z",
+                        "company_id": 20
+                    },
+                    "quantity": 2,
+                    "sub_total": 50000
+                },
+                {
+                    "product_id": 21530,
+                    "product_name": "Rice",
+                    "company_id": null,
+                    "net_unit_price": 40000,
+                    "product_price": 40000,
+                    "tax_type": 1,
+                    "tax_value": 0,
+                    "tax_amount": 0,
+                    "discount_type": 2,
+                    "discount_value": 0,
+                    "discount_amount": 0,
+                    "sale_unit": {
+                        "id": 18,
+                        "name": "piece",
+                        "short_name": "piece",
+                        "base_unit": 26,
+                        "created_at": "2024-07-05T14:31:38.000000Z",
+                        "updated_at": "2024-07-05T14:31:38.000000Z",
+                        "company_id": 20
+                    },
+                    "quantity": 1,
+                    "sub_total": 40000
+                },
+                {
+                    "product_id": 20963,
+                    "product_name": "Osuofia",
+                    "company_id": null,
+                    "net_unit_price": 27000,
+                    "product_price": 27000,
+                    "tax_type": 1,
+                    "tax_value": 0,
+                    "tax_amount": 0,
+                    "discount_type": 2,
+                    "discount_value": 0,
+                    "discount_amount": 0,
+                    "sale_unit": {
+                        "id": 38,
+                        "name": "Piece",
+                        "short_name": "Pcs",
+                        "base_unit": 26,
+                        "created_at": "2024-08-09T12:15:46.000000Z",
+                        "updated_at": "2024-08-09T12:15:46.000000Z",
+                        "company_id": 20
+                    },
+                    "quantity": 1,
+                    "sub_total": 27000
+                },
+                {
+                    "product_id": 20968,
+                    "product_name": "Eva Classic Soap 150g",
+                    "company_id": null,
+                    "net_unit_price": 25000,
+                    "product_price": 25000,
+                    "tax_type": 1,
+                    "tax_value": 0,
+                    "tax_amount": 0,
+                    "discount_type": 2,
+                    "discount_value": 0,
+                    "discount_amount": 0,
+                    "sale_unit": {
+                        "id": 18,
+                        "name": "piece",
+                        "short_name": "piece",
+                        "base_unit": 26,
+                        "created_at": "2024-07-05T14:31:38.000000Z",
+                        "updated_at": "2024-07-05T14:31:38.000000Z",
+                        "company_id": 20
+                    },
+                    "quantity": 1,
+                    "sub_total": 25000
+                }
+            ],
+            "payments": [
+                {
+                    "sale_id": 13221,
+                    "company_id": 20,
+                    "reference": "INV-1760021691_12242",
+                    "payment_date": "2025-10-09",
+                    "payment_type": 1,
+                    "payment_method": "Cash",
+                    "amount": 200000,
+                    "received_amount": 200000
+                },
+                {
+                    "sale_id": 13221,
+                    "company_id": 20,
+                    "reference": "INV-1760021691_12243",
+                    "payment_date": "2025-10-09",
+                    "payment_type": 2,
+                    "payment_method": "POS",
+                    "amount": 5000,
+                    "received_amount": 5000
+                },
+                {
+                    "sale_id": 13221,
+                    "company_id": 20,
+                    "reference": "INV-1760021691_12244",
+                    "payment_date": "2025-10-09",
+                    "payment_type": 3,
+                    "payment_method": "Bank Transfer",
+                    "amount": 2000,
+                    "received_amount": 2000
+                }
+            ],
+            "payment_methods": [
+                "Cash",
+                "POS",
+                "Bank Transfer"
+            ],
+            "created_at": "2025-10-09T14:54:51.000000Z",
+            "barcode_url": "https:\/\/app.spotstockinventory.com\/uploads\/sales\/barcode-INV-1760021691.png",
+            "is_offline": 0,
+            "offline_customer_name": null,
+            "staff_id": 360
+        },
+        "links": {
+            "self": "https:\/\/app.spotstockinventory.com\/api\/sales\/13221"
+        }
+    }
+}

@@ -8,6 +8,8 @@ import '../../../../core/presentation/buttons/spotstock_primary_button.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
 import '../view_model/profile_view_model.dart';
 
+const int settingsSupportingTextColor = 153;
+
 class Profile extends StatelessWidget {
   const Profile({super.key});
 
@@ -25,21 +27,169 @@ class Profile extends StatelessWidget {
                   title: SpotstockStrings.profile,
                 ),
                 const SizedBox(height: SpotstockSizes.s10),
-                SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: SpotstockSizes.s16),
-                  child: Column(
-                    children: [
-                      SpotstockPrimaryButton(
-                        color: Theme.of(context).colorScheme.error,
-                        child: Text(
-                          SpotstockStrings.logout,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onError),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: SpotstockSizes.s16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        CircleAvatar(
+                          radius: SpotstockSizes.s40,
                         ),
-                        onPressed: () {
-                          viewModel.logoutCommand.execute(context);
-                        },
-                      ),
-                    ],
+                        SizedBox(height: SpotstockSizes.s10),
+                        Center(
+                          child: Text(
+                            "${viewModel.spotstockUser?.firstName} ${viewModel.spotstockUser?.lastName}",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: SpotstockSizes.s18,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.person_outlined,
+                              size: SpotstockSizes.s18,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withAlpha(settingsSupportingTextColor),
+                            ),
+                            SizedBox(width: SpotstockSizes.s5),
+                            Text(
+                              viewModel.spotstockUser?.roleDisplayName ?? SpotstockStrings.EMPTY,
+                              style: TextStyle(
+                                fontSize: SpotstockSizes.s14,
+                                fontWeight: FontWeight.w400,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withAlpha(settingsSupportingTextColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: SpotstockSizes.s30),
+                        Text(
+                          SpotstockStrings.personalInformation,
+                          style: TextStyle(
+                            fontSize: SpotstockSizes.s13,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(settingsSupportingTextColor),
+                          ),
+                        ),
+                        SizedBox(height: SpotstockSizes.s15),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.email,
+                              size: SpotstockSizes.s18,
+                            ),
+                            SizedBox(width: SpotstockSizes.s16),
+                            Text(
+                              viewModel.spotstockUser?.email ?? SpotstockStrings.EMPTY,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: SpotstockSizes.s10),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.phone,
+                              size: SpotstockSizes.s18,
+                            ),
+                            SizedBox(width: SpotstockSizes.s16),
+                            Text(
+                              viewModel.spotstockUser?.phone ?? SpotstockStrings.EMPTY,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: SpotstockSizes.s15),
+                        Divider(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withAlpha(settingsSupportingTextColor),
+                        ),
+                        SizedBox(height: SpotstockSizes.s15),
+                        Text(
+                          SpotstockStrings.settings,
+                          style: TextStyle(
+                            fontSize: SpotstockSizes.s13,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(settingsSupportingTextColor),
+                          ),
+                        ),
+                        SizedBox(height: SpotstockSizes.s15),
+                        Divider(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withAlpha(settingsSupportingTextColor),
+                        ),
+                        SizedBox(height: SpotstockSizes.s15),
+                        Text(
+                          SpotstockStrings.helpAndSupport,
+                          style: TextStyle(
+                            fontSize: SpotstockSizes.s13,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(settingsSupportingTextColor),
+                          ),
+                        ),
+                        SizedBox(height: SpotstockSizes.s15),
+                        Divider(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withAlpha(settingsSupportingTextColor),
+                        ),
+                        SpotstockPrimaryButton(
+                          color: Theme.of(context).colorScheme.error,
+                          child: Text(
+                            SpotstockStrings.logout,
+                            style: TextStyle(color: Theme.of(context).colorScheme.onError),
+                          ),
+                          onPressed: () {
+                            viewModel.logoutCommand.execute(context);
+                          },
+                        ),
+                        const SizedBox(height: SpotstockSizes.s50),
+                        Center(
+                          child: Text(
+                            'Built by Okoli .C. Tobenna',
+                            style: TextStyle(
+                              fontSize: SpotstockSizes.s13,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withAlpha(settingsSupportingTextColor),
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Text(
+                            '0813 088 9915',
+                            style: TextStyle(
+                              fontSize: SpotstockSizes.s13,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withAlpha(settingsSupportingTextColor),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

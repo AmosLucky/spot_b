@@ -17,6 +17,7 @@ class SpotstockSizes {
   static const double s3 = 3;
   static const double s4 = 4;
   static const double s5 = 5;
+  static const double s6 = 6;
   static const double s7 = 7;
   static const double s8 = 8;
   static const double s10 = 10;
@@ -35,14 +36,22 @@ class SpotstockSizes {
   static const double s27 = 27;
   static const double s30 = 30;
   static const double s32 = 32;
+  static const double s33 = 33;
+  static const double s34 = 34;
+  static const double s35 = 35;
+  static const double s36 = 36;
+  static const double s37 = 37;
+  static const double s38 = 38;
   static const double s40 = 40;
   static const double s45 = 45;
+  static const double s48 = 48;
   static const double s50 = 50;
   static const double s54 = 54;
   static const double s60 = 60;
   static const double s64 = 64;
   static const double s65 = 65;
   static const double s70 = 70;
+  static const double s80 = 80;
   static const double s98 = 98;
   static const double s100 = 100;
   static const double s128 = 128;
@@ -59,5 +68,13 @@ class SpotstockSizes {
     } else {
       return notchHeight + s12;
     }
+  }
+
+  static double bottomSpacing(BuildContext context) {
+    final notchHeight = MediaQuery.of(context).viewPadding.bottom;
+    if (notchHeight < s5) {
+      return s12;
+    }
+    return notchHeight;
   }
 }

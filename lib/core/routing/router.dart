@@ -8,10 +8,13 @@ import '../../features/auth/presentation/view_model/login_view_model.dart';
 import '../../features/home/presentation/view/home.dart';
 import '../../features/home/presentation/view/root.dart';
 import '../../features/home/presentation/view_model/root_view_model.dart';
+import '../../features/pos/presentation/view/pos.dart';
+import '../../features/pos/presentation/view_model/pos_view_model.dart';
 import '../../features/splash/presentation/view/mobile/splash.dart';
 import '../../features/splash/presentation/view_model/splash_view_model.dart';
 import '../../features/webview/presentation/view/webview.dart';
 import '../../features/webview/presentation/view_model/webview_view_model.dart';
+import '../constants/keys/spotstock_app_keys.dart';
 
 class SpotstockMobileRoutes {
   static const String splash = '/';
@@ -20,6 +23,7 @@ class SpotstockMobileRoutes {
   static const String home = '/mobile/home';
   static const String root = '/mobile/root';
   static const String selectApp = '/mobile/select-app';
+  static const String pos = '/mobile/pos';
 }
 
 class SpotstockDesktopRoutes {
@@ -32,6 +36,7 @@ final GetIt getIt = GetIt.instance;
 
 class SpotstockRouter {
   static final mobileRouter = GoRouter(
+    navigatorKey: spotstockNavigatorKey,
     routes: [
       GoRoute(
         path: SpotstockMobileRoutes.splash,
@@ -72,6 +77,13 @@ class SpotstockRouter {
         builder: (context, state) {
           final viewModel = getIt<SelectAppViewModel>();
           return SelectApp(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.pos,
+        builder: (context, state) {
+          final viewModel = getIt<PosViewModel>();
+          return Pos(viewModel: viewModel);
         },
       ),
     ],

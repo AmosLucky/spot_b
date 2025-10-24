@@ -6,4 +6,5 @@ class SpotstockApiPaths {
   static const String productCategories = '/product-categories';
   static const String customers = '/customers';
   static const String attendants = '/attendants';
+  static const String sales = '/store-sales';
 }

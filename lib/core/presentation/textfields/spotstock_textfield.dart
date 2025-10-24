@@ -76,7 +76,11 @@ class SpotstockTextField extends StatelessWidget {
   final TextStyle? style;
   final List<TextInputFormatter>? inputFormatters;
   final Function(String?)? onChanged;
-
+  final FocusNode? focusNode;
+  final TextAlign textAlign;
+  final bool? enabled;
+  final int? maxLines;
+  final String? initialValue;
   const SpotstockTextField({
     super.key,
     this.hintText,
@@ -92,12 +96,21 @@ class SpotstockTextField extends StatelessWidget {
     this.style,
     this.inputFormatters,
     this.onChanged,
+    this.focusNode,
+    this.textAlign = TextAlign.start,
+    this.enabled,
+    this.maxLines,
+    this.initialValue,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: initialValue,
+      focusNode: focusNode,
+      enabled: enabled,
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      textAlign: textAlign,
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -122,6 +135,7 @@ class SpotstockTextField extends StatelessWidget {
         suffixIcon: suffixIcon,
         counterText: counterText,
       ),
+      maxLines: maxLines,
     );
   }
 }

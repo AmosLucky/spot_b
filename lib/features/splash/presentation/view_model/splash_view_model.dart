@@ -73,11 +73,11 @@ class SplashViewModel extends SpotstockViewModel {
         _lastLoginTime != null &&
         !_hasElapsedSessionTime(_lastLoginTime!)) {
       if (context.mounted) {
-        SpotstockNavigation.replace(SpotstockMobileRoutes.root, context);
+        SpotstockNavigation.replace(SpotstockMobileRoutes.root);
       }
     } else {
       if (context.mounted) {
-        SpotstockNavigation.replace(SpotstockMobileRoutes.login, context);
+        SpotstockNavigation.replace(SpotstockMobileRoutes.login);
       }
     }
     return Result.success(null);

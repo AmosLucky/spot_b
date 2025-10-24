@@ -10,12 +10,14 @@ class SpotstockAppbar extends StatelessWidget {
   final Widget? trailing;
   final Color? backgroundColor;
   final bool? withBackButton;
+  final Future<bool?> Function()? onBackPressed;
   const SpotstockAppbar({
     super.key,
     required this.title,
     this.trailing,
     this.backgroundColor,
     this.withBackButton = false,
+    this.onBackPressed,
   });
 
   @override
@@ -37,8 +39,15 @@ class SpotstockAppbar extends StatelessWidget {
                       color: Theme.of(context).colorScheme.onPrimary,
                       size: SpotstockSizes.s18,
                     ),
-                    onPressed: () {
-                      SpotstockNavigation.goBack(context);
+                    onPressed: () async {
+                      if (onBackPressed != null) {
+                        final confirmed = await onBackPressed!();
+                        if (confirmed == true && context.mounted) {
+                          SpotstockNavigation.goBack(confirmed);
+                        }
+                      } else {
+                        SpotstockNavigation.goBack(true);
+                      }
                     },
                     tooltip: SpotstockStrings.back,
                   ),

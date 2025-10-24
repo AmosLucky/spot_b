@@ -5,6 +5,8 @@ import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/presentation/appbars/spotstock_appbar.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
+import '../../../../core/routing/navigation.dart';
+import '../../../../core/routing/router.dart';
 import '../view_model/select_app_view_model.dart';
 import '../widgets/spotstock_app_widget.dart';
 
@@ -38,15 +40,13 @@ class SelectApp extends StatelessWidget {
                             name: SpotstockStrings.pointOfSale,
                             iconPath: SpotstockIconAssets.pointOfSale,
                             onTap: () {
-                              print('point of sale');
+                              SpotstockNavigation.goTo(SpotstockMobileRoutes.pos);
                             },
                           ),
                           SpotstockAppWidget(
                             name: SpotstockStrings.hotel,
                             iconPath: SpotstockIconAssets.hotel,
-                            onTap: () {
-                              print('hotel');
-                            },
+                            onTap: () {},
                           ),
                         ],
                       )

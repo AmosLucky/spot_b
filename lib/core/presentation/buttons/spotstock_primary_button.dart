@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../constants/sizes/spotstock_sizes.dart';
 
+const int disabledColorAlpha = 87;
+
 class SpotstockPrimaryButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onPressed;
@@ -15,8 +17,8 @@ class SpotstockPrimaryButton extends StatelessWidget {
     super.key,
     required this.child,
     required this.onPressed,
-    this.color = Colors.deepPurple,
-    this.textColor = Colors.white,
+    this.color,
+    this.textColor,
     this.height = SpotstockSizes.s54,
     this.width = double.infinity,
     this.enabled = true,
@@ -25,7 +27,7 @@ class SpotstockPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = enabled ?? true;
-    final disabledColor = color?.withAlpha(87);
+    final disabledColor = color?.withAlpha(disabledColorAlpha);
 
     return SizedBox(
       width: width,
@@ -33,7 +35,10 @@ class SpotstockPrimaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: isEnabled ? onPressed : null,
         style: OutlinedButton.styleFrom(
-          backgroundColor: isEnabled ? color : disabledColor,
+          backgroundColor: isEnabled
+              ? color ?? Theme.of(context).colorScheme.primary
+              : disabledColor ??
+                  Theme.of(context).colorScheme.primary.withAlpha(disabledColorAlpha),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(SpotstockSizes.s5)),
           side: BorderSide.none,
         ),

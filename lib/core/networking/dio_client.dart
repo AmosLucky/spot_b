@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 
 import '../../features/auth/domain/repositories/token_repository.dart';
+import '../../features/auth/domain/usecases/remove_last_login_time.dart';
+import '../../features/auth/domain/usecases/remove_token.dart';
 import '../constants/durations/spotstock_durations.dart';
 import '../di/di.dart';
 import 'interceptors/spotstock_token_interceptor.dart';
@@ -26,7 +28,11 @@ class DioClient {
     );
     dio.interceptors.addAll([
       LogInterceptor(request: true, responseBody: true),
-      SpotstockTokenInterceptor(getIt<TokenRepository>()),
+      SpotstockTokenInterceptor(
+        getIt<TokenRepository>(),
+        getIt<RemoveLastLoginTime>(),
+        getIt<RemoveToken>(),
+      ),
     ]);
     _instance = DioClient._internal(dio);
     return _instance!;

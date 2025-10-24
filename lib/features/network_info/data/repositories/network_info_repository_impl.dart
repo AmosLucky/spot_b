@@ -11,4 +11,9 @@ class NetworkInfoRepositoryImpl implements NetworkInfoRepository {
 
   @override
   Stream<bool> get onNetworkChange => _networkInfoService.onNetworkChange;
+
+  @override
+  Future<void> checkAndUpdateNetworkStatus() async {
+    await _networkInfoService.checkAndUpdateNetworkStatus();
+  }
 }

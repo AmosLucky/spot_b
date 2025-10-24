@@ -7,7 +7,7 @@ import 'spotstock_status_code.dart';
 SpotstockApiError handleSpotstockApiError(Object e) {
   if (e is DioException) {
     return SpotstockApiError(
-      message: e.response?.data['message'].toString() ?? SpotstockStrings.somethingWentWrong,
+      message: e.response?.data?['message'].toString() ?? SpotstockStrings.somethingWentWrong,
       code: e.response?.statusCode.toString() ?? SpotstockStatusCode.internalServerError.toString(),
       originalError: e.response?.data,
     );

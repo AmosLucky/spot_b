@@ -17,8 +17,8 @@ class SpotstockSecondaryButton extends StatelessWidget {
     super.key,
     required this.child,
     required this.onPressed,
-    this.borderColor = Colors.deepPurple,
-    this.textColor = Colors.deepPurple,
+    this.borderColor,
+    this.textColor,
     this.height = SpotstockSizes.s54,
     this.width = double.infinity,
     this.enabled = true,
@@ -27,8 +27,12 @@ class SpotstockSecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = enabled ?? true;
-    final effectiveBorderColor = isEnabled ? borderColor! : borderColor!.withAlpha(borderAlpha);
-    final effectiveTextColor = isEnabled ? textColor! : textColor!.withAlpha(borderAlpha);
+    final effectiveBorderColor = isEnabled
+        ? borderColor ?? Theme.of(context).colorScheme.primary
+        : borderColor?.withAlpha(borderAlpha);
+    final effectiveTextColor = isEnabled
+        ? textColor ?? Theme.of(context).colorScheme.primary
+        : textColor?.withAlpha(borderAlpha);
 
     return SizedBox(
       width: width,
@@ -38,7 +42,10 @@ class SpotstockSecondaryButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: effectiveTextColor,
           backgroundColor: Colors.transparent,
-          side: BorderSide(color: effectiveBorderColor, width: SpotstockSizes.s1_5),
+          side: BorderSide(
+            color: effectiveBorderColor ?? Theme.of(context).colorScheme.primary,
+            width: SpotstockSizes.s1_5,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(SpotstockSizes.s5),
           ),

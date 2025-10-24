@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/keys/spotstock_app_keys.dart';
 import '../../constants/sizes/spotstock_sizes.dart';
 import '../../constants/strings/spotstock_strings.dart';
 import '../../error_handling/app_error.dart';
 
 mixin SpotstockSnackbarMixin {
-  void showErrorSnackbar(BuildContext context, AppError? error, {String? title, String? subtitle}) {
-    ScaffoldMessenger.of(context).showSnackBar(
+  void showErrorSnackbar(AppError? error, {String? title, String? subtitle}) {
+    spotstockScaffoldMessengerKey.currentState?.removeCurrentSnackBar();
+    spotstockScaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         padding: EdgeInsets.symmetric(
           horizontal: SpotstockSizes.s20,

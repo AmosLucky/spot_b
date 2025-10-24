@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/error_handling/app_error.dart';
-import '../../../../core/networking/spotstock_api_error.dart';
 import '../../../../core/networking/spotstock_status_code.dart';
 import '../../../../core/presentation/snackbars/spotstock_snackbar.dart';
 import '../../../../core/presentation/view_models/spotstock_view_model.dart';
@@ -44,7 +43,11 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
   final TextEditingController _passwordController = TextEditingController();
   TextEditingController get passwordController => _passwordController;
 
+  bool _obscurePassword = true;
+  bool get obscurePassword => _obscurePassword;
+
   late Command1<void, BuildContext> loginCommand;
+  late Command1<void, BuildContext> toggleObscurePasswordCommand;
 
   @override
   void bind(BuildContext context) async {
@@ -52,6 +55,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
       ..addListener(() {
         notifyListeners();
       });
+    toggleObscurePasswordCommand = Command1<void, BuildContext>(_toggleObscurePassword);
     final result = await getSpotstockUser();
     result.when(
       onSuccess: (spotstockUser) {
@@ -70,11 +74,17 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
     errorStream.listen((error) {
       if (context.mounted) {
         if (error is LoginError) {
-          showErrorSnackbar(context, error, title: error.title, subtitle: error.subtitle);
+          showErrorSnackbar(error, title: error.title, subtitle: error.subtitle);
           return;
         }
       }
     });
+  }
+
+  Future<Result<void>> _toggleObscurePassword(BuildContext context) async {
+    _obscurePassword = !_obscurePassword;
+    notifyListeners();
+    return Result.success(null);
   }
 
   Future<Result<void>> _login(BuildContext context) async {
@@ -89,7 +99,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
         _formKey.currentState?.reset();
         _emailController.clear();
         _passwordController.clear();
-        SpotstockNavigation.replace(SpotstockMobileRoutes.root, context);
+        SpotstockNavigation.replace(SpotstockMobileRoutes.root);
       },
       onFailure: (error) {
         addError(
@@ -168,6 +178,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
   @override
   void dispose() {
     loginCommand.dispose();
+    toggleObscurePasswordCommand.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();

@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/networking/spotstock_api_data_conversion_helper.dart';
+import 'stock.dart';
 
 part 'product.freezed.dart';
 
@@ -17,6 +18,7 @@ class Product with _$Product {
     double? productCost,
     double? productPrice,
     bool? isActive,
+    Stock? stock,
     DateTime? createdAt,
     int? inStock,
     String? link,
@@ -38,6 +40,7 @@ class Product with _$Product {
       productCost: SpotstockApiDataConversionHelper.toDouble(attributes['product_cost']),
       productPrice: SpotstockApiDataConversionHelper.toDouble(attributes['product_price']),
       isActive: attributes['is_active'],
+      stock: Stock.fromJson(attributes['stock']),
       createdAt:
           attributes['created_at'] != null ? DateTime.tryParse(attributes['created_at']) : null,
       inStock: attributes['in_stock'],

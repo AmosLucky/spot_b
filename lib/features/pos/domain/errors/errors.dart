@@ -15,3 +15,18 @@ class LocalDatabaseError extends AppError {
         subtitle = subtitle ?? message,
         super(code: code ?? SpotstockStatusCode.internalAppDatabaseError.toString());
 }
+
+class OutOfStockError extends AppError {
+  final String title;
+  final String subtitle;
+
+  OutOfStockError({
+    required super.message,
+    super.originalError,
+    String? code,
+    String? title,
+    String? subtitle,
+  })  : title = title ?? message,
+        subtitle = subtitle ?? message,
+        super(code: code ?? SpotstockStatusCode.internalAppDatabaseError.toString());
+}

@@ -28,7 +28,7 @@ class WebviewViewModel extends SpotstockViewModel {
     logoutCommand = Command1<void, BuildContext>(_logout);
     _webviewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)
+      ..setBackgroundColor(Theme.of(context).colorScheme.surface)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {},
@@ -41,7 +41,7 @@ class WebviewViewModel extends SpotstockViewModel {
   Future<Result<void>> _logout(BuildContext context) async {
     removeLastLoginTime();
     removeToken();
-    SpotstockNavigation.replace(SpotstockMobileRoutes.login, context);
+    SpotstockNavigation.replace(SpotstockMobileRoutes.login);
     return Result.success(null);
   }
 }
