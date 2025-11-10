@@ -44,55 +44,65 @@ class _PosState extends State<Pos> with SingleTickerProviderStateMixin {
                       },
                       trailing: Row(
                         children: [
-                          Badge(
-                            label: widget.viewModel.isBranchSelected
-                                ? null
-                                : Text(SpotstockStrings.exclamation),
-                            backgroundColor: widget.viewModel.isBranchSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
-                            child: SpotstockIconButton(
-                              icon: Icon(
-                                Icons.store_mall_directory,
-                                size: SpotstockSizes.s18,
-                                color: widget.viewModel.isBranchSelected
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary
-                                        .withAlpha(_unselectedIconAlpha),
+                          GestureDetector(
+                            onTap: () {
+                              widget.viewModel.onBranchPressed(context);
+                            },
+                            child: Badge(
+                              label: widget.viewModel.isBranchSelected
+                                  ? null
+                                  : Text(SpotstockStrings.exclamation),
+                              backgroundColor: widget.viewModel.isBranchSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              child: SpotstockIconButton(
+                                icon: Icon(
+                                  Icons.store_mall_directory,
+                                  size: SpotstockSizes.s18,
+                                  color: widget.viewModel.isBranchSelected
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary
+                                          .withAlpha(_unselectedIconAlpha),
+                                ),
+                                onPressed: () {
+                                  widget.viewModel.onBranchPressed(context);
+                                },
+                                tooltip: widget.viewModel.selectedBranch?.name ??
+                                    SpotstockStrings.branch,
                               ),
-                              onPressed: () {
-                                widget.viewModel.onBranchPressed(context);
-                              },
-                              tooltip:
-                                  widget.viewModel.selectedBranch?.name ?? SpotstockStrings.branch,
                             ),
                           ),
                           SizedBox(width: SpotstockSizes.s16),
-                          Badge(
-                            label: widget.viewModel.isAttendantSelected
-                                ? null
-                                : Text(SpotstockStrings.exclamation),
-                            backgroundColor: widget.viewModel.isAttendantSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : null,
-                            child: SpotstockIconButton(
-                              icon: Icon(
-                                Icons.manage_accounts,
-                                size: SpotstockSizes.s18,
-                                color: widget.viewModel.isAttendantSelected
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onPrimary
-                                        .withAlpha(_unselectedIconAlpha),
+                          GestureDetector(
+                            onTap: () {
+                              widget.viewModel.onAttendantPressed(context);
+                            },
+                            child: Badge(
+                              label: widget.viewModel.isAttendantSelected
+                                  ? null
+                                  : Text(SpotstockStrings.exclamation),
+                              backgroundColor: widget.viewModel.isAttendantSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              child: SpotstockIconButton(
+                                icon: Icon(
+                                  Icons.manage_accounts,
+                                  size: SpotstockSizes.s18,
+                                  color: widget.viewModel.isAttendantSelected
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary
+                                          .withAlpha(_unselectedIconAlpha),
+                                ),
+                                onPressed: () {
+                                  widget.viewModel.onAttendantPressed(context);
+                                },
+                                tooltip: widget.viewModel.selectedAttendant?.firstName ??
+                                    SpotstockStrings.selectAttendant,
                               ),
-                              onPressed: () {
-                                widget.viewModel.onAttendantPressed(context);
-                              },
-                              tooltip: widget.viewModel.selectedAttendant?.firstName ??
-                                  SpotstockStrings.selectAttendant,
                             ),
                           ),
                           SizedBox(width: SpotstockSizes.s16),
@@ -189,6 +199,8 @@ class _PosState extends State<Pos> with SingleTickerProviderStateMixin {
                         children: [
                           SpotstockCartTab(
                             saleItems: widget.viewModel.createSaleDto.saleItems ?? [],
+                            discountController: widget.viewModel.discountController,
+                            shippingController: widget.viewModel.shippingController,
                             taxAmount: widget.viewModel.taxAmount,
                             grandTotal: widget.viewModel.grandTotal,
                             subTotal: widget.viewModel.subTotal,
@@ -224,10 +236,8 @@ class _PosState extends State<Pos> with SingleTickerProviderStateMixin {
                           ),
                           SpotstockProductsTab(
                             products: widget.viewModel.products,
-                            onAddProduct: (product) {
-                              widget.viewModel.onAddProduct(product);
-                            },
-                            branchId: widget.viewModel.selectedBranch?.id,
+                            onAddProduct: widget.viewModel.onAddProduct,
+                            isUpdatingProducts: widget.viewModel.getProductsCommand.running,
                           ),
                         ],
                       ),

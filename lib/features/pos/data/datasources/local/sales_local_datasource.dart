@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:drift/drift.dart';
 
 import '../../../../../core/constants/strings/spotstock_strings.dart';

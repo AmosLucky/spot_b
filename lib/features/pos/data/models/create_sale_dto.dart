@@ -36,6 +36,8 @@ class CreateSaleDto with _$CreateSaleDto {
     @JsonKey(name: 'attendant_name') String? attendantName,
     @JsonKey(name: 'room_details') dynamic roomDetails,
     @JsonKey(name: 'is_offline') int? isOffline,
+    @JsonKey(includeFromJson: false, includeToJson: false) String? warehouseName,
+    @JsonKey(includeFromJson: false, includeToJson: false) String? customerName,
   }) = _CreateSaleDto;
 
   factory CreateSaleDto.fromJson(Map<String, dynamic> json) => _$CreateSaleDtoFromJson(json);
@@ -67,6 +69,7 @@ class SaleItemDto with _$SaleItemDto {
     @JsonKey(name: 'sale_unit') dynamic saleUnit,
     @JsonKey(name: 'quantity') double? quantity,
     @JsonKey(name: 'sub_total') double? subTotal,
+    @JsonKey(includeFromJson: false, includeToJson: false) String? productName,
   }) = _SaleItemDto;
 
   factory SaleItemDto.fromJson(Map<String, dynamic> json) => _$SaleItemDtoFromJson(json);

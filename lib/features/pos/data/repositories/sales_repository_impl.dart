@@ -2,6 +2,7 @@ import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/networking/spotstock_status_code.dart';
 import '../../../../core/shared/result.dart';
 import '../../../network_info/domain/repositories/network_info_repository.dart';
+import '../../../receipt/domain/repositories/local_receipt_reference_no_repository.dart';
 import '../../domain/errors/errors.dart';
 import '../../domain/repositories/sales_repository.dart';
 import '../datasources/local/sales_local_datasource.dart';
@@ -13,9 +14,15 @@ import '../models/sale.dart';
 class SalesRepositoryImpl extends SalesRepository {
   final SalesLocalDatasource localDatasource;
   final SalesRemoteDatasource remoteDatasource;
+  final LocalReceiptReferenceNoRepository localReceiptReferenceNoRepository;
   final NetworkInfoRepository networkInfoRepository;
 
-  SalesRepositoryImpl(this.localDatasource, this.remoteDatasource, this.networkInfoRepository);
+  SalesRepositoryImpl(
+    this.localDatasource,
+    this.remoteDatasource,
+    this.localReceiptReferenceNoRepository,
+    this.networkInfoRepository,
+  );
 
   @override
   Future<Result<Sale>> createSale(CreateSaleDto createSaleDto) async {
@@ -35,12 +42,29 @@ class SalesRepositoryImpl extends SalesRepository {
         return Result.failure(remoteResult.error);
       }
     } else {
-      final localResult = await localDatasource.createSale(createSaleDto.copyWith(isOffline: 1));
-      if (localResult is Failure) {
-        return Result.failure(localResult.error);
+      final receiptRefNoResult =
+          await localReceiptReferenceNoRepository.generateReceiptReferenceNo();
+      if (receiptRefNoResult is Success) {
+        final localResult = await localDatasource.createSale(
+          createSaleDto.copyWith(
+            isOffline: 1,
+            referenceCode: receiptRefNoResult.data,
+          ),
+        );
+        if (localResult is Failure) {
+          return Result.failure(localResult.error);
+        }
+        final sale = SaleMapper.fromCreateDto(
+          createSaleDto.copyWith(
+            isOffline: 1,
+            referenceCode: receiptRefNoResult.data,
+          ),
+        );
+        return Result.success(sale);
       }
-      final sale = SaleMapper.fromCreateDto(createSaleDto.copyWith(isOffline: 1));
-      return Result.success(sale);
+      if (receiptRefNoResult is Failure) {
+        return Result.failure(receiptRefNoResult.error);
+      }
     }
     return Result.failure(LocalDatabaseError(
       message: SpotstockStrings.failedToWriteData,

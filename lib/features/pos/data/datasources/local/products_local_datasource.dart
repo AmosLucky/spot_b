@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:drift/drift.dart';
+
 import '../../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../../core/database/database_client.dart';
 import '../../../../../core/networking/spotstock_status_code.dart';
@@ -11,14 +15,25 @@ class ProductsLocalDatasource {
 
   ProductsLocalDatasource(this.db);
 
-  Future<Result<void>> saveProducts(List<Product> products) async {
+  Future<Result<void>> saveProducts(List<Product> products, {int? warehouseId}) async {
     try {
       await db.transaction(() async {
-        await db.delete(db.localProducts).go();
-        final companions = products.map((p) => p.toDrift()).toList();
-        await db.batch((batch) {
-          batch.insertAll(db.localProducts, companions);
-        });
+        if (warehouseId != null) {
+          await (db.delete(db.localProducts)..where((tbl) => tbl.warehouseId.equals(warehouseId)))
+              .go();
+
+          final companions = products.map((p) => p.toDrift(warehouseId: warehouseId)).toList();
+
+          await db.batch((batch) {
+            for (final companion in companions) {
+              batch.insert(
+                db.localProducts,
+                companion,
+                mode: InsertMode.insertOrReplace,
+              );
+            }
+          });
+        }
       });
       return Result.success(null);
     } catch (e) {
@@ -31,9 +46,14 @@ class ProductsLocalDatasource {
     }
   }
 
-  Future<Result<List<Product>>> getProducts() async {
+  Future<Result<List<Product>>> getProducts({int? warehouseId}) async {
     try {
-      final rows = await db.select(db.localProducts).get();
+      final query = db.select(db.localProducts);
+      if (warehouseId != null) {
+        query.where((p) => p.warehouseId.equals(warehouseId));
+      }
+
+      final rows = await query.get();
       final products = rows.map((product) => ProductMapper.fromDrift(product)).toList();
       return Result.success(products);
     } catch (e) {

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
@@ -18,6 +19,9 @@ import '../../../../core/shared/command.dart';
 import '../../../../core/shared/result.dart';
 import '../../../coming_soon/domain/errors/errors.dart';
 import '../../../network_info/domain/usecases/check_and_update_network_status.dart';
+import '../../../receipt/data/models/extra_receipt_details.dart';
+import '../../../receipt/domain/usecases/print_pdf_receipt.dart';
+import '../../../receipt/domain/usecases/share_pdf_receipt.dart';
 import '../../constants/spotstock_sale_creation_constant.dart';
 import '../../data/enums/enums.dart';
 import '../../data/models/attendant.dart';
@@ -59,6 +63,8 @@ class PosViewModel extends SpotstockViewModel
   final GetProducts getProducts;
   final GetWarehouses getWarehouses;
   final CreateSale createSale;
+  final PrintPdfReceipt printPdfReceipt;
+  final SharePdfReceipt sharePdfReceipt;
 
   PosViewModel(
     this.checkAndUpdateNetworkStatus,
@@ -69,6 +75,8 @@ class PosViewModel extends SpotstockViewModel
     this.getProducts,
     this.getWarehouses,
     this.createSale,
+    this.printPdfReceipt,
+    this.sharePdfReceipt,
   );
 
   CreateSaleDto _createSaleDto = CreateSaleDto(
@@ -161,6 +169,12 @@ class PosViewModel extends SpotstockViewModel
   TabController? _tabController;
   TabController? get tabController => _tabController;
 
+  TextEditingController _discountController = TextEditingController();
+  TextEditingController get discountController => _discountController;
+
+  TextEditingController _shippingController = TextEditingController();
+  TextEditingController get shippingController => _shippingController;
+
   bool get canPay {
     return cartCount > 0 && isBranchSelected && isAttendantSelected;
   }
@@ -170,12 +184,12 @@ class PosViewModel extends SpotstockViewModel
     _createSaleDto = createSaleDto ?? _createSaleDto;
     _tabController ??=
         (vsync != null) ? TabController(length: SpotstockSizes.s2.toInt(), vsync: vsync) : null;
+    _getWarehousesCommand = Command0<void>(_getWarehouses)..execute();
     _getAttendantsCommand = Command0<void>(_getAttendants)..execute();
     _getBarTablesCommand = Command0<void>(_getBarTables)..execute();
     _getCustomersCommand = Command0<void>(_getCustomers)..execute();
     _getProductCategoriesCommand = Command0<void>(_getProductCategories)..execute();
-    _getProductsCommand = Command0<void>(_getProducts)..execute();
-    _getWarehousesCommand = Command0<void>(_getWarehouses)..execute();
+    _getProductsCommand = Command0<void>(_getProducts);
     _createSaleCommand = Command1<void, BuildContext>(_createSale);
     await checkAndUpdateNetworkStatus();
   }
@@ -241,21 +255,16 @@ class PosViewModel extends SpotstockViewModel
   }
 
   Future<Result<void>> _getProducts() async {
-    getProducts().listen((result) {
+    final stream = getProducts(warehouseId: selectedBranch?.id);
+    await for (final result in stream) {
       result.when(
         onSuccess: (products) {
-          _products = products.where((p) {
-            //
-            // return p.inStock != null && p.inStock! > 0;
-            return true;
-          }).toList();
+          _products = products;
           notifyListeners();
         },
-        onFailure: (error) {
-          addError(error);
-        },
+        onFailure: (error) => addError(error),
       );
-    });
+    }
     return Result.success(null);
   }
 
@@ -264,7 +273,14 @@ class PosViewModel extends SpotstockViewModel
       result.when(
         onSuccess: (branches) {
           _branches = branches;
+          if (selectedBranch == null && branches.isNotEmpty) {
+            _createSaleDto = _createSaleDto.copyWith(
+              warehouseId: branches.first.id,
+              warehouseName: branches.first.name,
+            );
+          }
           notifyListeners();
+          _getProductsCommand.execute();
         },
         onFailure: (error) {
           addError(error);
@@ -317,6 +333,7 @@ class PosViewModel extends SpotstockViewModel
     final result = await createSale(createSaleDto);
     result.when(
       onSuccess: (sale) {
+        final extraReceiptDetails = ExtraReceiptDetails(tableName: selectedBarTable?.name);
         _resetSale();
         WidgetsBinding.instance.addPostFrameCallback((_) {
           showSpotstockBottomSheet(
@@ -330,12 +347,16 @@ class PosViewModel extends SpotstockViewModel
                   SpotstockStrings.print,
                   style: TextStyle(color: theme.colorScheme.onPrimary),
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  await printPdfReceipt(sale, extraReceiptDetails: extraReceiptDetails);
+                },
               ),
               const SizedBox(height: SpotstockSizes.s10),
               SpotstockSecondaryButton(
                 child: Text(SpotstockStrings.share),
-                onPressed: () {},
+                onPressed: () async {
+                  await sharePdfReceipt(sale, extraReceiptDetails: extraReceiptDetails);
+                },
               ),
             ],
           );
@@ -345,7 +366,7 @@ class PosViewModel extends SpotstockViewModel
       onFailure: (error) {
         showSpotstockInformationDialog(
           SpotstockNavigation.context ?? context,
-          icon: Icon(Icons.error, color: theme.colorScheme.error),
+          icon: Icon(Icons.error, color: theme.colorScheme.error, size: SpotstockSizes.s40),
           title: SpotstockStrings.anErrorOccurred,
           description: error.message,
           actions: [
@@ -433,9 +454,11 @@ class PosViewModel extends SpotstockViewModel
           SpotstockNavigation.goBack();
           final createSaleDto = _createSaleDto.copyWith(
             warehouseId: branch.id,
+            warehouseName: branch.name,
           );
           _createSaleDto = createSaleDto;
           notifyListeners();
+          _getProductsCommand.execute();
         },
       ),
     );
@@ -470,6 +493,7 @@ class PosViewModel extends SpotstockViewModel
           SpotstockNavigation.goBack();
           final createSaleDto = _createSaleDto.copyWith(
             customerId: customer?.id,
+            customerName: customer?.name,
           );
           _createSaleDto = createSaleDto;
           notifyListeners();
@@ -526,6 +550,7 @@ class PosViewModel extends SpotstockViewModel
       }
       final saleItem = SaleItemDto(
         productId: product.id,
+        productName: product.name,
         tableId: selectedBarTable?.id,
         productPrice: product.productPrice,
         netUnitPrice: product.productPrice,
@@ -642,9 +667,13 @@ class PosViewModel extends SpotstockViewModel
   }
 
   void _resetSale() {
+    _discountController.clear();
+    _shippingController.clear();
     _selectedBarTable = null;
     _createSaleDto = CreateSaleDto(
       taxAmount: SpotstockSaleCreationConstant.taxAmount,
+      warehouseId: selectedBranch?.id,
+      warehouseName: selectedBranch?.name,
     );
     _updateGrandTotal();
     notifyListeners();

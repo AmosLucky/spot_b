@@ -68,6 +68,10 @@ mixin _$CreateSaleDto {
   dynamic get roomDetails => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_offline')
   int? get isOffline => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get warehouseName => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get customerName => throw _privateConstructorUsedError;
 
   /// Serializes this CreateSaleDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -112,7 +116,11 @@ abstract class $CreateSaleDtoCopyWith<$Res> {
       @JsonKey(name: 'attendant_id') int? attendantId,
       @JsonKey(name: 'attendant_name') String? attendantName,
       @JsonKey(name: 'room_details') dynamic roomDetails,
-      @JsonKey(name: 'is_offline') int? isOffline});
+      @JsonKey(name: 'is_offline') int? isOffline,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? warehouseName,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? customerName});
 }
 
 /// @nodoc
@@ -157,6 +165,8 @@ class _$CreateSaleDtoCopyWithImpl<$Res, $Val extends CreateSaleDto>
     Object? attendantName = freezed,
     Object? roomDetails = freezed,
     Object? isOffline = freezed,
+    Object? warehouseName = freezed,
+    Object? customerName = freezed,
   }) {
     return _then(_value.copyWith(
       referenceCode: freezed == referenceCode
@@ -267,6 +277,14 @@ class _$CreateSaleDtoCopyWithImpl<$Res, $Val extends CreateSaleDto>
           ? _value.isOffline
           : isOffline // ignore: cast_nullable_to_non_nullable
               as int?,
+      warehouseName: freezed == warehouseName
+          ? _value.warehouseName
+          : warehouseName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customerName: freezed == customerName
+          ? _value.customerName
+          : customerName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -306,7 +324,11 @@ abstract class _$$CreateSaleDtoImplCopyWith<$Res>
       @JsonKey(name: 'attendant_id') int? attendantId,
       @JsonKey(name: 'attendant_name') String? attendantName,
       @JsonKey(name: 'room_details') dynamic roomDetails,
-      @JsonKey(name: 'is_offline') int? isOffline});
+      @JsonKey(name: 'is_offline') int? isOffline,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? warehouseName,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? customerName});
 }
 
 /// @nodoc
@@ -349,6 +371,8 @@ class __$$CreateSaleDtoImplCopyWithImpl<$Res>
     Object? attendantName = freezed,
     Object? roomDetails = freezed,
     Object? isOffline = freezed,
+    Object? warehouseName = freezed,
+    Object? customerName = freezed,
   }) {
     return _then(_$CreateSaleDtoImpl(
       referenceCode: freezed == referenceCode
@@ -459,6 +483,14 @@ class __$$CreateSaleDtoImplCopyWithImpl<$Res>
           ? _value.isOffline
           : isOffline // ignore: cast_nullable_to_non_nullable
               as int?,
+      warehouseName: freezed == warehouseName
+          ? _value.warehouseName
+          : warehouseName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customerName: freezed == customerName
+          ? _value.customerName
+          : customerName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -493,7 +525,9 @@ class _$CreateSaleDtoImpl implements _CreateSaleDto {
       @JsonKey(name: 'attendant_id') this.attendantId,
       @JsonKey(name: 'attendant_name') this.attendantName,
       @JsonKey(name: 'room_details') this.roomDetails,
-      @JsonKey(name: 'is_offline') this.isOffline})
+      @JsonKey(name: 'is_offline') this.isOffline,
+      @JsonKey(includeFromJson: false, includeToJson: false) this.warehouseName,
+      @JsonKey(includeFromJson: false, includeToJson: false) this.customerName})
       : _payments = payments,
         _saleItems = saleItems;
 
@@ -591,10 +625,16 @@ class _$CreateSaleDtoImpl implements _CreateSaleDto {
   @override
   @JsonKey(name: 'is_offline')
   final int? isOffline;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final String? warehouseName;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final String? customerName;
 
   @override
   String toString() {
-    return 'CreateSaleDto(referenceCode: $referenceCode, date: $date, customerId: $customerId, warehouseId: $warehouseId, taxRate: $taxRate, taxAmount: $taxAmount, discount: $discount, discountAmount: $discountAmount, shipping: $shipping, grandTotal: $grandTotal, status: $status, paymentStatus: $paymentStatus, paymentType: $paymentType, receivedAmount: $receivedAmount, paidAmount: $paidAmount, payments: $payments, notes: $notes, saleItems: $saleItems, note: $note, partialPaymentAmount: $partialPaymentAmount, partialPaymentMethod: $partialPaymentMethod, staffId: $staffId, staffName: $staffName, attendantId: $attendantId, attendantName: $attendantName, roomDetails: $roomDetails, isOffline: $isOffline)';
+    return 'CreateSaleDto(referenceCode: $referenceCode, date: $date, customerId: $customerId, warehouseId: $warehouseId, taxRate: $taxRate, taxAmount: $taxAmount, discount: $discount, discountAmount: $discountAmount, shipping: $shipping, grandTotal: $grandTotal, status: $status, paymentStatus: $paymentStatus, paymentType: $paymentType, receivedAmount: $receivedAmount, paidAmount: $paidAmount, payments: $payments, notes: $notes, saleItems: $saleItems, note: $note, partialPaymentAmount: $partialPaymentAmount, partialPaymentMethod: $partialPaymentMethod, staffId: $staffId, staffName: $staffName, attendantId: $attendantId, attendantName: $attendantName, roomDetails: $roomDetails, isOffline: $isOffline, warehouseName: $warehouseName, customerName: $customerName)';
   }
 
   @override
@@ -648,7 +688,11 @@ class _$CreateSaleDtoImpl implements _CreateSaleDto {
             const DeepCollectionEquality()
                 .equals(other.roomDetails, roomDetails) &&
             (identical(other.isOffline, isOffline) ||
-                other.isOffline == isOffline));
+                other.isOffline == isOffline) &&
+            (identical(other.warehouseName, warehouseName) ||
+                other.warehouseName == warehouseName) &&
+            (identical(other.customerName, customerName) ||
+                other.customerName == customerName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -681,7 +725,9 @@ class _$CreateSaleDtoImpl implements _CreateSaleDto {
         attendantId,
         attendantName,
         const DeepCollectionEquality().hash(roomDetails),
-        isOffline
+        isOffline,
+        warehouseName,
+        customerName
       ]);
 
   /// Create a copy of CreateSaleDto
@@ -730,7 +776,11 @@ abstract class _CreateSaleDto implements CreateSaleDto {
       @JsonKey(name: 'attendant_id') final int? attendantId,
       @JsonKey(name: 'attendant_name') final String? attendantName,
       @JsonKey(name: 'room_details') final dynamic roomDetails,
-      @JsonKey(name: 'is_offline') final int? isOffline}) = _$CreateSaleDtoImpl;
+      @JsonKey(name: 'is_offline') final int? isOffline,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final String? warehouseName,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final String? customerName}) = _$CreateSaleDtoImpl;
 
   factory _CreateSaleDto.fromJson(Map<String, dynamic> json) =
       _$CreateSaleDtoImpl.fromJson;
@@ -810,6 +860,12 @@ abstract class _CreateSaleDto implements CreateSaleDto {
   @override
   @JsonKey(name: 'is_offline')
   int? get isOffline;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get warehouseName;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get customerName;
 
   /// Create a copy of CreateSaleDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1031,6 +1087,8 @@ mixin _$SaleItemDto {
   double? get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'sub_total')
   double? get subTotal => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get productName => throw _privateConstructorUsedError;
 
   /// Serializes this SaleItemDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1061,7 +1119,9 @@ abstract class $SaleItemDtoCopyWith<$Res> {
       @JsonKey(name: 'discount_amount') double? discountAmount,
       @JsonKey(name: 'sale_unit') dynamic saleUnit,
       @JsonKey(name: 'quantity') double? quantity,
-      @JsonKey(name: 'sub_total') double? subTotal});
+      @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? productName});
 }
 
 /// @nodoc
@@ -1092,6 +1152,7 @@ class _$SaleItemDtoCopyWithImpl<$Res, $Val extends SaleItemDto>
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? productName = freezed,
   }) {
     return _then(_value.copyWith(
       productId: freezed == productId
@@ -1146,6 +1207,10 @@ class _$SaleItemDtoCopyWithImpl<$Res, $Val extends SaleItemDto>
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      productName: freezed == productName
+          ? _value.productName
+          : productName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -1171,7 +1236,9 @@ abstract class _$$SaleItemDtoImplCopyWith<$Res>
       @JsonKey(name: 'discount_amount') double? discountAmount,
       @JsonKey(name: 'sale_unit') dynamic saleUnit,
       @JsonKey(name: 'quantity') double? quantity,
-      @JsonKey(name: 'sub_total') double? subTotal});
+      @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      String? productName});
 }
 
 /// @nodoc
@@ -1200,6 +1267,7 @@ class __$$SaleItemDtoImplCopyWithImpl<$Res>
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? productName = freezed,
   }) {
     return _then(_$SaleItemDtoImpl(
       productId: freezed == productId
@@ -1254,6 +1322,10 @@ class __$$SaleItemDtoImplCopyWithImpl<$Res>
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      productName: freezed == productName
+          ? _value.productName
+          : productName // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -1274,7 +1346,8 @@ class _$SaleItemDtoImpl implements _SaleItemDto {
       @JsonKey(name: 'discount_amount') this.discountAmount,
       @JsonKey(name: 'sale_unit') this.saleUnit,
       @JsonKey(name: 'quantity') this.quantity,
-      @JsonKey(name: 'sub_total') this.subTotal});
+      @JsonKey(name: 'sub_total') this.subTotal,
+      @JsonKey(includeFromJson: false, includeToJson: false) this.productName});
 
   factory _$SaleItemDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$SaleItemDtoImplFromJson(json);
@@ -1318,10 +1391,13 @@ class _$SaleItemDtoImpl implements _SaleItemDto {
   @override
   @JsonKey(name: 'sub_total')
   final double? subTotal;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final String? productName;
 
   @override
   String toString() {
-    return 'SaleItemDto(productId: $productId, tableId: $tableId, productPrice: $productPrice, netUnitPrice: $netUnitPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal)';
+    return 'SaleItemDto(productId: $productId, tableId: $tableId, productPrice: $productPrice, netUnitPrice: $netUnitPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal, productName: $productName)';
   }
 
   @override
@@ -1351,7 +1427,9 @@ class _$SaleItemDtoImpl implements _SaleItemDto {
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
             (identical(other.subTotal, subTotal) ||
-                other.subTotal == subTotal));
+                other.subTotal == subTotal) &&
+            (identical(other.productName, productName) ||
+                other.productName == productName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1370,7 +1448,8 @@ class _$SaleItemDtoImpl implements _SaleItemDto {
       discountAmount,
       const DeepCollectionEquality().hash(saleUnit),
       quantity,
-      subTotal);
+      subTotal,
+      productName);
 
   /// Create a copy of SaleItemDto
   /// with the given fields replaced by the non-null parameter values.
@@ -1402,7 +1481,9 @@ abstract class _SaleItemDto implements SaleItemDto {
       @JsonKey(name: 'discount_amount') final double? discountAmount,
       @JsonKey(name: 'sale_unit') final dynamic saleUnit,
       @JsonKey(name: 'quantity') final double? quantity,
-      @JsonKey(name: 'sub_total') final double? subTotal}) = _$SaleItemDtoImpl;
+      @JsonKey(name: 'sub_total') final double? subTotal,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final String? productName}) = _$SaleItemDtoImpl;
 
   factory _SaleItemDto.fromJson(Map<String, dynamic> json) =
       _$SaleItemDtoImpl.fromJson;
@@ -1446,6 +1527,9 @@ abstract class _SaleItemDto implements SaleItemDto {
   @override
   @JsonKey(name: 'sub_total')
   double? get subTotal;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  String? get productName;
 
   /// Create a copy of SaleItemDto
   /// with the given fields replaced by the non-null parameter values.

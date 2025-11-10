@@ -7,7 +7,7 @@ class GetProducts {
 
   GetProducts(this.productsRepository);
 
-  Stream<Result<List<Product>>> call() async* {
-    yield* productsRepository.getProducts();
+  Stream<Result<List<Product>>> call({int? warehouseId}) async* {
+    yield* productsRepository.getProducts(warehouseId: warehouseId);
   }
 }

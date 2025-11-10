@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:spotstock_inventory/core/networking/spotstock_api_constants.dart';
 
 import '../../../../core/database/database_client.dart';
 import '../../../../core/networking/api_response/spotstock_api_data_item.dart';
@@ -58,9 +59,13 @@ extension SaleMapper on Sale {
   }
 
   static Sale fromCreateDto(CreateSaleDto createSaleDto) {
+    final receivedAmount =
+        (createSaleDto.payments ?? []).fold<double>(0, (total, p) => total + (p.amount ?? 0));
+
+    final dueAmount = receivedAmount - (createSaleDto.grandTotal ?? 0);
     return Sale(
       referenceCode: createSaleDto.referenceCode,
-      date: createSaleDto.date,
+      date: createSaleDto.date ?? DateTime.now(),
       customerId: createSaleDto.customerId,
       isOffline: createSaleDto.isOffline ?? 1,
       staffName: createSaleDto.staffName,
@@ -71,7 +76,7 @@ extension SaleMapper on Sale {
       discountAmount: createSaleDto.discountAmount,
       shipping: createSaleDto.shipping,
       grandTotal: createSaleDto.grandTotal,
-      receivedAmount: createSaleDto.receivedAmount,
+      receivedAmount: receivedAmount,
       paidAmount: createSaleDto.paidAmount,
       partialAmount: createSaleDto.partialPaymentAmount,
       paymentType: createSaleDto.paymentType,
@@ -81,6 +86,7 @@ extension SaleMapper on Sale {
       saleItems: createSaleDto.saleItems
           ?.map((i) => SaleItem(
                 productId: i.productId,
+                productName: i.productName,
                 productPrice: i.productPrice,
                 netUnitPrice: i.netUnitPrice,
                 taxType: i.taxType,
@@ -100,17 +106,21 @@ extension SaleMapper on Sale {
                 amount: p.amount,
               ))
           .toList(),
+      paymentMethods:
+          createSaleDto.payments?.map((p) => p.paymentType?.name).whereType<String>().toList(),
       staffId: createSaleDto.staffId,
-      attendantName: createSaleDto.attendantName,
-      attendantId: createSaleDto.attendantId,
+      attendantName: createSaleDto.staffName,
+      dueAmount: dueAmount,
+      attendantId: createSaleDto.staffId,
       roomDetails: createSaleDto.roomDetails,
       partialPaymentMethod: createSaleDto.partialPaymentMethod,
+      warehouseName: createSaleDto.warehouseName,
+      customerName: createSaleDto.customerName ?? SpotstockApiConstants.walkInCustomerName,
     );
   }
 
   LocalSalesCompanion toDrift() {
     return LocalSalesCompanion(
-      id: id != null ? Value(id!) : const Value.absent(),
       remoteId: Value(id),
       type: Value(type),
       links: Value(links),
@@ -158,7 +168,7 @@ extension SaleMapper on Sale {
 
   static Sale fromDrift(LocalSale row) {
     return Sale(
-      id: row.id,
+      id: row.remoteId,
       referenceCode: row.referenceCode,
       date: row.date,
       customerId: row.customerId,
@@ -230,8 +240,6 @@ extension SaleMapper on Sale {
         companyId: attributes.loggedUser?.companyId,
         isAdmin: attributes.loggedUser?.isAdmin,
         isSuper: attributes.loggedUser?.isSuper,
-        warehouseId: attributes.loggedUser?.warehouseId,
-        branchId: attributes.loggedUser?.branchId,
         type: attributes.loggedUser?.type,
         salaryAmount: attributes.loggedUser?.salaryAmount,
         balance: attributes.loggedUser?.balance,
@@ -262,6 +270,7 @@ extension SaleMapper on Sale {
       saleItems: attributes.saleItems
           ?.map((i) => SaleItem(
                 productId: i.productId,
+                productName: i.productName,
                 productPrice: i.productPrice,
                 netUnitPrice: i.netUnitPrice,
                 taxType: i.taxType,

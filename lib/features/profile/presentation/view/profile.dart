@@ -163,31 +163,6 @@ class Profile extends StatelessWidget {
                             viewModel.logoutCommand.execute(context);
                           },
                         ),
-                        const SizedBox(height: SpotstockSizes.s50),
-                        Center(
-                          child: Text(
-                            'Built by Okoli .C. Tobenna',
-                            style: TextStyle(
-                              fontSize: SpotstockSizes.s13,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withAlpha(settingsSupportingTextColor),
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: Text(
-                            '0813 088 9915',
-                            style: TextStyle(
-                              fontSize: SpotstockSizes.s13,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withAlpha(settingsSupportingTextColor),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

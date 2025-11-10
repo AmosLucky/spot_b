@@ -9,6 +9,6 @@ class CreateSale {
   CreateSale(this.salesRepository);
 
   Future<Result<Sale>> call(CreateSaleDto createSaleDto) async {
-    return await salesRepository.createSale(createSaleDto);
+    return await salesRepository.createSale(createSaleDto.copyWith(date: DateTime.now()));
   }
 }

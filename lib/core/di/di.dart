@@ -82,6 +82,14 @@ import '../../features/pos/presentation/view_model/spotstock_select_bar_table_fo
 import '../../features/pos/presentation/view_model/spotstock_select_branch_form_view_model.dart';
 import '../../features/pos/presentation/view_model/spotstock_select_customer_form_view_model.dart';
 import '../../features/profile/presentation/view_model/profile_view_model.dart';
+import '../../features/receipt/data/repositories/local_receipt_reference_no_repository_impl.dart';
+import '../../features/receipt/data/services/pdf_sale_receipt_service.dart';
+import '../../features/receipt/data/services/receipt_reference_no_service_impl.dart';
+import '../../features/receipt/domain/repositories/local_receipt_reference_no_repository.dart';
+import '../../features/receipt/domain/services/receipt_reference_no_service.dart';
+import '../../features/receipt/domain/usecases/generate_receipt_reference_no.dart';
+import '../../features/receipt/domain/usecases/print_pdf_receipt.dart';
+import '../../features/receipt/domain/usecases/share_pdf_receipt.dart';
 import '../../features/register_management/data/datasources/local/local_register_datasource.dart';
 import '../../features/register_management/data/repositories/register_repository_impl.dart';
 import '../../features/register_management/domain/repositories/register_repository.dart';
@@ -116,6 +124,8 @@ Future<void> setupServiceLocator() async {
   });
   getIt.registerLazySingleton<DatabaseClient>(() => DatabaseClient());
   getIt.registerLazySingleton<NetworkInfoService>(() => NetworkInfoService()..start());
+  getIt.registerLazySingleton<PdfSaleReceiptService>(() => PdfSaleReceiptService());
+  getIt.registerLazySingleton<ReceiptReferenceNoService>(() => ReceiptReferenceNoServiceImpl());
 
   // ============ DATASOURCES ============
   getIt.registerLazySingleton<LoginDatasource>(() => LoginDatasource(getIt<DioClient>()));
@@ -235,10 +245,14 @@ Future<void> setupServiceLocator() async {
       getIt<NetworkInfoRepository>(),
     ),
   );
+  getIt.registerLazySingleton<LocalReceiptReferenceNoRepository>(
+    () => LocalReceiptReferenceNoRepositoryImpl(getIt<ReceiptReferenceNoService>()),
+  );
   getIt.registerLazySingleton<SalesRepository>(
     () => SalesRepositoryImpl(
       getIt<SalesLocalDatasource>(),
       getIt<SalesRemoteDatasource>(),
+      getIt<LocalReceiptReferenceNoRepository>(),
       getIt<NetworkInfoRepository>(),
     ),
   );
@@ -273,7 +287,12 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton<GetProducts>(() => GetProducts(getIt<ProductsRepository>()));
   getIt.registerLazySingleton<GetWarehouses>(() => GetWarehouses(getIt<WarehousesRepository>()));
   getIt.registerLazySingleton<CreateSale>(() => CreateSale(getIt<SalesRepository>()));
-
+  getIt.registerLazySingleton<PrintPdfReceipt>(
+      () => PrintPdfReceipt(getIt<PdfSaleReceiptService>(), getIt<GetSpotstockUser>()));
+  getIt.registerLazySingleton<SharePdfReceipt>(
+      () => SharePdfReceipt(getIt<PdfSaleReceiptService>(), getIt<GetSpotstockUser>()));
+  getIt.registerLazySingleton<GenerateReceiptReferenceNo>(
+      () => GenerateReceiptReferenceNo(getIt<ReceiptReferenceNoService>()));
   // ============ VIEW MODELS ============
   // Register as factories so fresh instances are created each time
   getIt.registerFactory<SplashViewModel>(() => SplashViewModel(
@@ -331,6 +350,8 @@ Future<void> setupServiceLocator() async {
         getIt<GetProducts>(),
         getIt<GetWarehouses>(),
         getIt<CreateSale>(),
+        getIt<PrintPdfReceipt>(),
+        getIt<SharePdfReceipt>(),
       ));
   getIt.registerFactory<SpotstockProductsTabViewModel>(() => SpotstockProductsTabViewModel());
   getIt.registerFactory<SpotstockCartTabViewModel>(() => SpotstockCartTabViewModel());

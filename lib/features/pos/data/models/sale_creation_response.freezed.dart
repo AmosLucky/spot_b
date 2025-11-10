@@ -1080,10 +1080,6 @@ mixin _$SaleCreationResponseLoggedUserDao {
   int? get isAdmin => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_super')
   int? get isSuper => throw _privateConstructorUsedError;
-  @JsonKey(name: 'warehouse_id')
-  int? get warehouseId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'branch_id')
-  int? get branchId => throw _privateConstructorUsedError;
   String? get type => throw _privateConstructorUsedError;
   @JsonKey(name: 'salary_amount')
   double? get salaryAmount => throw _privateConstructorUsedError;
@@ -1132,8 +1128,6 @@ abstract class $SaleCreationResponseLoggedUserDaoCopyWith<$Res> {
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'is_admin') int? isAdmin,
       @JsonKey(name: 'is_super') int? isSuper,
-      @JsonKey(name: 'warehouse_id') int? warehouseId,
-      @JsonKey(name: 'branch_id') int? branchId,
       String? type,
       @JsonKey(name: 'salary_amount') double? salaryAmount,
       double? balance,
@@ -1176,8 +1170,6 @@ class _$SaleCreationResponseLoggedUserDaoCopyWithImpl<$Res,
     Object? companyId = freezed,
     Object? isAdmin = freezed,
     Object? isSuper = freezed,
-    Object? warehouseId = freezed,
-    Object? branchId = freezed,
     Object? type = freezed,
     Object? salaryAmount = freezed,
     Object? balance = freezed,
@@ -1252,14 +1244,6 @@ class _$SaleCreationResponseLoggedUserDaoCopyWithImpl<$Res,
           ? _value.isSuper
           : isSuper // ignore: cast_nullable_to_non_nullable
               as int?,
-      warehouseId: freezed == warehouseId
-          ? _value.warehouseId
-          : warehouseId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      branchId: freezed == branchId
-          ? _value.branchId
-          : branchId // ignore: cast_nullable_to_non_nullable
-              as int?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -1322,8 +1306,6 @@ abstract class _$$SaleCreationResponseLoggedUserDaoImplCopyWith<$Res>
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'is_admin') int? isAdmin,
       @JsonKey(name: 'is_super') int? isSuper,
-      @JsonKey(name: 'warehouse_id') int? warehouseId,
-      @JsonKey(name: 'branch_id') int? branchId,
       String? type,
       @JsonKey(name: 'salary_amount') double? salaryAmount,
       double? balance,
@@ -1365,8 +1347,6 @@ class __$$SaleCreationResponseLoggedUserDaoImplCopyWithImpl<$Res>
     Object? companyId = freezed,
     Object? isAdmin = freezed,
     Object? isSuper = freezed,
-    Object? warehouseId = freezed,
-    Object? branchId = freezed,
     Object? type = freezed,
     Object? salaryAmount = freezed,
     Object? balance = freezed,
@@ -1441,14 +1421,6 @@ class __$$SaleCreationResponseLoggedUserDaoImplCopyWithImpl<$Res>
           ? _value.isSuper
           : isSuper // ignore: cast_nullable_to_non_nullable
               as int?,
-      warehouseId: freezed == warehouseId
-          ? _value.warehouseId
-          : warehouseId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      branchId: freezed == branchId
-          ? _value.branchId
-          : branchId // ignore: cast_nullable_to_non_nullable
-              as int?,
       type: freezed == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -1506,8 +1478,6 @@ class _$SaleCreationResponseLoggedUserDaoImpl
       @JsonKey(name: 'company_id') this.companyId,
       @JsonKey(name: 'is_admin') this.isAdmin,
       @JsonKey(name: 'is_super') this.isSuper,
-      @JsonKey(name: 'warehouse_id') this.warehouseId,
-      @JsonKey(name: 'branch_id') this.branchId,
       this.type,
       @JsonKey(name: 'salary_amount') this.salaryAmount,
       this.balance,
@@ -1565,12 +1535,6 @@ class _$SaleCreationResponseLoggedUserDaoImpl
   @JsonKey(name: 'is_super')
   final int? isSuper;
   @override
-  @JsonKey(name: 'warehouse_id')
-  final int? warehouseId;
-  @override
-  @JsonKey(name: 'branch_id')
-  final int? branchId;
-  @override
   final String? type;
   @override
   @JsonKey(name: 'salary_amount')
@@ -1600,7 +1564,7 @@ class _$SaleCreationResponseLoggedUserDaoImpl
 
   @override
   String toString() {
-    return 'SaleCreationResponseLoggedUserDao(id: $id, firstName: $firstName, lastName: $lastName, dob: $dob, salaryDate: $salaryDate, email: $email, phone: $phone, emailVerifiedAt: $emailVerifiedAt, defaultPassword: $defaultPassword, createdAt: $createdAt, updatedAt: $updatedAt, status: $status, language: $language, companyId: $companyId, isAdmin: $isAdmin, isSuper: $isSuper, warehouseId: $warehouseId, branchId: $branchId, type: $type, salaryAmount: $salaryAmount, balance: $balance, dateEmployed: $dateEmployed, note: $note, isAttendant: $isAttendant, imageUrl: $imageUrl, media: $media)';
+    return 'SaleCreationResponseLoggedUserDao(id: $id, firstName: $firstName, lastName: $lastName, dob: $dob, salaryDate: $salaryDate, email: $email, phone: $phone, emailVerifiedAt: $emailVerifiedAt, defaultPassword: $defaultPassword, createdAt: $createdAt, updatedAt: $updatedAt, status: $status, language: $language, companyId: $companyId, isAdmin: $isAdmin, isSuper: $isSuper, type: $type, salaryAmount: $salaryAmount, balance: $balance, dateEmployed: $dateEmployed, note: $note, isAttendant: $isAttendant, imageUrl: $imageUrl, media: $media)';
   }
 
   @override
@@ -1633,10 +1597,6 @@ class _$SaleCreationResponseLoggedUserDaoImpl
                 other.companyId == companyId) &&
             (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
             (identical(other.isSuper, isSuper) || other.isSuper == isSuper) &&
-            (identical(other.warehouseId, warehouseId) ||
-                other.warehouseId == warehouseId) &&
-            (identical(other.branchId, branchId) ||
-                other.branchId == branchId) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.salaryAmount, salaryAmount) ||
                 other.salaryAmount == salaryAmount) &&
@@ -1671,8 +1631,6 @@ class _$SaleCreationResponseLoggedUserDaoImpl
         companyId,
         isAdmin,
         isSuper,
-        warehouseId,
-        branchId,
         type,
         salaryAmount,
         balance,
@@ -1720,8 +1678,6 @@ abstract class _SaleCreationResponseLoggedUserDao
       @JsonKey(name: 'company_id') final int? companyId,
       @JsonKey(name: 'is_admin') final int? isAdmin,
       @JsonKey(name: 'is_super') final int? isSuper,
-      @JsonKey(name: 'warehouse_id') final int? warehouseId,
-      @JsonKey(name: 'branch_id') final int? branchId,
       final String? type,
       @JsonKey(name: 'salary_amount') final double? salaryAmount,
       final double? balance,
@@ -1777,12 +1733,6 @@ abstract class _SaleCreationResponseLoggedUserDao
   @override
   @JsonKey(name: 'is_super')
   int? get isSuper;
-  @override
-  @JsonKey(name: 'warehouse_id')
-  int? get warehouseId;
-  @override
-  @JsonKey(name: 'branch_id')
-  int? get branchId;
   @override
   String? get type;
   @override

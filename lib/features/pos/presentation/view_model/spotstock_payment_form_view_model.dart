@@ -190,6 +190,7 @@ class SpotstockPaymentFormViewModel extends SpotstockFormViewModel {
     _customerChange = (totalPayments > grandTotal) ? totalPayments - grandTotal : 0;
 
     _changeController.text = _customerChange?.toStringAsFixed(2) ?? '';
+
     notifyListeners();
   }
 

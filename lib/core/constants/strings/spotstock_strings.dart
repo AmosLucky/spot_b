@@ -180,4 +180,34 @@ class SpotstockStrings {
   static const String updatedAt = 'Updated at';
   static const String barcodeUrl = 'Barcode url';
   static const String anErrorOccurred = 'An error occurred';
+  static const String salesInvoiceCapital = 'SALES INVOICE';
+  static const String thankYouExclamation = 'Thank You!';
+  static const String soldBy = 'Sold by';
+  static const String invoiceNo = 'Invoice no';
+  static const String customer = 'Customer';
+  static const String item = 'Item';
+  static const String qty = 'Qty';
+  static const String amount = 'Amount';
+  static const String table = 'Table';
+  static const String subtotal = 'Subtotal';
+  static const String tax = 'Tax';
+  static const String paidBy = 'Paid by';
+  static const String amountPaid = 'Amount paid';
+  static const String ngn = 'NGN';
+  static const String updatingProducts = 'Updating products...';
+  static const String tel = 'Tel';
+  static const String salesReceiptCapital = 'SALES RECEIPT';
+  static const String receiptNo = 'Receipt no';
+  static const String cashier = 'Cashier';
+  static const String vat = 'VAT';
+  static const String payments = 'Payments';
+  static const String amountOwed = 'Amount owed';
+  static const String amountReceived = 'Amount received';
+  static const String thankYouForYourPurchaseExclamation = 'Thank you for your purchase!';
+  static const String pleaseKeepThisReceiptForYourRecords =
+      'Please keep this receipt for your records';
+  static const String ref = 'Ref';
+  static const String failedToGenerateReceiptReferenceNo =
+      'Failed to generate receipt reference no';
+  static const String localReceiptReferenceNoPrefix = 'LO-INV-';
 }

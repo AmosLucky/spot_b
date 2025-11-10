@@ -25,12 +25,9 @@ class SpotstockProductsTabViewModel extends SpotstockViewModel {
   bool get showScrollToTopButton => _showScrollToTopButton;
 
   @override
-  void bind(BuildContext context, {List<Product> products = const [], int? branchId}) {
-    final branchProducts = products.where((product) {
-      return product.stock?.warehouseId == branchId;
-    }).toList();
-    _products = branchProducts;
-    _filteredProducts = branchProducts;
+  void bind(BuildContext context, {List<Product> products = const []}) {
+    _products = products;
+    _filteredProducts = products;
     _initScrollListener();
     notifyListeners();
   }

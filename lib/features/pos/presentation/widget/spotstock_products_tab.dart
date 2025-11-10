@@ -6,6 +6,7 @@ import '../../../../core/di/di.dart';
 import '../../../../core/presentation/buttons/spotstock_floating_action_button.dart';
 import '../../../../core/presentation/buttons/spotstock_icon_button.dart';
 import '../../../../core/presentation/extensions/num_extensions.dart';
+import '../../../../core/presentation/progress_indicators/spotstock_progress_indicator.dart';
 import '../../../../core/presentation/symbols/naira_symbol.dart';
 import '../../../../core/presentation/textfields/spotstock_textfield.dart';
 import '../../data/models/product.dart';
@@ -15,20 +16,20 @@ const int borderAlpha = 25;
 
 class SpotstockProductsTab extends StatelessWidget {
   final List<Product> products;
-  final int? branchId;
   final Function(Product) onAddProduct;
+  final bool isUpdatingProducts;
   const SpotstockProductsTab({
     super.key,
     required this.products,
     required this.onAddProduct,
-    required this.branchId,
+    required this.isUpdatingProducts,
   });
 
   @override
   Widget build(BuildContext context) {
     final viewModel = getIt<SpotstockProductsTabViewModel>();
     return ListenableBuilder(
-      listenable: viewModel..bind(context, products: products, branchId: branchId),
+      listenable: viewModel..bind(context, products: products),
       builder: (context, _) {
         return Column(
           children: [
@@ -78,7 +79,7 @@ class SpotstockProductsTab extends StatelessWidget {
             Divider(
               height: SpotstockSizes.s1,
             ),
-            if (viewModel.filteredProducts.isEmpty)
+            if (viewModel.filteredProducts.isEmpty && !isUpdatingProducts)
               Expanded(
                 child: Center(
                   child: Column(
@@ -91,6 +92,21 @@ class SpotstockProductsTab extends StatelessWidget {
                       ),
                       SizedBox(height: SpotstockSizes.s8),
                       Text(SpotstockStrings.noProductsFound),
+                    ],
+                  ),
+                ),
+              ),
+            if (isUpdatingProducts && viewModel.filteredProducts.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SpotstockProgressIndicator(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      SizedBox(height: SpotstockSizes.s8),
+                      Text(SpotstockStrings.updatingProducts),
                     ],
                   ),
                 ),

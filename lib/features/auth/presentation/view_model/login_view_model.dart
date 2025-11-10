@@ -9,6 +9,7 @@ import '../../../../core/routing/navigation.dart';
 import '../../../../core/routing/router.dart';
 import '../../../../core/shared/command.dart';
 import '../../../../core/shared/result.dart';
+import '../../data/models/login_company_dao.dart';
 import '../../data/models/login_dto.dart';
 import '../../data/models/login_response_dao.dart';
 import '../../data/models/login_role_dao.dart';
@@ -94,7 +95,8 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
       onSuccess: (response) {
         _validateResponse(response.data);
         saveToken(response.data.token!);
-        saveSpotstockUser(_createSpotstockUser(response.data.user, response.data.role));
+        saveSpotstockUser(_createSpotstockUser(
+            response.data.user, response.data.role, response.data.user?.company));
         saveLastLoginTime(DateTime.now());
         _formKey.currentState?.reset();
         _emailController.clear();
@@ -162,7 +164,8 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
     }
   }
 
-  SpotstockUser _createSpotstockUser(LoginUserDao? user, LoginRoleDao? role) {
+  SpotstockUser _createSpotstockUser(
+      LoginUserDao? user, LoginRoleDao? role, LoginCompanyDao? company) {
     return SpotstockUser(
       id: user!.id!,
       firstName: user.firstName!,
@@ -172,6 +175,13 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
       roleId: role!.id!,
       roleName: role.name!,
       roleDisplayName: role.displayName!,
+      company: SpotstockCompany(
+        id: company!.id!,
+        name: company.name!,
+        address: company.address!,
+        phone: company.phone!,
+        email: company.email!,
+      ),
     );
   }
 

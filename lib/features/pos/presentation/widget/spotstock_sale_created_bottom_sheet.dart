@@ -79,22 +79,7 @@ class SpotstockSaleCreatedBottomSheetBody extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(SpotstockStrings.date),
-              Text(sale.date?.toFormattedDate() ?? ''),
-            ],
-          ),
-          const SizedBox(height: SpotstockSizes.s8),
-          Divider(
-            color: Theme.of(context).colorScheme.outlineVariant,
-            height: SpotstockSizes.s1,
-          ),
-          const SizedBox(height: SpotstockSizes.s8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(SpotstockStrings.time),
-              Text(
-                sale.date?.toFormattedDate() ?? '',
-              ),
+              Text(sale.date?.toFormattedDateTime() ?? ''),
             ],
           ),
           const SizedBox(height: SpotstockSizes.s8),
@@ -134,19 +119,6 @@ class SpotstockSaleCreatedBottomSheetBody extends StatelessWidget {
             children: [
               Text(SpotstockStrings.referenceCode),
               Text(sale.referenceCode ?? ''),
-            ],
-          ),
-          const SizedBox(height: SpotstockSizes.s8),
-          Divider(
-            color: Theme.of(context).colorScheme.outlineVariant,
-            height: SpotstockSizes.s1,
-          ),
-          const SizedBox(height: SpotstockSizes.s8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(SpotstockStrings.createdAt),
-              Text(sale.createdAt?.toFormattedDate() ?? ''),
             ],
           ),
           const SizedBox(height: SpotstockSizes.s8),

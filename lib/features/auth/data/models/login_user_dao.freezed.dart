@@ -27,6 +27,7 @@ mixin _$LoginUserDao {
   String? get lastName => throw _privateConstructorUsedError;
   String? get email => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
+  LoginCompanyDao? get company => throw _privateConstructorUsedError;
 
   /// Serializes this LoginUserDao to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -49,7 +50,10 @@ abstract class $LoginUserDaoCopyWith<$Res> {
       @JsonKey(name: 'first_name') String? firstName,
       @JsonKey(name: 'last_name') String? lastName,
       String? email,
-      String? phone});
+      String? phone,
+      LoginCompanyDao? company});
+
+  $LoginCompanyDaoCopyWith<$Res>? get company;
 }
 
 /// @nodoc
@@ -72,6 +76,7 @@ class _$LoginUserDaoCopyWithImpl<$Res, $Val extends LoginUserDao>
     Object? lastName = freezed,
     Object? email = freezed,
     Object? phone = freezed,
+    Object? company = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -94,7 +99,25 @@ class _$LoginUserDaoCopyWithImpl<$Res, $Val extends LoginUserDao>
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
               as String?,
+      company: freezed == company
+          ? _value.company
+          : company // ignore: cast_nullable_to_non_nullable
+              as LoginCompanyDao?,
     ) as $Val);
+  }
+
+  /// Create a copy of LoginUserDao
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $LoginCompanyDaoCopyWith<$Res>? get company {
+    if (_value.company == null) {
+      return null;
+    }
+
+    return $LoginCompanyDaoCopyWith<$Res>(_value.company!, (value) {
+      return _then(_value.copyWith(company: value) as $Val);
+    });
   }
 }
 
@@ -111,7 +134,11 @@ abstract class _$$LoginUserDaoImplCopyWith<$Res>
       @JsonKey(name: 'first_name') String? firstName,
       @JsonKey(name: 'last_name') String? lastName,
       String? email,
-      String? phone});
+      String? phone,
+      LoginCompanyDao? company});
+
+  @override
+  $LoginCompanyDaoCopyWith<$Res>? get company;
 }
 
 /// @nodoc
@@ -132,6 +159,7 @@ class __$$LoginUserDaoImplCopyWithImpl<$Res>
     Object? lastName = freezed,
     Object? email = freezed,
     Object? phone = freezed,
+    Object? company = freezed,
   }) {
     return _then(_$LoginUserDaoImpl(
       id: freezed == id
@@ -154,6 +182,10 @@ class __$$LoginUserDaoImplCopyWithImpl<$Res>
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
               as String?,
+      company: freezed == company
+          ? _value.company
+          : company // ignore: cast_nullable_to_non_nullable
+              as LoginCompanyDao?,
     ));
   }
 }
@@ -166,7 +198,8 @@ class _$LoginUserDaoImpl implements _LoginUserDao {
       @JsonKey(name: 'first_name') required this.firstName,
       @JsonKey(name: 'last_name') required this.lastName,
       required this.email,
-      required this.phone});
+      required this.phone,
+      required this.company});
 
   factory _$LoginUserDaoImpl.fromJson(Map<String, dynamic> json) =>
       _$$LoginUserDaoImplFromJson(json);
@@ -183,10 +216,12 @@ class _$LoginUserDaoImpl implements _LoginUserDao {
   final String? email;
   @override
   final String? phone;
+  @override
+  final LoginCompanyDao? company;
 
   @override
   String toString() {
-    return 'LoginUserDao(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone)';
+    return 'LoginUserDao(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, company: $company)';
   }
 
   @override
@@ -200,13 +235,14 @@ class _$LoginUserDaoImpl implements _LoginUserDao {
             (identical(other.lastName, lastName) ||
                 other.lastName == lastName) &&
             (identical(other.email, email) || other.email == email) &&
-            (identical(other.phone, phone) || other.phone == phone));
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.company, company) || other.company == company));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, firstName, lastName, email, phone);
+      Object.hash(runtimeType, id, firstName, lastName, email, phone, company);
 
   /// Create a copy of LoginUserDao
   /// with the given fields replaced by the non-null parameter values.
@@ -230,7 +266,8 @@ abstract class _LoginUserDao implements LoginUserDao {
       @JsonKey(name: 'first_name') required final String? firstName,
       @JsonKey(name: 'last_name') required final String? lastName,
       required final String? email,
-      required final String? phone}) = _$LoginUserDaoImpl;
+      required final String? phone,
+      required final LoginCompanyDao? company}) = _$LoginUserDaoImpl;
 
   factory _LoginUserDao.fromJson(Map<String, dynamic> json) =
       _$LoginUserDaoImpl.fromJson;
@@ -247,6 +284,8 @@ abstract class _LoginUserDao implements LoginUserDao {
   String? get email;
   @override
   String? get phone;
+  @override
+  LoginCompanyDao? get company;
 
   /// Create a copy of LoginUserDao
   /// with the given fields replaced by the non-null parameter values.

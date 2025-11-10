@@ -24,10 +24,14 @@ class DioClient {
         baseUrl: SpotstockApiConstants.baseUrl,
         connectTimeout: SpotstockDurations.apiRequestTimeout,
         receiveTimeout: SpotstockDurations.apiRequestTimeout,
+        headers: {
+          'Content-Type': SpotstockApiConstants.contentType,
+          'Accept': SpotstockApiConstants.accept,
+        },
       ),
     );
     dio.interceptors.addAll([
-      LogInterceptor(request: true, responseBody: true),
+      // LogInterceptor(request: true, responseBody: true),
       SpotstockTokenInterceptor(
         getIt<TokenRepository>(),
         getIt<RemoveLastLoginTime>(),

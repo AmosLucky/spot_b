@@ -5,7 +5,7 @@ import '../models/product.dart';
 import '../models/stock.dart';
 
 extension ProductMapper on Product {
-  LocalProductsCompanion toDrift() {
+  LocalProductsCompanion toDrift({int? warehouseId}) {
     return LocalProductsCompanion(
       id: id != null ? Value(id!) : const Value.absent(),
       name: Value(name),
@@ -20,7 +20,7 @@ extension ProductMapper on Product {
       inStock: Value(inStock),
       link: Value(link),
       stockId: Value(stock?.id),
-      warehouseId: Value(stock?.warehouseId),
+      warehouseId: Value(warehouseId),
     );
   }
 
@@ -38,9 +38,7 @@ extension ProductMapper on Product {
       createdAt: row.createdAt,
       inStock: row.inStock,
       link: row.link,
-      stock: row.stockId != null || row.warehouseId != null
-          ? Stock(id: row.stockId, warehouseId: row.warehouseId)
-          : null,
+      stock: Stock(id: row.stockId, warehouseId: row.warehouseId),
     );
   }
 }

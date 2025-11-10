@@ -69,8 +69,6 @@ class SaleCreationResponseLoggedUserDao with _$SaleCreationResponseLoggedUserDao
     @JsonKey(name: 'company_id') int? companyId,
     @JsonKey(name: 'is_admin') int? isAdmin,
     @JsonKey(name: 'is_super') int? isSuper,
-    @JsonKey(name: 'warehouse_id') int? warehouseId,
-    @JsonKey(name: 'branch_id') int? branchId,
     String? type,
     @JsonKey(name: 'salary_amount') double? salaryAmount,
     double? balance,

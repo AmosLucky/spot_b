@@ -46,6 +46,8 @@ class ProductsRemoteDatasource {
           'page[number]': pageNumber,
           'page[size]': pageSize,
           'warehouse_id': warehouseId,
+          'stock_status': SpotstockApiConstants.inStock,
+          'sort': SpotstockApiConstants.sort,
         },
       );
       if (response.statusCode == SpotstockStatusCode.success) {

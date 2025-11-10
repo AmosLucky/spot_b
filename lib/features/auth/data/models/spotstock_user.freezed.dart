@@ -28,6 +28,7 @@ mixin _$SpotstockUser {
   int get roleId => throw _privateConstructorUsedError;
   String get roleName => throw _privateConstructorUsedError;
   String get roleDisplayName => throw _privateConstructorUsedError;
+  SpotstockCompany get company => throw _privateConstructorUsedError;
 
   /// Serializes this SpotstockUser to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,7 +54,10 @@ abstract class $SpotstockUserCopyWith<$Res> {
       String phone,
       int roleId,
       String roleName,
-      String roleDisplayName});
+      String roleDisplayName,
+      SpotstockCompany company});
+
+  $SpotstockCompanyCopyWith<$Res> get company;
 }
 
 /// @nodoc
@@ -79,6 +83,7 @@ class _$SpotstockUserCopyWithImpl<$Res, $Val extends SpotstockUser>
     Object? roleId = null,
     Object? roleName = null,
     Object? roleDisplayName = null,
+    Object? company = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -113,7 +118,21 @@ class _$SpotstockUserCopyWithImpl<$Res, $Val extends SpotstockUser>
           ? _value.roleDisplayName
           : roleDisplayName // ignore: cast_nullable_to_non_nullable
               as String,
+      company: null == company
+          ? _value.company
+          : company // ignore: cast_nullable_to_non_nullable
+              as SpotstockCompany,
     ) as $Val);
+  }
+
+  /// Create a copy of SpotstockUser
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SpotstockCompanyCopyWith<$Res> get company {
+    return $SpotstockCompanyCopyWith<$Res>(_value.company, (value) {
+      return _then(_value.copyWith(company: value) as $Val);
+    });
   }
 }
 
@@ -133,7 +152,11 @@ abstract class _$$SpotstockUserImplCopyWith<$Res>
       String phone,
       int roleId,
       String roleName,
-      String roleDisplayName});
+      String roleDisplayName,
+      SpotstockCompany company});
+
+  @override
+  $SpotstockCompanyCopyWith<$Res> get company;
 }
 
 /// @nodoc
@@ -157,6 +180,7 @@ class __$$SpotstockUserImplCopyWithImpl<$Res>
     Object? roleId = null,
     Object? roleName = null,
     Object? roleDisplayName = null,
+    Object? company = null,
   }) {
     return _then(_$SpotstockUserImpl(
       id: null == id
@@ -191,6 +215,10 @@ class __$$SpotstockUserImplCopyWithImpl<$Res>
           ? _value.roleDisplayName
           : roleDisplayName // ignore: cast_nullable_to_non_nullable
               as String,
+      company: null == company
+          ? _value.company
+          : company // ignore: cast_nullable_to_non_nullable
+              as SpotstockCompany,
     ));
   }
 }
@@ -206,7 +234,8 @@ class _$SpotstockUserImpl implements _SpotstockUser {
       required this.phone,
       required this.roleId,
       required this.roleName,
-      required this.roleDisplayName});
+      required this.roleDisplayName,
+      required this.company});
 
   factory _$SpotstockUserImpl.fromJson(Map<String, dynamic> json) =>
       _$$SpotstockUserImplFromJson(json);
@@ -227,10 +256,12 @@ class _$SpotstockUserImpl implements _SpotstockUser {
   final String roleName;
   @override
   final String roleDisplayName;
+  @override
+  final SpotstockCompany company;
 
   @override
   String toString() {
-    return 'SpotstockUser(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, roleId: $roleId, roleName: $roleName, roleDisplayName: $roleDisplayName)';
+    return 'SpotstockUser(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, roleId: $roleId, roleName: $roleName, roleDisplayName: $roleDisplayName, company: $company)';
   }
 
   @override
@@ -249,13 +280,14 @@ class _$SpotstockUserImpl implements _SpotstockUser {
             (identical(other.roleName, roleName) ||
                 other.roleName == roleName) &&
             (identical(other.roleDisplayName, roleDisplayName) ||
-                other.roleDisplayName == roleDisplayName));
+                other.roleDisplayName == roleDisplayName) &&
+            (identical(other.company, company) || other.company == company));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, firstName, lastName, email,
-      phone, roleId, roleName, roleDisplayName);
+      phone, roleId, roleName, roleDisplayName, company);
 
   /// Create a copy of SpotstockUser
   /// with the given fields replaced by the non-null parameter values.
@@ -282,7 +314,8 @@ abstract class _SpotstockUser implements SpotstockUser {
       required final String phone,
       required final int roleId,
       required final String roleName,
-      required final String roleDisplayName}) = _$SpotstockUserImpl;
+      required final String roleDisplayName,
+      required final SpotstockCompany company}) = _$SpotstockUserImpl;
 
   factory _SpotstockUser.fromJson(Map<String, dynamic> json) =
       _$SpotstockUserImpl.fromJson;
@@ -303,11 +336,237 @@ abstract class _SpotstockUser implements SpotstockUser {
   String get roleName;
   @override
   String get roleDisplayName;
+  @override
+  SpotstockCompany get company;
 
   /// Create a copy of SpotstockUser
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SpotstockUserImplCopyWith<_$SpotstockUserImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+SpotstockCompany _$SpotstockCompanyFromJson(Map<String, dynamic> json) {
+  return _SpotstockCompany.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SpotstockCompany {
+  int get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get address => throw _privateConstructorUsedError;
+  String get phone => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
+
+  /// Serializes this SpotstockCompany to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of SpotstockCompany
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SpotstockCompanyCopyWith<SpotstockCompany> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SpotstockCompanyCopyWith<$Res> {
+  factory $SpotstockCompanyCopyWith(
+          SpotstockCompany value, $Res Function(SpotstockCompany) then) =
+      _$SpotstockCompanyCopyWithImpl<$Res, SpotstockCompany>;
+  @useResult
+  $Res call({int id, String name, String address, String phone, String email});
+}
+
+/// @nodoc
+class _$SpotstockCompanyCopyWithImpl<$Res, $Val extends SpotstockCompany>
+    implements $SpotstockCompanyCopyWith<$Res> {
+  _$SpotstockCompanyCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SpotstockCompany
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? address = null,
+    Object? phone = null,
+    Object? email = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: null == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$SpotstockCompanyImplCopyWith<$Res>
+    implements $SpotstockCompanyCopyWith<$Res> {
+  factory _$$SpotstockCompanyImplCopyWith(_$SpotstockCompanyImpl value,
+          $Res Function(_$SpotstockCompanyImpl) then) =
+      __$$SpotstockCompanyImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({int id, String name, String address, String phone, String email});
+}
+
+/// @nodoc
+class __$$SpotstockCompanyImplCopyWithImpl<$Res>
+    extends _$SpotstockCompanyCopyWithImpl<$Res, _$SpotstockCompanyImpl>
+    implements _$$SpotstockCompanyImplCopyWith<$Res> {
+  __$$SpotstockCompanyImplCopyWithImpl(_$SpotstockCompanyImpl _value,
+      $Res Function(_$SpotstockCompanyImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of SpotstockCompany
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? address = null,
+    Object? phone = null,
+    Object? email = null,
+  }) {
+    return _then(_$SpotstockCompanyImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: null == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$SpotstockCompanyImpl implements _SpotstockCompany {
+  const _$SpotstockCompanyImpl(
+      {required this.id,
+      required this.name,
+      required this.address,
+      required this.phone,
+      required this.email});
+
+  factory _$SpotstockCompanyImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SpotstockCompanyImplFromJson(json);
+
+  @override
+  final int id;
+  @override
+  final String name;
+  @override
+  final String address;
+  @override
+  final String phone;
+  @override
+  final String email;
+
+  @override
+  String toString() {
+    return 'SpotstockCompany(id: $id, name: $name, address: $address, phone: $phone, email: $email)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SpotstockCompanyImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.email, email) || other.email == email));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, name, address, phone, email);
+
+  /// Create a copy of SpotstockCompany
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SpotstockCompanyImplCopyWith<_$SpotstockCompanyImpl> get copyWith =>
+      __$$SpotstockCompanyImplCopyWithImpl<_$SpotstockCompanyImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$SpotstockCompanyImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _SpotstockCompany implements SpotstockCompany {
+  const factory _SpotstockCompany(
+      {required final int id,
+      required final String name,
+      required final String address,
+      required final String phone,
+      required final String email}) = _$SpotstockCompanyImpl;
+
+  factory _SpotstockCompany.fromJson(Map<String, dynamic> json) =
+      _$SpotstockCompanyImpl.fromJson;
+
+  @override
+  int get id;
+  @override
+  String get name;
+  @override
+  String get address;
+  @override
+  String get phone;
+  @override
+  String get email;
+
+  /// Create a copy of SpotstockCompany
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SpotstockCompanyImplCopyWith<_$SpotstockCompanyImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

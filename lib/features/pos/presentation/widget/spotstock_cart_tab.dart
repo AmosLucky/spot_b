@@ -14,6 +14,8 @@ import '../view_model/spotstock_cart_tab_view_model.dart';
 
 class SpotstockCartTab extends StatelessWidget {
   final List<SaleItemDto>? saleItems;
+  final TextEditingController? discountController;
+  final TextEditingController? shippingController;
   final double taxAmount;
   final double grandTotal;
   final double subTotal;
@@ -31,6 +33,8 @@ class SpotstockCartTab extends StatelessWidget {
   const SpotstockCartTab({
     super.key,
     required this.saleItems,
+    required this.discountController,
+    required this.shippingController,
     required this.taxAmount,
     required this.grandTotal,
     required this.subTotal,
@@ -308,6 +312,7 @@ class SpotstockCartTab extends StatelessWidget {
                             Text(SpotstockStrings.discount),
                             SizedBox(height: SpotstockSizes.s8),
                             SpotstockTextField(
+                              controller: discountController,
                               enabled: !(saleItems?.isEmpty ?? true),
                               hintText: SpotstockStrings.zero_00,
                               keyboardType: TextInputType.number,
@@ -324,6 +329,7 @@ class SpotstockCartTab extends StatelessWidget {
                             Text(SpotstockStrings.shipping),
                             SizedBox(height: SpotstockSizes.s8),
                             SpotstockTextField(
+                              controller: shippingController,
                               enabled: !(saleItems?.isEmpty ?? true),
                               hintText: SpotstockStrings.zero_00,
                               keyboardType: TextInputType.number,
@@ -413,7 +419,10 @@ class SpotstockCartTab extends StatelessWidget {
                       SpotstockStrings.pay,
                       style: TextStyle(color: Theme.of(context).colorScheme.onPayNow),
                     ),
-                    onPressed: () => onPayPressed(context),
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                      onPayPressed(context);
+                    },
                   ),
                   SizedBox(height: SpotstockSizes.bottomSpacing(context)),
                 ],

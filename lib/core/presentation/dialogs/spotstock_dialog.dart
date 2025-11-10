@@ -35,10 +35,14 @@ mixin SpotstockDialogMixin {
               const SizedBox(height: SpotstockSizes.s8),
               Text(
                 title,
+                textAlign: TextAlign.center,
                 style: TextStyle(fontSize: SpotstockSizes.s16, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: SpotstockSizes.s10),
-              Text(description),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: SpotstockSizes.s16),
               ...actions ?? [],
               if (actions == null)
