@@ -6,6 +6,7 @@ import 'dart:async';
 import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/di/di.dart';
+import '../../../../core/error_handling/app_error.dart';
 import '../../../../core/networking/spotstock_status_code.dart';
 import '../../../../core/presentation/bottom_sheets/spotstock_bottom_sheet.dart';
 import '../../../../core/presentation/buttons/spotstock_primary_button.dart';
@@ -14,6 +15,8 @@ import '../../../../core/presentation/dialogs/spotstock_dialog.dart';
 import '../../../../core/presentation/progress_indicators/spotstock_progress_indicator.dart';
 import '../../../../core/presentation/snackbars/spotstock_snackbar.dart';
 import '../../../../core/presentation/view_models/spotstock_view_model.dart';
+import '../../../staff_pin/domain/usecases/verify_staff_pin.dart';
+import '../../../staff_pin/presentation/view_model/spotstock_staff_pin_form_view_model.dart';
 import '../../../../core/routing/navigation.dart';
 import '../../../../core/shared/command.dart';
 import '../../../../core/shared/result.dart';
@@ -22,6 +25,7 @@ import '../../../network_info/domain/usecases/check_and_update_network_status.da
 import '../../../receipt/data/models/extra_receipt_details.dart';
 import '../../../receipt/domain/usecases/print_pdf_receipt.dart';
 import '../../../receipt/domain/usecases/share_pdf_receipt.dart';
+import '../../../staff_pin/presentation/widget/spotstock_staff_pin_form.dart';
 import '../../constants/spotstock_sale_creation_constant.dart';
 import '../../data/enums/enums.dart';
 import '../../data/models/attendant.dart';
@@ -184,13 +188,13 @@ class PosViewModel extends SpotstockViewModel
     _createSaleDto = createSaleDto ?? _createSaleDto;
     _tabController ??=
         (vsync != null) ? TabController(length: SpotstockSizes.s2.toInt(), vsync: vsync) : null;
+    _createSaleCommand = Command1<void, BuildContext>(_createSale);
     _getWarehousesCommand = Command0<void>(_getWarehouses)..execute();
     _getAttendantsCommand = Command0<void>(_getAttendants)..execute();
     _getBarTablesCommand = Command0<void>(_getBarTables)..execute();
     _getCustomersCommand = Command0<void>(_getCustomers)..execute();
     _getProductCategoriesCommand = Command0<void>(_getProductCategories)..execute();
     _getProductsCommand = Command0<void>(_getProducts);
-    _createSaleCommand = Command1<void, BuildContext>(_createSale);
     await checkAndUpdateNetworkStatus();
   }
 
@@ -414,6 +418,30 @@ class PosViewModel extends SpotstockViewModel
     return confirmed;
   }
 
+  void _verifyStaffPin(
+    BuildContext context,
+    Attendant attendant, {
+    Function()? onPinCorrect,
+    Function(AppError error)? onPinIncorrect,
+  }) async {
+    final viewModel = getIt<SpotstockStaffPinFormViewModel>()..bind(context, userId: attendant.id);
+    await showSpotstockFormDialog(
+      context,
+      title: SpotstockStrings.verifyStaffPin,
+      form: SpotstockStaffPinForm(
+        viewModel: viewModel,
+        staffName:
+            "${attendant.firstName ?? SpotstockStrings.EMPTY} ${attendant.lastName ?? SpotstockStrings.EMPTY}",
+        onPinCorrect: () {
+          onPinCorrect?.call();
+        },
+        onPinIncorrect: (error) {
+          onPinIncorrect?.call(error);
+        },
+      ),
+    );
+  }
+
   void onAttendantPressed(BuildContext context) {
     final viewModel = getIt<SpotstockSelectAttendantFormViewModel>()
       ..bind(context, attendants, _createSaleDto.attendantId);
@@ -424,14 +452,21 @@ class PosViewModel extends SpotstockViewModel
         viewModel: viewModel,
         onAttendantSelected: (attendant) {
           SpotstockNavigation.goBack();
-          final createSaleDto = _createSaleDto.copyWith(
-            attendantId: attendant.id,
-            staffId: attendant.id,
-            attendantName: "${attendant.firstName} ${attendant.lastName}",
-            staffName: "${attendant.firstName} ${attendant.lastName}",
+          _verifyStaffPin(
+            context,
+            attendant,
+            onPinCorrect: () {
+              final createSaleDto = _createSaleDto.copyWith(
+                attendantId: attendant.id,
+                staffId: attendant.id,
+                attendantName: "${attendant.firstName} ${attendant.lastName}",
+                staffName: "${attendant.firstName} ${attendant.lastName}",
+              );
+              _createSaleDto = createSaleDto;
+              notifyListeners();
+            },
+            onPinIncorrect: (error) {},
           );
-          _createSaleDto = createSaleDto;
-          notifyListeners();
         },
       ),
     );
@@ -733,6 +768,12 @@ class PosViewModel extends SpotstockViewModel
   }
 
   void onPayPressed(BuildContext context) async {
+    _verifyStaffPin(context, selectedAttendant!, onPinCorrect: () {
+      _openPaymentForm(context);
+    }, onPinIncorrect: (error) {});
+  }
+
+  void _openPaymentForm(BuildContext context) async {
     final viewModel = getIt<SpotstockPaymentFormViewModel>()
       ..bind(
         context,

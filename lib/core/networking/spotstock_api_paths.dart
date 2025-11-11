@@ -7,4 +7,5 @@ class SpotstockApiPaths {
   static const String customers = '/customers';
   static const String attendants = '/attendants';
   static const String sales = '/store-sales';
+  static const String verifyPin = '/verify-pin';
 }

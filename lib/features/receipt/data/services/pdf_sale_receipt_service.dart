@@ -375,9 +375,18 @@ class PdfSaleReceiptService implements SaleReceiptService {
 
   @override
   Future<Result> printReceipt(Sale sale, {ExtraReceiptDetails? extraReceiptDetails}) async {
-    final pdf = await generateReceipt(sale, extraReceiptDetails: extraReceiptDetails);
     try {
-      await Printing.layoutPdf(onLayout: (format) => pdf.save());
+      await Printing.layoutPdf(
+        name:
+            '${sale.referenceCode}_${extraReceiptDetails?.companyName?.replaceAll(' ', '_') ?? SpotstockStrings.spotstock}_receipt.pdf',
+        onLayout: (format) async {
+          final pdf = await generateReceipt(
+            sale,
+            extraReceiptDetails: extraReceiptDetails,
+          );
+          return await pdf.save();
+        },
+      );
       return Result.success(null);
     } catch (e) {
       return Result.failure(AppError(message: e.toString()));
@@ -391,7 +400,7 @@ class PdfSaleReceiptService implements SaleReceiptService {
       await Printing.sharePdf(
         bytes: await pdf.save(),
         filename:
-            '${sale.referenceCode}_${extraReceiptDetails?.companyName ?? SpotstockStrings.na}_receipt.pdf',
+            '${sale.referenceCode}_${extraReceiptDetails?.companyName?.replaceAll(' ', '_') ?? SpotstockStrings.spotstock}_receipt.pdf',
       );
       return Result.success(null);
     } catch (e) {

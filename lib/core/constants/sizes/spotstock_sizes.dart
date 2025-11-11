@@ -59,6 +59,7 @@ class SpotstockSizes {
   static const double s37 = 37;
   static const double s38 = 38;
   static const double s40 = 40;
+  static const double s42 = 42;
   static const double s45 = 45;
   static const double s48 = 48;
   static const double s50 = 50;

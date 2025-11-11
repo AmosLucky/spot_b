@@ -210,4 +210,14 @@ class SpotstockStrings {
   static const String failedToGenerateReceiptReferenceNo =
       'Failed to generate receipt reference no';
   static const String localReceiptReferenceNoPrefix = 'LO-INV-';
+  static const String pinNotFound = 'Pin not found';
+  static const String invalidPin = 'Invalid pin';
+  static const String failedToVerifyPin = 'Failed to verify pin';
+  static const String verifyAttendantOnlineAndTryAgain = 'Verify attendant online and try again';
+  static const String checkYourPinAndTryAgain = 'Check your pin and try again';
+  static const String enterStaffPin = 'Enter staff pin';
+  static const String verifyStaffPin = 'Verify staff pin';
+  static const String pleaseEnterYourPinToContinue = 'Please enter your pin to continue';
+  static const String hi = 'Hi';
+  static const String verifyingPin = 'Verifying pin...';
 }

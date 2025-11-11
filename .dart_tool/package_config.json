@@ -554,6 +554,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "pinput",
+      "rootUri": "file:///Users/tobeokoli/.pub-cache/hosted/pub.dev/pinput-5.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "platform",
       "rootUri": "file:///Users/tobeokoli/.pub-cache/hosted/pub.dev/platform-3.1.6",
       "packageUri": "lib/",
@@ -756,6 +762,12 @@
       "rootUri": "file:///Users/tobeokoli/.pub-cache/hosted/pub.dev/universal_io-2.2.2",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "universal_platform",
+      "rootUri": "file:///Users/tobeokoli/.pub-cache/hosted/pub.dev/universal_platform-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "vector_graphics",

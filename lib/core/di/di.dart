@@ -96,6 +96,12 @@ import '../../features/register_management/domain/repositories/register_reposito
 import '../../features/register_management/domain/usecases/check_if_register_is_open.dart';
 import '../../features/register_management/domain/usecases/open_register.dart';
 import '../../features/splash/presentation/view_model/splash_view_model.dart';
+import '../../features/staff_pin/data/datasources/local/staff_pin_local_datasource.dart';
+import '../../features/staff_pin/data/datasources/remote/staff_pin_remote_datasource.dart';
+import '../../features/staff_pin/data/repositories/staff_pin_repository_impl.dart';
+import '../../features/staff_pin/domain/repositories/staff_pin_repository.dart';
+import '../../features/staff_pin/domain/usecases/verify_staff_pin.dart';
+import '../../features/staff_pin/presentation/view_model/spotstock_staff_pin_form_view_model.dart';
 import '../../features/summary/presentation/view_model/summary_view_model.dart';
 import '../../features/sync/presentation/view_model/sync_view_model.dart';
 import '../../features/webview/presentation/view_model/webview_view_model.dart';
@@ -183,6 +189,12 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton<SalesRemoteDatasource>(
     () => SalesRemoteDatasource(getIt<DioClient>()),
   );
+  getIt.registerLazySingleton<StaffPinLocalDatasource>(
+    () => StaffPinLocalDatasource(getIt<LocalStorageClient>()),
+  );
+  getIt.registerLazySingleton<StaffPinRemoteDatasource>(
+    () => StaffPinRemoteDatasource(getIt<DioClient>()),
+  );
 
   // ============ REPOSITORIES ============
   getIt.registerLazySingleton<LoginRepository>(
@@ -256,6 +268,13 @@ Future<void> setupServiceLocator() async {
       getIt<NetworkInfoRepository>(),
     ),
   );
+  getIt.registerLazySingleton<StaffPinRepository>(
+    () => StaffPinRepositoryImpl(
+      getIt<StaffPinLocalDatasource>(),
+      getIt<StaffPinRemoteDatasource>(),
+      getIt<NetworkInfoRepository>(),
+    ),
+  );
 
   // ============ USE CASES ============
   getIt.registerLazySingleton<Login>(() => Login(getIt<LoginRepository>()));
@@ -293,6 +312,8 @@ Future<void> setupServiceLocator() async {
       () => SharePdfReceipt(getIt<PdfSaleReceiptService>(), getIt<GetSpotstockUser>()));
   getIt.registerLazySingleton<GenerateReceiptReferenceNo>(
       () => GenerateReceiptReferenceNo(getIt<ReceiptReferenceNoService>()));
+  getIt.registerLazySingleton<VerifyStaffPin>(() => VerifyStaffPin(getIt<StaffPinRepository>()));
+
   // ============ VIEW MODELS ============
   // Register as factories so fresh instances are created each time
   getIt.registerFactory<SplashViewModel>(() => SplashViewModel(
@@ -371,6 +392,7 @@ Future<void> setupServiceLocator() async {
   getIt.registerFactory<SpotstockEditSaleItemFormViewModel>(
       () => SpotstockEditSaleItemFormViewModel());
   getIt.registerFactory<SpotstockPaymentFormViewModel>(() => SpotstockPaymentFormViewModel());
-
+  getIt.registerFactory<SpotstockStaffPinFormViewModel>(
+      () => SpotstockStaffPinFormViewModel(getIt<VerifyStaffPin>()));
   await getIt.allReady();
 }
