@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../../../../core/shared/result.dart';
 import '../../../network_info/domain/repositories/network_info_repository.dart';
 import '../../domain/repositories/products_repository.dart';

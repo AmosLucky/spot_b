@@ -170,10 +170,10 @@ class PosViewModel extends SpotstockViewModel
   TabController? _tabController;
   TabController? get tabController => _tabController;
 
-  TextEditingController _discountController = TextEditingController();
+  final TextEditingController _discountController = TextEditingController();
   TextEditingController get discountController => _discountController;
 
-  TextEditingController _shippingController = TextEditingController();
+  final TextEditingController _shippingController = TextEditingController();
   TextEditingController get shippingController => _shippingController;
 
   bool get canPay {
