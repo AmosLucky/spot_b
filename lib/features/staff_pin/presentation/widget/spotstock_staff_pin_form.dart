@@ -74,7 +74,6 @@ class SpotstockStaffPinForm extends StatelessWidget {
                             );
                           },
                         ),
-                        const SizedBox(height: SpotstockSizes.s8),
                       ],
                     ),
               const SizedBox(height: SpotstockSizes.s16),

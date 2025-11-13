@@ -448,6 +448,10 @@ class PosViewModel extends SpotstockViewModel
       form: SpotstockSelectAttendantForm(
         viewModel: viewModel,
         onAttendantSelected: (attendant) {
+          if (attendant.id == _createSaleDto.attendantId) {
+            SpotstockNavigation.goBack();
+            return;
+          }
           SpotstockNavigation.goBack();
           _verifyStaffPin(
             context,
