@@ -37,7 +37,7 @@ class BarTablesRepositoryImpl extends BarTablesRepository {
           break;
         }
       } while (lastPage != null && currentPage <= lastPage);
-      localDatasource.saveBarTables(allBarTables);
+      await localDatasource.saveBarTables(allBarTables);
       yield Result.success(allBarTables);
     }
   }

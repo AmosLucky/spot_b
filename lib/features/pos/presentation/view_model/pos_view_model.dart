@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -13,6 +15,7 @@ import '../../../../core/presentation/dialogs/spotstock_dialog.dart';
 import '../../../../core/presentation/progress_indicators/spotstock_progress_indicator.dart';
 import '../../../../core/presentation/snackbars/spotstock_snackbar.dart';
 import '../../../../core/presentation/view_models/spotstock_view_model.dart';
+import '../../../holds/domain/usecases/get_grouped_holds.dart';
 import '../../../staff_pin/presentation/view_model/spotstock_staff_pin_form_view_model.dart';
 import '../../../../core/routing/navigation.dart';
 import '../../../../core/shared/command.dart';
@@ -66,6 +69,7 @@ class PosViewModel extends SpotstockViewModel
   final CreateSale createSale;
   final PrintPdfReceipt printPdfReceipt;
   final SharePdfReceipt sharePdfReceipt;
+  final GetGroupedHolds getGroupedHolds;
 
   PosViewModel(
     this.checkAndUpdateNetworkStatus,
@@ -78,6 +82,7 @@ class PosViewModel extends SpotstockViewModel
     this.createSale,
     this.printPdfReceipt,
     this.sharePdfReceipt,
+    this.getGroupedHolds,
   );
 
   CreateSaleDto _createSaleDto = CreateSaleDto(
@@ -164,6 +169,9 @@ class PosViewModel extends SpotstockViewModel
   late Command0<void> _getWarehousesCommand;
   Command0<void> get getWarehousesCommand => _getWarehousesCommand;
 
+  late Command0<void> _getGroupedHoldsCommand;
+  Command0<void> get getGroupedHoldsCommand => _getGroupedHoldsCommand;
+
   late Command1<void, BuildContext> _createSaleCommand;
   Command1<void, BuildContext> get createSaleCommand => _createSaleCommand;
 
@@ -191,6 +199,7 @@ class PosViewModel extends SpotstockViewModel
     _getBarTablesCommand = Command0<void>(_getBarTables)..execute();
     _getCustomersCommand = Command0<void>(_getCustomers)..execute();
     _getProductCategoriesCommand = Command0<void>(_getProductCategories)..execute();
+    _getGroupedHoldsCommand = Command0<void>(_getGroupedHolds)..execute();
     _getProductsCommand = Command0<void>(_getProducts);
     await checkAndUpdateNetworkStatus();
   }
@@ -287,6 +296,17 @@ class PosViewModel extends SpotstockViewModel
           addError(error);
         },
       );
+    });
+    return Result.success(null);
+  }
+
+  Future<Result<void>> _getGroupedHolds() async {
+    getGroupedHolds().listen((result) {
+      result.when(onSuccess: (groupedHolds) {
+        notifyListeners();
+      }, onFailure: (error) {
+        addError(error);
+      });
     });
     return Result.success(null);
   }

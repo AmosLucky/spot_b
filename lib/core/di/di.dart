@@ -27,6 +27,13 @@ import '../../features/auth/domain/usecases/save_spotstock_user.dart';
 import '../../features/auth/domain/usecases/save_token.dart';
 import '../../features/auth/presentation/view_model/login_view_model.dart';
 import '../../features/history/presentation/view_model/history_view_model.dart';
+import '../../features/holds/data/datasources/local/holds_local_datasource.dart';
+import '../../features/holds/data/datasources/remote/holds_remote_datasource.dart';
+import '../../features/holds/data/repositories/grouped_holds_repository_impl.dart';
+import '../../features/holds/data/repositories/holds_repository_impl.dart';
+import '../../features/holds/domain/repositories/grouped_holds_repository.dart';
+import '../../features/holds/domain/repositories/holds_repository.dart';
+import '../../features/holds/domain/usecases/get_grouped_holds.dart';
 import '../../features/home/presentation/view_model/home_view_model.dart';
 import '../../features/home/presentation/view_model/root_view_model.dart';
 import '../../features/home/presentation/view_model/spotstock_open_register_form_view_model.dart';
@@ -195,6 +202,12 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton<StaffPinRemoteDatasource>(
     () => StaffPinRemoteDatasource(getIt<DioClient>()),
   );
+  getIt.registerLazySingleton<HoldsLocalDatasource>(
+    () => HoldsLocalDatasource(getIt<DatabaseClient>()),
+  );
+  getIt.registerLazySingleton<HoldsRemoteDatasource>(
+    () => HoldsRemoteDatasource(getIt<DioClient>()),
+  );
 
   // ============ REPOSITORIES ============
   getIt.registerLazySingleton<LoginRepository>(
@@ -275,7 +288,18 @@ Future<void> setupServiceLocator() async {
       getIt<NetworkInfoRepository>(),
     ),
   );
-
+  getIt.registerLazySingleton<HoldsRepository>(
+    () => HoldsRepositoryImpl(
+      getIt<HoldsRemoteDatasource>(),
+      getIt<HoldsLocalDatasource>(),
+      getIt<NetworkInfoRepository>(),
+    ),
+  );
+  getIt.registerLazySingleton<GroupedHoldsRepository>(
+    () => GroupedHoldsRepositoryImpl(
+      getIt<HoldsRepository>(),
+    ),
+  );
   // ============ USE CASES ============
   getIt.registerLazySingleton<Login>(() => Login(getIt<LoginRepository>()));
   getIt.registerLazySingleton<GetToken>(() => GetToken(getIt<TokenRepository>()));
@@ -313,6 +337,8 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton<GenerateReceiptReferenceNo>(
       () => GenerateReceiptReferenceNo(getIt<ReceiptReferenceNoService>()));
   getIt.registerLazySingleton<VerifyStaffPin>(() => VerifyStaffPin(getIt<StaffPinRepository>()));
+  getIt.registerLazySingleton<GetGroupedHolds>(
+      () => GetGroupedHolds(getIt<GroupedHoldsRepository>()));
 
   // ============ VIEW MODELS ============
   // Register as factories so fresh instances are created each time
@@ -373,6 +399,7 @@ Future<void> setupServiceLocator() async {
         getIt<CreateSale>(),
         getIt<PrintPdfReceipt>(),
         getIt<SharePdfReceipt>(),
+        getIt<GetGroupedHolds>(),
       ));
   getIt.registerFactory<SpotstockProductsTabViewModel>(() => SpotstockProductsTabViewModel());
   getIt.registerFactory<SpotstockCartTabViewModel>(() => SpotstockCartTabViewModel());

@@ -41,7 +41,7 @@ class ProductCategoriesRepositoryImpl extends ProductCategoriesRepository {
           break;
         }
       } while (lastPage != null && currentPage <= lastPage);
-      localDatasource.saveProductCategories(allProductCategories);
+      await localDatasource.saveProductCategories(allProductCategories);
       yield Result.success(allProductCategories);
     }
   }

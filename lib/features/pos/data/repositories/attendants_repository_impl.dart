@@ -37,7 +37,7 @@ class AttendantsRepositoryImpl extends AttendantsRepository {
           break;
         }
       } while (lastPage != null && currentPage <= lastPage);
-      localDatasource.saveAttendants(allAttendants);
+      await localDatasource.saveAttendants(allAttendants);
       yield Result.success(allAttendants);
     }
   }

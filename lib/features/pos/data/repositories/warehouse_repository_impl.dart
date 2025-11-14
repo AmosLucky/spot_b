@@ -37,7 +37,7 @@ class WarehousesRepositoryImpl extends WarehousesRepository {
           break;
         }
       } while (lastPage != null && currentPage <= lastPage);
-      localDatasource.saveWarehouses(allWarehouses);
+      await localDatasource.saveWarehouses(allWarehouses);
       yield Result.success(allWarehouses);
     }
   }

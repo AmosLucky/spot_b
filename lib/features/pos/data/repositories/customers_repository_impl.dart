@@ -37,7 +37,7 @@ class CustomersRepositoryImpl extends CustomersRepository {
           break;
         }
       } while (lastPage != null && currentPage <= lastPage);
-      localDatasource.saveCustomers(allCustomers);
+      await localDatasource.saveCustomers(allCustomers);
       yield Result.success(allCustomers);
     }
   }
