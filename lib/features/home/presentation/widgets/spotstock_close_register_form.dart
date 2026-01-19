@@ -4,22 +4,22 @@ import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/presentation/symbols/naira_symbol.dart';
 import '../../../../core/presentation/textfields/spotstock_textfield.dart';
-import '../view_model/spotstock_open_register_form_view_model.dart';
+import '../view_model/spotstock_close_register_form_view_model.dart';
 
-class SpotstockOpenRegisterForm extends StatefulWidget {
-  final SpotstockOpenRegisterFormViewModel viewModel;
+class SpotstockCloseRegisterForm extends StatefulWidget {
+  final SpotstockCloseRegisterFormViewModel viewModel;
   final VoidCallback onFormValidated;
-  const SpotstockOpenRegisterForm({
+  const SpotstockCloseRegisterForm({
     super.key,
-    required this.onFormValidated,
     required this.viewModel,
+    required this.onFormValidated,
   });
 
   @override
-  State<SpotstockOpenRegisterForm> createState() => _SpotstockOpenRegisterFormState();
+  State<SpotstockCloseRegisterForm> createState() => _SpotstockCloseRegisterFormState();
 }
 
-class _SpotstockOpenRegisterFormState extends State<SpotstockOpenRegisterForm> {
+class _SpotstockCloseRegisterFormState extends State<SpotstockCloseRegisterForm> {
   @override
   void initState() {
     super.initState();
@@ -50,7 +50,7 @@ class _SpotstockOpenRegisterFormState extends State<SpotstockOpenRegisterForm> {
               ),
               const SizedBox(height: SpotstockSizes.s8),
               SpotstockTextField(
-                enabled: !widget.viewModel.openRegisterCommand.running,
+                enabled: !widget.viewModel.closeRegisterCommand.running,
                 focusNode: widget.viewModel.cashAtHandFocusNode,
                 hintText: SpotstockStrings.zero_00,
                 keyboardType: TextInputType.number,
@@ -61,7 +61,7 @@ class _SpotstockOpenRegisterFormState extends State<SpotstockOpenRegisterForm> {
               Text(SpotstockStrings.note),
               const SizedBox(height: SpotstockSizes.s8),
               SpotstockTextField(
-                enabled: !widget.viewModel.openRegisterCommand.running,
+                enabled: !widget.viewModel.closeRegisterCommand.running,
                 controller: widget.viewModel.noteController,
               ),
               const SizedBox(height: SpotstockSizes.s10),

@@ -25,8 +25,11 @@ class SpotstockOpenRegisterFormViewModel extends SpotstockFormViewModel {
 
   late Command1<void, BuildContext> requestFocusCommand;
 
+  late String? _screenToNavigateTo;
+
   @override
-  void bind(BuildContext context) {
+  void bind(BuildContext context, {String? screenToNavigateTo}) {
+    _screenToNavigateTo = screenToNavigateTo;
     openRegisterCommand = Command1<void, BuildContext>(_openRegister);
     requestFocusCommand = Command1<void, BuildContext>(_requestFocus);
   }
@@ -45,7 +48,11 @@ class SpotstockOpenRegisterFormViewModel extends SpotstockFormViewModel {
     result.when(
       onSuccess: (value) {
         SpotstockNavigation.goBack();
-        SpotstockNavigation.goTo(SpotstockMobileRoutes.selectApp);
+        if (_screenToNavigateTo != null) {
+          SpotstockNavigation.goTo(_screenToNavigateTo!);
+        } else {
+          SpotstockNavigation.goTo(SpotstockMobileRoutes.selectApp);
+        }
         return Result.success(null);
       },
       onFailure: (error) {
