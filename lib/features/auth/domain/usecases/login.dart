@@ -1,4 +1,3 @@
-import '../../../../core/networking/api_response/spotstock_api_response.dart';
 import '../../../../core/shared/result.dart';
 import '../../data/models/login_dto.dart';
 import '../../data/models/login_response_dao.dart';
@@ -9,7 +8,7 @@ class Login {
 
   Login(this.loginRepository);
 
-  Future<Result<SpotstockApiResponse<LoginResponseDao>>> call(LoginDto loginDto) async {
+  Future<Result<LoginResponseDao>> call(LoginDto loginDto) async {
     return await loginRepository.login(loginDto);
   }
 }
