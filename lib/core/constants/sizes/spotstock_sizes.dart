@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 class SpotstockSizes {
   static const double s0 = 0;
+  static const double s0_05 = 0.05;
   static const double s0_1 = 0.1;
   static const double s0_2 = 0.2;
+  static const double s0_25 = 0.25;
   static const double s0_3 = 0.3;
+  static const double s0_4 = 0.4;
   static const double s0_5 = 0.5;
   static const double s0_6 = 0.6;
   static const double s0_7 = 0.7;
@@ -80,7 +83,9 @@ class SpotstockSizes {
   static const double s150 = 150;
   static const double s200 = 200;
   static const double s250 = 250;
+  static const double s255 = 255;
   static const double s256 = 256;
+  static const double s1000 = 1000;
 
   static double topSpacing(BuildContext context) {
     final notchHeight = MediaQuery.of(context).viewPadding.top;

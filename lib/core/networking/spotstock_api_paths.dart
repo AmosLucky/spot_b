@@ -9,4 +9,9 @@ class SpotstockApiPaths {
   static const String sales = '/store-sales';
   static const String verifyPin = '/verify-pin';
   static const String holds = '/holds';
+  static const String registerReport = '/register-report';
+  static const String getRegisterDetails = '/get-register-details';
+  static const String registerEntry = '/register-entry';
+  static const String registerClose = '/register-close';
+  static const String stockReport = '/stock-report';
 }

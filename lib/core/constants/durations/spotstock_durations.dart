@@ -5,6 +5,7 @@ class SpotstockDurations {
   static const Duration networkBannerDisplayTime = Duration(seconds: 5);
   static const Duration networkBannerAnimationDuration = Duration(milliseconds: 100);
   static const Duration scrollToTopAnimationDuration = Duration(milliseconds: 400);
+  static const Duration syncHoldsDelay = Duration(seconds: 1);
 
   static const int sessionTimeInHours = 12;
 }
