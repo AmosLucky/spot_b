@@ -89,44 +89,18 @@ class SpotstockPaymentFormViewModel extends SpotstockFormViewModel {
   }) {
     _onFormLoaded(createSaleDto, onFormLoaded);
     _payingAmountController.text = _createSaleDto?.grandTotal?.toMoney() ?? '';
-    _selectedPaymentTypes =
-        _createSaleDto?.payments?.map((p) => p.paymentType).whereType<PaymentType>().toSet() ??
-            {PaymentType.cash};
-    _cashAmountController.text = _createSaleDto?.payments
-            ?.where((p) => p.paymentType == PaymentType.cash)
-            .firstOrNull
-            ?.amount
-            ?.toInt()
-            .toString() ??
-        '';
-    _posAmountController.text = _createSaleDto?.payments
-            ?.where((p) => p.paymentType == PaymentType.pos)
-            .firstOrNull
-            ?.amount
-            ?.toInt()
-            .toString() ??
-        '';
-    _transferAmountController.text = _createSaleDto?.payments
-            ?.where((p) => p.paymentType == PaymentType.transfer)
-            .firstOrNull
-            ?.amount
-            ?.toInt()
-            .toString() ??
-        '';
-    _folioAmountController.text = _createSaleDto?.payments
-            ?.where((p) => p.paymentType == PaymentType.folio)
-            .firstOrNull
-            ?.amount
-            ?.toInt()
-            .toString() ??
-        '';
-    _otherAmountController.text = _createSaleDto?.payments
-            ?.where((p) => p.paymentType == PaymentType.other)
-            .firstOrNull
-            ?.amount
-            ?.toInt()
-            .toString() ??
-        '';
+    _selectedPaymentTypes = _createSaleDto?.payments?.map((p) => p.paymentType).whereType<PaymentType>().toSet() ?? {PaymentType.cash};
+    _cashAmountController.text =
+        _createSaleDto?.payments?.where((p) => p.paymentType == PaymentType.cash).firstOrNull?.amount?.round().toString() ?? '';
+    //
+    _posAmountController.text =
+        _createSaleDto?.payments?.where((p) => p.paymentType == PaymentType.pos).firstOrNull?.amount?.round().toString() ?? '';
+    _transferAmountController.text =
+        _createSaleDto?.payments?.where((p) => p.paymentType == PaymentType.transfer).firstOrNull?.amount?.round().toString() ?? '';
+    _folioAmountController.text =
+        _createSaleDto?.payments?.where((p) => p.paymentType == PaymentType.folio).firstOrNull?.amount?.round().toString() ?? '';
+    _otherAmountController.text =
+        _createSaleDto?.payments?.where((p) => p.paymentType == PaymentType.other).firstOrNull?.amount?.round().toString() ?? '';
 
     _noteController.text = _createSaleDto?.note ?? _createSaleDto?.notes ?? '';
 
@@ -181,9 +155,7 @@ class SpotstockPaymentFormViewModel extends SpotstockFormViewModel {
   }
 
   void _updateCustomerChange() {
-    final totalPayments = _selectedPaymentTypes
-        .map((type) => _getPaymentAmount(type) ?? 0)
-        .fold(0.0, (a, b) => a + b);
+    final totalPayments = _selectedPaymentTypes.map((type) => _getPaymentAmount(type) ?? 0).fold(0.0, (a, b) => a + b);
 
     final grandTotal = _createSaleDto?.grandTotal ?? 0;
 

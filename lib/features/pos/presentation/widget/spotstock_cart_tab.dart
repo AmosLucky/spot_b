@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spotstock_inventory/features/holds/data/models/grouped_hold.dart';
 
 import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
@@ -8,6 +9,7 @@ import '../../../../core/presentation/buttons/spotstock_primary_button.dart';
 import '../../../../core/presentation/colors/color_scheme_extension.dart';
 import '../../../../core/presentation/extensions/num_extensions.dart';
 import '../../../../core/presentation/textfields/spotstock_textfield.dart';
+import '../../../holds/data/models/hold.dart';
 import '../../data/models/create_sale_dto.dart';
 import '../../data/models/product.dart';
 import '../view_model/spotstock_cart_tab_view_model.dart';
@@ -30,6 +32,10 @@ class SpotstockCartTab extends StatelessWidget {
   final Function(BuildContext) onHoldPressed;
   final Function(BuildContext) onPayPressed;
   final bool canPay;
+  final bool isHold;
+  final Hold? selectedHold;
+  final GroupedHold? selectedGroupedHold;
+
   const SpotstockCartTab({
     super.key,
     required this.saleItems,
@@ -49,13 +55,23 @@ class SpotstockCartTab extends StatelessWidget {
     required this.onHoldPressed,
     required this.onPayPressed,
     required this.canPay,
+    required this.isHold,
+    this.selectedHold,
+    this.selectedGroupedHold,
   });
 
   @override
   Widget build(BuildContext context) {
     final viewModel = getIt<SpotstockCartTabViewModel>();
     return ListenableBuilder(
-      listenable: viewModel..bind(context, products: products),
+      listenable: viewModel
+        ..bind(
+          context,
+          products: products,
+          saleItems: saleItems,
+          selectedGroupedHold: selectedGroupedHold,
+          selectedHold: selectedHold,
+        ),
       builder: (context, _) {
         return Column(
           children: [
@@ -115,175 +131,217 @@ class SpotstockCartTab extends StatelessWidget {
                       height: SpotstockSizes.s1,
                     ),
                     Expanded(
-                      child: saleItems?.isEmpty ?? true
-                          ? SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              child: Center(
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: SpotstockSizes.s80),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.add_shopping_cart_outlined,
-                                        size: SpotstockSizes.s40,
-                                        color: Theme.of(context).colorScheme.outline,
-                                      ),
-                                      SizedBox(height: SpotstockSizes.s5),
-                                      Text(
-                                        SpotstockStrings.yourCartIsEmpty,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: SpotstockSizes.s16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      SizedBox(height: SpotstockSizes.s5),
-                                      Text(
-                                        SpotstockStrings.addItemsToGetStarted,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: SpotstockSizes.s14,
-                                          fontWeight: FontWeight.w400,
+                      child: viewModel.saleItems?.isEmpty ?? true
+                          ? Scrollbar(
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: SpotstockSizes.s80),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add_shopping_cart_outlined,
+                                          size: SpotstockSizes.s40,
                                           color: Theme.of(context).colorScheme.outline,
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(height: SpotstockSizes.s5),
+                                        Text(
+                                          SpotstockStrings.yourCartIsEmpty,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: SpotstockSizes.s16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(height: SpotstockSizes.s5),
+                                        Text(
+                                          SpotstockStrings.addItemsToGetStarted,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: SpotstockSizes.s14,
+                                            fontWeight: FontWeight.w400,
+                                            color: Theme.of(context).colorScheme.outline,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             )
-                          : ListView.builder(
-                              padding: EdgeInsets.zero,
-                              itemCount: saleItems?.length ?? 0,
-                              itemBuilder: (context, index) {
-                                return Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        margin: EdgeInsets.fromLTRB(
-                                          SpotstockSizes.s5,
-                                          SpotstockSizes.s5,
-                                          SpotstockSizes.s5,
-                                          SpotstockSizes.s5,
-                                        ),
-                                        padding: EdgeInsets.fromLTRB(
-                                          SpotstockSizes.s10,
-                                          SpotstockSizes.s10,
-                                          SpotstockSizes.s0,
-                                          SpotstockSizes.s10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.surface,
-                                          borderRadius: BorderRadius.circular(SpotstockSizes.s10),
-                                          border: Border.all(
-                                            color: Theme.of(context).colorScheme.outlineVariant,
-                                            width: SpotstockSizes.s1,
+                          : MediaQuery.removePadding(
+                              context: context,
+                              removeTop: true,
+                              removeBottom: true,
+                              child: Scrollbar(
+                                child: ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  itemCount: viewModel.saleItems?.length ?? 0,
+                                  itemBuilder: (context, index) {
+                                    final saleItem = viewModel.saleItems?[index];
+                                    return Row(
+                                      children: [
+                                        Expanded(
+                                          child: Stack(
+                                            children: [
+                                              Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                  SpotstockSizes.s5,
+                                                  SpotstockSizes.s5,
+                                                  SpotstockSizes.s5,
+                                                  SpotstockSizes.s5,
+                                                ),
+                                                padding: EdgeInsets.fromLTRB(
+                                                  SpotstockSizes.s10,
+                                                  SpotstockSizes.s10,
+                                                  SpotstockSizes.s0,
+                                                  SpotstockSizes.s10,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Theme.of(context).colorScheme.surface,
+                                                  borderRadius: BorderRadius.circular(SpotstockSizes.s10),
+                                                  border: Border.all(
+                                                    color: Theme.of(context).colorScheme.outlineVariant,
+                                                    width: SpotstockSizes.s1,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            saleItem?.isCustom == true
+                                                                ? saleItem?.customName ?? viewModel.getProductName(saleItem?.productId ?? 0)
+                                                                : viewModel.getProductName(saleItem?.productId ?? 0),
+                                                          ),
+                                                          if (saleItems?[index].isCustom == true)
+                                                            Column(
+                                                              children: [
+                                                                SizedBox(
+                                                                  height: SpotstockSizes.s3,
+                                                                ),
+                                                                Container(
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: SpotstockSizes.s5,
+                                                                  ),
+                                                                  decoration: BoxDecoration(
+                                                                    borderRadius: BorderRadius.circular(SpotstockSizes.s1000),
+                                                                    color: Theme.of(context).colorScheme.primary,
+                                                                  ),
+                                                                  child: Text(
+                                                                    SpotstockStrings.custom,
+                                                                    style: TextStyle(
+                                                                      fontSize: SpotstockSizes.s11,
+                                                                      color: Theme.of(context).colorScheme.onPrimary,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Center(
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            isHold
+                                                                ? SizedBox.shrink()
+                                                                : SpotstockIconButton(
+                                                                    icon: Icon(
+                                                                      Icons.remove,
+                                                                      color: Theme.of(context).colorScheme.primary,
+                                                                      size: SpotstockSizes.s18,
+                                                                    ),
+                                                                    onPressed: () {
+                                                                      onDecreaseSaleItemQuantity(viewModel.saleItems?[index].productId);
+                                                                    },
+                                                                  ),
+                                                            SizedBox(width: SpotstockSizes.s5),
+                                                            Text(
+                                                              viewModel.saleItems![index].quantity?.toInt().toString() ?? '0',
+                                                            ),
+                                                            SizedBox(width: SpotstockSizes.s5),
+                                                            isHold
+                                                                ? SizedBox.shrink()
+                                                                : SpotstockIconButton(
+                                                                    icon: Icon(
+                                                                      Icons.add,
+                                                                      color: Theme.of(context).colorScheme.primary,
+                                                                      size: SpotstockSizes.s18,
+                                                                    ),
+                                                                    onPressed: () {
+                                                                      onIncreaseSaleItemQuantity(viewModel.saleItems?[index].productId);
+                                                                    },
+                                                                  ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Center(
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+                                                            Text(
+                                                              viewModel.saleItems?[index].productPrice?.toMoney() ?? '0',
+                                                            ),
+                                                            SizedBox(width: SpotstockSizes.s5),
+                                                            isHold
+                                                                ? SizedBox.shrink()
+                                                                : SpotstockIconButton(
+                                                                    icon: Icon(
+                                                                      Icons.edit,
+                                                                      color: Theme.of(context).colorScheme.primary,
+                                                                      size: SpotstockSizes.s16,
+                                                                    ),
+                                                                    onPressed: () {
+                                                                      onEditSaleItem(viewModel.saleItems?[index]);
+                                                                    },
+                                                                  ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.end,
+                                                        children: [
+                                                          Text(
+                                                            viewModel.saleItems?[index].subTotal?.toMoney() ?? '0',
+                                                          ),
+                                                          SizedBox(width: SpotstockSizes.s5),
+                                                          isHold
+                                                              ? SizedBox.shrink()
+                                                              : SpotstockIconButton(
+                                                                  icon: Icon(
+                                                                    Icons.close,
+                                                                    color: Theme.of(context).colorScheme.error,
+                                                                    size: SpotstockSizes.s18,
+                                                                  ),
+                                                                  onPressed: () {
+                                                                    onRemoveSaleItem(viewModel.saleItems?[index].productId);
+                                                                  },
+                                                                ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                viewModel.getProductName(
-                                                    saleItems?[index].productId ?? 0),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Center(
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    SpotstockIconButton(
-                                                      icon: Icon(
-                                                        Icons.remove,
-                                                        color:
-                                                            Theme.of(context).colorScheme.primary,
-                                                        size: SpotstockSizes.s18,
-                                                      ),
-                                                      onPressed: () {
-                                                        onDecreaseSaleItemQuantity(
-                                                            saleItems?[index].productId);
-                                                      },
-                                                    ),
-                                                    SizedBox(width: SpotstockSizes.s5),
-                                                    Text(
-                                                      saleItems![index]
-                                                              .quantity
-                                                              ?.toInt()
-                                                              .toString() ??
-                                                          '0',
-                                                    ),
-                                                    SizedBox(width: SpotstockSizes.s5),
-                                                    SpotstockIconButton(
-                                                      icon: Icon(
-                                                        Icons.add,
-                                                        color:
-                                                            Theme.of(context).colorScheme.primary,
-                                                        size: SpotstockSizes.s18,
-                                                      ),
-                                                      onPressed: () {
-                                                        onIncreaseSaleItemQuantity(
-                                                            saleItems?[index].productId);
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Center(
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      saleItems?[index].productPrice?.toMoney() ??
-                                                          '0',
-                                                    ),
-                                                    SizedBox(width: SpotstockSizes.s5),
-                                                    SpotstockIconButton(
-                                                      icon: Icon(
-                                                        Icons.edit,
-                                                        color:
-                                                            Theme.of(context).colorScheme.primary,
-                                                        size: SpotstockSizes.s16,
-                                                      ),
-                                                      onPressed: () {
-                                                        onEditSaleItem(saleItems?[index]);
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    saleItems?[index].subTotal?.toMoney() ?? '0',
-                                                  ),
-                                                  SizedBox(width: SpotstockSizes.s5),
-                                                  SpotstockIconButton(
-                                                    icon: Icon(
-                                                      Icons.close,
-                                                      color: Theme.of(context).colorScheme.error,
-                                                      size: SpotstockSizes.s18,
-                                                    ),
-                                                    onPressed: () {
-                                                      onRemoveSaleItem(saleItems?[index].productId);
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
                     ),
                   ],
@@ -313,7 +371,7 @@ class SpotstockCartTab extends StatelessWidget {
                             SizedBox(height: SpotstockSizes.s8),
                             SpotstockTextField(
                               controller: discountController,
-                              enabled: !(saleItems?.isEmpty ?? true),
+                              enabled: !(viewModel.saleItems?.isEmpty ?? true) && !isHold,
                               hintText: SpotstockStrings.zero_00,
                               keyboardType: TextInputType.number,
                               onChanged: onDiscountChanged,
@@ -330,7 +388,7 @@ class SpotstockCartTab extends StatelessWidget {
                             SizedBox(height: SpotstockSizes.s8),
                             SpotstockTextField(
                               controller: shippingController,
-                              enabled: !(saleItems?.isEmpty ?? true),
+                              enabled: !(viewModel.saleItems?.isEmpty ?? true) && !isHold,
                               hintText: SpotstockStrings.zero_00,
                               keyboardType: TextInputType.number,
                               onChanged: onShippingChanged,
@@ -388,7 +446,7 @@ class SpotstockCartTab extends StatelessWidget {
                     children: [
                       Expanded(
                         child: SpotstockPrimaryButton(
-                          enabled: !(saleItems?.isEmpty ?? true),
+                          enabled: !(viewModel.saleItems?.isEmpty ?? true),
                           color: Theme.of(context).colorScheme.reset,
                           child: Text(
                             SpotstockStrings.reset,
@@ -400,7 +458,7 @@ class SpotstockCartTab extends StatelessWidget {
                       SizedBox(width: SpotstockSizes.s10),
                       Expanded(
                         child: SpotstockPrimaryButton(
-                          enabled: canPay,
+                          enabled: canPay && !isHold,
                           color: Theme.of(context).colorScheme.hold,
                           child: Text(
                             SpotstockStrings.hold,

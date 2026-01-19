@@ -22,257 +22,326 @@ class Pos extends StatefulWidget with SpotstockDialogMixin {
 }
 
 class _PosState extends State<Pos> with SingleTickerProviderStateMixin {
+  late TabController tabController;
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: SpotstockSizes.s2.toInt(), vsync: this);
+    widget.viewModel.initPosView();
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Listenable.merge([
-        widget.viewModel..bind(context, vsync: this),
-        widget.viewModel.createSaleCommand,
-      ]),
-      builder: (context, _) {
-        return SpotstockView(
-          content: Scaffold(
-            body: Stack(
-              children: [
-                Column(
-                  children: [
-                    SpotstockAppbar(
-                      title: SpotstockStrings.pos,
-                      withBackButton: true,
-                      onBackPressed: () async {
-                        return await widget.viewModel.onBackPressed(context);
-                      },
-                      trailing: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              widget.viewModel.onBranchPressed(context);
-                            },
-                            child: Badge(
-                              label: widget.viewModel.isBranchSelected
-                                  ? null
-                                  : Text(SpotstockStrings.exclamation),
-                              backgroundColor: widget.viewModel.isBranchSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                              child: SpotstockIconButton(
-                                icon: Icon(
-                                  Icons.store_mall_directory,
-                                  size: SpotstockSizes.s18,
-                                  color: widget.viewModel.isBranchSelected
-                                      ? Theme.of(context).colorScheme.onPrimary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary
-                                          .withAlpha(_unselectedIconAlpha),
-                                ),
-                                onPressed: () {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await widget.viewModel.onBackPressed(context);
+      },
+      child: ListenableBuilder(
+        listenable: widget.viewModel..bind(context, tabController: tabController),
+        builder: (context, _) {
+          return SpotstockView(
+            content: Scaffold(
+              body: Stack(
+                children: [
+                  Column(
+                    children: [
+                      SpotstockAppbar(
+                        title: SpotstockStrings.pos,
+                        withBackButton: true,
+                        onBackPressed: () async {
+                          return await widget.viewModel.onBackPressed(context);
+                        },
+                        trailing: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                if (widget.viewModel.isHoldSaleGuard) {
                                   widget.viewModel.onBranchPressed(context);
-                                },
-                                tooltip: widget.viewModel.selectedBranch?.name ??
-                                    SpotstockStrings.branch,
+                                }
+                              },
+                              child: Badge(
+                                label: widget.viewModel.isBranchSelected ? null : Text(SpotstockStrings.exclamation),
+                                backgroundColor: widget.viewModel.isBranchSelected ? Theme.of(context).colorScheme.primary : null,
+                                child: SpotstockIconButton(
+                                  icon: Icon(
+                                    Icons.store_mall_directory,
+                                    size: SpotstockSizes.s18,
+                                    color: widget.viewModel.isBranchSelected
+                                        ? Theme.of(context).colorScheme.onPrimary
+                                        : Theme.of(context).colorScheme.onPrimary.withAlpha(_unselectedIconAlpha),
+                                  ),
+                                  onPressed: () {
+                                    if (widget.viewModel.isHoldSaleGuard) {
+                                      widget.viewModel.onBranchPressed(context);
+                                    }
+                                  },
+                                  tooltip: widget.viewModel.selectedBranch?.name ?? SpotstockStrings.branch,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: SpotstockSizes.s16),
-                          GestureDetector(
-                            onTap: () {
-                              widget.viewModel.onAttendantPressed(context);
-                            },
-                            child: Badge(
-                              label: widget.viewModel.isAttendantSelected
-                                  ? null
-                                  : Text(SpotstockStrings.exclamation),
-                              backgroundColor: widget.viewModel.isAttendantSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : null,
-                              child: SpotstockIconButton(
-                                icon: Icon(
-                                  Icons.manage_accounts,
-                                  size: SpotstockSizes.s18,
-                                  color: widget.viewModel.isAttendantSelected
-                                      ? Theme.of(context).colorScheme.onPrimary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary
-                                          .withAlpha(_unselectedIconAlpha),
-                                ),
-                                onPressed: () {
+                            SizedBox(width: SpotstockSizes.s16),
+                            GestureDetector(
+                              onTap: () {
+                                if (widget.viewModel.isHoldSaleGuard) {
                                   widget.viewModel.onAttendantPressed(context);
-                                },
-                                tooltip: widget.viewModel.selectedAttendant?.firstName ??
-                                    SpotstockStrings.selectAttendant,
+                                }
+                              },
+                              child: Badge(
+                                label: widget.viewModel.isAttendantSelected ? null : Text(SpotstockStrings.exclamation),
+                                backgroundColor: widget.viewModel.isAttendantSelected ? Theme.of(context).colorScheme.primary : null,
+                                child: SpotstockIconButton(
+                                  icon: Icon(
+                                    Icons.manage_accounts,
+                                    size: SpotstockSizes.s18,
+                                    color: widget.viewModel.isAttendantSelected
+                                        ? Theme.of(context).colorScheme.onPrimary
+                                        : Theme.of(context).colorScheme.onPrimary.withAlpha(_unselectedIconAlpha),
+                                  ),
+                                  onPressed: () {
+                                    if (widget.viewModel.isHoldSaleGuard) {
+                                      widget.viewModel.onAttendantPressed(context);
+                                    }
+                                  },
+                                  tooltip: widget.viewModel.selectedAttendant?.firstName ?? SpotstockStrings.selectAttendant,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: SpotstockSizes.s16),
-                          SpotstockIconButton(
-                            icon: Icon(
-                              Icons.table_bar,
-                              size: SpotstockSizes.s18,
-                              color: widget.viewModel.isBarTableSelected
-                                  ? Theme.of(context).colorScheme.onPrimary
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onPrimary
-                                      .withAlpha(_unselectedIconAlpha),
+                            SizedBox(width: SpotstockSizes.s16),
+                            SpotstockIconButton(
+                              icon: Icon(
+                                Icons.table_bar,
+                                size: SpotstockSizes.s18,
+                                color: widget.viewModel.isBarTableSelected
+                                    ? Theme.of(context).colorScheme.onPrimary
+                                    : Theme.of(context).colorScheme.onPrimary.withAlpha(_unselectedIconAlpha),
+                              ),
+                              onPressed: () {
+                                if (widget.viewModel.isHoldSaleGuard) {
+                                  widget.viewModel.onBarTablePressed(context);
+                                }
+                              },
+                              tooltip: widget.viewModel.selectedBarTable?.name ?? SpotstockStrings.selectBarTable,
                             ),
-                            onPressed: () {
-                              widget.viewModel.onBarTablePressed(context);
-                            },
-                            tooltip: widget.viewModel.selectedBarTable?.name ??
-                                SpotstockStrings.selectBarTable,
-                          ),
-                          SizedBox(width: SpotstockSizes.s16),
-                          SpotstockIconButton(
-                            icon: Icon(
-                              Icons.person,
-                              size: SpotstockSizes.s18,
-                              color: widget.viewModel.isCustomerSelected
-                                  ? Theme.of(context).colorScheme.onPrimary
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onPrimary
-                                      .withAlpha(_unselectedIconAlpha),
+                            SizedBox(width: SpotstockSizes.s16),
+                            SpotstockIconButton(
+                              icon: Icon(
+                                Icons.person,
+                                size: SpotstockSizes.s18,
+                                color: widget.viewModel.isCustomerSelected
+                                    ? Theme.of(context).colorScheme.onPrimary
+                                    : Theme.of(context).colorScheme.onPrimary.withAlpha(_unselectedIconAlpha),
+                              ),
+                              onPressed: () {
+                                if (widget.viewModel.isHoldSaleGuard) {
+                                  widget.viewModel.onCustomerPressed(context);
+                                }
+                              },
+                              tooltip: widget.viewModel.selectedCustomer?.name ?? SpotstockStrings.selectCustomer,
                             ),
-                            onPressed: () {
-                              widget.viewModel.onCustomerPressed(context);
-                            },
-                            tooltip: widget.viewModel.selectedCustomer?.name ??
-                                SpotstockStrings.selectCustomer,
-                          ),
-                          SizedBox(width: SpotstockSizes.s14),
-                          Builder(
-                            builder: (BuildContext buttonContext) {
-                              return SpotstockIconButton(
-                                icon: Icon(
-                                  Icons.more_vert,
-                                  size: SpotstockSizes.s18,
-                                  color: Theme.of(context).colorScheme.onPrimary,
-                                ),
-                                onPressed: () async {
-                                  final result = await showMenu(
-                                    context: buttonContext,
-                                    position: RelativeRect.fromLTRB(
-                                      MediaQuery.of(context).size.width,
-                                      kToolbarHeight,
-                                      SpotstockSizes.s0,
-                                      SpotstockSizes.s0,
-                                    ),
-                                    items: [
-                                      PopupMenuItem(
-                                        value: SpotstockStrings.holdsValue,
-                                        child: Text(SpotstockStrings.holds),
-                                        onTap: () {
-                                          widget.viewModel.onHoldsPressed(context);
-                                        },
+                            SizedBox(width: SpotstockSizes.s14),
+                            Builder(
+                              builder: (BuildContext buttonContext) {
+                                return SpotstockIconButton(
+                                  icon: Icon(
+                                    Icons.more_vert,
+                                    size: SpotstockSizes.s18,
+                                    color: Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                  onPressed: () async {
+                                    final result = await showMenu(
+                                      context: buttonContext,
+                                      position: RelativeRect.fromLTRB(
+                                        MediaQuery.of(context).size.width,
+                                        kToolbarHeight,
+                                        SpotstockSizes.s0,
+                                        SpotstockSizes.s0,
                                       ),
-                                    ],
-                                  );
-                                  if (result != null) {
-                                    return;
+                                      items: [
+                                        PopupMenuItem(
+                                          value: SpotstockStrings.holdsValue,
+                                          child: Text(SpotstockStrings.holds),
+                                          onTap: () {
+                                            widget.viewModel.onHoldsPressed(context);
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                    if (result != null) {
+                                      return;
+                                    }
+                                  },
+                                  tooltip: SpotstockStrings.more,
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      if (widget.viewModel.tabController != null) ...[
+                        TabBar(
+                          controller: widget.viewModel.tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          onTap: (index) {
+                            FocusScope.of(context).unfocus();
+                          },
+                          tabs: [
+                            Tab(
+                              text: "${SpotstockStrings.cart}(${widget.viewModel.cartCount})",
+                            ),
+                            Tab(text: SpotstockStrings.products),
+                          ],
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            controller: widget.viewModel.tabController,
+                            children: [
+                              SpotstockCartTab(
+                                saleItems: widget.viewModel.createSaleDto.saleItems ?? [],
+                                discountController: widget.viewModel.discountController,
+                                shippingController: widget.viewModel.shippingController,
+                                taxAmount: widget.viewModel.taxAmount,
+                                grandTotal: widget.viewModel.grandTotal,
+                                subTotal: widget.viewModel.subTotal,
+                                products: widget.viewModel.cartTabProducts,
+                                canPay: widget.viewModel.canPay,
+                                isHold: widget.viewModel.isHold,
+                                selectedHold: widget.viewModel.selectedHold,
+                                selectedGroupedHold: widget.viewModel.selectedGroupedHold,
+                                onDiscountChanged: (value) {
+                                  widget.viewModel.onDiscountChanged(value);
+                                },
+                                onShippingChanged: (value) {
+                                  widget.viewModel.onShippingChanged(value);
+                                },
+                                onRemoveSaleItem: (productId) {
+                                  widget.viewModel.onRemoveSaleItem(productId);
+                                },
+                                onIncreaseSaleItemQuantity: (productId) {
+                                  widget.viewModel.onIncreaseSaleItemQuantity(productId);
+                                },
+                                onDecreaseSaleItemQuantity: (productId) {
+                                  widget.viewModel.onDecreaseSaleItemQuantity(productId);
+                                },
+                                onEditSaleItem: (saleItem) {
+                                  widget.viewModel.onEditSaleItem(context, saleItem);
+                                },
+                                onResetPressed: (context) {
+                                  widget.viewModel.onResetPressed(context);
+                                },
+                                onHoldPressed: (context) {
+                                  widget.viewModel.onHoldPressed(context);
+                                },
+                                onPayPressed: (context) {
+                                  widget.viewModel.onPayPressed(context);
+                                },
+                              ),
+                              SpotstockProductsTab(
+                                products: widget.viewModel.products,
+                                onAddProduct: (product) {
+                                  if (widget.viewModel.isHoldSaleGuard) {
+                                    widget.viewModel.onAddProduct(product);
                                   }
                                 },
-                                // tooltip: SpotstockStrings.more,
-                              );
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                    TabBar(
-                      controller: widget.viewModel.tabController,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      onTap: (index) {
-                        FocusScope.of(context).unfocus();
-                      },
-                      tabs: [
-                        Tab(
-                          text: "${SpotstockStrings.cart}(${widget.viewModel.cartCount})",
+                                isUpdatingProducts: widget.viewModel.getProductsCommand.running,
+                                onTapAddCustomProduct: () {
+                                  if (widget.viewModel.isHoldSaleGuard) {
+                                    widget.viewModel.onTapAddCustomProduct(context);
+                                  }
+                                },
+                                isHold: widget.viewModel.isHold,
+                              ),
+                            ],
+                          ),
                         ),
-                        Tab(text: SpotstockStrings.products),
                       ],
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: widget.viewModel.tabController,
+                    ],
+                  ),
+                  if (widget.viewModel.createSaleCommand.running)
+                    Material(
+                      color: Theme.of(context).colorScheme.surface.withAlpha(186),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SpotstockCartTab(
-                            saleItems: widget.viewModel.createSaleDto.saleItems ?? [],
-                            discountController: widget.viewModel.discountController,
-                            shippingController: widget.viewModel.shippingController,
-                            taxAmount: widget.viewModel.taxAmount,
-                            grandTotal: widget.viewModel.grandTotal,
-                            subTotal: widget.viewModel.subTotal,
-                            products: widget.viewModel.products,
-                            canPay: widget.viewModel.canPay,
-                            onDiscountChanged: (value) {
-                              widget.viewModel.onDiscountChanged(value);
-                            },
-                            onShippingChanged: (value) {
-                              widget.viewModel.onShippingChanged(value);
-                            },
-                            onRemoveSaleItem: (productId) {
-                              widget.viewModel.onRemoveSaleItem(productId);
-                            },
-                            onIncreaseSaleItemQuantity: (productId) {
-                              widget.viewModel.onIncreaseSaleItemQuantity(productId);
-                            },
-                            onDecreaseSaleItemQuantity: (productId) {
-                              widget.viewModel.onDecreaseSaleItemQuantity(productId);
-                            },
-                            onEditSaleItem: (saleItem) {
-                              widget.viewModel.onEditSaleItem(context, saleItem);
-                            },
-                            onResetPressed: (context) {
-                              widget.viewModel.onResetPressed(context);
-                            },
-                            onHoldPressed: (context) {
-                              widget.viewModel.onHoldPressed(context);
-                            },
-                            onPayPressed: (context) {
-                              widget.viewModel.onPayPressed(context);
-                            },
+                          SpotstockProgressIndicator(
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                          SpotstockProductsTab(
-                            products: widget.viewModel.products,
-                            onAddProduct: widget.viewModel.onAddProduct,
-                            isUpdatingProducts: widget.viewModel.getProductsCommand.running,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                if (widget.viewModel.createSaleCommand.running)
-                  Material(
-                    color: Theme.of(context).colorScheme.surface.withAlpha(186),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SpotstockProgressIndicator(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        SizedBox(height: SpotstockSizes.s5),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            SpotstockStrings.creatingSale,
-                            style: TextStyle(
-                              fontSize: SpotstockSizes.s10,
-                              fontWeight: FontWeight.w500,
+                          SizedBox(height: SpotstockSizes.s5),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              SpotstockStrings.creatingSale,
+                              style: TextStyle(
+                                fontSize: SpotstockSizes.s10,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-              ],
+                  if (widget.viewModel.createHoldCommand.running)
+                    Material(
+                      color: Theme.of(context).colorScheme.surface.withAlpha(186),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SpotstockProgressIndicator(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          SizedBox(height: SpotstockSizes.s5),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              SpotstockStrings.creatingHold,
+                              style: TextStyle(
+                                fontSize: SpotstockSizes.s10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (widget.viewModel.createCustomerCommand.running)
+                    Material(
+                      color: Theme.of(context).colorScheme.surface.withAlpha(186),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SpotstockProgressIndicator(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          SizedBox(height: SpotstockSizes.s5),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              SpotstockStrings.creatingCustomer,
+                              style: TextStyle(
+                                fontSize: SpotstockSizes.s10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

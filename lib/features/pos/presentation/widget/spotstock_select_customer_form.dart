@@ -74,10 +74,7 @@ class SpotstockSelectCustomerForm extends StatelessWidget {
                         padding: EdgeInsets.all(SpotstockSizes.s8),
                         margin: EdgeInsets.only(bottom: SpotstockSizes.s8),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.outline),
+                          border: Border.all(color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.outline),
                           borderRadius: BorderRadius.circular(SpotstockSizes.s8),
                         ),
                         child: Row(
@@ -89,38 +86,43 @@ class SpotstockSelectCustomerForm extends StatelessWidget {
                                 Text(
                                   customer.name ?? SpotstockStrings.na,
                                   style: TextStyle(
-                                    color: isSelected
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).colorScheme.onSurface,
+                                    color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                                   ),
-                                ),
-                                Text(
-                                  customer.email ?? SpotstockStrings.dash,
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: isSelected
-                                            ? Theme.of(context).colorScheme.primary
-                                            : Theme.of(context).colorScheme.onSurface,
-                                      ),
                                 ),
                                 Text(
                                   customer.phone ?? SpotstockStrings.dash,
                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: isSelected
-                                            ? Theme.of(context).colorScheme.primary
-                                            : Theme.of(context).colorScheme.onSurface,
+                                        color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                                       ),
                                 ),
+                                if (customer.email?.isNotEmpty == true)
+                                  Text(
+                                    customer.email ?? SpotstockStrings.dash,
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                                        ),
+                                  ),
                               ],
                             ),
-                            isSelected
-                                ? Icon(
-                                    Icons.check,
-                                    color: isSelected
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).colorScheme.onSurface,
-                                    size: SpotstockSizes.s18,
-                                  )
-                                : SizedBox.shrink(),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                isSelected
+                                    ? Icon(
+                                        Icons.check,
+                                        color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                                        size: SpotstockSizes.s18,
+                                      )
+                                    : SizedBox.shrink(),
+                                if (customer.isSynced == false) ...[
+                                  Icon(
+                                    Icons.sync_problem,
+                                    size: SpotstockSizes.s16,
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                ]
+                              ],
+                            ),
                           ],
                         ),
                       ),

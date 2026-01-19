@@ -126,14 +126,16 @@ class SpotstockSaleCreatedBottomSheetBody extends StatelessWidget {
             color: Theme.of(context).colorScheme.outlineVariant,
             height: SpotstockSizes.s1,
           ),
-          const SizedBox(height: SpotstockSizes.s8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(SpotstockStrings.note),
-              Text(sale.note ?? ''),
-            ],
-          ),
+          if (sale.note?.isNotEmpty ?? false) ...[
+            const SizedBox(height: SpotstockSizes.s8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(child: Text(SpotstockStrings.note)),
+                Expanded(child: Text(sale.note ?? '')),
+              ],
+            ),
+          ],
         ],
       ),
     );

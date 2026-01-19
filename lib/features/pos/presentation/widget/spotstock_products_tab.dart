@@ -10,19 +10,24 @@ import '../../../../core/presentation/progress_indicators/spotstock_progress_ind
 import '../../../../core/presentation/symbols/naira_symbol.dart';
 import '../../../../core/presentation/textfields/spotstock_textfield.dart';
 import '../../data/models/product.dart';
+import '../../data/models/sellable_product.dart';
 import '../view_model/spotstock_products_tab_view_model.dart';
 
 const int borderAlpha = 25;
 
 class SpotstockProductsTab extends StatelessWidget {
   final List<Product> products;
-  final Function(Product) onAddProduct;
+  final Function(SellableProduct) onAddProduct;
   final bool isUpdatingProducts;
+  final VoidCallback onTapAddCustomProduct;
+  final bool isHold;
   const SpotstockProductsTab({
     super.key,
     required this.products,
     required this.onAddProduct,
     required this.isUpdatingProducts,
+    required this.onTapAddCustomProduct,
+    required this.isHold,
   });
 
   @override
@@ -126,7 +131,7 @@ class SpotstockProductsTab extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final product = viewModel.filteredProducts[index];
                       return GestureDetector(
-                        onTap: () => onAddProduct(product),
+                        onTap: () => onAddProduct(DefaultSellableProduct(product)),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
@@ -137,10 +142,7 @@ class SpotstockProductsTab extends StatelessWidget {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .outlineVariant
-                                    .withAlpha(borderAlpha),
+                                color: Theme.of(context).colorScheme.outlineVariant.withAlpha(borderAlpha),
                                 blurRadius: SpotstockSizes.s10,
                                 offset: Offset(0, SpotstockSizes.s10),
                               ),
@@ -155,10 +157,7 @@ class SpotstockProductsTab extends StatelessWidget {
                                     Container(
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .outlineVariant
-                                            .withAlpha(borderAlpha),
+                                        color: Theme.of(context).colorScheme.outlineVariant.withAlpha(borderAlpha),
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(SpotstockSizes.s10),
                                           topRight: Radius.circular(SpotstockSizes.s10),
@@ -176,10 +175,7 @@ class SpotstockProductsTab extends StatelessWidget {
                                       child: Container(
                                         padding: EdgeInsets.all(SpotstockSizes.s4),
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withAlpha(borderAlpha),
+                                          color: Theme.of(context).colorScheme.primary.withAlpha(borderAlpha),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Text(
@@ -226,8 +222,7 @@ class SpotstockProductsTab extends StatelessWidget {
                                                       product.productPrice?.toMoney() ?? '',
                                                       style: TextStyle(
                                                         fontWeight: FontWeight.w600,
-                                                        color:
-                                                            Theme.of(context).colorScheme.primary,
+                                                        color: Theme.of(context).colorScheme.primary,
                                                       ),
                                                     ),
                                                   ],
@@ -239,7 +234,7 @@ class SpotstockProductsTab extends StatelessWidget {
                                           Column(
                                             children: [
                                               SpotstockIconButton(
-                                                onPressed: () => onAddProduct(product),
+                                                onPressed: () => onAddProduct(DefaultSellableProduct(product)),
                                                 icon: Icon(
                                                   Icons.add,
                                                   color: Theme.of(context).colorScheme.primary,
@@ -260,21 +255,42 @@ class SpotstockProductsTab extends StatelessWidget {
                       );
                     },
                   ),
-                  if (viewModel.showScrollToTopButton)
-                    Positioned(
-                      bottom: SpotstockSizes.bottomSpacing(context) + SpotstockSizes.s24,
-                      right: SpotstockSizes.s24,
-                      child: SpotstockFloatingActionButton(
-                        onPressed: () async {
-                          viewModel.scrollToTop();
-                        },
-                        icon: Icon(
-                          Icons.arrow_upward,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          size: SpotstockSizes.s18,
-                        ),
-                      ),
+                  Positioned(
+                    bottom: SpotstockSizes.bottomSpacing(context) + SpotstockSizes.s24,
+                    right: SpotstockSizes.s24,
+                    child: Row(
+                      children: [
+                        if (!isHold)
+                          SpotstockFloatingActionButton(
+                            onPressed: () async {
+                              onTapAddCustomProduct();
+                            },
+                            label: SpotstockStrings.addCustomProduct,
+                            icon: Icon(
+                              Icons.add_shopping_cart,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              size: SpotstockSizes.s18,
+                            ),
+                          ),
+                        if (viewModel.showScrollToTopButton)
+                          Row(
+                            children: [
+                              SizedBox(width: SpotstockSizes.s10),
+                              SpotstockFloatingActionButton(
+                                onPressed: () async {
+                                  viewModel.scrollToTop();
+                                },
+                                icon: Icon(
+                                  Icons.arrow_upward,
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  size: SpotstockSizes.s18,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),
