@@ -63,6 +63,7 @@ class _LoginState extends State<Login> with SpotstockInputValidationMixin {
                         ),
                         const SizedBox(height: SpotstockSizes.s15),
                         SpotstockTextField(
+                          keyboardType: TextInputType.emailAddress,
                           hintText: SpotstockStrings.email,
                           controller: widget.viewModel.emailController,
                           prefixIcon: Icon(Icons.email),
@@ -70,6 +71,7 @@ class _LoginState extends State<Login> with SpotstockInputValidationMixin {
                         ),
                         const SizedBox(height: SpotstockSizes.s15),
                         SpotstockTextField(
+                          keyboardType: TextInputType.visiblePassword,
                           maxLines: maxLines,
                           obscureText: widget.viewModel.obscurePassword,
                           hintText: SpotstockStrings.password,
@@ -80,9 +82,7 @@ class _LoginState extends State<Login> with SpotstockInputValidationMixin {
                               widget.viewModel.toggleObscurePasswordCommand.execute(context);
                             },
                             child: Icon(
-                              widget.viewModel.obscurePassword
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
+                              widget.viewModel.obscurePassword ? Icons.visibility : Icons.visibility_off,
                             ),
                           ),
                           validator: (value) => isValidPassword(value),

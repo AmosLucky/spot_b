@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spotstock_inventory/features/auth/domain/usecases/save_offline_user.dart';
 
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/error_handling/app_error.dart';
@@ -28,6 +29,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
   final SaveSpotstockUser saveSpotstockUser;
   final SaveLastLoginTime saveLastLoginTime;
   final GetSpotstockUser getSpotstockUser;
+  final SaveOfflineUser saveOfflineUser;
 
   LoginViewModel(
     this.login,
@@ -35,6 +37,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
     this.saveSpotstockUser,
     this.saveLastLoginTime,
     this.getSpotstockUser,
+    this.saveOfflineUser,
   );
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -61,7 +64,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
     result.when(
       onSuccess: (spotstockUser) {
         if (spotstockUser?.email != null) {
-          _emailController.text = spotstockUser!.email;
+          _emailController.text = spotstockUser?.email ?? SpotstockStrings.EMPTY;
         }
       },
       onFailure: (error) {
@@ -90,14 +93,20 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
 
   Future<Result<void>> _login(BuildContext context) async {
     FocusScope.of(context).unfocus();
-    final result = await login(_createLoginDto());
+    final loginDto = _createLoginDto();
+    final result = await login(loginDto);
     result.when(
       onSuccess: (response) {
-        _validateResponse(response.data);
-        saveToken(response.data.token!);
+        _validateResponse(response);
+        saveToken(response.token!);
         saveSpotstockUser(_createSpotstockUser(
-            response.data.user, response.data.role, response.data.user?.company));
+          response.user,
+          response.role,
+          response.user?.company,
+          response.permissions,
+        ));
         saveLastLoginTime(DateTime.now());
+        saveOfflineUser(loginDto, response);
         _formKey.currentState?.reset();
         _emailController.clear();
         _passwordController.clear();
@@ -165,7 +174,11 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
   }
 
   SpotstockUser _createSpotstockUser(
-      LoginUserDao? user, LoginRoleDao? role, LoginCompanyDao? company) {
+    LoginUserDao? user,
+    LoginRoleDao? role,
+    LoginCompanyDao? company,
+    List<String>? permissions,
+  ) {
     return SpotstockUser(
       id: user!.id!,
       firstName: user.firstName!,
@@ -175,6 +188,8 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
       roleId: role!.id!,
       roleName: role.name!,
       roleDisplayName: role.displayName!,
+      isAdmin: user.isAdmin,
+      permissions: permissions ?? [],
       company: SpotstockCompany(
         id: company!.id!,
         name: company.name!,
