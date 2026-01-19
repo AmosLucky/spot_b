@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../../core/networking/api_response/spotstock_api_data_item.dart';
 import '../../../../../core/networking/api_response/spotstock_api_response.dart';
@@ -19,19 +17,19 @@ class HoldsRemoteDatasource {
 
   HoldsRemoteDatasource(this.dioClient);
 
-  SpotstockApiResponse<List<Hold>> _createApiResponse(Map<String, dynamic> responseData) {
-    final List<SpotstockApiDataItem> apiDataItems = (responseData['data'] as List<dynamic>)
-        .map((item) => SpotstockApiDataItem.fromJson(item as Map<String, dynamic>))
-        .toList();
+  SpotstockApiResponse<List<Hold>> _createGetHoldsApiResponse(Map<String, dynamic> responseData) {
+    final List<SpotstockApiDataItem> apiDataItems =
+        (responseData['data'] as List<dynamic>).map((item) => SpotstockApiDataItem.fromJson(item as Map<String, dynamic>)).toList();
 
     final holds = <Hold>[];
     for (var item in apiDataItems) {
       try {
-        final hold = HoldMapper.fromJson({
+        Hold hold = HoldMapper.fromJson({
           'id': item.id,
           'attributes': item.attributes,
           'links': item.links,
         });
+        hold = hold.copyWith(isSynced: true);
         holds.add(hold);
       } catch (e) {
         rethrow;
@@ -60,7 +58,7 @@ class HoldsRemoteDatasource {
         },
       );
       if (response.statusCode == SpotstockStatusCode.success) {
-        final apiResponse = _createApiResponse(response.data);
+        final apiResponse = _createGetHoldsApiResponse(response.data);
         return Result.success(apiResponse);
       } else {
         return Result.failure(SpotstockApiError(
@@ -76,8 +74,7 @@ class HoldsRemoteDatasource {
     }
   }
 
-  Future<Result<SpotstockApiResponse<SpotstockApiDataItem>>> createHold(
-      CreateHoldDto createHoldDto) async {
+  Future<Result<SpotstockApiResponse<SpotstockApiDataItem>>> createHold(CreateHoldDto createHoldDto) async {
     try {
       final response = await dioClient.dio.post(
         SpotstockApiPaths.holds,
@@ -90,6 +87,86 @@ class HoldsRemoteDatasource {
           success: response.data['success'],
           rawResponse: response.data,
         ));
+      } else {
+        return Result.failure(SpotstockApiError(
+          message: response.data['message'] ?? SpotstockStrings.somethingWentWrong,
+          code: response.statusCode.toString(),
+          success: response.data['success'] ?? false,
+          rawResponse: response.data,
+          originalError: response.data,
+        ));
+      }
+    } catch (e) {
+      return Result.failure(handleSpotstockApiError(e));
+    }
+  }
+
+  Future<Result<SpotstockApiResponse>> deleteHold(String holdId) async {
+    try {
+      final response = await dioClient.dio.delete("${SpotstockApiPaths.holds}/$holdId");
+      if (response.statusCode == SpotstockStatusCode.success) {
+        return Result.success(SpotstockApiResponse(
+          data: null,
+          message: response.data['message'],
+          success: response.data['success'],
+          rawResponse: response.data,
+        ));
+      } else {
+        return Result.failure(SpotstockApiError(
+          message: response.data['message'] ?? SpotstockStrings.somethingWentWrong,
+          code: response.statusCode.toString(),
+          success: response.data['success'] ?? false,
+          rawResponse: response.data,
+          originalError: response.data,
+        ));
+      }
+    } catch (e) {
+      return Result.failure(handleSpotstockApiError(e));
+    }
+  }
+
+  // final List<SpotstockApiDataItem> apiDataItems = (responseData['data'] as List<dynamic>)
+  //       .map((item) => SpotstockApiDataItem.fromJson(item as Map<String, dynamic>))
+  //       .toList();
+
+  //   final List<BarTable> barTables = apiDataItems
+  //       .map((item) => BarTable.fromJson({
+  //             'id': item.id,
+  //             'attributes': item.attributes,
+  //             'links': item.links,
+  //           }))
+  //       .toList();
+
+  //   return SpotstockApiResponse(
+  //     data: barTables,
+  //     links: responseData['links'] != null ? ApiLinks.fromJson(responseData['links']) : null,
+  //     meta: responseData['meta'] != null ? ApiMeta.fromJson(responseData['meta']) : null,
+  //     rawResponse: responseData,
+  //   );
+
+  // method to convert data item to hold
+
+  SpotstockApiResponse<Hold> _createGetHoldApiResponse(Map<String, dynamic> responseData) {
+    SpotstockApiDataItem item = SpotstockApiDataItem.fromJson(responseData['data']);
+    Hold hold = Hold.fromJson({
+      'id': item.id,
+      'attributes': item.attributes,
+      'links': item.links,
+    });
+    return SpotstockApiResponse(
+      data: hold,
+      links: responseData['links'] != null ? ApiLinks.fromJson(responseData['links']) : null,
+      meta: responseData['meta'] != null ? ApiMeta.fromJson(responseData['meta']) : null,
+      rawResponse: responseData,
+    );
+  }
+
+  Future<Result<SpotstockApiResponse<Hold>>> getHold(String holdId) async {
+    try {
+      final response = await dioClient.dio.get("${SpotstockApiPaths.holds}/$holdId");
+      if (response.statusCode == SpotstockStatusCode.success) {
+        final apiResponse = _createGetHoldApiResponse(response.data);
+        return Result.success(apiResponse);
       } else {
         return Result.failure(SpotstockApiError(
           message: response.data['message'] ?? SpotstockStrings.somethingWentWrong,
