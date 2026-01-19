@@ -87,8 +87,7 @@ class LocalSales extends Table {
   IntColumn get remoteId => integer().nullable()();
 
   TextColumn get type => text().nullable()();
-  TextColumn get links =>
-      text().map(NullAwareTypeConverter.wrap(const MapStringDynamicConverter())).nullable()();
+  TextColumn get links => text().map(NullAwareTypeConverter.wrap(const MapStringDynamicConverter())).nullable()();
 
   DateTimeColumn get date => dateTime().nullable()();
 
@@ -97,8 +96,7 @@ class LocalSales extends Table {
   IntColumn get customerId => integer().nullable()();
   IntColumn get companyId => integer().nullable()();
 
-  TextColumn get loggedUser =>
-      text().map(NullAwareTypeConverter.wrap(const LoggedUserConverter())).nullable()();
+  TextColumn get loggedUser => text().map(NullAwareTypeConverter.wrap(const LoggedUserConverter())).nullable()();
 
   TextColumn get customerName => text().nullable()();
   TextColumn get staffName => text().nullable()();
@@ -128,17 +126,14 @@ class LocalSales extends Table {
 
   TextColumn get referenceCode => text().nullable()();
 
-  TextColumn get saleItems =>
-      text().map(NullAwareTypeConverter.wrap(const SaleItemListConverter())).nullable()();
-  TextColumn get payments =>
-      text().map(NullAwareTypeConverter.wrap(const PaymentListConverter())).nullable()();
+  TextColumn get saleItems => text().map(NullAwareTypeConverter.wrap(const SaleItemListConverter())).nullable()();
+  TextColumn get payments => text().map(NullAwareTypeConverter.wrap(const PaymentListConverter())).nullable()();
 
-  TextColumn get paymentMethods =>
-      text().map(NullAwareTypeConverter.wrap(const PaymentMethodsConverter())).nullable()();
+  TextColumn get paymentMethods => text().map(NullAwareTypeConverter.wrap(const PaymentMethodsConverter())).nullable()();
 
   DateTimeColumn get createdAt => dateTime().nullable()();
   TextColumn get barcodeUrl => text().nullable()();
-  IntColumn get isOffline => integer().withDefault(const Constant(0))();
+  BoolColumn get isOffline => boolean().withDefault(const Constant(false))();
 
   TextColumn get offlineCustomerName => text().nullable()();
 
@@ -146,8 +141,7 @@ class LocalSales extends Table {
   TextColumn get attendantName => text().nullable()();
   IntColumn get attendantId => integer().nullable()();
 
-  TextColumn get roomDetails =>
-      text().map(NullAwareTypeConverter.wrap(const MapStringDynamicConverter())).nullable()();
+  TextColumn get roomDetails => text().map(NullAwareTypeConverter.wrap(const MapStringDynamicConverter())).nullable()();
 
   RealColumn get partialPaymentAmount => real().nullable()();
   TextColumn get partialPaymentMethod => text().nullable()();

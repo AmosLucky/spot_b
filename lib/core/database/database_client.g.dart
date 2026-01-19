@@ -588,8 +588,12 @@ class $LocalCustomersTable extends LocalCustomers
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -639,6 +643,16 @@ class $LocalCustomersTable extends LocalCustomers
   late final GeneratedColumn<String> link = GeneratedColumn<String>(
       'link', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isSyncedMeta =
+      const VerificationMeta('isSynced');
+  @override
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
+      'is_synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -650,7 +664,8 @@ class $LocalCustomersTable extends LocalCustomers
         city,
         address,
         createdAt,
-        link
+        link,
+        isSynced
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -701,6 +716,10 @@ class $LocalCustomersTable extends LocalCustomers
       context.handle(
           _linkMeta, link.isAcceptableOrUnknown(data['link']!, _linkMeta));
     }
+    if (data.containsKey('is_synced')) {
+      context.handle(_isSyncedMeta,
+          isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
+    }
     return context;
   }
 
@@ -711,7 +730,7 @@ class $LocalCustomersTable extends LocalCustomers
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalCustomer(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id']),
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name']),
       companyId: attachedDatabase.typeMapping
@@ -730,6 +749,8 @@ class $LocalCustomersTable extends LocalCustomers
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at']),
       link: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}link']),
+      isSynced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_synced'])!,
     );
   }
 
@@ -740,7 +761,7 @@ class $LocalCustomersTable extends LocalCustomers
 }
 
 class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
-  final int? id;
+  final int id;
   final String? name;
   final int? companyId;
   final String? email;
@@ -750,8 +771,9 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
   final String? address;
   final DateTime? createdAt;
   final String? link;
+  final bool isSynced;
   const LocalCustomer(
-      {this.id,
+      {required this.id,
       this.name,
       this.companyId,
       this.email,
@@ -760,13 +782,12 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
       this.city,
       this.address,
       this.createdAt,
-      this.link});
+      this.link,
+      required this.isSynced});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (!nullToAbsent || id != null) {
-      map['id'] = Variable<int>(id);
-    }
+    map['id'] = Variable<int>(id);
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
     }
@@ -794,12 +815,13 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
     if (!nullToAbsent || link != null) {
       map['link'] = Variable<String>(link);
     }
+    map['is_synced'] = Variable<bool>(isSynced);
     return map;
   }
 
   LocalCustomersCompanion toCompanion(bool nullToAbsent) {
     return LocalCustomersCompanion(
-      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      id: Value(id),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
       companyId: companyId == null && nullToAbsent
           ? const Value.absent()
@@ -819,6 +841,7 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
           ? const Value.absent()
           : Value(createdAt),
       link: link == null && nullToAbsent ? const Value.absent() : Value(link),
+      isSynced: Value(isSynced),
     );
   }
 
@@ -826,7 +849,7 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalCustomer(
-      id: serializer.fromJson<int?>(json['id']),
+      id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String?>(json['name']),
       companyId: serializer.fromJson<int?>(json['companyId']),
       email: serializer.fromJson<String?>(json['email']),
@@ -836,13 +859,14 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
       address: serializer.fromJson<String?>(json['address']),
       createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
       link: serializer.fromJson<String?>(json['link']),
+      isSynced: serializer.fromJson<bool>(json['isSynced']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int?>(id),
+      'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String?>(name),
       'companyId': serializer.toJson<int?>(companyId),
       'email': serializer.toJson<String?>(email),
@@ -852,11 +876,12 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
       'address': serializer.toJson<String?>(address),
       'createdAt': serializer.toJson<DateTime?>(createdAt),
       'link': serializer.toJson<String?>(link),
+      'isSynced': serializer.toJson<bool>(isSynced),
     };
   }
 
   LocalCustomer copyWith(
-          {Value<int?> id = const Value.absent(),
+          {int? id,
           Value<String?> name = const Value.absent(),
           Value<int?> companyId = const Value.absent(),
           Value<String?> email = const Value.absent(),
@@ -865,9 +890,10 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
           Value<String?> city = const Value.absent(),
           Value<String?> address = const Value.absent(),
           Value<DateTime?> createdAt = const Value.absent(),
-          Value<String?> link = const Value.absent()}) =>
+          Value<String?> link = const Value.absent(),
+          bool? isSynced}) =>
       LocalCustomer(
-        id: id.present ? id.value : this.id,
+        id: id ?? this.id,
         name: name.present ? name.value : this.name,
         companyId: companyId.present ? companyId.value : this.companyId,
         email: email.present ? email.value : this.email,
@@ -877,6 +903,7 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
         address: address.present ? address.value : this.address,
         createdAt: createdAt.present ? createdAt.value : this.createdAt,
         link: link.present ? link.value : this.link,
+        isSynced: isSynced ?? this.isSynced,
       );
   LocalCustomer copyWithCompanion(LocalCustomersCompanion data) {
     return LocalCustomer(
@@ -890,6 +917,7 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
       address: data.address.present ? data.address.value : this.address,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       link: data.link.present ? data.link.value : this.link,
+      isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
     );
   }
 
@@ -905,14 +933,15 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
           ..write('city: $city, ')
           ..write('address: $address, ')
           ..write('createdAt: $createdAt, ')
-          ..write('link: $link')
+          ..write('link: $link, ')
+          ..write('isSynced: $isSynced')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(id, name, companyId, email, phone, country,
-      city, address, createdAt, link);
+      city, address, createdAt, link, isSynced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -926,11 +955,12 @@ class LocalCustomer extends DataClass implements Insertable<LocalCustomer> {
           other.city == this.city &&
           other.address == this.address &&
           other.createdAt == this.createdAt &&
-          other.link == this.link);
+          other.link == this.link &&
+          other.isSynced == this.isSynced);
 }
 
 class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
-  final Value<int?> id;
+  final Value<int> id;
   final Value<String?> name;
   final Value<int?> companyId;
   final Value<String?> email;
@@ -940,6 +970,7 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
   final Value<String?> address;
   final Value<DateTime?> createdAt;
   final Value<String?> link;
+  final Value<bool> isSynced;
   const LocalCustomersCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -951,6 +982,7 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
     this.address = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.link = const Value.absent(),
+    this.isSynced = const Value.absent(),
   });
   LocalCustomersCompanion.insert({
     this.id = const Value.absent(),
@@ -963,6 +995,7 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
     this.address = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.link = const Value.absent(),
+    this.isSynced = const Value.absent(),
   });
   static Insertable<LocalCustomer> custom({
     Expression<int>? id,
@@ -975,6 +1008,7 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
     Expression<String>? address,
     Expression<DateTime>? createdAt,
     Expression<String>? link,
+    Expression<bool>? isSynced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -987,11 +1021,12 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
       if (address != null) 'address': address,
       if (createdAt != null) 'created_at': createdAt,
       if (link != null) 'link': link,
+      if (isSynced != null) 'is_synced': isSynced,
     });
   }
 
   LocalCustomersCompanion copyWith(
-      {Value<int?>? id,
+      {Value<int>? id,
       Value<String?>? name,
       Value<int?>? companyId,
       Value<String?>? email,
@@ -1000,7 +1035,8 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
       Value<String?>? city,
       Value<String?>? address,
       Value<DateTime?>? createdAt,
-      Value<String?>? link}) {
+      Value<String?>? link,
+      Value<bool>? isSynced}) {
     return LocalCustomersCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -1012,6 +1048,7 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
       address: address ?? this.address,
       createdAt: createdAt ?? this.createdAt,
       link: link ?? this.link,
+      isSynced: isSynced ?? this.isSynced,
     );
   }
 
@@ -1048,6 +1085,9 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
     if (link.present) {
       map['link'] = Variable<String>(link.value);
     }
+    if (isSynced.present) {
+      map['is_synced'] = Variable<bool>(isSynced.value);
+    }
     return map;
   }
 
@@ -1063,7 +1103,8 @@ class LocalCustomersCompanion extends UpdateCompanion<LocalCustomer> {
           ..write('city: $city, ')
           ..write('address: $address, ')
           ..write('createdAt: $createdAt, ')
-          ..write('link: $link')
+          ..write('link: $link, ')
+          ..write('isSynced: $isSynced')
           ..write(')'))
         .toString();
   }
@@ -1761,6 +1802,12 @@ class $LocalProductsTable extends LocalProducts
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _companyIdMeta =
+      const VerificationMeta('companyId');
+  @override
+  late final GeneratedColumn<int> companyId = GeneratedColumn<int>(
+      'company_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _codeMeta = const VerificationMeta('code');
   @override
   late final GeneratedColumn<String> code = GeneratedColumn<String>(
@@ -1834,10 +1881,42 @@ class $LocalProductsTable extends LocalProducts
   late final GeneratedColumn<int> warehouseId = GeneratedColumn<int>(
       'warehouse_id', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _brandNameMeta =
+      const VerificationMeta('brandName');
+  @override
+  late final GeneratedColumn<String> brandName = GeneratedColumn<String>(
+      'brand_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _productCategoryNameMeta =
+      const VerificationMeta('productCategoryName');
+  @override
+  late final GeneratedColumn<String> productCategoryName =
+      GeneratedColumn<String>('product_category_name', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _stockAlertMeta =
+      const VerificationMeta('stockAlert');
+  @override
+  late final GeneratedColumn<String> stockAlert = GeneratedColumn<String>(
+      'stock_alert', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  late final GeneratedColumnWithTypeConverter<ProductUnitName?, String>
+      productUnitName = GeneratedColumn<String>(
+              'product_unit_name', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<ProductUnitName?>(
+              $LocalProductsTable.$converterproductUnitName);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<ProductWarehouse>?, String>
+      warehouse = GeneratedColumn<String>('warehouse', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<List<ProductWarehouse>?>(
+              $LocalProductsTable.$converterwarehouse);
   @override
   List<GeneratedColumn> get $columns => [
         id,
         name,
+        companyId,
         code,
         expiryDate,
         mainProductId,
@@ -1849,7 +1928,12 @@ class $LocalProductsTable extends LocalProducts
         inStock,
         link,
         stockId,
-        warehouseId
+        warehouseId,
+        brandName,
+        productCategoryName,
+        stockAlert,
+        productUnitName,
+        warehouse
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1867,6 +1951,10 @@ class $LocalProductsTable extends LocalProducts
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    }
+    if (data.containsKey('company_id')) {
+      context.handle(_companyIdMeta,
+          companyId.isAcceptableOrUnknown(data['company_id']!, _companyIdMeta));
     }
     if (data.containsKey('code')) {
       context.handle(
@@ -1928,6 +2016,22 @@ class $LocalProductsTable extends LocalProducts
           warehouseId.isAcceptableOrUnknown(
               data['warehouse_id']!, _warehouseIdMeta));
     }
+    if (data.containsKey('brand_name')) {
+      context.handle(_brandNameMeta,
+          brandName.isAcceptableOrUnknown(data['brand_name']!, _brandNameMeta));
+    }
+    if (data.containsKey('product_category_name')) {
+      context.handle(
+          _productCategoryNameMeta,
+          productCategoryName.isAcceptableOrUnknown(
+              data['product_category_name']!, _productCategoryNameMeta));
+    }
+    if (data.containsKey('stock_alert')) {
+      context.handle(
+          _stockAlertMeta,
+          stockAlert.isAcceptableOrUnknown(
+              data['stock_alert']!, _stockAlertMeta));
+    }
     return context;
   }
 
@@ -1941,6 +2045,8 @@ class $LocalProductsTable extends LocalProducts
           .read(DriftSqlType.int, data['${effectivePrefix}id']),
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name']),
+      companyId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}company_id']),
       code: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}code']),
       expiryDate: attachedDatabase.typeMapping
@@ -1965,6 +2071,18 @@ class $LocalProductsTable extends LocalProducts
           .read(DriftSqlType.int, data['${effectivePrefix}stock_id']),
       warehouseId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}warehouse_id']),
+      brandName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}brand_name']),
+      productCategoryName: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}product_category_name']),
+      stockAlert: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}stock_alert']),
+      productUnitName: $LocalProductsTable.$converterproductUnitName.fromSql(
+          attachedDatabase.typeMapping.read(DriftSqlType.string,
+              data['${effectivePrefix}product_unit_name'])),
+      warehouse: $LocalProductsTable.$converterwarehouse.fromSql(
+          attachedDatabase.typeMapping
+              .read(DriftSqlType.string, data['${effectivePrefix}warehouse'])),
     );
   }
 
@@ -1972,11 +2090,17 @@ class $LocalProductsTable extends LocalProducts
   $LocalProductsTable createAlias(String alias) {
     return $LocalProductsTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<ProductUnitName?, String?> $converterproductUnitName =
+      NullAwareTypeConverter.wrap(const ProductUnitNameConverter());
+  static TypeConverter<List<ProductWarehouse>?, String?> $converterwarehouse =
+      NullAwareTypeConverter.wrap(const ProductWarehouseListConverter());
 }
 
 class LocalProduct extends DataClass implements Insertable<LocalProduct> {
   final int? id;
   final String? name;
+  final int? companyId;
   final String? code;
   final DateTime? expiryDate;
   final int? mainProductId;
@@ -1989,9 +2113,15 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
   final String? link;
   final int? stockId;
   final int? warehouseId;
+  final String? brandName;
+  final String? productCategoryName;
+  final String? stockAlert;
+  final ProductUnitName? productUnitName;
+  final List<ProductWarehouse>? warehouse;
   const LocalProduct(
       {this.id,
       this.name,
+      this.companyId,
       this.code,
       this.expiryDate,
       this.mainProductId,
@@ -2003,7 +2133,12 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
       this.inStock,
       this.link,
       this.stockId,
-      this.warehouseId});
+      this.warehouseId,
+      this.brandName,
+      this.productCategoryName,
+      this.stockAlert,
+      this.productUnitName,
+      this.warehouse});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2012,6 +2147,9 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
     }
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
+    }
+    if (!nullToAbsent || companyId != null) {
+      map['company_id'] = Variable<int>(companyId);
     }
     if (!nullToAbsent || code != null) {
       map['code'] = Variable<String>(code);
@@ -2049,6 +2187,23 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
     if (!nullToAbsent || warehouseId != null) {
       map['warehouse_id'] = Variable<int>(warehouseId);
     }
+    if (!nullToAbsent || brandName != null) {
+      map['brand_name'] = Variable<String>(brandName);
+    }
+    if (!nullToAbsent || productCategoryName != null) {
+      map['product_category_name'] = Variable<String>(productCategoryName);
+    }
+    if (!nullToAbsent || stockAlert != null) {
+      map['stock_alert'] = Variable<String>(stockAlert);
+    }
+    if (!nullToAbsent || productUnitName != null) {
+      map['product_unit_name'] = Variable<String>(
+          $LocalProductsTable.$converterproductUnitName.toSql(productUnitName));
+    }
+    if (!nullToAbsent || warehouse != null) {
+      map['warehouse'] = Variable<String>(
+          $LocalProductsTable.$converterwarehouse.toSql(warehouse));
+    }
     return map;
   }
 
@@ -2056,6 +2211,9 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
     return LocalProductsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      companyId: companyId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(companyId),
       code: code == null && nullToAbsent ? const Value.absent() : Value(code),
       expiryDate: expiryDate == null && nullToAbsent
           ? const Value.absent()
@@ -2088,6 +2246,21 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
       warehouseId: warehouseId == null && nullToAbsent
           ? const Value.absent()
           : Value(warehouseId),
+      brandName: brandName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(brandName),
+      productCategoryName: productCategoryName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(productCategoryName),
+      stockAlert: stockAlert == null && nullToAbsent
+          ? const Value.absent()
+          : Value(stockAlert),
+      productUnitName: productUnitName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(productUnitName),
+      warehouse: warehouse == null && nullToAbsent
+          ? const Value.absent()
+          : Value(warehouse),
     );
   }
 
@@ -2097,6 +2270,7 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
     return LocalProduct(
       id: serializer.fromJson<int?>(json['id']),
       name: serializer.fromJson<String?>(json['name']),
+      companyId: serializer.fromJson<int?>(json['companyId']),
       code: serializer.fromJson<String?>(json['code']),
       expiryDate: serializer.fromJson<DateTime?>(json['expiryDate']),
       mainProductId: serializer.fromJson<int?>(json['mainProductId']),
@@ -2109,6 +2283,14 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
       link: serializer.fromJson<String?>(json['link']),
       stockId: serializer.fromJson<int?>(json['stockId']),
       warehouseId: serializer.fromJson<int?>(json['warehouseId']),
+      brandName: serializer.fromJson<String?>(json['brandName']),
+      productCategoryName:
+          serializer.fromJson<String?>(json['productCategoryName']),
+      stockAlert: serializer.fromJson<String?>(json['stockAlert']),
+      productUnitName:
+          serializer.fromJson<ProductUnitName?>(json['productUnitName']),
+      warehouse:
+          serializer.fromJson<List<ProductWarehouse>?>(json['warehouse']),
     );
   }
   @override
@@ -2117,6 +2299,7 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
     return <String, dynamic>{
       'id': serializer.toJson<int?>(id),
       'name': serializer.toJson<String?>(name),
+      'companyId': serializer.toJson<int?>(companyId),
       'code': serializer.toJson<String?>(code),
       'expiryDate': serializer.toJson<DateTime?>(expiryDate),
       'mainProductId': serializer.toJson<int?>(mainProductId),
@@ -2129,12 +2312,18 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
       'link': serializer.toJson<String?>(link),
       'stockId': serializer.toJson<int?>(stockId),
       'warehouseId': serializer.toJson<int?>(warehouseId),
+      'brandName': serializer.toJson<String?>(brandName),
+      'productCategoryName': serializer.toJson<String?>(productCategoryName),
+      'stockAlert': serializer.toJson<String?>(stockAlert),
+      'productUnitName': serializer.toJson<ProductUnitName?>(productUnitName),
+      'warehouse': serializer.toJson<List<ProductWarehouse>?>(warehouse),
     };
   }
 
   LocalProduct copyWith(
           {Value<int?> id = const Value.absent(),
           Value<String?> name = const Value.absent(),
+          Value<int?> companyId = const Value.absent(),
           Value<String?> code = const Value.absent(),
           Value<DateTime?> expiryDate = const Value.absent(),
           Value<int?> mainProductId = const Value.absent(),
@@ -2146,10 +2335,16 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
           Value<int?> inStock = const Value.absent(),
           Value<String?> link = const Value.absent(),
           Value<int?> stockId = const Value.absent(),
-          Value<int?> warehouseId = const Value.absent()}) =>
+          Value<int?> warehouseId = const Value.absent(),
+          Value<String?> brandName = const Value.absent(),
+          Value<String?> productCategoryName = const Value.absent(),
+          Value<String?> stockAlert = const Value.absent(),
+          Value<ProductUnitName?> productUnitName = const Value.absent(),
+          Value<List<ProductWarehouse>?> warehouse = const Value.absent()}) =>
       LocalProduct(
         id: id.present ? id.value : this.id,
         name: name.present ? name.value : this.name,
+        companyId: companyId.present ? companyId.value : this.companyId,
         code: code.present ? code.value : this.code,
         expiryDate: expiryDate.present ? expiryDate.value : this.expiryDate,
         mainProductId:
@@ -2166,11 +2361,21 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
         link: link.present ? link.value : this.link,
         stockId: stockId.present ? stockId.value : this.stockId,
         warehouseId: warehouseId.present ? warehouseId.value : this.warehouseId,
+        brandName: brandName.present ? brandName.value : this.brandName,
+        productCategoryName: productCategoryName.present
+            ? productCategoryName.value
+            : this.productCategoryName,
+        stockAlert: stockAlert.present ? stockAlert.value : this.stockAlert,
+        productUnitName: productUnitName.present
+            ? productUnitName.value
+            : this.productUnitName,
+        warehouse: warehouse.present ? warehouse.value : this.warehouse,
       );
   LocalProduct copyWithCompanion(LocalProductsCompanion data) {
     return LocalProduct(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      companyId: data.companyId.present ? data.companyId.value : this.companyId,
       code: data.code.present ? data.code.value : this.code,
       expiryDate:
           data.expiryDate.present ? data.expiryDate.value : this.expiryDate,
@@ -2192,6 +2397,16 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
       stockId: data.stockId.present ? data.stockId.value : this.stockId,
       warehouseId:
           data.warehouseId.present ? data.warehouseId.value : this.warehouseId,
+      brandName: data.brandName.present ? data.brandName.value : this.brandName,
+      productCategoryName: data.productCategoryName.present
+          ? data.productCategoryName.value
+          : this.productCategoryName,
+      stockAlert:
+          data.stockAlert.present ? data.stockAlert.value : this.stockAlert,
+      productUnitName: data.productUnitName.present
+          ? data.productUnitName.value
+          : this.productUnitName,
+      warehouse: data.warehouse.present ? data.warehouse.value : this.warehouse,
     );
   }
 
@@ -2200,6 +2415,7 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
     return (StringBuffer('LocalProduct(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('companyId: $companyId, ')
           ..write('code: $code, ')
           ..write('expiryDate: $expiryDate, ')
           ..write('mainProductId: $mainProductId, ')
@@ -2211,7 +2427,12 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
           ..write('inStock: $inStock, ')
           ..write('link: $link, ')
           ..write('stockId: $stockId, ')
-          ..write('warehouseId: $warehouseId')
+          ..write('warehouseId: $warehouseId, ')
+          ..write('brandName: $brandName, ')
+          ..write('productCategoryName: $productCategoryName, ')
+          ..write('stockAlert: $stockAlert, ')
+          ..write('productUnitName: $productUnitName, ')
+          ..write('warehouse: $warehouse')
           ..write(')'))
         .toString();
   }
@@ -2220,6 +2441,7 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
   int get hashCode => Object.hash(
       id,
       name,
+      companyId,
       code,
       expiryDate,
       mainProductId,
@@ -2231,13 +2453,19 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
       inStock,
       link,
       stockId,
-      warehouseId);
+      warehouseId,
+      brandName,
+      productCategoryName,
+      stockAlert,
+      productUnitName,
+      warehouse);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LocalProduct &&
           other.id == this.id &&
           other.name == this.name &&
+          other.companyId == this.companyId &&
           other.code == this.code &&
           other.expiryDate == this.expiryDate &&
           other.mainProductId == this.mainProductId &&
@@ -2249,12 +2477,18 @@ class LocalProduct extends DataClass implements Insertable<LocalProduct> {
           other.inStock == this.inStock &&
           other.link == this.link &&
           other.stockId == this.stockId &&
-          other.warehouseId == this.warehouseId);
+          other.warehouseId == this.warehouseId &&
+          other.brandName == this.brandName &&
+          other.productCategoryName == this.productCategoryName &&
+          other.stockAlert == this.stockAlert &&
+          other.productUnitName == this.productUnitName &&
+          other.warehouse == this.warehouse);
 }
 
 class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
   final Value<int?> id;
   final Value<String?> name;
+  final Value<int?> companyId;
   final Value<String?> code;
   final Value<DateTime?> expiryDate;
   final Value<int?> mainProductId;
@@ -2267,9 +2501,15 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
   final Value<String?> link;
   final Value<int?> stockId;
   final Value<int?> warehouseId;
+  final Value<String?> brandName;
+  final Value<String?> productCategoryName;
+  final Value<String?> stockAlert;
+  final Value<ProductUnitName?> productUnitName;
+  final Value<List<ProductWarehouse>?> warehouse;
   const LocalProductsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.companyId = const Value.absent(),
     this.code = const Value.absent(),
     this.expiryDate = const Value.absent(),
     this.mainProductId = const Value.absent(),
@@ -2282,10 +2522,16 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
     this.link = const Value.absent(),
     this.stockId = const Value.absent(),
     this.warehouseId = const Value.absent(),
+    this.brandName = const Value.absent(),
+    this.productCategoryName = const Value.absent(),
+    this.stockAlert = const Value.absent(),
+    this.productUnitName = const Value.absent(),
+    this.warehouse = const Value.absent(),
   });
   LocalProductsCompanion.insert({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.companyId = const Value.absent(),
     this.code = const Value.absent(),
     this.expiryDate = const Value.absent(),
     this.mainProductId = const Value.absent(),
@@ -2298,10 +2544,16 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
     this.link = const Value.absent(),
     this.stockId = const Value.absent(),
     this.warehouseId = const Value.absent(),
+    this.brandName = const Value.absent(),
+    this.productCategoryName = const Value.absent(),
+    this.stockAlert = const Value.absent(),
+    this.productUnitName = const Value.absent(),
+    this.warehouse = const Value.absent(),
   });
   static Insertable<LocalProduct> custom({
     Expression<int>? id,
     Expression<String>? name,
+    Expression<int>? companyId,
     Expression<String>? code,
     Expression<DateTime>? expiryDate,
     Expression<int>? mainProductId,
@@ -2314,10 +2566,16 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
     Expression<String>? link,
     Expression<int>? stockId,
     Expression<int>? warehouseId,
+    Expression<String>? brandName,
+    Expression<String>? productCategoryName,
+    Expression<String>? stockAlert,
+    Expression<String>? productUnitName,
+    Expression<String>? warehouse,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (companyId != null) 'company_id': companyId,
       if (code != null) 'code': code,
       if (expiryDate != null) 'expiry_date': expiryDate,
       if (mainProductId != null) 'main_product_id': mainProductId,
@@ -2330,12 +2588,19 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
       if (link != null) 'link': link,
       if (stockId != null) 'stock_id': stockId,
       if (warehouseId != null) 'warehouse_id': warehouseId,
+      if (brandName != null) 'brand_name': brandName,
+      if (productCategoryName != null)
+        'product_category_name': productCategoryName,
+      if (stockAlert != null) 'stock_alert': stockAlert,
+      if (productUnitName != null) 'product_unit_name': productUnitName,
+      if (warehouse != null) 'warehouse': warehouse,
     });
   }
 
   LocalProductsCompanion copyWith(
       {Value<int?>? id,
       Value<String?>? name,
+      Value<int?>? companyId,
       Value<String?>? code,
       Value<DateTime?>? expiryDate,
       Value<int?>? mainProductId,
@@ -2347,10 +2612,16 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
       Value<int?>? inStock,
       Value<String?>? link,
       Value<int?>? stockId,
-      Value<int?>? warehouseId}) {
+      Value<int?>? warehouseId,
+      Value<String?>? brandName,
+      Value<String?>? productCategoryName,
+      Value<String?>? stockAlert,
+      Value<ProductUnitName?>? productUnitName,
+      Value<List<ProductWarehouse>?>? warehouse}) {
     return LocalProductsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      companyId: companyId ?? this.companyId,
       code: code ?? this.code,
       expiryDate: expiryDate ?? this.expiryDate,
       mainProductId: mainProductId ?? this.mainProductId,
@@ -2363,6 +2634,11 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
       link: link ?? this.link,
       stockId: stockId ?? this.stockId,
       warehouseId: warehouseId ?? this.warehouseId,
+      brandName: brandName ?? this.brandName,
+      productCategoryName: productCategoryName ?? this.productCategoryName,
+      stockAlert: stockAlert ?? this.stockAlert,
+      productUnitName: productUnitName ?? this.productUnitName,
+      warehouse: warehouse ?? this.warehouse,
     );
   }
 
@@ -2374,6 +2650,9 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (companyId.present) {
+      map['company_id'] = Variable<int>(companyId.value);
     }
     if (code.present) {
       map['code'] = Variable<String>(code.value);
@@ -2411,6 +2690,25 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
     if (warehouseId.present) {
       map['warehouse_id'] = Variable<int>(warehouseId.value);
     }
+    if (brandName.present) {
+      map['brand_name'] = Variable<String>(brandName.value);
+    }
+    if (productCategoryName.present) {
+      map['product_category_name'] =
+          Variable<String>(productCategoryName.value);
+    }
+    if (stockAlert.present) {
+      map['stock_alert'] = Variable<String>(stockAlert.value);
+    }
+    if (productUnitName.present) {
+      map['product_unit_name'] = Variable<String>($LocalProductsTable
+          .$converterproductUnitName
+          .toSql(productUnitName.value));
+    }
+    if (warehouse.present) {
+      map['warehouse'] = Variable<String>(
+          $LocalProductsTable.$converterwarehouse.toSql(warehouse.value));
+    }
     return map;
   }
 
@@ -2419,6 +2717,7 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
     return (StringBuffer('LocalProductsCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('companyId: $companyId, ')
           ..write('code: $code, ')
           ..write('expiryDate: $expiryDate, ')
           ..write('mainProductId: $mainProductId, ')
@@ -2430,7 +2729,12 @@ class LocalProductsCompanion extends UpdateCompanion<LocalProduct> {
           ..write('inStock: $inStock, ')
           ..write('link: $link, ')
           ..write('stockId: $stockId, ')
-          ..write('warehouseId: $warehouseId')
+          ..write('warehouseId: $warehouseId, ')
+          ..write('brandName: $brandName, ')
+          ..write('productCategoryName: $productCategoryName, ')
+          ..write('stockAlert: $stockAlert, ')
+          ..write('productUnitName: $productUnitName, ')
+          ..write('warehouse: $warehouse')
           ..write(')'))
         .toString();
   }
@@ -2987,26 +3291,23 @@ class $LocalRegistersTable extends LocalRegisters
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _isOpenMeta = const VerificationMeta('isOpen');
+  static const VerificationMeta _closedAtMeta =
+      const VerificationMeta('closedAt');
   @override
-  late final GeneratedColumn<bool> isOpen = GeneratedColumn<bool>(
-      'is_open', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("is_open" IN (0, 1))'),
-      defaultValue: const Constant(false));
+  late final GeneratedColumn<DateTime> closedAt = GeneratedColumn<DateTime>(
+      'closed_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _openingCashAtHandMeta =
       const VerificationMeta('openingCashAtHand');
   @override
   late final GeneratedColumn<double> openingCashAtHand =
       GeneratedColumn<double>('opening_cash_at_hand', aliasedName, true,
           type: DriftSqlType.double, requiredDuringInsert: false);
-  static const VerificationMeta _closingCashAtHandMeta =
-      const VerificationMeta('closingCashAtHand');
+  static const VerificationMeta _cashInHandWhileClosingMeta =
+      const VerificationMeta('cashInHandWhileClosing');
   @override
-  late final GeneratedColumn<double> closingCashAtHand =
-      GeneratedColumn<double>('closing_cash_at_hand', aliasedName, true,
+  late final GeneratedColumn<double> cashInHandWhileClosing =
+      GeneratedColumn<double>('cash_in_hand_while_closing', aliasedName, true,
           type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _noteMeta = const VerificationMeta('note');
   @override
@@ -3014,8 +3315,31 @@ class $LocalRegistersTable extends LocalRegisters
       'note', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, createdAt, isOpen, openingCashAtHand, closingCashAtHand, note];
+  late final GeneratedColumnWithTypeConverter<SpotstockUser?, String> user =
+      GeneratedColumn<String>('user', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<SpotstockUser?>($LocalRegistersTable.$converteruser);
+  static const VerificationMeta _isSyncedMeta =
+      const VerificationMeta('isSynced');
+  @override
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
+      'is_synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        createdAt,
+        closedAt,
+        openingCashAtHand,
+        cashInHandWhileClosing,
+        note,
+        user,
+        isSynced
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3033,9 +3357,9 @@ class $LocalRegistersTable extends LocalRegisters
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
     }
-    if (data.containsKey('is_open')) {
-      context.handle(_isOpenMeta,
-          isOpen.isAcceptableOrUnknown(data['is_open']!, _isOpenMeta));
+    if (data.containsKey('closed_at')) {
+      context.handle(_closedAtMeta,
+          closedAt.isAcceptableOrUnknown(data['closed_at']!, _closedAtMeta));
     }
     if (data.containsKey('opening_cash_at_hand')) {
       context.handle(
@@ -3043,15 +3367,20 @@ class $LocalRegistersTable extends LocalRegisters
           openingCashAtHand.isAcceptableOrUnknown(
               data['opening_cash_at_hand']!, _openingCashAtHandMeta));
     }
-    if (data.containsKey('closing_cash_at_hand')) {
+    if (data.containsKey('cash_in_hand_while_closing')) {
       context.handle(
-          _closingCashAtHandMeta,
-          closingCashAtHand.isAcceptableOrUnknown(
-              data['closing_cash_at_hand']!, _closingCashAtHandMeta));
+          _cashInHandWhileClosingMeta,
+          cashInHandWhileClosing.isAcceptableOrUnknown(
+              data['cash_in_hand_while_closing']!,
+              _cashInHandWhileClosingMeta));
     }
     if (data.containsKey('note')) {
       context.handle(
           _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
+    }
+    if (data.containsKey('is_synced')) {
+      context.handle(_isSyncedMeta,
+          isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
     }
     return context;
   }
@@ -3066,14 +3395,20 @@ class $LocalRegistersTable extends LocalRegisters
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at']),
-      isOpen: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}is_open'])!,
+      closedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}closed_at']),
       openingCashAtHand: attachedDatabase.typeMapping.read(
           DriftSqlType.double, data['${effectivePrefix}opening_cash_at_hand']),
-      closingCashAtHand: attachedDatabase.typeMapping.read(
-          DriftSqlType.double, data['${effectivePrefix}closing_cash_at_hand']),
+      cashInHandWhileClosing: attachedDatabase.typeMapping.read(
+          DriftSqlType.double,
+          data['${effectivePrefix}cash_in_hand_while_closing']),
       note: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}note']),
+      user: $LocalRegistersTable.$converteruser.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user'])),
+      isSynced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_synced'])!,
     );
   }
 
@@ -3081,22 +3416,29 @@ class $LocalRegistersTable extends LocalRegisters
   $LocalRegistersTable createAlias(String alias) {
     return $LocalRegistersTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<SpotstockUser?, String?> $converteruser =
+      NullAwareTypeConverter.wrap(const SpotstockUserConverter());
 }
 
 class LocalRegister extends DataClass implements Insertable<LocalRegister> {
   final int id;
   final DateTime? createdAt;
-  final bool isOpen;
+  final DateTime? closedAt;
   final double? openingCashAtHand;
-  final double? closingCashAtHand;
+  final double? cashInHandWhileClosing;
   final String? note;
+  final SpotstockUser? user;
+  final bool isSynced;
   const LocalRegister(
       {required this.id,
       this.createdAt,
-      required this.isOpen,
+      this.closedAt,
       this.openingCashAtHand,
-      this.closingCashAtHand,
-      this.note});
+      this.cashInHandWhileClosing,
+      this.note,
+      this.user,
+      required this.isSynced});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3104,16 +3446,24 @@ class LocalRegister extends DataClass implements Insertable<LocalRegister> {
     if (!nullToAbsent || createdAt != null) {
       map['created_at'] = Variable<DateTime>(createdAt);
     }
-    map['is_open'] = Variable<bool>(isOpen);
+    if (!nullToAbsent || closedAt != null) {
+      map['closed_at'] = Variable<DateTime>(closedAt);
+    }
     if (!nullToAbsent || openingCashAtHand != null) {
       map['opening_cash_at_hand'] = Variable<double>(openingCashAtHand);
     }
-    if (!nullToAbsent || closingCashAtHand != null) {
-      map['closing_cash_at_hand'] = Variable<double>(closingCashAtHand);
+    if (!nullToAbsent || cashInHandWhileClosing != null) {
+      map['cash_in_hand_while_closing'] =
+          Variable<double>(cashInHandWhileClosing);
     }
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
+    if (!nullToAbsent || user != null) {
+      map['user'] =
+          Variable<String>($LocalRegistersTable.$converteruser.toSql(user));
+    }
+    map['is_synced'] = Variable<bool>(isSynced);
     return map;
   }
 
@@ -3123,14 +3473,18 @@ class LocalRegister extends DataClass implements Insertable<LocalRegister> {
       createdAt: createdAt == null && nullToAbsent
           ? const Value.absent()
           : Value(createdAt),
-      isOpen: Value(isOpen),
+      closedAt: closedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(closedAt),
       openingCashAtHand: openingCashAtHand == null && nullToAbsent
           ? const Value.absent()
           : Value(openingCashAtHand),
-      closingCashAtHand: closingCashAtHand == null && nullToAbsent
+      cashInHandWhileClosing: cashInHandWhileClosing == null && nullToAbsent
           ? const Value.absent()
-          : Value(closingCashAtHand),
+          : Value(cashInHandWhileClosing),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      user: user == null && nullToAbsent ? const Value.absent() : Value(user),
+      isSynced: Value(isSynced),
     );
   }
 
@@ -3140,12 +3494,14 @@ class LocalRegister extends DataClass implements Insertable<LocalRegister> {
     return LocalRegister(
       id: serializer.fromJson<int>(json['id']),
       createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
-      isOpen: serializer.fromJson<bool>(json['isOpen']),
+      closedAt: serializer.fromJson<DateTime?>(json['closedAt']),
       openingCashAtHand:
           serializer.fromJson<double?>(json['openingCashAtHand']),
-      closingCashAtHand:
-          serializer.fromJson<double?>(json['closingCashAtHand']),
+      cashInHandWhileClosing:
+          serializer.fromJson<double?>(json['cashInHandWhileClosing']),
       note: serializer.fromJson<String?>(json['note']),
+      user: serializer.fromJson<SpotstockUser?>(json['user']),
+      isSynced: serializer.fromJson<bool>(json['isSynced']),
     );
   }
   @override
@@ -3154,44 +3510,53 @@ class LocalRegister extends DataClass implements Insertable<LocalRegister> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'createdAt': serializer.toJson<DateTime?>(createdAt),
-      'isOpen': serializer.toJson<bool>(isOpen),
+      'closedAt': serializer.toJson<DateTime?>(closedAt),
       'openingCashAtHand': serializer.toJson<double?>(openingCashAtHand),
-      'closingCashAtHand': serializer.toJson<double?>(closingCashAtHand),
+      'cashInHandWhileClosing':
+          serializer.toJson<double?>(cashInHandWhileClosing),
       'note': serializer.toJson<String?>(note),
+      'user': serializer.toJson<SpotstockUser?>(user),
+      'isSynced': serializer.toJson<bool>(isSynced),
     };
   }
 
   LocalRegister copyWith(
           {int? id,
           Value<DateTime?> createdAt = const Value.absent(),
-          bool? isOpen,
+          Value<DateTime?> closedAt = const Value.absent(),
           Value<double?> openingCashAtHand = const Value.absent(),
-          Value<double?> closingCashAtHand = const Value.absent(),
-          Value<String?> note = const Value.absent()}) =>
+          Value<double?> cashInHandWhileClosing = const Value.absent(),
+          Value<String?> note = const Value.absent(),
+          Value<SpotstockUser?> user = const Value.absent(),
+          bool? isSynced}) =>
       LocalRegister(
         id: id ?? this.id,
         createdAt: createdAt.present ? createdAt.value : this.createdAt,
-        isOpen: isOpen ?? this.isOpen,
+        closedAt: closedAt.present ? closedAt.value : this.closedAt,
         openingCashAtHand: openingCashAtHand.present
             ? openingCashAtHand.value
             : this.openingCashAtHand,
-        closingCashAtHand: closingCashAtHand.present
-            ? closingCashAtHand.value
-            : this.closingCashAtHand,
+        cashInHandWhileClosing: cashInHandWhileClosing.present
+            ? cashInHandWhileClosing.value
+            : this.cashInHandWhileClosing,
         note: note.present ? note.value : this.note,
+        user: user.present ? user.value : this.user,
+        isSynced: isSynced ?? this.isSynced,
       );
   LocalRegister copyWithCompanion(LocalRegistersCompanion data) {
     return LocalRegister(
       id: data.id.present ? data.id.value : this.id,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      isOpen: data.isOpen.present ? data.isOpen.value : this.isOpen,
+      closedAt: data.closedAt.present ? data.closedAt.value : this.closedAt,
       openingCashAtHand: data.openingCashAtHand.present
           ? data.openingCashAtHand.value
           : this.openingCashAtHand,
-      closingCashAtHand: data.closingCashAtHand.present
-          ? data.closingCashAtHand.value
-          : this.closingCashAtHand,
+      cashInHandWhileClosing: data.cashInHandWhileClosing.present
+          ? data.cashInHandWhileClosing.value
+          : this.cashInHandWhileClosing,
       note: data.note.present ? data.note.value : this.note,
+      user: data.user.present ? data.user.value : this.user,
+      isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
     );
   }
 
@@ -3200,84 +3565,104 @@ class LocalRegister extends DataClass implements Insertable<LocalRegister> {
     return (StringBuffer('LocalRegister(')
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
-          ..write('isOpen: $isOpen, ')
+          ..write('closedAt: $closedAt, ')
           ..write('openingCashAtHand: $openingCashAtHand, ')
-          ..write('closingCashAtHand: $closingCashAtHand, ')
-          ..write('note: $note')
+          ..write('cashInHandWhileClosing: $cashInHandWhileClosing, ')
+          ..write('note: $note, ')
+          ..write('user: $user, ')
+          ..write('isSynced: $isSynced')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, createdAt, isOpen, openingCashAtHand, closingCashAtHand, note);
+  int get hashCode => Object.hash(id, createdAt, closedAt, openingCashAtHand,
+      cashInHandWhileClosing, note, user, isSynced);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is LocalRegister &&
           other.id == this.id &&
           other.createdAt == this.createdAt &&
-          other.isOpen == this.isOpen &&
+          other.closedAt == this.closedAt &&
           other.openingCashAtHand == this.openingCashAtHand &&
-          other.closingCashAtHand == this.closingCashAtHand &&
-          other.note == this.note);
+          other.cashInHandWhileClosing == this.cashInHandWhileClosing &&
+          other.note == this.note &&
+          other.user == this.user &&
+          other.isSynced == this.isSynced);
 }
 
 class LocalRegistersCompanion extends UpdateCompanion<LocalRegister> {
   final Value<int> id;
   final Value<DateTime?> createdAt;
-  final Value<bool> isOpen;
+  final Value<DateTime?> closedAt;
   final Value<double?> openingCashAtHand;
-  final Value<double?> closingCashAtHand;
+  final Value<double?> cashInHandWhileClosing;
   final Value<String?> note;
+  final Value<SpotstockUser?> user;
+  final Value<bool> isSynced;
   const LocalRegistersCompanion({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
-    this.isOpen = const Value.absent(),
+    this.closedAt = const Value.absent(),
     this.openingCashAtHand = const Value.absent(),
-    this.closingCashAtHand = const Value.absent(),
+    this.cashInHandWhileClosing = const Value.absent(),
     this.note = const Value.absent(),
+    this.user = const Value.absent(),
+    this.isSynced = const Value.absent(),
   });
   LocalRegistersCompanion.insert({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
-    this.isOpen = const Value.absent(),
+    this.closedAt = const Value.absent(),
     this.openingCashAtHand = const Value.absent(),
-    this.closingCashAtHand = const Value.absent(),
+    this.cashInHandWhileClosing = const Value.absent(),
     this.note = const Value.absent(),
+    this.user = const Value.absent(),
+    this.isSynced = const Value.absent(),
   });
   static Insertable<LocalRegister> custom({
     Expression<int>? id,
     Expression<DateTime>? createdAt,
-    Expression<bool>? isOpen,
+    Expression<DateTime>? closedAt,
     Expression<double>? openingCashAtHand,
-    Expression<double>? closingCashAtHand,
+    Expression<double>? cashInHandWhileClosing,
     Expression<String>? note,
+    Expression<String>? user,
+    Expression<bool>? isSynced,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (createdAt != null) 'created_at': createdAt,
-      if (isOpen != null) 'is_open': isOpen,
+      if (closedAt != null) 'closed_at': closedAt,
       if (openingCashAtHand != null) 'opening_cash_at_hand': openingCashAtHand,
-      if (closingCashAtHand != null) 'closing_cash_at_hand': closingCashAtHand,
+      if (cashInHandWhileClosing != null)
+        'cash_in_hand_while_closing': cashInHandWhileClosing,
       if (note != null) 'note': note,
+      if (user != null) 'user': user,
+      if (isSynced != null) 'is_synced': isSynced,
     });
   }
 
   LocalRegistersCompanion copyWith(
       {Value<int>? id,
       Value<DateTime?>? createdAt,
-      Value<bool>? isOpen,
+      Value<DateTime?>? closedAt,
       Value<double?>? openingCashAtHand,
-      Value<double?>? closingCashAtHand,
-      Value<String?>? note}) {
+      Value<double?>? cashInHandWhileClosing,
+      Value<String?>? note,
+      Value<SpotstockUser?>? user,
+      Value<bool>? isSynced}) {
     return LocalRegistersCompanion(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
-      isOpen: isOpen ?? this.isOpen,
+      closedAt: closedAt ?? this.closedAt,
       openingCashAtHand: openingCashAtHand ?? this.openingCashAtHand,
-      closingCashAtHand: closingCashAtHand ?? this.closingCashAtHand,
+      cashInHandWhileClosing:
+          cashInHandWhileClosing ?? this.cashInHandWhileClosing,
       note: note ?? this.note,
+      user: user ?? this.user,
+      isSynced: isSynced ?? this.isSynced,
     );
   }
 
@@ -3290,17 +3675,25 @@ class LocalRegistersCompanion extends UpdateCompanion<LocalRegister> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
-    if (isOpen.present) {
-      map['is_open'] = Variable<bool>(isOpen.value);
+    if (closedAt.present) {
+      map['closed_at'] = Variable<DateTime>(closedAt.value);
     }
     if (openingCashAtHand.present) {
       map['opening_cash_at_hand'] = Variable<double>(openingCashAtHand.value);
     }
-    if (closingCashAtHand.present) {
-      map['closing_cash_at_hand'] = Variable<double>(closingCashAtHand.value);
+    if (cashInHandWhileClosing.present) {
+      map['cash_in_hand_while_closing'] =
+          Variable<double>(cashInHandWhileClosing.value);
     }
     if (note.present) {
       map['note'] = Variable<String>(note.value);
+    }
+    if (user.present) {
+      map['user'] = Variable<String>(
+          $LocalRegistersTable.$converteruser.toSql(user.value));
+    }
+    if (isSynced.present) {
+      map['is_synced'] = Variable<bool>(isSynced.value);
     }
     return map;
   }
@@ -3310,10 +3703,12 @@ class LocalRegistersCompanion extends UpdateCompanion<LocalRegister> {
     return (StringBuffer('LocalRegistersCompanion(')
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
-          ..write('isOpen: $isOpen, ')
+          ..write('closedAt: $closedAt, ')
           ..write('openingCashAtHand: $openingCashAtHand, ')
-          ..write('closingCashAtHand: $closingCashAtHand, ')
-          ..write('note: $note')
+          ..write('cashInHandWhileClosing: $cashInHandWhileClosing, ')
+          ..write('note: $note, ')
+          ..write('user: $user, ')
+          ..write('isSynced: $isSynced')
           ..write(')'))
         .toString();
   }
@@ -3525,11 +3920,13 @@ class $LocalSalesTable extends LocalSales
   static const VerificationMeta _isOfflineMeta =
       const VerificationMeta('isOffline');
   @override
-  late final GeneratedColumn<int> isOffline = GeneratedColumn<int>(
+  late final GeneratedColumn<bool> isOffline = GeneratedColumn<bool>(
       'is_offline', aliasedName, false,
-      type: DriftSqlType.int,
+      type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultValue: const Constant(0));
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_offline" IN (0, 1))'),
+      defaultValue: const Constant(false));
   static const VerificationMeta _offlineCustomerNameMeta =
       const VerificationMeta('offlineCustomerName');
   @override
@@ -3923,7 +4320,7 @@ class $LocalSalesTable extends LocalSales
       barcodeUrl: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}barcode_url']),
       isOffline: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}is_offline'])!,
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_offline'])!,
       offlineCustomerName: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}offline_customer_name']),
       staffId: attachedDatabase.typeMapping
@@ -4003,7 +4400,7 @@ class LocalSale extends DataClass implements Insertable<LocalSale> {
   final List<String>? paymentMethods;
   final DateTime? createdAt;
   final String? barcodeUrl;
-  final int isOffline;
+  final bool isOffline;
   final String? offlineCustomerName;
   final int? staffId;
   final String? attendantName;
@@ -4164,7 +4561,7 @@ class LocalSale extends DataClass implements Insertable<LocalSale> {
     if (!nullToAbsent || barcodeUrl != null) {
       map['barcode_url'] = Variable<String>(barcodeUrl);
     }
-    map['is_offline'] = Variable<int>(isOffline);
+    map['is_offline'] = Variable<bool>(isOffline);
     if (!nullToAbsent || offlineCustomerName != null) {
       map['offline_customer_name'] = Variable<String>(offlineCustomerName);
     }
@@ -4358,7 +4755,7 @@ class LocalSale extends DataClass implements Insertable<LocalSale> {
           serializer.fromJson<List<String>?>(json['paymentMethods']),
       createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
       barcodeUrl: serializer.fromJson<String?>(json['barcodeUrl']),
-      isOffline: serializer.fromJson<int>(json['isOffline']),
+      isOffline: serializer.fromJson<bool>(json['isOffline']),
       offlineCustomerName:
           serializer.fromJson<String?>(json['offlineCustomerName']),
       staffId: serializer.fromJson<int?>(json['staffId']),
@@ -4413,7 +4810,7 @@ class LocalSale extends DataClass implements Insertable<LocalSale> {
       'paymentMethods': serializer.toJson<List<String>?>(paymentMethods),
       'createdAt': serializer.toJson<DateTime?>(createdAt),
       'barcodeUrl': serializer.toJson<String?>(barcodeUrl),
-      'isOffline': serializer.toJson<int>(isOffline),
+      'isOffline': serializer.toJson<bool>(isOffline),
       'offlineCustomerName': serializer.toJson<String?>(offlineCustomerName),
       'staffId': serializer.toJson<int?>(staffId),
       'attendantName': serializer.toJson<String?>(attendantName),
@@ -4461,7 +4858,7 @@ class LocalSale extends DataClass implements Insertable<LocalSale> {
           Value<List<String>?> paymentMethods = const Value.absent(),
           Value<DateTime?> createdAt = const Value.absent(),
           Value<String?> barcodeUrl = const Value.absent(),
-          int? isOffline,
+          bool? isOffline,
           Value<String?> offlineCustomerName = const Value.absent(),
           Value<int?> staffId = const Value.absent(),
           Value<String?> attendantName = const Value.absent(),
@@ -4804,7 +5201,7 @@ class LocalSalesCompanion extends UpdateCompanion<LocalSale> {
   final Value<List<String>?> paymentMethods;
   final Value<DateTime?> createdAt;
   final Value<String?> barcodeUrl;
-  final Value<int> isOffline;
+  final Value<bool> isOffline;
   final Value<String?> offlineCustomerName;
   final Value<int?> staffId;
   final Value<String?> attendantName;
@@ -4941,7 +5338,7 @@ class LocalSalesCompanion extends UpdateCompanion<LocalSale> {
     Expression<String>? paymentMethods,
     Expression<DateTime>? createdAt,
     Expression<String>? barcodeUrl,
-    Expression<int>? isOffline,
+    Expression<bool>? isOffline,
     Expression<String>? offlineCustomerName,
     Expression<int>? staffId,
     Expression<String>? attendantName,
@@ -5038,7 +5435,7 @@ class LocalSalesCompanion extends UpdateCompanion<LocalSale> {
       Value<List<String>?>? paymentMethods,
       Value<DateTime?>? createdAt,
       Value<String?>? barcodeUrl,
-      Value<int>? isOffline,
+      Value<bool>? isOffline,
       Value<String?>? offlineCustomerName,
       Value<int?>? staffId,
       Value<String?>? attendantName,
@@ -5206,7 +5603,7 @@ class LocalSalesCompanion extends UpdateCompanion<LocalSale> {
       map['barcode_url'] = Variable<String>(barcodeUrl.value);
     }
     if (isOffline.present) {
-      map['is_offline'] = Variable<int>(isOffline.value);
+      map['is_offline'] = Variable<bool>(isOffline.value);
     }
     if (offlineCustomerName.present) {
       map['offline_customer_name'] =
@@ -5297,6 +5694,1358 @@ class LocalSalesCompanion extends UpdateCompanion<LocalSale> {
   }
 }
 
+class $LocalHoldsTable extends LocalHolds
+    with TableInfo<$LocalHoldsTable, LocalHold> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalHoldsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
+  @override
+  late final GeneratedColumn<int> remoteId = GeneratedColumn<int>(
+      'remote_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+      'type', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, dynamic>?, String>
+      links = GeneratedColumn<String>('links', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<Map<String, dynamic>?>(
+              $LocalHoldsTable.$converterlinks);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+      'date', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+      'user_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  @override
+  late final GeneratedColumnWithTypeConverter<HoldAttendant?, String>
+      attendant = GeneratedColumn<String>('attendant', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<HoldAttendant?>($LocalHoldsTable.$converterattendant);
+  static const VerificationMeta _customerIdMeta =
+      const VerificationMeta('customerId');
+  @override
+  late final GeneratedColumn<int> customerId = GeneratedColumn<int>(
+      'customer_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _customerNameMeta =
+      const VerificationMeta('customerName');
+  @override
+  late final GeneratedColumn<String> customerName = GeneratedColumn<String>(
+      'customer_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _staffIdMeta =
+      const VerificationMeta('staffId');
+  @override
+  late final GeneratedColumn<int> staffId = GeneratedColumn<int>(
+      'staff_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _staffNameMeta =
+      const VerificationMeta('staffName');
+  @override
+  late final GeneratedColumn<String> staffName = GeneratedColumn<String>(
+      'staff_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _warehouseIdMeta =
+      const VerificationMeta('warehouseId');
+  @override
+  late final GeneratedColumn<int> warehouseId = GeneratedColumn<int>(
+      'warehouse_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _warehouseNameMeta =
+      const VerificationMeta('warehouseName');
+  @override
+  late final GeneratedColumn<String> warehouseName = GeneratedColumn<String>(
+      'warehouse_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _taxRateMeta =
+      const VerificationMeta('taxRate');
+  @override
+  late final GeneratedColumn<double> taxRate = GeneratedColumn<double>(
+      'tax_rate', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _taxAmountMeta =
+      const VerificationMeta('taxAmount');
+  @override
+  late final GeneratedColumn<double> taxAmount = GeneratedColumn<double>(
+      'tax_amount', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _discountMeta =
+      const VerificationMeta('discount');
+  @override
+  late final GeneratedColumn<double> discount = GeneratedColumn<double>(
+      'discount', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _shippingMeta =
+      const VerificationMeta('shipping');
+  @override
+  late final GeneratedColumn<double> shipping = GeneratedColumn<double>(
+      'shipping', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _grandTotalMeta =
+      const VerificationMeta('grandTotal');
+  @override
+  late final GeneratedColumn<double> grandTotal = GeneratedColumn<double>(
+      'grand_total', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _receivedAmountMeta =
+      const VerificationMeta('receivedAmount');
+  @override
+  late final GeneratedColumn<double> receivedAmount = GeneratedColumn<double>(
+      'received_amount', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _paidAmountMeta =
+      const VerificationMeta('paidAmount');
+  @override
+  late final GeneratedColumn<double> paidAmount = GeneratedColumn<double>(
+      'paid_amount', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _referenceCodeMeta =
+      const VerificationMeta('referenceCode');
+  @override
+  late final GeneratedColumn<String> referenceCode = GeneratedColumn<String>(
+      'reference_code', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+      'note', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _tableIdMeta =
+      const VerificationMeta('tableId');
+  @override
+  late final GeneratedColumn<String> tableId = GeneratedColumn<String>(
+      'table_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _holdTableNameMeta =
+      const VerificationMeta('holdTableName');
+  @override
+  late final GeneratedColumn<String> holdTableName = GeneratedColumn<String>(
+      'hold_table_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<HoldItem>?, String>
+      holdItems = GeneratedColumn<String>('hold_items', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<List<HoldItem>?>($LocalHoldsTable.$converterholdItems);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _isSyncedMeta =
+      const VerificationMeta('isSynced');
+  @override
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
+      'is_synced', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_synced" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _lastSyncedAtMeta =
+      const VerificationMeta('lastSyncedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastSyncedAt = GeneratedColumn<DateTime>(
+      'last_synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdLocallyAtMeta =
+      const VerificationMeta('createdLocallyAt');
+  @override
+  late final GeneratedColumn<DateTime> createdLocallyAt =
+      GeneratedColumn<DateTime>('created_locally_at', aliasedName, true,
+          type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        remoteId,
+        type,
+        links,
+        date,
+        userId,
+        attendant,
+        customerId,
+        customerName,
+        staffId,
+        staffName,
+        warehouseId,
+        warehouseName,
+        taxRate,
+        taxAmount,
+        discount,
+        shipping,
+        grandTotal,
+        receivedAmount,
+        paidAmount,
+        referenceCode,
+        note,
+        status,
+        tableId,
+        holdTableName,
+        holdItems,
+        createdAt,
+        isSynced,
+        lastSyncedAt,
+        createdLocallyAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_holds';
+  @override
+  VerificationContext validateIntegrity(Insertable<LocalHold> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+          _typeMeta, type.isAcceptableOrUnknown(data['type']!, _typeMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    }
+    if (data.containsKey('customer_id')) {
+      context.handle(
+          _customerIdMeta,
+          customerId.isAcceptableOrUnknown(
+              data['customer_id']!, _customerIdMeta));
+    }
+    if (data.containsKey('customer_name')) {
+      context.handle(
+          _customerNameMeta,
+          customerName.isAcceptableOrUnknown(
+              data['customer_name']!, _customerNameMeta));
+    }
+    if (data.containsKey('staff_id')) {
+      context.handle(_staffIdMeta,
+          staffId.isAcceptableOrUnknown(data['staff_id']!, _staffIdMeta));
+    }
+    if (data.containsKey('staff_name')) {
+      context.handle(_staffNameMeta,
+          staffName.isAcceptableOrUnknown(data['staff_name']!, _staffNameMeta));
+    }
+    if (data.containsKey('warehouse_id')) {
+      context.handle(
+          _warehouseIdMeta,
+          warehouseId.isAcceptableOrUnknown(
+              data['warehouse_id']!, _warehouseIdMeta));
+    }
+    if (data.containsKey('warehouse_name')) {
+      context.handle(
+          _warehouseNameMeta,
+          warehouseName.isAcceptableOrUnknown(
+              data['warehouse_name']!, _warehouseNameMeta));
+    }
+    if (data.containsKey('tax_rate')) {
+      context.handle(_taxRateMeta,
+          taxRate.isAcceptableOrUnknown(data['tax_rate']!, _taxRateMeta));
+    }
+    if (data.containsKey('tax_amount')) {
+      context.handle(_taxAmountMeta,
+          taxAmount.isAcceptableOrUnknown(data['tax_amount']!, _taxAmountMeta));
+    }
+    if (data.containsKey('discount')) {
+      context.handle(_discountMeta,
+          discount.isAcceptableOrUnknown(data['discount']!, _discountMeta));
+    }
+    if (data.containsKey('shipping')) {
+      context.handle(_shippingMeta,
+          shipping.isAcceptableOrUnknown(data['shipping']!, _shippingMeta));
+    }
+    if (data.containsKey('grand_total')) {
+      context.handle(
+          _grandTotalMeta,
+          grandTotal.isAcceptableOrUnknown(
+              data['grand_total']!, _grandTotalMeta));
+    }
+    if (data.containsKey('received_amount')) {
+      context.handle(
+          _receivedAmountMeta,
+          receivedAmount.isAcceptableOrUnknown(
+              data['received_amount']!, _receivedAmountMeta));
+    }
+    if (data.containsKey('paid_amount')) {
+      context.handle(
+          _paidAmountMeta,
+          paidAmount.isAcceptableOrUnknown(
+              data['paid_amount']!, _paidAmountMeta));
+    }
+    if (data.containsKey('reference_code')) {
+      context.handle(
+          _referenceCodeMeta,
+          referenceCode.isAcceptableOrUnknown(
+              data['reference_code']!, _referenceCodeMeta));
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+          _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
+    if (data.containsKey('table_id')) {
+      context.handle(_tableIdMeta,
+          tableId.isAcceptableOrUnknown(data['table_id']!, _tableIdMeta));
+    }
+    if (data.containsKey('hold_table_name')) {
+      context.handle(
+          _holdTableNameMeta,
+          holdTableName.isAcceptableOrUnknown(
+              data['hold_table_name']!, _holdTableNameMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('is_synced')) {
+      context.handle(_isSyncedMeta,
+          isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta));
+    }
+    if (data.containsKey('last_synced_at')) {
+      context.handle(
+          _lastSyncedAtMeta,
+          lastSyncedAt.isAcceptableOrUnknown(
+              data['last_synced_at']!, _lastSyncedAtMeta));
+    }
+    if (data.containsKey('created_locally_at')) {
+      context.handle(
+          _createdLocallyAtMeta,
+          createdLocallyAt.isAcceptableOrUnknown(
+              data['created_locally_at']!, _createdLocallyAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalHold map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalHold(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}remote_id']),
+      type: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type']),
+      links: $LocalHoldsTable.$converterlinks.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}links'])),
+      date: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date']),
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}user_id']),
+      attendant: $LocalHoldsTable.$converterattendant.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}attendant'])),
+      customerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}customer_id']),
+      customerName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}customer_name']),
+      staffId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}staff_id']),
+      staffName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}staff_name']),
+      warehouseId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}warehouse_id']),
+      warehouseName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}warehouse_name']),
+      taxRate: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}tax_rate']),
+      taxAmount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}tax_amount']),
+      discount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}discount']),
+      shipping: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}shipping']),
+      grandTotal: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}grand_total']),
+      receivedAmount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}received_amount']),
+      paidAmount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}paid_amount']),
+      referenceCode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}reference_code']),
+      note: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}note']),
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status']),
+      tableId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}table_id']),
+      holdTableName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}hold_table_name']),
+      holdItems: $LocalHoldsTable.$converterholdItems.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}hold_items'])),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at']),
+      isSynced: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_synced'])!,
+      lastSyncedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_synced_at']),
+      createdLocallyAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}created_locally_at']),
+    );
+  }
+
+  @override
+  $LocalHoldsTable createAlias(String alias) {
+    return $LocalHoldsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Map<String, dynamic>?, String?> $converterlinks =
+      NullAwareTypeConverter.wrap(const MapStringDynamicConverter());
+  static TypeConverter<HoldAttendant?, String?> $converterattendant =
+      NullAwareTypeConverter.wrap(const HoldAttendantConverter());
+  static TypeConverter<List<HoldItem>?, String?> $converterholdItems =
+      NullAwareTypeConverter.wrap(const HoldItemListConverter());
+}
+
+class LocalHold extends DataClass implements Insertable<LocalHold> {
+  final int id;
+  final int? remoteId;
+  final String? type;
+  final Map<String, dynamic>? links;
+  final DateTime? date;
+  final int? userId;
+  final HoldAttendant? attendant;
+  final int? customerId;
+  final String? customerName;
+  final int? staffId;
+  final String? staffName;
+  final int? warehouseId;
+  final String? warehouseName;
+  final double? taxRate;
+  final double? taxAmount;
+  final double? discount;
+  final double? shipping;
+  final double? grandTotal;
+  final double? receivedAmount;
+  final double? paidAmount;
+  final String? referenceCode;
+  final String? note;
+  final String? status;
+  final String? tableId;
+  final String? holdTableName;
+  final List<HoldItem>? holdItems;
+  final DateTime? createdAt;
+  final bool isSynced;
+  final DateTime? lastSyncedAt;
+  final DateTime? createdLocallyAt;
+  const LocalHold(
+      {required this.id,
+      this.remoteId,
+      this.type,
+      this.links,
+      this.date,
+      this.userId,
+      this.attendant,
+      this.customerId,
+      this.customerName,
+      this.staffId,
+      this.staffName,
+      this.warehouseId,
+      this.warehouseName,
+      this.taxRate,
+      this.taxAmount,
+      this.discount,
+      this.shipping,
+      this.grandTotal,
+      this.receivedAmount,
+      this.paidAmount,
+      this.referenceCode,
+      this.note,
+      this.status,
+      this.tableId,
+      this.holdTableName,
+      this.holdItems,
+      this.createdAt,
+      required this.isSynced,
+      this.lastSyncedAt,
+      this.createdLocallyAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<int>(remoteId);
+    }
+    if (!nullToAbsent || type != null) {
+      map['type'] = Variable<String>(type);
+    }
+    if (!nullToAbsent || links != null) {
+      map['links'] =
+          Variable<String>($LocalHoldsTable.$converterlinks.toSql(links));
+    }
+    if (!nullToAbsent || date != null) {
+      map['date'] = Variable<DateTime>(date);
+    }
+    if (!nullToAbsent || userId != null) {
+      map['user_id'] = Variable<int>(userId);
+    }
+    if (!nullToAbsent || attendant != null) {
+      map['attendant'] = Variable<String>(
+          $LocalHoldsTable.$converterattendant.toSql(attendant));
+    }
+    if (!nullToAbsent || customerId != null) {
+      map['customer_id'] = Variable<int>(customerId);
+    }
+    if (!nullToAbsent || customerName != null) {
+      map['customer_name'] = Variable<String>(customerName);
+    }
+    if (!nullToAbsent || staffId != null) {
+      map['staff_id'] = Variable<int>(staffId);
+    }
+    if (!nullToAbsent || staffName != null) {
+      map['staff_name'] = Variable<String>(staffName);
+    }
+    if (!nullToAbsent || warehouseId != null) {
+      map['warehouse_id'] = Variable<int>(warehouseId);
+    }
+    if (!nullToAbsent || warehouseName != null) {
+      map['warehouse_name'] = Variable<String>(warehouseName);
+    }
+    if (!nullToAbsent || taxRate != null) {
+      map['tax_rate'] = Variable<double>(taxRate);
+    }
+    if (!nullToAbsent || taxAmount != null) {
+      map['tax_amount'] = Variable<double>(taxAmount);
+    }
+    if (!nullToAbsent || discount != null) {
+      map['discount'] = Variable<double>(discount);
+    }
+    if (!nullToAbsent || shipping != null) {
+      map['shipping'] = Variable<double>(shipping);
+    }
+    if (!nullToAbsent || grandTotal != null) {
+      map['grand_total'] = Variable<double>(grandTotal);
+    }
+    if (!nullToAbsent || receivedAmount != null) {
+      map['received_amount'] = Variable<double>(receivedAmount);
+    }
+    if (!nullToAbsent || paidAmount != null) {
+      map['paid_amount'] = Variable<double>(paidAmount);
+    }
+    if (!nullToAbsent || referenceCode != null) {
+      map['reference_code'] = Variable<String>(referenceCode);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    if (!nullToAbsent || status != null) {
+      map['status'] = Variable<String>(status);
+    }
+    if (!nullToAbsent || tableId != null) {
+      map['table_id'] = Variable<String>(tableId);
+    }
+    if (!nullToAbsent || holdTableName != null) {
+      map['hold_table_name'] = Variable<String>(holdTableName);
+    }
+    if (!nullToAbsent || holdItems != null) {
+      map['hold_items'] = Variable<String>(
+          $LocalHoldsTable.$converterholdItems.toSql(holdItems));
+    }
+    if (!nullToAbsent || createdAt != null) {
+      map['created_at'] = Variable<DateTime>(createdAt);
+    }
+    map['is_synced'] = Variable<bool>(isSynced);
+    if (!nullToAbsent || lastSyncedAt != null) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt);
+    }
+    if (!nullToAbsent || createdLocallyAt != null) {
+      map['created_locally_at'] = Variable<DateTime>(createdLocallyAt);
+    }
+    return map;
+  }
+
+  LocalHoldsCompanion toCompanion(bool nullToAbsent) {
+    return LocalHoldsCompanion(
+      id: Value(id),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      type: type == null && nullToAbsent ? const Value.absent() : Value(type),
+      links:
+          links == null && nullToAbsent ? const Value.absent() : Value(links),
+      date: date == null && nullToAbsent ? const Value.absent() : Value(date),
+      userId:
+          userId == null && nullToAbsent ? const Value.absent() : Value(userId),
+      attendant: attendant == null && nullToAbsent
+          ? const Value.absent()
+          : Value(attendant),
+      customerId: customerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customerId),
+      customerName: customerName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customerName),
+      staffId: staffId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(staffId),
+      staffName: staffName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(staffName),
+      warehouseId: warehouseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(warehouseId),
+      warehouseName: warehouseName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(warehouseName),
+      taxRate: taxRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taxRate),
+      taxAmount: taxAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taxAmount),
+      discount: discount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(discount),
+      shipping: shipping == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shipping),
+      grandTotal: grandTotal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(grandTotal),
+      receivedAmount: receivedAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(receivedAmount),
+      paidAmount: paidAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paidAmount),
+      referenceCode: referenceCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(referenceCode),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      status:
+          status == null && nullToAbsent ? const Value.absent() : Value(status),
+      tableId: tableId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tableId),
+      holdTableName: holdTableName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(holdTableName),
+      holdItems: holdItems == null && nullToAbsent
+          ? const Value.absent()
+          : Value(holdItems),
+      createdAt: createdAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdAt),
+      isSynced: Value(isSynced),
+      lastSyncedAt: lastSyncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSyncedAt),
+      createdLocallyAt: createdLocallyAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdLocallyAt),
+    );
+  }
+
+  factory LocalHold.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalHold(
+      id: serializer.fromJson<int>(json['id']),
+      remoteId: serializer.fromJson<int?>(json['remoteId']),
+      type: serializer.fromJson<String?>(json['type']),
+      links: serializer.fromJson<Map<String, dynamic>?>(json['links']),
+      date: serializer.fromJson<DateTime?>(json['date']),
+      userId: serializer.fromJson<int?>(json['userId']),
+      attendant: serializer.fromJson<HoldAttendant?>(json['attendant']),
+      customerId: serializer.fromJson<int?>(json['customerId']),
+      customerName: serializer.fromJson<String?>(json['customerName']),
+      staffId: serializer.fromJson<int?>(json['staffId']),
+      staffName: serializer.fromJson<String?>(json['staffName']),
+      warehouseId: serializer.fromJson<int?>(json['warehouseId']),
+      warehouseName: serializer.fromJson<String?>(json['warehouseName']),
+      taxRate: serializer.fromJson<double?>(json['taxRate']),
+      taxAmount: serializer.fromJson<double?>(json['taxAmount']),
+      discount: serializer.fromJson<double?>(json['discount']),
+      shipping: serializer.fromJson<double?>(json['shipping']),
+      grandTotal: serializer.fromJson<double?>(json['grandTotal']),
+      receivedAmount: serializer.fromJson<double?>(json['receivedAmount']),
+      paidAmount: serializer.fromJson<double?>(json['paidAmount']),
+      referenceCode: serializer.fromJson<String?>(json['referenceCode']),
+      note: serializer.fromJson<String?>(json['note']),
+      status: serializer.fromJson<String?>(json['status']),
+      tableId: serializer.fromJson<String?>(json['tableId']),
+      holdTableName: serializer.fromJson<String?>(json['holdTableName']),
+      holdItems: serializer.fromJson<List<HoldItem>?>(json['holdItems']),
+      createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
+      isSynced: serializer.fromJson<bool>(json['isSynced']),
+      lastSyncedAt: serializer.fromJson<DateTime?>(json['lastSyncedAt']),
+      createdLocallyAt:
+          serializer.fromJson<DateTime?>(json['createdLocallyAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'remoteId': serializer.toJson<int?>(remoteId),
+      'type': serializer.toJson<String?>(type),
+      'links': serializer.toJson<Map<String, dynamic>?>(links),
+      'date': serializer.toJson<DateTime?>(date),
+      'userId': serializer.toJson<int?>(userId),
+      'attendant': serializer.toJson<HoldAttendant?>(attendant),
+      'customerId': serializer.toJson<int?>(customerId),
+      'customerName': serializer.toJson<String?>(customerName),
+      'staffId': serializer.toJson<int?>(staffId),
+      'staffName': serializer.toJson<String?>(staffName),
+      'warehouseId': serializer.toJson<int?>(warehouseId),
+      'warehouseName': serializer.toJson<String?>(warehouseName),
+      'taxRate': serializer.toJson<double?>(taxRate),
+      'taxAmount': serializer.toJson<double?>(taxAmount),
+      'discount': serializer.toJson<double?>(discount),
+      'shipping': serializer.toJson<double?>(shipping),
+      'grandTotal': serializer.toJson<double?>(grandTotal),
+      'receivedAmount': serializer.toJson<double?>(receivedAmount),
+      'paidAmount': serializer.toJson<double?>(paidAmount),
+      'referenceCode': serializer.toJson<String?>(referenceCode),
+      'note': serializer.toJson<String?>(note),
+      'status': serializer.toJson<String?>(status),
+      'tableId': serializer.toJson<String?>(tableId),
+      'holdTableName': serializer.toJson<String?>(holdTableName),
+      'holdItems': serializer.toJson<List<HoldItem>?>(holdItems),
+      'createdAt': serializer.toJson<DateTime?>(createdAt),
+      'isSynced': serializer.toJson<bool>(isSynced),
+      'lastSyncedAt': serializer.toJson<DateTime?>(lastSyncedAt),
+      'createdLocallyAt': serializer.toJson<DateTime?>(createdLocallyAt),
+    };
+  }
+
+  LocalHold copyWith(
+          {int? id,
+          Value<int?> remoteId = const Value.absent(),
+          Value<String?> type = const Value.absent(),
+          Value<Map<String, dynamic>?> links = const Value.absent(),
+          Value<DateTime?> date = const Value.absent(),
+          Value<int?> userId = const Value.absent(),
+          Value<HoldAttendant?> attendant = const Value.absent(),
+          Value<int?> customerId = const Value.absent(),
+          Value<String?> customerName = const Value.absent(),
+          Value<int?> staffId = const Value.absent(),
+          Value<String?> staffName = const Value.absent(),
+          Value<int?> warehouseId = const Value.absent(),
+          Value<String?> warehouseName = const Value.absent(),
+          Value<double?> taxRate = const Value.absent(),
+          Value<double?> taxAmount = const Value.absent(),
+          Value<double?> discount = const Value.absent(),
+          Value<double?> shipping = const Value.absent(),
+          Value<double?> grandTotal = const Value.absent(),
+          Value<double?> receivedAmount = const Value.absent(),
+          Value<double?> paidAmount = const Value.absent(),
+          Value<String?> referenceCode = const Value.absent(),
+          Value<String?> note = const Value.absent(),
+          Value<String?> status = const Value.absent(),
+          Value<String?> tableId = const Value.absent(),
+          Value<String?> holdTableName = const Value.absent(),
+          Value<List<HoldItem>?> holdItems = const Value.absent(),
+          Value<DateTime?> createdAt = const Value.absent(),
+          bool? isSynced,
+          Value<DateTime?> lastSyncedAt = const Value.absent(),
+          Value<DateTime?> createdLocallyAt = const Value.absent()}) =>
+      LocalHold(
+        id: id ?? this.id,
+        remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        type: type.present ? type.value : this.type,
+        links: links.present ? links.value : this.links,
+        date: date.present ? date.value : this.date,
+        userId: userId.present ? userId.value : this.userId,
+        attendant: attendant.present ? attendant.value : this.attendant,
+        customerId: customerId.present ? customerId.value : this.customerId,
+        customerName:
+            customerName.present ? customerName.value : this.customerName,
+        staffId: staffId.present ? staffId.value : this.staffId,
+        staffName: staffName.present ? staffName.value : this.staffName,
+        warehouseId: warehouseId.present ? warehouseId.value : this.warehouseId,
+        warehouseName:
+            warehouseName.present ? warehouseName.value : this.warehouseName,
+        taxRate: taxRate.present ? taxRate.value : this.taxRate,
+        taxAmount: taxAmount.present ? taxAmount.value : this.taxAmount,
+        discount: discount.present ? discount.value : this.discount,
+        shipping: shipping.present ? shipping.value : this.shipping,
+        grandTotal: grandTotal.present ? grandTotal.value : this.grandTotal,
+        receivedAmount:
+            receivedAmount.present ? receivedAmount.value : this.receivedAmount,
+        paidAmount: paidAmount.present ? paidAmount.value : this.paidAmount,
+        referenceCode:
+            referenceCode.present ? referenceCode.value : this.referenceCode,
+        note: note.present ? note.value : this.note,
+        status: status.present ? status.value : this.status,
+        tableId: tableId.present ? tableId.value : this.tableId,
+        holdTableName:
+            holdTableName.present ? holdTableName.value : this.holdTableName,
+        holdItems: holdItems.present ? holdItems.value : this.holdItems,
+        createdAt: createdAt.present ? createdAt.value : this.createdAt,
+        isSynced: isSynced ?? this.isSynced,
+        lastSyncedAt:
+            lastSyncedAt.present ? lastSyncedAt.value : this.lastSyncedAt,
+        createdLocallyAt: createdLocallyAt.present
+            ? createdLocallyAt.value
+            : this.createdLocallyAt,
+      );
+  LocalHold copyWithCompanion(LocalHoldsCompanion data) {
+    return LocalHold(
+      id: data.id.present ? data.id.value : this.id,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      type: data.type.present ? data.type.value : this.type,
+      links: data.links.present ? data.links.value : this.links,
+      date: data.date.present ? data.date.value : this.date,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      attendant: data.attendant.present ? data.attendant.value : this.attendant,
+      customerId:
+          data.customerId.present ? data.customerId.value : this.customerId,
+      customerName: data.customerName.present
+          ? data.customerName.value
+          : this.customerName,
+      staffId: data.staffId.present ? data.staffId.value : this.staffId,
+      staffName: data.staffName.present ? data.staffName.value : this.staffName,
+      warehouseId:
+          data.warehouseId.present ? data.warehouseId.value : this.warehouseId,
+      warehouseName: data.warehouseName.present
+          ? data.warehouseName.value
+          : this.warehouseName,
+      taxRate: data.taxRate.present ? data.taxRate.value : this.taxRate,
+      taxAmount: data.taxAmount.present ? data.taxAmount.value : this.taxAmount,
+      discount: data.discount.present ? data.discount.value : this.discount,
+      shipping: data.shipping.present ? data.shipping.value : this.shipping,
+      grandTotal:
+          data.grandTotal.present ? data.grandTotal.value : this.grandTotal,
+      receivedAmount: data.receivedAmount.present
+          ? data.receivedAmount.value
+          : this.receivedAmount,
+      paidAmount:
+          data.paidAmount.present ? data.paidAmount.value : this.paidAmount,
+      referenceCode: data.referenceCode.present
+          ? data.referenceCode.value
+          : this.referenceCode,
+      note: data.note.present ? data.note.value : this.note,
+      status: data.status.present ? data.status.value : this.status,
+      tableId: data.tableId.present ? data.tableId.value : this.tableId,
+      holdTableName: data.holdTableName.present
+          ? data.holdTableName.value
+          : this.holdTableName,
+      holdItems: data.holdItems.present ? data.holdItems.value : this.holdItems,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
+      lastSyncedAt: data.lastSyncedAt.present
+          ? data.lastSyncedAt.value
+          : this.lastSyncedAt,
+      createdLocallyAt: data.createdLocallyAt.present
+          ? data.createdLocallyAt.value
+          : this.createdLocallyAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalHold(')
+          ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('type: $type, ')
+          ..write('links: $links, ')
+          ..write('date: $date, ')
+          ..write('userId: $userId, ')
+          ..write('attendant: $attendant, ')
+          ..write('customerId: $customerId, ')
+          ..write('customerName: $customerName, ')
+          ..write('staffId: $staffId, ')
+          ..write('staffName: $staffName, ')
+          ..write('warehouseId: $warehouseId, ')
+          ..write('warehouseName: $warehouseName, ')
+          ..write('taxRate: $taxRate, ')
+          ..write('taxAmount: $taxAmount, ')
+          ..write('discount: $discount, ')
+          ..write('shipping: $shipping, ')
+          ..write('grandTotal: $grandTotal, ')
+          ..write('receivedAmount: $receivedAmount, ')
+          ..write('paidAmount: $paidAmount, ')
+          ..write('referenceCode: $referenceCode, ')
+          ..write('note: $note, ')
+          ..write('status: $status, ')
+          ..write('tableId: $tableId, ')
+          ..write('holdTableName: $holdTableName, ')
+          ..write('holdItems: $holdItems, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('isSynced: $isSynced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('createdLocallyAt: $createdLocallyAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+        id,
+        remoteId,
+        type,
+        links,
+        date,
+        userId,
+        attendant,
+        customerId,
+        customerName,
+        staffId,
+        staffName,
+        warehouseId,
+        warehouseName,
+        taxRate,
+        taxAmount,
+        discount,
+        shipping,
+        grandTotal,
+        receivedAmount,
+        paidAmount,
+        referenceCode,
+        note,
+        status,
+        tableId,
+        holdTableName,
+        holdItems,
+        createdAt,
+        isSynced,
+        lastSyncedAt,
+        createdLocallyAt
+      ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalHold &&
+          other.id == this.id &&
+          other.remoteId == this.remoteId &&
+          other.type == this.type &&
+          other.links == this.links &&
+          other.date == this.date &&
+          other.userId == this.userId &&
+          other.attendant == this.attendant &&
+          other.customerId == this.customerId &&
+          other.customerName == this.customerName &&
+          other.staffId == this.staffId &&
+          other.staffName == this.staffName &&
+          other.warehouseId == this.warehouseId &&
+          other.warehouseName == this.warehouseName &&
+          other.taxRate == this.taxRate &&
+          other.taxAmount == this.taxAmount &&
+          other.discount == this.discount &&
+          other.shipping == this.shipping &&
+          other.grandTotal == this.grandTotal &&
+          other.receivedAmount == this.receivedAmount &&
+          other.paidAmount == this.paidAmount &&
+          other.referenceCode == this.referenceCode &&
+          other.note == this.note &&
+          other.status == this.status &&
+          other.tableId == this.tableId &&
+          other.holdTableName == this.holdTableName &&
+          other.holdItems == this.holdItems &&
+          other.createdAt == this.createdAt &&
+          other.isSynced == this.isSynced &&
+          other.lastSyncedAt == this.lastSyncedAt &&
+          other.createdLocallyAt == this.createdLocallyAt);
+}
+
+class LocalHoldsCompanion extends UpdateCompanion<LocalHold> {
+  final Value<int> id;
+  final Value<int?> remoteId;
+  final Value<String?> type;
+  final Value<Map<String, dynamic>?> links;
+  final Value<DateTime?> date;
+  final Value<int?> userId;
+  final Value<HoldAttendant?> attendant;
+  final Value<int?> customerId;
+  final Value<String?> customerName;
+  final Value<int?> staffId;
+  final Value<String?> staffName;
+  final Value<int?> warehouseId;
+  final Value<String?> warehouseName;
+  final Value<double?> taxRate;
+  final Value<double?> taxAmount;
+  final Value<double?> discount;
+  final Value<double?> shipping;
+  final Value<double?> grandTotal;
+  final Value<double?> receivedAmount;
+  final Value<double?> paidAmount;
+  final Value<String?> referenceCode;
+  final Value<String?> note;
+  final Value<String?> status;
+  final Value<String?> tableId;
+  final Value<String?> holdTableName;
+  final Value<List<HoldItem>?> holdItems;
+  final Value<DateTime?> createdAt;
+  final Value<bool> isSynced;
+  final Value<DateTime?> lastSyncedAt;
+  final Value<DateTime?> createdLocallyAt;
+  const LocalHoldsCompanion({
+    this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.links = const Value.absent(),
+    this.date = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.attendant = const Value.absent(),
+    this.customerId = const Value.absent(),
+    this.customerName = const Value.absent(),
+    this.staffId = const Value.absent(),
+    this.staffName = const Value.absent(),
+    this.warehouseId = const Value.absent(),
+    this.warehouseName = const Value.absent(),
+    this.taxRate = const Value.absent(),
+    this.taxAmount = const Value.absent(),
+    this.discount = const Value.absent(),
+    this.shipping = const Value.absent(),
+    this.grandTotal = const Value.absent(),
+    this.receivedAmount = const Value.absent(),
+    this.paidAmount = const Value.absent(),
+    this.referenceCode = const Value.absent(),
+    this.note = const Value.absent(),
+    this.status = const Value.absent(),
+    this.tableId = const Value.absent(),
+    this.holdTableName = const Value.absent(),
+    this.holdItems = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.isSynced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.createdLocallyAt = const Value.absent(),
+  });
+  LocalHoldsCompanion.insert({
+    this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.links = const Value.absent(),
+    this.date = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.attendant = const Value.absent(),
+    this.customerId = const Value.absent(),
+    this.customerName = const Value.absent(),
+    this.staffId = const Value.absent(),
+    this.staffName = const Value.absent(),
+    this.warehouseId = const Value.absent(),
+    this.warehouseName = const Value.absent(),
+    this.taxRate = const Value.absent(),
+    this.taxAmount = const Value.absent(),
+    this.discount = const Value.absent(),
+    this.shipping = const Value.absent(),
+    this.grandTotal = const Value.absent(),
+    this.receivedAmount = const Value.absent(),
+    this.paidAmount = const Value.absent(),
+    this.referenceCode = const Value.absent(),
+    this.note = const Value.absent(),
+    this.status = const Value.absent(),
+    this.tableId = const Value.absent(),
+    this.holdTableName = const Value.absent(),
+    this.holdItems = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.isSynced = const Value.absent(),
+    this.lastSyncedAt = const Value.absent(),
+    this.createdLocallyAt = const Value.absent(),
+  });
+  static Insertable<LocalHold> custom({
+    Expression<int>? id,
+    Expression<int>? remoteId,
+    Expression<String>? type,
+    Expression<String>? links,
+    Expression<DateTime>? date,
+    Expression<int>? userId,
+    Expression<String>? attendant,
+    Expression<int>? customerId,
+    Expression<String>? customerName,
+    Expression<int>? staffId,
+    Expression<String>? staffName,
+    Expression<int>? warehouseId,
+    Expression<String>? warehouseName,
+    Expression<double>? taxRate,
+    Expression<double>? taxAmount,
+    Expression<double>? discount,
+    Expression<double>? shipping,
+    Expression<double>? grandTotal,
+    Expression<double>? receivedAmount,
+    Expression<double>? paidAmount,
+    Expression<String>? referenceCode,
+    Expression<String>? note,
+    Expression<String>? status,
+    Expression<String>? tableId,
+    Expression<String>? holdTableName,
+    Expression<String>? holdItems,
+    Expression<DateTime>? createdAt,
+    Expression<bool>? isSynced,
+    Expression<DateTime>? lastSyncedAt,
+    Expression<DateTime>? createdLocallyAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (type != null) 'type': type,
+      if (links != null) 'links': links,
+      if (date != null) 'date': date,
+      if (userId != null) 'user_id': userId,
+      if (attendant != null) 'attendant': attendant,
+      if (customerId != null) 'customer_id': customerId,
+      if (customerName != null) 'customer_name': customerName,
+      if (staffId != null) 'staff_id': staffId,
+      if (staffName != null) 'staff_name': staffName,
+      if (warehouseId != null) 'warehouse_id': warehouseId,
+      if (warehouseName != null) 'warehouse_name': warehouseName,
+      if (taxRate != null) 'tax_rate': taxRate,
+      if (taxAmount != null) 'tax_amount': taxAmount,
+      if (discount != null) 'discount': discount,
+      if (shipping != null) 'shipping': shipping,
+      if (grandTotal != null) 'grand_total': grandTotal,
+      if (receivedAmount != null) 'received_amount': receivedAmount,
+      if (paidAmount != null) 'paid_amount': paidAmount,
+      if (referenceCode != null) 'reference_code': referenceCode,
+      if (note != null) 'note': note,
+      if (status != null) 'status': status,
+      if (tableId != null) 'table_id': tableId,
+      if (holdTableName != null) 'hold_table_name': holdTableName,
+      if (holdItems != null) 'hold_items': holdItems,
+      if (createdAt != null) 'created_at': createdAt,
+      if (isSynced != null) 'is_synced': isSynced,
+      if (lastSyncedAt != null) 'last_synced_at': lastSyncedAt,
+      if (createdLocallyAt != null) 'created_locally_at': createdLocallyAt,
+    });
+  }
+
+  LocalHoldsCompanion copyWith(
+      {Value<int>? id,
+      Value<int?>? remoteId,
+      Value<String?>? type,
+      Value<Map<String, dynamic>?>? links,
+      Value<DateTime?>? date,
+      Value<int?>? userId,
+      Value<HoldAttendant?>? attendant,
+      Value<int?>? customerId,
+      Value<String?>? customerName,
+      Value<int?>? staffId,
+      Value<String?>? staffName,
+      Value<int?>? warehouseId,
+      Value<String?>? warehouseName,
+      Value<double?>? taxRate,
+      Value<double?>? taxAmount,
+      Value<double?>? discount,
+      Value<double?>? shipping,
+      Value<double?>? grandTotal,
+      Value<double?>? receivedAmount,
+      Value<double?>? paidAmount,
+      Value<String?>? referenceCode,
+      Value<String?>? note,
+      Value<String?>? status,
+      Value<String?>? tableId,
+      Value<String?>? holdTableName,
+      Value<List<HoldItem>?>? holdItems,
+      Value<DateTime?>? createdAt,
+      Value<bool>? isSynced,
+      Value<DateTime?>? lastSyncedAt,
+      Value<DateTime?>? createdLocallyAt}) {
+    return LocalHoldsCompanion(
+      id: id ?? this.id,
+      remoteId: remoteId ?? this.remoteId,
+      type: type ?? this.type,
+      links: links ?? this.links,
+      date: date ?? this.date,
+      userId: userId ?? this.userId,
+      attendant: attendant ?? this.attendant,
+      customerId: customerId ?? this.customerId,
+      customerName: customerName ?? this.customerName,
+      staffId: staffId ?? this.staffId,
+      staffName: staffName ?? this.staffName,
+      warehouseId: warehouseId ?? this.warehouseId,
+      warehouseName: warehouseName ?? this.warehouseName,
+      taxRate: taxRate ?? this.taxRate,
+      taxAmount: taxAmount ?? this.taxAmount,
+      discount: discount ?? this.discount,
+      shipping: shipping ?? this.shipping,
+      grandTotal: grandTotal ?? this.grandTotal,
+      receivedAmount: receivedAmount ?? this.receivedAmount,
+      paidAmount: paidAmount ?? this.paidAmount,
+      referenceCode: referenceCode ?? this.referenceCode,
+      note: note ?? this.note,
+      status: status ?? this.status,
+      tableId: tableId ?? this.tableId,
+      holdTableName: holdTableName ?? this.holdTableName,
+      holdItems: holdItems ?? this.holdItems,
+      createdAt: createdAt ?? this.createdAt,
+      isSynced: isSynced ?? this.isSynced,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      createdLocallyAt: createdLocallyAt ?? this.createdLocallyAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<int>(remoteId.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (links.present) {
+      map['links'] =
+          Variable<String>($LocalHoldsTable.$converterlinks.toSql(links.value));
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (attendant.present) {
+      map['attendant'] = Variable<String>(
+          $LocalHoldsTable.$converterattendant.toSql(attendant.value));
+    }
+    if (customerId.present) {
+      map['customer_id'] = Variable<int>(customerId.value);
+    }
+    if (customerName.present) {
+      map['customer_name'] = Variable<String>(customerName.value);
+    }
+    if (staffId.present) {
+      map['staff_id'] = Variable<int>(staffId.value);
+    }
+    if (staffName.present) {
+      map['staff_name'] = Variable<String>(staffName.value);
+    }
+    if (warehouseId.present) {
+      map['warehouse_id'] = Variable<int>(warehouseId.value);
+    }
+    if (warehouseName.present) {
+      map['warehouse_name'] = Variable<String>(warehouseName.value);
+    }
+    if (taxRate.present) {
+      map['tax_rate'] = Variable<double>(taxRate.value);
+    }
+    if (taxAmount.present) {
+      map['tax_amount'] = Variable<double>(taxAmount.value);
+    }
+    if (discount.present) {
+      map['discount'] = Variable<double>(discount.value);
+    }
+    if (shipping.present) {
+      map['shipping'] = Variable<double>(shipping.value);
+    }
+    if (grandTotal.present) {
+      map['grand_total'] = Variable<double>(grandTotal.value);
+    }
+    if (receivedAmount.present) {
+      map['received_amount'] = Variable<double>(receivedAmount.value);
+    }
+    if (paidAmount.present) {
+      map['paid_amount'] = Variable<double>(paidAmount.value);
+    }
+    if (referenceCode.present) {
+      map['reference_code'] = Variable<String>(referenceCode.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (tableId.present) {
+      map['table_id'] = Variable<String>(tableId.value);
+    }
+    if (holdTableName.present) {
+      map['hold_table_name'] = Variable<String>(holdTableName.value);
+    }
+    if (holdItems.present) {
+      map['hold_items'] = Variable<String>(
+          $LocalHoldsTable.$converterholdItems.toSql(holdItems.value));
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (isSynced.present) {
+      map['is_synced'] = Variable<bool>(isSynced.value);
+    }
+    if (lastSyncedAt.present) {
+      map['last_synced_at'] = Variable<DateTime>(lastSyncedAt.value);
+    }
+    if (createdLocallyAt.present) {
+      map['created_locally_at'] = Variable<DateTime>(createdLocallyAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalHoldsCompanion(')
+          ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('type: $type, ')
+          ..write('links: $links, ')
+          ..write('date: $date, ')
+          ..write('userId: $userId, ')
+          ..write('attendant: $attendant, ')
+          ..write('customerId: $customerId, ')
+          ..write('customerName: $customerName, ')
+          ..write('staffId: $staffId, ')
+          ..write('staffName: $staffName, ')
+          ..write('warehouseId: $warehouseId, ')
+          ..write('warehouseName: $warehouseName, ')
+          ..write('taxRate: $taxRate, ')
+          ..write('taxAmount: $taxAmount, ')
+          ..write('discount: $discount, ')
+          ..write('shipping: $shipping, ')
+          ..write('grandTotal: $grandTotal, ')
+          ..write('receivedAmount: $receivedAmount, ')
+          ..write('paidAmount: $paidAmount, ')
+          ..write('referenceCode: $referenceCode, ')
+          ..write('note: $note, ')
+          ..write('status: $status, ')
+          ..write('tableId: $tableId, ')
+          ..write('holdTableName: $holdTableName, ')
+          ..write('holdItems: $holdItems, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('isSynced: $isSynced, ')
+          ..write('lastSyncedAt: $lastSyncedAt, ')
+          ..write('createdLocallyAt: $createdLocallyAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -5311,6 +7060,7 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
       $LocalWarehousesTable(this);
   late final $LocalRegistersTable localRegisters = $LocalRegistersTable(this);
   late final $LocalSalesTable localSales = $LocalSalesTable(this);
+  late final $LocalHoldsTable localHolds = $LocalHoldsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5323,7 +7073,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         localProducts,
         localWarehouses,
         localRegisters,
-        localSales
+        localSales,
+        localHolds
       ];
 }
 
@@ -5602,7 +7353,7 @@ typedef $$LocalAttendantsTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$LocalCustomersTableCreateCompanionBuilder = LocalCustomersCompanion
     Function({
-  Value<int?> id,
+  Value<int> id,
   Value<String?> name,
   Value<int?> companyId,
   Value<String?> email,
@@ -5612,10 +7363,11 @@ typedef $$LocalCustomersTableCreateCompanionBuilder = LocalCustomersCompanion
   Value<String?> address,
   Value<DateTime?> createdAt,
   Value<String?> link,
+  Value<bool> isSynced,
 });
 typedef $$LocalCustomersTableUpdateCompanionBuilder = LocalCustomersCompanion
     Function({
-  Value<int?> id,
+  Value<int> id,
   Value<String?> name,
   Value<int?> companyId,
   Value<String?> email,
@@ -5625,6 +7377,7 @@ typedef $$LocalCustomersTableUpdateCompanionBuilder = LocalCustomersCompanion
   Value<String?> address,
   Value<DateTime?> createdAt,
   Value<String?> link,
+  Value<bool> isSynced,
 });
 
 class $$LocalCustomersTableFilterComposer
@@ -5665,6 +7418,9 @@ class $$LocalCustomersTableFilterComposer
 
   ColumnFilters<String> get link => $composableBuilder(
       column: $table.link, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isSynced => $composableBuilder(
+      column: $table.isSynced, builder: (column) => ColumnFilters(column));
 }
 
 class $$LocalCustomersTableOrderingComposer
@@ -5705,6 +7461,9 @@ class $$LocalCustomersTableOrderingComposer
 
   ColumnOrderings<String> get link => $composableBuilder(
       column: $table.link, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isSynced => $composableBuilder(
+      column: $table.isSynced, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalCustomersTableAnnotationComposer
@@ -5745,6 +7504,9 @@ class $$LocalCustomersTableAnnotationComposer
 
   GeneratedColumn<String> get link =>
       $composableBuilder(column: $table.link, builder: (column) => column);
+
+  GeneratedColumn<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => column);
 }
 
 class $$LocalCustomersTableTableManager extends RootTableManager<
@@ -5774,7 +7536,7 @@ class $$LocalCustomersTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$LocalCustomersTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<int?> id = const Value.absent(),
+            Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
             Value<int?> companyId = const Value.absent(),
             Value<String?> email = const Value.absent(),
@@ -5784,6 +7546,7 @@ class $$LocalCustomersTableTableManager extends RootTableManager<
             Value<String?> address = const Value.absent(),
             Value<DateTime?> createdAt = const Value.absent(),
             Value<String?> link = const Value.absent(),
+            Value<bool> isSynced = const Value.absent(),
           }) =>
               LocalCustomersCompanion(
             id: id,
@@ -5796,9 +7559,10 @@ class $$LocalCustomersTableTableManager extends RootTableManager<
             address: address,
             createdAt: createdAt,
             link: link,
+            isSynced: isSynced,
           ),
           createCompanionCallback: ({
-            Value<int?> id = const Value.absent(),
+            Value<int> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
             Value<int?> companyId = const Value.absent(),
             Value<String?> email = const Value.absent(),
@@ -5808,6 +7572,7 @@ class $$LocalCustomersTableTableManager extends RootTableManager<
             Value<String?> address = const Value.absent(),
             Value<DateTime?> createdAt = const Value.absent(),
             Value<String?> link = const Value.absent(),
+            Value<bool> isSynced = const Value.absent(),
           }) =>
               LocalCustomersCompanion.insert(
             id: id,
@@ -5820,6 +7585,7 @@ class $$LocalCustomersTableTableManager extends RootTableManager<
             address: address,
             createdAt: createdAt,
             link: link,
+            isSynced: isSynced,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -6220,6 +7986,7 @@ typedef $$LocalProductsTableCreateCompanionBuilder = LocalProductsCompanion
     Function({
   Value<int?> id,
   Value<String?> name,
+  Value<int?> companyId,
   Value<String?> code,
   Value<DateTime?> expiryDate,
   Value<int?> mainProductId,
@@ -6232,11 +7999,17 @@ typedef $$LocalProductsTableCreateCompanionBuilder = LocalProductsCompanion
   Value<String?> link,
   Value<int?> stockId,
   Value<int?> warehouseId,
+  Value<String?> brandName,
+  Value<String?> productCategoryName,
+  Value<String?> stockAlert,
+  Value<ProductUnitName?> productUnitName,
+  Value<List<ProductWarehouse>?> warehouse,
 });
 typedef $$LocalProductsTableUpdateCompanionBuilder = LocalProductsCompanion
     Function({
   Value<int?> id,
   Value<String?> name,
+  Value<int?> companyId,
   Value<String?> code,
   Value<DateTime?> expiryDate,
   Value<int?> mainProductId,
@@ -6249,6 +8022,11 @@ typedef $$LocalProductsTableUpdateCompanionBuilder = LocalProductsCompanion
   Value<String?> link,
   Value<int?> stockId,
   Value<int?> warehouseId,
+  Value<String?> brandName,
+  Value<String?> productCategoryName,
+  Value<String?> stockAlert,
+  Value<ProductUnitName?> productUnitName,
+  Value<List<ProductWarehouse>?> warehouse,
 });
 
 class $$LocalProductsTableFilterComposer
@@ -6265,6 +8043,9 @@ class $$LocalProductsTableFilterComposer
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get companyId => $composableBuilder(
+      column: $table.companyId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get code => $composableBuilder(
       column: $table.code, builder: (column) => ColumnFilters(column));
@@ -6302,6 +8083,27 @@ class $$LocalProductsTableFilterComposer
 
   ColumnFilters<int> get warehouseId => $composableBuilder(
       column: $table.warehouseId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get brandName => $composableBuilder(
+      column: $table.brandName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get productCategoryName => $composableBuilder(
+      column: $table.productCategoryName,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get stockAlert => $composableBuilder(
+      column: $table.stockAlert, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<ProductUnitName?, ProductUnitName, String>
+      get productUnitName => $composableBuilder(
+          column: $table.productUnitName,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnWithTypeConverterFilters<List<ProductWarehouse>?,
+          List<ProductWarehouse>, String>
+      get warehouse => $composableBuilder(
+          column: $table.warehouse,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 }
 
 class $$LocalProductsTableOrderingComposer
@@ -6318,6 +8120,9 @@ class $$LocalProductsTableOrderingComposer
 
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get companyId => $composableBuilder(
+      column: $table.companyId, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get code => $composableBuilder(
       column: $table.code, builder: (column) => ColumnOrderings(column));
@@ -6357,6 +8162,23 @@ class $$LocalProductsTableOrderingComposer
 
   ColumnOrderings<int> get warehouseId => $composableBuilder(
       column: $table.warehouseId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get brandName => $composableBuilder(
+      column: $table.brandName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productCategoryName => $composableBuilder(
+      column: $table.productCategoryName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get stockAlert => $composableBuilder(
+      column: $table.stockAlert, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get productUnitName => $composableBuilder(
+      column: $table.productUnitName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get warehouse => $composableBuilder(
+      column: $table.warehouse, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalProductsTableAnnotationComposer
@@ -6373,6 +8195,9 @@ class $$LocalProductsTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get companyId =>
+      $composableBuilder(column: $table.companyId, builder: (column) => column);
 
   GeneratedColumn<String> get code =>
       $composableBuilder(column: $table.code, builder: (column) => column);
@@ -6409,6 +8234,23 @@ class $$LocalProductsTableAnnotationComposer
 
   GeneratedColumn<int> get warehouseId => $composableBuilder(
       column: $table.warehouseId, builder: (column) => column);
+
+  GeneratedColumn<String> get brandName =>
+      $composableBuilder(column: $table.brandName, builder: (column) => column);
+
+  GeneratedColumn<String> get productCategoryName => $composableBuilder(
+      column: $table.productCategoryName, builder: (column) => column);
+
+  GeneratedColumn<String> get stockAlert => $composableBuilder(
+      column: $table.stockAlert, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<ProductUnitName?, String>
+      get productUnitName => $composableBuilder(
+          column: $table.productUnitName, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<ProductWarehouse>?, String>
+      get warehouse => $composableBuilder(
+          column: $table.warehouse, builder: (column) => column);
 }
 
 class $$LocalProductsTableTableManager extends RootTableManager<
@@ -6440,6 +8282,7 @@ class $$LocalProductsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int?> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
+            Value<int?> companyId = const Value.absent(),
             Value<String?> code = const Value.absent(),
             Value<DateTime?> expiryDate = const Value.absent(),
             Value<int?> mainProductId = const Value.absent(),
@@ -6452,10 +8295,16 @@ class $$LocalProductsTableTableManager extends RootTableManager<
             Value<String?> link = const Value.absent(),
             Value<int?> stockId = const Value.absent(),
             Value<int?> warehouseId = const Value.absent(),
+            Value<String?> brandName = const Value.absent(),
+            Value<String?> productCategoryName = const Value.absent(),
+            Value<String?> stockAlert = const Value.absent(),
+            Value<ProductUnitName?> productUnitName = const Value.absent(),
+            Value<List<ProductWarehouse>?> warehouse = const Value.absent(),
           }) =>
               LocalProductsCompanion(
             id: id,
             name: name,
+            companyId: companyId,
             code: code,
             expiryDate: expiryDate,
             mainProductId: mainProductId,
@@ -6468,10 +8317,16 @@ class $$LocalProductsTableTableManager extends RootTableManager<
             link: link,
             stockId: stockId,
             warehouseId: warehouseId,
+            brandName: brandName,
+            productCategoryName: productCategoryName,
+            stockAlert: stockAlert,
+            productUnitName: productUnitName,
+            warehouse: warehouse,
           ),
           createCompanionCallback: ({
             Value<int?> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
+            Value<int?> companyId = const Value.absent(),
             Value<String?> code = const Value.absent(),
             Value<DateTime?> expiryDate = const Value.absent(),
             Value<int?> mainProductId = const Value.absent(),
@@ -6484,10 +8339,16 @@ class $$LocalProductsTableTableManager extends RootTableManager<
             Value<String?> link = const Value.absent(),
             Value<int?> stockId = const Value.absent(),
             Value<int?> warehouseId = const Value.absent(),
+            Value<String?> brandName = const Value.absent(),
+            Value<String?> productCategoryName = const Value.absent(),
+            Value<String?> stockAlert = const Value.absent(),
+            Value<ProductUnitName?> productUnitName = const Value.absent(),
+            Value<List<ProductWarehouse>?> warehouse = const Value.absent(),
           }) =>
               LocalProductsCompanion.insert(
             id: id,
             name: name,
+            companyId: companyId,
             code: code,
             expiryDate: expiryDate,
             mainProductId: mainProductId,
@@ -6500,6 +8361,11 @@ class $$LocalProductsTableTableManager extends RootTableManager<
             link: link,
             stockId: stockId,
             warehouseId: warehouseId,
+            brandName: brandName,
+            productCategoryName: productCategoryName,
+            stockAlert: stockAlert,
+            productUnitName: productUnitName,
+            warehouse: warehouse,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -6785,19 +8651,23 @@ typedef $$LocalRegistersTableCreateCompanionBuilder = LocalRegistersCompanion
     Function({
   Value<int> id,
   Value<DateTime?> createdAt,
-  Value<bool> isOpen,
+  Value<DateTime?> closedAt,
   Value<double?> openingCashAtHand,
-  Value<double?> closingCashAtHand,
+  Value<double?> cashInHandWhileClosing,
   Value<String?> note,
+  Value<SpotstockUser?> user,
+  Value<bool> isSynced,
 });
 typedef $$LocalRegistersTableUpdateCompanionBuilder = LocalRegistersCompanion
     Function({
   Value<int> id,
   Value<DateTime?> createdAt,
-  Value<bool> isOpen,
+  Value<DateTime?> closedAt,
   Value<double?> openingCashAtHand,
-  Value<double?> closingCashAtHand,
+  Value<double?> cashInHandWhileClosing,
   Value<String?> note,
+  Value<SpotstockUser?> user,
+  Value<bool> isSynced,
 });
 
 class $$LocalRegistersTableFilterComposer
@@ -6815,19 +8685,27 @@ class $$LocalRegistersTableFilterComposer
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get isOpen => $composableBuilder(
-      column: $table.isOpen, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get closedAt => $composableBuilder(
+      column: $table.closedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<double> get openingCashAtHand => $composableBuilder(
       column: $table.openingCashAtHand,
       builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get closingCashAtHand => $composableBuilder(
-      column: $table.closingCashAtHand,
+  ColumnFilters<double> get cashInHandWhileClosing => $composableBuilder(
+      column: $table.cashInHandWhileClosing,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get note => $composableBuilder(
       column: $table.note, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<SpotstockUser?, SpotstockUser, String>
+      get user => $composableBuilder(
+          column: $table.user,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<bool> get isSynced => $composableBuilder(
+      column: $table.isSynced, builder: (column) => ColumnFilters(column));
 }
 
 class $$LocalRegistersTableOrderingComposer
@@ -6845,19 +8723,25 @@ class $$LocalRegistersTableOrderingComposer
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get isOpen => $composableBuilder(
-      column: $table.isOpen, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get closedAt => $composableBuilder(
+      column: $table.closedAt, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<double> get openingCashAtHand => $composableBuilder(
       column: $table.openingCashAtHand,
       builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get closingCashAtHand => $composableBuilder(
-      column: $table.closingCashAtHand,
+  ColumnOrderings<double> get cashInHandWhileClosing => $composableBuilder(
+      column: $table.cashInHandWhileClosing,
       builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get note => $composableBuilder(
       column: $table.note, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get user => $composableBuilder(
+      column: $table.user, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isSynced => $composableBuilder(
+      column: $table.isSynced, builder: (column) => ColumnOrderings(column));
 }
 
 class $$LocalRegistersTableAnnotationComposer
@@ -6875,17 +8759,23 @@ class $$LocalRegistersTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<bool> get isOpen =>
-      $composableBuilder(column: $table.isOpen, builder: (column) => column);
+  GeneratedColumn<DateTime> get closedAt =>
+      $composableBuilder(column: $table.closedAt, builder: (column) => column);
 
   GeneratedColumn<double> get openingCashAtHand => $composableBuilder(
       column: $table.openingCashAtHand, builder: (column) => column);
 
-  GeneratedColumn<double> get closingCashAtHand => $composableBuilder(
-      column: $table.closingCashAtHand, builder: (column) => column);
+  GeneratedColumn<double> get cashInHandWhileClosing => $composableBuilder(
+      column: $table.cashInHandWhileClosing, builder: (column) => column);
 
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SpotstockUser?, String> get user =>
+      $composableBuilder(column: $table.user, builder: (column) => column);
+
+  GeneratedColumn<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => column);
 }
 
 class $$LocalRegistersTableTableManager extends RootTableManager<
@@ -6917,34 +8807,42 @@ class $$LocalRegistersTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<DateTime?> createdAt = const Value.absent(),
-            Value<bool> isOpen = const Value.absent(),
+            Value<DateTime?> closedAt = const Value.absent(),
             Value<double?> openingCashAtHand = const Value.absent(),
-            Value<double?> closingCashAtHand = const Value.absent(),
+            Value<double?> cashInHandWhileClosing = const Value.absent(),
             Value<String?> note = const Value.absent(),
+            Value<SpotstockUser?> user = const Value.absent(),
+            Value<bool> isSynced = const Value.absent(),
           }) =>
               LocalRegistersCompanion(
             id: id,
             createdAt: createdAt,
-            isOpen: isOpen,
+            closedAt: closedAt,
             openingCashAtHand: openingCashAtHand,
-            closingCashAtHand: closingCashAtHand,
+            cashInHandWhileClosing: cashInHandWhileClosing,
             note: note,
+            user: user,
+            isSynced: isSynced,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<DateTime?> createdAt = const Value.absent(),
-            Value<bool> isOpen = const Value.absent(),
+            Value<DateTime?> closedAt = const Value.absent(),
             Value<double?> openingCashAtHand = const Value.absent(),
-            Value<double?> closingCashAtHand = const Value.absent(),
+            Value<double?> cashInHandWhileClosing = const Value.absent(),
             Value<String?> note = const Value.absent(),
+            Value<SpotstockUser?> user = const Value.absent(),
+            Value<bool> isSynced = const Value.absent(),
           }) =>
               LocalRegistersCompanion.insert(
             id: id,
             createdAt: createdAt,
-            isOpen: isOpen,
+            closedAt: closedAt,
             openingCashAtHand: openingCashAtHand,
-            closingCashAtHand: closingCashAtHand,
+            cashInHandWhileClosing: cashInHandWhileClosing,
             note: note,
+            user: user,
+            isSynced: isSynced,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -7002,7 +8900,7 @@ typedef $$LocalSalesTableCreateCompanionBuilder = LocalSalesCompanion Function({
   Value<List<String>?> paymentMethods,
   Value<DateTime?> createdAt,
   Value<String?> barcodeUrl,
-  Value<int> isOffline,
+  Value<bool> isOffline,
   Value<String?> offlineCustomerName,
   Value<int?> staffId,
   Value<String?> attendantName,
@@ -7048,7 +8946,7 @@ typedef $$LocalSalesTableUpdateCompanionBuilder = LocalSalesCompanion Function({
   Value<List<String>?> paymentMethods,
   Value<DateTime?> createdAt,
   Value<String?> barcodeUrl,
-  Value<int> isOffline,
+  Value<bool> isOffline,
   Value<String?> offlineCustomerName,
   Value<int?> staffId,
   Value<String?> attendantName,
@@ -7182,7 +9080,7 @@ class $$LocalSalesTableFilterComposer
   ColumnFilters<String> get barcodeUrl => $composableBuilder(
       column: $table.barcodeUrl, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get isOffline => $composableBuilder(
+  ColumnFilters<bool> get isOffline => $composableBuilder(
       column: $table.isOffline, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get offlineCustomerName => $composableBuilder(
@@ -7339,7 +9237,7 @@ class $$LocalSalesTableOrderingComposer
   ColumnOrderings<String> get barcodeUrl => $composableBuilder(
       column: $table.barcodeUrl, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get isOffline => $composableBuilder(
+  ColumnOrderings<bool> get isOffline => $composableBuilder(
       column: $table.isOffline, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get offlineCustomerName => $composableBuilder(
@@ -7489,7 +9387,7 @@ class $$LocalSalesTableAnnotationComposer
   GeneratedColumn<String> get barcodeUrl => $composableBuilder(
       column: $table.barcodeUrl, builder: (column) => column);
 
-  GeneratedColumn<int> get isOffline =>
+  GeneratedColumn<bool> get isOffline =>
       $composableBuilder(column: $table.isOffline, builder: (column) => column);
 
   GeneratedColumn<String> get offlineCustomerName => $composableBuilder(
@@ -7580,7 +9478,7 @@ class $$LocalSalesTableTableManager extends RootTableManager<
             Value<List<String>?> paymentMethods = const Value.absent(),
             Value<DateTime?> createdAt = const Value.absent(),
             Value<String?> barcodeUrl = const Value.absent(),
-            Value<int> isOffline = const Value.absent(),
+            Value<bool> isOffline = const Value.absent(),
             Value<String?> offlineCustomerName = const Value.absent(),
             Value<int?> staffId = const Value.absent(),
             Value<String?> attendantName = const Value.absent(),
@@ -7672,7 +9570,7 @@ class $$LocalSalesTableTableManager extends RootTableManager<
             Value<List<String>?> paymentMethods = const Value.absent(),
             Value<DateTime?> createdAt = const Value.absent(),
             Value<String?> barcodeUrl = const Value.absent(),
-            Value<int> isOffline = const Value.absent(),
+            Value<bool> isOffline = const Value.absent(),
             Value<String?> offlineCustomerName = const Value.absent(),
             Value<int?> staffId = const Value.absent(),
             Value<String?> attendantName = const Value.absent(),
@@ -7749,6 +9647,556 @@ typedef $$LocalSalesTableProcessedTableManager = ProcessedTableManager<
     (LocalSale, BaseReferences<_$DatabaseClient, $LocalSalesTable, LocalSale>),
     LocalSale,
     PrefetchHooks Function()>;
+typedef $$LocalHoldsTableCreateCompanionBuilder = LocalHoldsCompanion Function({
+  Value<int> id,
+  Value<int?> remoteId,
+  Value<String?> type,
+  Value<Map<String, dynamic>?> links,
+  Value<DateTime?> date,
+  Value<int?> userId,
+  Value<HoldAttendant?> attendant,
+  Value<int?> customerId,
+  Value<String?> customerName,
+  Value<int?> staffId,
+  Value<String?> staffName,
+  Value<int?> warehouseId,
+  Value<String?> warehouseName,
+  Value<double?> taxRate,
+  Value<double?> taxAmount,
+  Value<double?> discount,
+  Value<double?> shipping,
+  Value<double?> grandTotal,
+  Value<double?> receivedAmount,
+  Value<double?> paidAmount,
+  Value<String?> referenceCode,
+  Value<String?> note,
+  Value<String?> status,
+  Value<String?> tableId,
+  Value<String?> holdTableName,
+  Value<List<HoldItem>?> holdItems,
+  Value<DateTime?> createdAt,
+  Value<bool> isSynced,
+  Value<DateTime?> lastSyncedAt,
+  Value<DateTime?> createdLocallyAt,
+});
+typedef $$LocalHoldsTableUpdateCompanionBuilder = LocalHoldsCompanion Function({
+  Value<int> id,
+  Value<int?> remoteId,
+  Value<String?> type,
+  Value<Map<String, dynamic>?> links,
+  Value<DateTime?> date,
+  Value<int?> userId,
+  Value<HoldAttendant?> attendant,
+  Value<int?> customerId,
+  Value<String?> customerName,
+  Value<int?> staffId,
+  Value<String?> staffName,
+  Value<int?> warehouseId,
+  Value<String?> warehouseName,
+  Value<double?> taxRate,
+  Value<double?> taxAmount,
+  Value<double?> discount,
+  Value<double?> shipping,
+  Value<double?> grandTotal,
+  Value<double?> receivedAmount,
+  Value<double?> paidAmount,
+  Value<String?> referenceCode,
+  Value<String?> note,
+  Value<String?> status,
+  Value<String?> tableId,
+  Value<String?> holdTableName,
+  Value<List<HoldItem>?> holdItems,
+  Value<DateTime?> createdAt,
+  Value<bool> isSynced,
+  Value<DateTime?> lastSyncedAt,
+  Value<DateTime?> createdLocallyAt,
+});
+
+class $$LocalHoldsTableFilterComposer
+    extends Composer<_$DatabaseClient, $LocalHoldsTable> {
+  $$LocalHoldsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Map<String, dynamic>?, Map<String, dynamic>,
+          String>
+      get links => $composableBuilder(
+          column: $table.links,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<HoldAttendant?, HoldAttendant, String>
+      get attendant => $composableBuilder(
+          column: $table.attendant,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<int> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get customerName => $composableBuilder(
+      column: $table.customerName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get staffId => $composableBuilder(
+      column: $table.staffId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get staffName => $composableBuilder(
+      column: $table.staffName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get warehouseId => $composableBuilder(
+      column: $table.warehouseId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get warehouseName => $composableBuilder(
+      column: $table.warehouseName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get taxRate => $composableBuilder(
+      column: $table.taxRate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get taxAmount => $composableBuilder(
+      column: $table.taxAmount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get discount => $composableBuilder(
+      column: $table.discount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get shipping => $composableBuilder(
+      column: $table.shipping, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get grandTotal => $composableBuilder(
+      column: $table.grandTotal, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get receivedAmount => $composableBuilder(
+      column: $table.receivedAmount,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get paidAmount => $composableBuilder(
+      column: $table.paidAmount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get referenceCode => $composableBuilder(
+      column: $table.referenceCode, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get note => $composableBuilder(
+      column: $table.note, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get tableId => $composableBuilder(
+      column: $table.tableId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get holdTableName => $composableBuilder(
+      column: $table.holdTableName, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<List<HoldItem>?, List<HoldItem>, String>
+      get holdItems => $composableBuilder(
+          column: $table.holdItems,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isSynced => $composableBuilder(
+      column: $table.isSynced, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdLocallyAt => $composableBuilder(
+      column: $table.createdLocallyAt,
+      builder: (column) => ColumnFilters(column));
+}
+
+class $$LocalHoldsTableOrderingComposer
+    extends Composer<_$DatabaseClient, $LocalHoldsTable> {
+  $$LocalHoldsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get remoteId => $composableBuilder(
+      column: $table.remoteId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get links => $composableBuilder(
+      column: $table.links, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get attendant => $composableBuilder(
+      column: $table.attendant, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get customerName => $composableBuilder(
+      column: $table.customerName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get staffId => $composableBuilder(
+      column: $table.staffId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get staffName => $composableBuilder(
+      column: $table.staffName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get warehouseId => $composableBuilder(
+      column: $table.warehouseId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get warehouseName => $composableBuilder(
+      column: $table.warehouseName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get taxRate => $composableBuilder(
+      column: $table.taxRate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get taxAmount => $composableBuilder(
+      column: $table.taxAmount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get discount => $composableBuilder(
+      column: $table.discount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get shipping => $composableBuilder(
+      column: $table.shipping, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get grandTotal => $composableBuilder(
+      column: $table.grandTotal, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get receivedAmount => $composableBuilder(
+      column: $table.receivedAmount,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get paidAmount => $composableBuilder(
+      column: $table.paidAmount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get referenceCode => $composableBuilder(
+      column: $table.referenceCode,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get note => $composableBuilder(
+      column: $table.note, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get tableId => $composableBuilder(
+      column: $table.tableId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get holdTableName => $composableBuilder(
+      column: $table.holdTableName,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get holdItems => $composableBuilder(
+      column: $table.holdItems, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isSynced => $composableBuilder(
+      column: $table.isSynced, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdLocallyAt => $composableBuilder(
+      column: $table.createdLocallyAt,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$LocalHoldsTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $LocalHoldsTable> {
+  $$LocalHoldsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Map<String, dynamic>?, String> get links =>
+      $composableBuilder(column: $table.links, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<HoldAttendant?, String> get attendant =>
+      $composableBuilder(column: $table.attendant, builder: (column) => column);
+
+  GeneratedColumn<int> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => column);
+
+  GeneratedColumn<String> get customerName => $composableBuilder(
+      column: $table.customerName, builder: (column) => column);
+
+  GeneratedColumn<int> get staffId =>
+      $composableBuilder(column: $table.staffId, builder: (column) => column);
+
+  GeneratedColumn<String> get staffName =>
+      $composableBuilder(column: $table.staffName, builder: (column) => column);
+
+  GeneratedColumn<int> get warehouseId => $composableBuilder(
+      column: $table.warehouseId, builder: (column) => column);
+
+  GeneratedColumn<String> get warehouseName => $composableBuilder(
+      column: $table.warehouseName, builder: (column) => column);
+
+  GeneratedColumn<double> get taxRate =>
+      $composableBuilder(column: $table.taxRate, builder: (column) => column);
+
+  GeneratedColumn<double> get taxAmount =>
+      $composableBuilder(column: $table.taxAmount, builder: (column) => column);
+
+  GeneratedColumn<double> get discount =>
+      $composableBuilder(column: $table.discount, builder: (column) => column);
+
+  GeneratedColumn<double> get shipping =>
+      $composableBuilder(column: $table.shipping, builder: (column) => column);
+
+  GeneratedColumn<double> get grandTotal => $composableBuilder(
+      column: $table.grandTotal, builder: (column) => column);
+
+  GeneratedColumn<double> get receivedAmount => $composableBuilder(
+      column: $table.receivedAmount, builder: (column) => column);
+
+  GeneratedColumn<double> get paidAmount => $composableBuilder(
+      column: $table.paidAmount, builder: (column) => column);
+
+  GeneratedColumn<String> get referenceCode => $composableBuilder(
+      column: $table.referenceCode, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get tableId =>
+      $composableBuilder(column: $table.tableId, builder: (column) => column);
+
+  GeneratedColumn<String> get holdTableName => $composableBuilder(
+      column: $table.holdTableName, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<HoldItem>?, String> get holdItems =>
+      $composableBuilder(column: $table.holdItems, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSyncedAt => $composableBuilder(
+      column: $table.lastSyncedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdLocallyAt => $composableBuilder(
+      column: $table.createdLocallyAt, builder: (column) => column);
+}
+
+class $$LocalHoldsTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $LocalHoldsTable,
+    LocalHold,
+    $$LocalHoldsTableFilterComposer,
+    $$LocalHoldsTableOrderingComposer,
+    $$LocalHoldsTableAnnotationComposer,
+    $$LocalHoldsTableCreateCompanionBuilder,
+    $$LocalHoldsTableUpdateCompanionBuilder,
+    (LocalHold, BaseReferences<_$DatabaseClient, $LocalHoldsTable, LocalHold>),
+    LocalHold,
+    PrefetchHooks Function()> {
+  $$LocalHoldsTableTableManager(_$DatabaseClient db, $LocalHoldsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalHoldsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalHoldsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalHoldsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int?> remoteId = const Value.absent(),
+            Value<String?> type = const Value.absent(),
+            Value<Map<String, dynamic>?> links = const Value.absent(),
+            Value<DateTime?> date = const Value.absent(),
+            Value<int?> userId = const Value.absent(),
+            Value<HoldAttendant?> attendant = const Value.absent(),
+            Value<int?> customerId = const Value.absent(),
+            Value<String?> customerName = const Value.absent(),
+            Value<int?> staffId = const Value.absent(),
+            Value<String?> staffName = const Value.absent(),
+            Value<int?> warehouseId = const Value.absent(),
+            Value<String?> warehouseName = const Value.absent(),
+            Value<double?> taxRate = const Value.absent(),
+            Value<double?> taxAmount = const Value.absent(),
+            Value<double?> discount = const Value.absent(),
+            Value<double?> shipping = const Value.absent(),
+            Value<double?> grandTotal = const Value.absent(),
+            Value<double?> receivedAmount = const Value.absent(),
+            Value<double?> paidAmount = const Value.absent(),
+            Value<String?> referenceCode = const Value.absent(),
+            Value<String?> note = const Value.absent(),
+            Value<String?> status = const Value.absent(),
+            Value<String?> tableId = const Value.absent(),
+            Value<String?> holdTableName = const Value.absent(),
+            Value<List<HoldItem>?> holdItems = const Value.absent(),
+            Value<DateTime?> createdAt = const Value.absent(),
+            Value<bool> isSynced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<DateTime?> createdLocallyAt = const Value.absent(),
+          }) =>
+              LocalHoldsCompanion(
+            id: id,
+            remoteId: remoteId,
+            type: type,
+            links: links,
+            date: date,
+            userId: userId,
+            attendant: attendant,
+            customerId: customerId,
+            customerName: customerName,
+            staffId: staffId,
+            staffName: staffName,
+            warehouseId: warehouseId,
+            warehouseName: warehouseName,
+            taxRate: taxRate,
+            taxAmount: taxAmount,
+            discount: discount,
+            shipping: shipping,
+            grandTotal: grandTotal,
+            receivedAmount: receivedAmount,
+            paidAmount: paidAmount,
+            referenceCode: referenceCode,
+            note: note,
+            status: status,
+            tableId: tableId,
+            holdTableName: holdTableName,
+            holdItems: holdItems,
+            createdAt: createdAt,
+            isSynced: isSynced,
+            lastSyncedAt: lastSyncedAt,
+            createdLocallyAt: createdLocallyAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int?> remoteId = const Value.absent(),
+            Value<String?> type = const Value.absent(),
+            Value<Map<String, dynamic>?> links = const Value.absent(),
+            Value<DateTime?> date = const Value.absent(),
+            Value<int?> userId = const Value.absent(),
+            Value<HoldAttendant?> attendant = const Value.absent(),
+            Value<int?> customerId = const Value.absent(),
+            Value<String?> customerName = const Value.absent(),
+            Value<int?> staffId = const Value.absent(),
+            Value<String?> staffName = const Value.absent(),
+            Value<int?> warehouseId = const Value.absent(),
+            Value<String?> warehouseName = const Value.absent(),
+            Value<double?> taxRate = const Value.absent(),
+            Value<double?> taxAmount = const Value.absent(),
+            Value<double?> discount = const Value.absent(),
+            Value<double?> shipping = const Value.absent(),
+            Value<double?> grandTotal = const Value.absent(),
+            Value<double?> receivedAmount = const Value.absent(),
+            Value<double?> paidAmount = const Value.absent(),
+            Value<String?> referenceCode = const Value.absent(),
+            Value<String?> note = const Value.absent(),
+            Value<String?> status = const Value.absent(),
+            Value<String?> tableId = const Value.absent(),
+            Value<String?> holdTableName = const Value.absent(),
+            Value<List<HoldItem>?> holdItems = const Value.absent(),
+            Value<DateTime?> createdAt = const Value.absent(),
+            Value<bool> isSynced = const Value.absent(),
+            Value<DateTime?> lastSyncedAt = const Value.absent(),
+            Value<DateTime?> createdLocallyAt = const Value.absent(),
+          }) =>
+              LocalHoldsCompanion.insert(
+            id: id,
+            remoteId: remoteId,
+            type: type,
+            links: links,
+            date: date,
+            userId: userId,
+            attendant: attendant,
+            customerId: customerId,
+            customerName: customerName,
+            staffId: staffId,
+            staffName: staffName,
+            warehouseId: warehouseId,
+            warehouseName: warehouseName,
+            taxRate: taxRate,
+            taxAmount: taxAmount,
+            discount: discount,
+            shipping: shipping,
+            grandTotal: grandTotal,
+            receivedAmount: receivedAmount,
+            paidAmount: paidAmount,
+            referenceCode: referenceCode,
+            note: note,
+            status: status,
+            tableId: tableId,
+            holdTableName: holdTableName,
+            holdItems: holdItems,
+            createdAt: createdAt,
+            isSynced: isSynced,
+            lastSyncedAt: lastSyncedAt,
+            createdLocallyAt: createdLocallyAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$LocalHoldsTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $LocalHoldsTable,
+    LocalHold,
+    $$LocalHoldsTableFilterComposer,
+    $$LocalHoldsTableOrderingComposer,
+    $$LocalHoldsTableAnnotationComposer,
+    $$LocalHoldsTableCreateCompanionBuilder,
+    $$LocalHoldsTableUpdateCompanionBuilder,
+    (LocalHold, BaseReferences<_$DatabaseClient, $LocalHoldsTable, LocalHold>),
+    LocalHold,
+    PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -7770,4 +10218,6 @@ class $DatabaseClientManager {
       $$LocalRegistersTableTableManager(_db, _db.localRegisters);
   $$LocalSalesTableTableManager get localSales =>
       $$LocalSalesTableTableManager(_db, _db.localSales);
+  $$LocalHoldsTableTableManager get localHolds =>
+      $$LocalHoldsTableTableManager(_db, _db.localHolds);
 }
