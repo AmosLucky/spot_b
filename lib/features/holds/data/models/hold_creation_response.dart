@@ -28,13 +28,12 @@ class HoldCreationResponseAttributesDao with _$HoldCreationResponseAttributesDao
     String? note,
     String? status,
     @JsonKey(name: 'table_id') String? tableId,
-    @JsonKey(name: 'table_name') dynamic tableName,
+    @JsonKey(name: 'table_name') String? tableName,
     @JsonKey(name: 'hold_items') List<HoldCreationResponseHoldItemDao>? holdItems,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _HoldCreationResponseAttributesDao;
 
-  factory HoldCreationResponseAttributesDao.fromJson(Map<String, dynamic> json) =>
-      _$HoldCreationResponseAttributesDaoFromJson(json);
+  factory HoldCreationResponseAttributesDao.fromJson(Map<String, dynamic> json) => _$HoldCreationResponseAttributesDaoFromJson(json);
 }
 
 @freezed
@@ -69,8 +68,43 @@ class HoldCreationResponseAttendantDao with _$HoldCreationResponseAttendantDao {
     List<dynamic>? media,
   }) = _HoldCreationResponseAttendantDao;
 
-  factory HoldCreationResponseAttendantDao.fromJson(Map<String, dynamic> json) =>
-      _$HoldCreationResponseAttendantDaoFromJson(json);
+  factory HoldCreationResponseAttendantDao.fromJson(Map<String, dynamic> json) => _$HoldCreationResponseAttendantDaoFromJson(json);
+}
+
+class StringOrNumToDoubleConverter implements JsonConverter<double?, dynamic> {
+  const StringOrNumToDoubleConverter();
+
+  @override
+  double? fromJson(dynamic json) {
+    if (json == null) return null;
+
+    if (json is num) return json.toDouble();
+
+    if (json is String) {
+      if (json.trim().isEmpty) return null;
+      return double.tryParse(json);
+    }
+
+    return null;
+  }
+
+  @override
+  dynamic toJson(double? object) => object;
+}
+
+class IntBoolConverter implements JsonConverter<bool, dynamic> {
+  const IntBoolConverter();
+
+  @override
+  bool fromJson(dynamic json) {
+    if (json is bool) return json;
+    if (json is num) return json == 1;
+    if (json is String) return json == '1' || json.toLowerCase() == 'true';
+    return false;
+  }
+
+  @override
+  dynamic toJson(bool value) => value ? 1 : 0;
 }
 
 @freezed
@@ -91,12 +125,16 @@ class HoldCreationResponseHoldItemDao with _$HoldCreationResponseHoldItemDao {
     @JsonKey(name: 'sale_unit') HoldCreationResponseSaleUnitDao? saleUnit,
     double? quantity,
     @JsonKey(name: 'sub_total') double? subTotal,
+    @JsonKey(name: 'is_custom') @IntBoolConverter() @Default(false) bool isCustom,
+    @JsonKey(name: 'custom_name') String? customName,
+    @JsonKey(name: 'custom_cost') @StringOrNumToDoubleConverter() double? customCost,
+    @JsonKey(name: 'custom_price') @StringOrNumToDoubleConverter() double? customPrice,
+    @JsonKey(name: 'custom_description') String? customDescription,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _HoldCreationResponseHoldItemDao;
 
-  factory HoldCreationResponseHoldItemDao.fromJson(Map<String, dynamic> json) =>
-      _$HoldCreationResponseHoldItemDaoFromJson(json);
+  factory HoldCreationResponseHoldItemDao.fromJson(Map<String, dynamic> json) => _$HoldCreationResponseHoldItemDaoFromJson(json);
 }
 
 @freezed
@@ -111,6 +149,5 @@ class HoldCreationResponseSaleUnitDao with _$HoldCreationResponseSaleUnitDao {
     @JsonKey(name: 'company_id') int? companyId,
   }) = _HoldCreationResponseSaleUnitDao;
 
-  factory HoldCreationResponseSaleUnitDao.fromJson(Map<String, dynamic> json) =>
-      _$HoldCreationResponseSaleUnitDaoFromJson(json);
+  factory HoldCreationResponseSaleUnitDao.fromJson(Map<String, dynamic> json) => _$HoldCreationResponseSaleUnitDaoFromJson(json);
 }

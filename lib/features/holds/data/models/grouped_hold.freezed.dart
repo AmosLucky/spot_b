@@ -14,16 +14,9 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-GroupedHold _$GroupedHoldFromJson(Map<String, dynamic> json) {
-  return _GroupedHold.fromJson(json);
-}
-
 /// @nodoc
 mixin _$GroupedHold {
   List<Hold> get holds => throw _privateConstructorUsedError;
-
-  /// Serializes this GroupedHold to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of GroupedHold
   /// with the given fields replaced by the non-null parameter values.
@@ -103,14 +96,11 @@ class __$$GroupedHoldImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$GroupedHoldImpl extends _GroupedHold {
   const _$GroupedHoldImpl({required final List<Hold> holds})
       : _holds = holds,
         super._();
-
-  factory _$GroupedHoldImpl.fromJson(Map<String, dynamic> json) =>
-      _$$GroupedHoldImplFromJson(json);
 
   final List<Hold> _holds;
   @override
@@ -133,7 +123,6 @@ class _$GroupedHoldImpl extends _GroupedHold {
             const DeepCollectionEquality().equals(other._holds, _holds));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_holds));
@@ -145,22 +134,12 @@ class _$GroupedHoldImpl extends _GroupedHold {
   @pragma('vm:prefer-inline')
   _$$GroupedHoldImplCopyWith<_$GroupedHoldImpl> get copyWith =>
       __$$GroupedHoldImplCopyWithImpl<_$GroupedHoldImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GroupedHoldImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _GroupedHold extends GroupedHold {
   const factory _GroupedHold({required final List<Hold> holds}) =
       _$GroupedHoldImpl;
   const _GroupedHold._() : super._();
-
-  factory _GroupedHold.fromJson(Map<String, dynamic> json) =
-      _$GroupedHoldImpl.fromJson;
 
   @override
   List<Hold> get holds;

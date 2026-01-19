@@ -35,7 +35,7 @@ _$HoldCreationResponseAttributesDaoImpl
           note: json['note'] as String?,
           status: json['status'] as String?,
           tableId: json['table_id'] as String?,
-          tableName: json['table_name'],
+          tableName: json['table_name'] as String?,
           holdItems: (json['hold_items'] as List<dynamic>?)
               ?.map((e) => HoldCreationResponseHoldItemDao.fromJson(
                   e as Map<String, dynamic>))
@@ -171,6 +171,15 @@ _$HoldCreationResponseHoldItemDaoImpl
                   json['sale_unit'] as Map<String, dynamic>),
           quantity: (json['quantity'] as num?)?.toDouble(),
           subTotal: (json['sub_total'] as num?)?.toDouble(),
+          isCustom: json['is_custom'] == null
+              ? false
+              : const IntBoolConverter().fromJson(json['is_custom']),
+          customName: json['custom_name'] as String?,
+          customCost: const StringOrNumToDoubleConverter()
+              .fromJson(json['custom_cost']),
+          customPrice: const StringOrNumToDoubleConverter()
+              .fromJson(json['custom_price']),
+          customDescription: json['custom_description'] as String?,
           createdAt: json['created_at'] == null
               ? null
               : DateTime.parse(json['created_at'] as String),
@@ -197,6 +206,13 @@ Map<String, dynamic> _$$HoldCreationResponseHoldItemDaoImplToJson(
       'sale_unit': instance.saleUnit,
       'quantity': instance.quantity,
       'sub_total': instance.subTotal,
+      'is_custom': const IntBoolConverter().toJson(instance.isCustom),
+      'custom_name': instance.customName,
+      'custom_cost':
+          const StringOrNumToDoubleConverter().toJson(instance.customCost),
+      'custom_price':
+          const StringOrNumToDoubleConverter().toJson(instance.customPrice),
+      'custom_description': instance.customDescription,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };

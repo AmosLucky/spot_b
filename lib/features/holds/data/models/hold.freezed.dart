@@ -14,10 +14,6 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-Hold _$HoldFromJson(Map<String, dynamic> json) {
-  return _Hold.fromJson(json);
-}
-
 /// @nodoc
 mixin _$Hold {
   int? get id => throw _privateConstructorUsedError;
@@ -63,9 +59,8 @@ mixin _$Hold {
   List<HoldItem>? get holdItems => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
-
-  /// Serializes this Hold to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  bool? get isSynced => throw _privateConstructorUsedError;
 
   /// Create a copy of Hold
   /// with the given fields replaced by the non-null parameter values.
@@ -104,7 +99,8 @@ abstract class $HoldCopyWith<$Res> {
       @JsonKey(name: 'table_id') String? tableId,
       @JsonKey(name: 'table_name') dynamic tableName,
       @JsonKey(name: 'hold_items') List<HoldItem>? holdItems,
-      @JsonKey(name: 'created_at') DateTime? createdAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(includeFromJson: false, includeToJson: false) bool? isSynced});
 
   $HoldAttendantCopyWith<$Res>? get attendant;
 }
@@ -150,6 +146,7 @@ class _$HoldCopyWithImpl<$Res, $Val extends Hold>
     Object? tableName = freezed,
     Object? holdItems = freezed,
     Object? createdAt = freezed,
+    Object? isSynced = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -256,6 +253,10 @@ class _$HoldCopyWithImpl<$Res, $Val extends Hold>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      isSynced: freezed == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 
@@ -307,7 +308,8 @@ abstract class _$$HoldImplCopyWith<$Res> implements $HoldCopyWith<$Res> {
       @JsonKey(name: 'table_id') String? tableId,
       @JsonKey(name: 'table_name') dynamic tableName,
       @JsonKey(name: 'hold_items') List<HoldItem>? holdItems,
-      @JsonKey(name: 'created_at') DateTime? createdAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(includeFromJson: false, includeToJson: false) bool? isSynced});
 
   @override
   $HoldAttendantCopyWith<$Res>? get attendant;
@@ -351,6 +353,7 @@ class __$$HoldImplCopyWithImpl<$Res>
     Object? tableName = freezed,
     Object? holdItems = freezed,
     Object? createdAt = freezed,
+    Object? isSynced = freezed,
   }) {
     return _then(_$HoldImpl(
       id: freezed == id
@@ -457,12 +460,16 @@ class __$$HoldImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      isSynced: freezed == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$HoldImpl implements _Hold {
   const _$HoldImpl(
       {this.id,
@@ -490,12 +497,10 @@ class _$HoldImpl implements _Hold {
       @JsonKey(name: 'table_id') this.tableId,
       @JsonKey(name: 'table_name') this.tableName,
       @JsonKey(name: 'hold_items') final List<HoldItem>? holdItems,
-      @JsonKey(name: 'created_at') this.createdAt})
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(includeFromJson: false, includeToJson: false) this.isSynced})
       : _links = links,
         _holdItems = holdItems;
-
-  factory _$HoldImpl.fromJson(Map<String, dynamic> json) =>
-      _$$HoldImplFromJson(json);
 
   @override
   final int? id;
@@ -582,10 +587,13 @@ class _$HoldImpl implements _Hold {
   @override
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final bool? isSynced;
 
   @override
   String toString() {
-    return 'Hold(id: $id, type: $type, links: $links, referenceCode: $referenceCode, date: $date, userId: $userId, attendant: $attendant, customerId: $customerId, customerName: $customerName, staffId: $staffId, staffName: $staffName, warehouseId: $warehouseId, warehouseName: $warehouseName, taxRate: $taxRate, taxAmount: $taxAmount, discount: $discount, shipping: $shipping, grandTotal: $grandTotal, receivedAmount: $receivedAmount, paidAmount: $paidAmount, note: $note, status: $status, tableId: $tableId, tableName: $tableName, holdItems: $holdItems, createdAt: $createdAt)';
+    return 'Hold(id: $id, type: $type, links: $links, referenceCode: $referenceCode, date: $date, userId: $userId, attendant: $attendant, customerId: $customerId, customerName: $customerName, staffId: $staffId, staffName: $staffName, warehouseId: $warehouseId, warehouseName: $warehouseName, taxRate: $taxRate, taxAmount: $taxAmount, discount: $discount, shipping: $shipping, grandTotal: $grandTotal, receivedAmount: $receivedAmount, paidAmount: $paidAmount, note: $note, status: $status, tableId: $tableId, tableName: $tableName, holdItems: $holdItems, createdAt: $createdAt, isSynced: $isSynced)';
   }
 
   @override
@@ -633,10 +641,11 @@ class _$HoldImpl implements _Hold {
             const DeepCollectionEquality()
                 .equals(other._holdItems, _holdItems) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.isSynced, isSynced) ||
+                other.isSynced == isSynced));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hashAll([
         runtimeType,
@@ -665,7 +674,8 @@ class _$HoldImpl implements _Hold {
         tableId,
         const DeepCollectionEquality().hash(tableName),
         const DeepCollectionEquality().hash(_holdItems),
-        createdAt
+        createdAt,
+        isSynced
       ]);
 
   /// Create a copy of Hold
@@ -675,13 +685,6 @@ class _$HoldImpl implements _Hold {
   @pragma('vm:prefer-inline')
   _$$HoldImplCopyWith<_$HoldImpl> get copyWith =>
       __$$HoldImplCopyWithImpl<_$HoldImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$HoldImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _Hold implements Hold {
@@ -711,9 +714,9 @@ abstract class _Hold implements Hold {
       @JsonKey(name: 'table_id') final String? tableId,
       @JsonKey(name: 'table_name') final dynamic tableName,
       @JsonKey(name: 'hold_items') final List<HoldItem>? holdItems,
-      @JsonKey(name: 'created_at') final DateTime? createdAt}) = _$HoldImpl;
-
-  factory _Hold.fromJson(Map<String, dynamic> json) = _$HoldImpl.fromJson;
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      @JsonKey(includeFromJson: false, includeToJson: false)
+      final bool? isSynced}) = _$HoldImpl;
 
   @override
   int? get id;
@@ -784,6 +787,9 @@ abstract class _Hold implements Hold {
   @override
   @JsonKey(name: 'created_at')
   DateTime? get createdAt;
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  bool? get isSynced;
 
   /// Create a copy of Hold
   /// with the given fields replaced by the non-null parameter values.
@@ -1576,6 +1582,7 @@ HoldItem _$HoldItemFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$HoldItem {
   int? get id => throw _privateConstructorUsedError;
+  String? get code => throw _privateConstructorUsedError;
   @JsonKey(name: 'hold_id')
   int? get holdId => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_id')
@@ -1607,6 +1614,19 @@ mixin _$HoldItem {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_name')
+  String? get customName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_description')
+  String? get customDescription => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_custom')
+  @IntBoolConverter()
+  bool get isCustom => throw _privateConstructorUsedError;
 
   /// Serializes this HoldItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1625,6 +1645,7 @@ abstract class $HoldItemCopyWith<$Res> {
   @useResult
   $Res call(
       {int? id,
+      String? code,
       @JsonKey(name: 'hold_id') int? holdId,
       @JsonKey(name: 'product_id') int? productId,
       @JsonKey(name: 'product_name') String? productName,
@@ -1640,7 +1661,16 @@ abstract class $HoldItemCopyWith<$Res> {
       double? quantity,
       @JsonKey(name: 'sub_total') double? subTotal,
       @JsonKey(name: 'created_at') DateTime? createdAt,
-      @JsonKey(name: 'updated_at') DateTime? updatedAt});
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_description') String? customDescription,
+      @JsonKey(name: 'is_custom') @IntBoolConverter() bool isCustom});
 
   $HoldUnitCopyWith<$Res>? get saleUnit;
 }
@@ -1661,6 +1691,7 @@ class _$HoldItemCopyWithImpl<$Res, $Val extends HoldItem>
   @override
   $Res call({
     Object? id = freezed,
+    Object? code = freezed,
     Object? holdId = freezed,
     Object? productId = freezed,
     Object? productName = freezed,
@@ -1677,12 +1708,21 @@ class _$HoldItemCopyWithImpl<$Res, $Val extends HoldItem>
     Object? subTotal = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
+    Object? customName = freezed,
+    Object? customDescription = freezed,
+    Object? isCustom = null,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      code: freezed == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String?,
       holdId: freezed == holdId
           ? _value.holdId
           : holdId // ignore: cast_nullable_to_non_nullable
@@ -1747,6 +1787,26 @@ class _$HoldItemCopyWithImpl<$Res, $Val extends HoldItem>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isCustom: null == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 
@@ -1775,6 +1835,7 @@ abstract class _$$HoldItemImplCopyWith<$Res>
   @useResult
   $Res call(
       {int? id,
+      String? code,
       @JsonKey(name: 'hold_id') int? holdId,
       @JsonKey(name: 'product_id') int? productId,
       @JsonKey(name: 'product_name') String? productName,
@@ -1790,7 +1851,16 @@ abstract class _$$HoldItemImplCopyWith<$Res>
       double? quantity,
       @JsonKey(name: 'sub_total') double? subTotal,
       @JsonKey(name: 'created_at') DateTime? createdAt,
-      @JsonKey(name: 'updated_at') DateTime? updatedAt});
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_description') String? customDescription,
+      @JsonKey(name: 'is_custom') @IntBoolConverter() bool isCustom});
 
   @override
   $HoldUnitCopyWith<$Res>? get saleUnit;
@@ -1810,6 +1880,7 @@ class __$$HoldItemImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
+    Object? code = freezed,
     Object? holdId = freezed,
     Object? productId = freezed,
     Object? productName = freezed,
@@ -1826,12 +1897,21 @@ class __$$HoldItemImplCopyWithImpl<$Res>
     Object? subTotal = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
+    Object? customName = freezed,
+    Object? customDescription = freezed,
+    Object? isCustom = null,
   }) {
     return _then(_$HoldItemImpl(
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int?,
+      code: freezed == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
+              as String?,
       holdId: freezed == holdId
           ? _value.holdId
           : holdId // ignore: cast_nullable_to_non_nullable
@@ -1896,6 +1976,26 @@ class __$$HoldItemImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isCustom: null == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -1905,6 +2005,7 @@ class __$$HoldItemImplCopyWithImpl<$Res>
 class _$HoldItemImpl implements _HoldItem {
   const _$HoldItemImpl(
       {this.id,
+      this.code,
       @JsonKey(name: 'hold_id') this.holdId,
       @JsonKey(name: 'product_id') this.productId,
       @JsonKey(name: 'product_name') this.productName,
@@ -1920,13 +2021,24 @@ class _$HoldItemImpl implements _HoldItem {
       this.quantity,
       @JsonKey(name: 'sub_total') this.subTotal,
       @JsonKey(name: 'created_at') this.createdAt,
-      @JsonKey(name: 'updated_at') this.updatedAt});
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      this.customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      this.customPrice,
+      @JsonKey(name: 'custom_name') this.customName,
+      @JsonKey(name: 'custom_description') this.customDescription,
+      @JsonKey(name: 'is_custom') @IntBoolConverter() this.isCustom = false});
 
   factory _$HoldItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$HoldItemImplFromJson(json);
 
   @override
   final int? id;
+  @override
+  final String? code;
   @override
   @JsonKey(name: 'hold_id')
   final int? holdId;
@@ -1974,10 +2086,28 @@ class _$HoldItemImpl implements _HoldItem {
   @override
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  final double? customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  final double? customPrice;
+  @override
+  @JsonKey(name: 'custom_name')
+  final String? customName;
+  @override
+  @JsonKey(name: 'custom_description')
+  final String? customDescription;
+  @override
+  @JsonKey(name: 'is_custom')
+  @IntBoolConverter()
+  final bool isCustom;
 
   @override
   String toString() {
-    return 'HoldItem(id: $id, holdId: $holdId, productId: $productId, productName: $productName, productPrice: $productPrice, netUnitPrice: $netUnitPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'HoldItem(id: $id, code: $code, holdId: $holdId, productId: $productId, productName: $productName, productPrice: $productPrice, netUnitPrice: $netUnitPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal, createdAt: $createdAt, updatedAt: $updatedAt, customCost: $customCost, customPrice: $customPrice, customName: $customName, customDescription: $customDescription, isCustom: $isCustom)';
   }
 
   @override
@@ -1986,6 +2116,7 @@ class _$HoldItemImpl implements _HoldItem {
         (other.runtimeType == runtimeType &&
             other is _$HoldItemImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.code, code) || other.code == code) &&
             (identical(other.holdId, holdId) || other.holdId == holdId) &&
             (identical(other.productId, productId) ||
                 other.productId == productId) &&
@@ -2015,30 +2146,47 @@ class _$HoldItemImpl implements _HoldItem {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.customCost, customCost) ||
+                other.customCost == customCost) &&
+            (identical(other.customPrice, customPrice) ||
+                other.customPrice == customPrice) &&
+            (identical(other.customName, customName) ||
+                other.customName == customName) &&
+            (identical(other.customDescription, customDescription) ||
+                other.customDescription == customDescription) &&
+            (identical(other.isCustom, isCustom) ||
+                other.isCustom == isCustom));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      holdId,
-      productId,
-      productName,
-      productPrice,
-      netUnitPrice,
-      taxType,
-      taxValue,
-      taxAmount,
-      discountType,
-      discountValue,
-      discountAmount,
-      saleUnit,
-      quantity,
-      subTotal,
-      createdAt,
-      updatedAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        code,
+        holdId,
+        productId,
+        productName,
+        productPrice,
+        netUnitPrice,
+        taxType,
+        taxValue,
+        taxAmount,
+        discountType,
+        discountValue,
+        discountAmount,
+        saleUnit,
+        quantity,
+        subTotal,
+        createdAt,
+        updatedAt,
+        customCost,
+        customPrice,
+        customName,
+        customDescription,
+        isCustom
+      ]);
 
   /// Create a copy of HoldItem
   /// with the given fields replaced by the non-null parameter values.
@@ -2059,6 +2207,7 @@ class _$HoldItemImpl implements _HoldItem {
 abstract class _HoldItem implements HoldItem {
   const factory _HoldItem(
       {final int? id,
+      final String? code,
       @JsonKey(name: 'hold_id') final int? holdId,
       @JsonKey(name: 'product_id') final int? productId,
       @JsonKey(name: 'product_name') final String? productName,
@@ -2074,13 +2223,26 @@ abstract class _HoldItem implements HoldItem {
       final double? quantity,
       @JsonKey(name: 'sub_total') final double? subTotal,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
-      @JsonKey(name: 'updated_at') final DateTime? updatedAt}) = _$HoldItemImpl;
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      final double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      final double? customPrice,
+      @JsonKey(name: 'custom_name') final String? customName,
+      @JsonKey(name: 'custom_description') final String? customDescription,
+      @JsonKey(name: 'is_custom')
+      @IntBoolConverter()
+      final bool isCustom}) = _$HoldItemImpl;
 
   factory _HoldItem.fromJson(Map<String, dynamic> json) =
       _$HoldItemImpl.fromJson;
 
   @override
   int? get id;
+  @override
+  String? get code;
   @override
   @JsonKey(name: 'hold_id')
   int? get holdId;
@@ -2128,6 +2290,24 @@ abstract class _HoldItem implements HoldItem {
   @override
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice;
+  @override
+  @JsonKey(name: 'custom_name')
+  String? get customName;
+  @override
+  @JsonKey(name: 'custom_description')
+  String? get customDescription;
+  @override
+  @JsonKey(name: 'is_custom')
+  @IntBoolConverter()
+  bool get isCustom;
 
   /// Create a copy of HoldItem
   /// with the given fields replaced by the non-null parameter values.

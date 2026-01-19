@@ -2,6 +2,8 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'create_hold_dto.dart';
+
 part 'hold.freezed.dart';
 part 'hold.g.dart';
 
@@ -34,9 +36,46 @@ class Hold with _$Hold {
     @JsonKey(name: 'table_name') dynamic tableName,
     @JsonKey(name: 'hold_items') List<HoldItem>? holdItems,
     @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(includeFromJson: false, includeToJson: false) bool? isSynced,
   }) = _Hold;
 
-  factory Hold.fromJson(Map<String, dynamic> json) => _$HoldFromJson(json);
+  factory Hold.fromJson(Map<String, dynamic> json) {
+    final attributes = json['attributes'] as Map<String, dynamic>? ?? {};
+    final links = json['links'] as Map<String, dynamic>?;
+
+    return Hold(
+      id: int.tryParse(json['id']?.toString() ?? ''),
+      type: json['type'] as String?,
+      links: links,
+
+      referenceCode: attributes['reference_code'] as String?,
+      date: attributes['date'] != null ? DateTime.tryParse(attributes['date']) : null,
+      userId: attributes['user_id'] as int?,
+      attendant: attributes['attendant'] != null ? HoldAttendant.fromJson(attributes['attendant']) : null,
+      customerId: attributes['customer_id'] as int?,
+      customerName: attributes['customer_name'] as String?,
+      staffId: attributes['staff_id'] as int?,
+      staffName: attributes['staff_name'] as String?,
+      warehouseId: attributes['warehouse_id'] as int?,
+      warehouseName: attributes['warehouse_name'] as String?,
+      taxRate: (attributes['tax_rate'] as num?)?.toDouble(),
+      taxAmount: (attributes['tax_amount'] as num?)?.toDouble(),
+      discount: (attributes['discount'] as num?)?.toDouble(),
+      shipping: (attributes['shipping'] as num?)?.toDouble(),
+      grandTotal: (attributes['grand_total'] as num?)?.toDouble(),
+      receivedAmount: (attributes['received_amount'] as num?)?.toDouble(),
+      paidAmount: (attributes['paid_amount'] as num?)?.toDouble(),
+      note: attributes['note'] as String?,
+      status: attributes['status'],
+      tableId: attributes['table_id']?.toString(),
+      tableName: attributes['table_name'],
+      holdItems: attributes['hold_items'] != null ? (attributes['hold_items'] as List).map((e) => HoldItem.fromJson(e)).toList() : null,
+      createdAt: attributes['created_at'] != null ? DateTime.tryParse(attributes['created_at']) : null,
+
+      // Not included in JSON
+      // isSynced: false,
+    );
+  }
 }
 
 @freezed
@@ -78,6 +117,7 @@ class HoldAttendant with _$HoldAttendant {
 class HoldItem with _$HoldItem {
   const factory HoldItem({
     int? id,
+    String? code,
     @JsonKey(name: 'hold_id') int? holdId,
     @JsonKey(name: 'product_id') int? productId,
     @JsonKey(name: 'product_name') String? productName,
@@ -94,6 +134,11 @@ class HoldItem with _$HoldItem {
     @JsonKey(name: 'sub_total') double? subTotal,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'custom_cost') @StringOrNumToDoubleConverter() double? customCost,
+    @JsonKey(name: 'custom_price') @StringOrNumToDoubleConverter() double? customPrice,
+    @JsonKey(name: 'custom_name') String? customName,
+    @JsonKey(name: 'custom_description') String? customDescription,
+    @JsonKey(name: 'is_custom') @IntBoolConverter() @Default(false) bool isCustom,
   }) = _HoldItem;
 
   factory HoldItem.fromJson(Map<String, dynamic> json) => _$HoldItemFromJson(json);

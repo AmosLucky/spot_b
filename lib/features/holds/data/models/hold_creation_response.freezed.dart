@@ -57,7 +57,7 @@ mixin _$HoldCreationResponseAttributesDao {
   @JsonKey(name: 'table_id')
   String? get tableId => throw _privateConstructorUsedError;
   @JsonKey(name: 'table_name')
-  dynamic get tableName => throw _privateConstructorUsedError;
+  String? get tableName => throw _privateConstructorUsedError;
   @JsonKey(name: 'hold_items')
   List<HoldCreationResponseHoldItemDao>? get holdItems =>
       throw _privateConstructorUsedError;
@@ -103,7 +103,7 @@ abstract class $HoldCreationResponseAttributesDaoCopyWith<$Res> {
       String? note,
       String? status,
       @JsonKey(name: 'table_id') String? tableId,
-      @JsonKey(name: 'table_name') dynamic tableName,
+      @JsonKey(name: 'table_name') String? tableName,
       @JsonKey(name: 'hold_items')
       List<HoldCreationResponseHoldItemDao>? holdItems,
       @JsonKey(name: 'created_at') DateTime? createdAt});
@@ -235,7 +235,7 @@ class _$HoldCreationResponseAttributesDaoCopyWithImpl<$Res,
       tableName: freezed == tableName
           ? _value.tableName
           : tableName // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       holdItems: freezed == holdItems
           ? _value.holdItems
           : holdItems // ignore: cast_nullable_to_non_nullable
@@ -293,7 +293,7 @@ abstract class _$$HoldCreationResponseAttributesDaoImplCopyWith<$Res>
       String? note,
       String? status,
       @JsonKey(name: 'table_id') String? tableId,
-      @JsonKey(name: 'table_name') dynamic tableName,
+      @JsonKey(name: 'table_name') String? tableName,
       @JsonKey(name: 'hold_items')
       List<HoldCreationResponseHoldItemDao>? holdItems,
       @JsonKey(name: 'created_at') DateTime? createdAt});
@@ -425,7 +425,7 @@ class __$$HoldCreationResponseAttributesDaoImplCopyWithImpl<$Res>
       tableName: freezed == tableName
           ? _value.tableName
           : tableName // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       holdItems: freezed == holdItems
           ? _value._holdItems
           : holdItems // ignore: cast_nullable_to_non_nullable
@@ -529,7 +529,7 @@ class _$HoldCreationResponseAttributesDaoImpl
   final String? tableId;
   @override
   @JsonKey(name: 'table_name')
-  final dynamic tableName;
+  final String? tableName;
   final List<HoldCreationResponseHoldItemDao>? _holdItems;
   @override
   @JsonKey(name: 'hold_items')
@@ -588,7 +588,8 @@ class _$HoldCreationResponseAttributesDaoImpl
             (identical(other.note, note) || other.note == note) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.tableId, tableId) || other.tableId == tableId) &&
-            const DeepCollectionEquality().equals(other.tableName, tableName) &&
+            (identical(other.tableName, tableName) ||
+                other.tableName == tableName) &&
             const DeepCollectionEquality()
                 .equals(other._holdItems, _holdItems) &&
             (identical(other.createdAt, createdAt) ||
@@ -619,7 +620,7 @@ class _$HoldCreationResponseAttributesDaoImpl
         note,
         status,
         tableId,
-        const DeepCollectionEquality().hash(tableName),
+        tableName,
         const DeepCollectionEquality().hash(_holdItems),
         createdAt
       ]);
@@ -665,7 +666,7 @@ abstract class _HoldCreationResponseAttributesDao
           final String? note,
           final String? status,
           @JsonKey(name: 'table_id') final String? tableId,
-          @JsonKey(name: 'table_name') final dynamic tableName,
+          @JsonKey(name: 'table_name') final String? tableName,
           @JsonKey(name: 'hold_items')
           final List<HoldCreationResponseHoldItemDao>? holdItems,
           @JsonKey(name: 'created_at') final DateTime? createdAt}) =
@@ -731,7 +732,7 @@ abstract class _HoldCreationResponseAttributesDao
   String? get tableId;
   @override
   @JsonKey(name: 'table_name')
-  dynamic get tableName;
+  String? get tableName;
   @override
   @JsonKey(name: 'hold_items')
   List<HoldCreationResponseHoldItemDao>? get holdItems;
@@ -1573,6 +1574,19 @@ mixin _$HoldCreationResponseHoldItemDao {
   double? get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'sub_total')
   double? get subTotal => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_custom')
+  @IntBoolConverter()
+  bool get isCustom => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_name')
+  String? get customName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_description')
+  String? get customDescription => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -1612,6 +1626,15 @@ abstract class $HoldCreationResponseHoldItemDaoCopyWith<$Res> {
       @JsonKey(name: 'sale_unit') HoldCreationResponseSaleUnitDao? saleUnit,
       double? quantity,
       @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(name: 'is_custom') @IntBoolConverter() bool isCustom,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice,
+      @JsonKey(name: 'custom_description') String? customDescription,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 
@@ -1649,6 +1672,11 @@ class _$HoldCreationResponseHoldItemDaoCopyWithImpl<$Res,
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? isCustom = null,
+    Object? customName = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
+    Object? customDescription = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -1713,6 +1741,26 @@ class _$HoldCreationResponseHoldItemDaoCopyWithImpl<$Res,
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      isCustom: null == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -1765,6 +1813,15 @@ abstract class _$$HoldCreationResponseHoldItemDaoImplCopyWith<$Res>
       @JsonKey(name: 'sale_unit') HoldCreationResponseSaleUnitDao? saleUnit,
       double? quantity,
       @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(name: 'is_custom') @IntBoolConverter() bool isCustom,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice,
+      @JsonKey(name: 'custom_description') String? customDescription,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 
@@ -1802,6 +1859,11 @@ class __$$HoldCreationResponseHoldItemDaoImplCopyWithImpl<$Res>
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? isCustom = null,
+    Object? customName = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
+    Object? customDescription = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -1866,6 +1928,26 @@ class __$$HoldCreationResponseHoldItemDaoImplCopyWithImpl<$Res>
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      isCustom: null == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -1898,6 +1980,15 @@ class _$HoldCreationResponseHoldItemDaoImpl
       @JsonKey(name: 'sale_unit') this.saleUnit,
       this.quantity,
       @JsonKey(name: 'sub_total') this.subTotal,
+      @JsonKey(name: 'is_custom') @IntBoolConverter() this.isCustom = false,
+      @JsonKey(name: 'custom_name') this.customName,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      this.customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      this.customPrice,
+      @JsonKey(name: 'custom_description') this.customDescription,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt});
 
@@ -1949,6 +2040,24 @@ class _$HoldCreationResponseHoldItemDaoImpl
   @JsonKey(name: 'sub_total')
   final double? subTotal;
   @override
+  @JsonKey(name: 'is_custom')
+  @IntBoolConverter()
+  final bool isCustom;
+  @override
+  @JsonKey(name: 'custom_name')
+  final String? customName;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  final double? customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  final double? customPrice;
+  @override
+  @JsonKey(name: 'custom_description')
+  final String? customDescription;
+  @override
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
   @override
@@ -1957,7 +2066,7 @@ class _$HoldCreationResponseHoldItemDaoImpl
 
   @override
   String toString() {
-    return 'HoldCreationResponseHoldItemDao(id: $id, holdId: $holdId, productId: $productId, productName: $productName, productPrice: $productPrice, netUnitPrice: $netUnitPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'HoldCreationResponseHoldItemDao(id: $id, holdId: $holdId, productId: $productId, productName: $productName, productPrice: $productPrice, netUnitPrice: $netUnitPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal, isCustom: $isCustom, customName: $customName, customCost: $customCost, customPrice: $customPrice, customDescription: $customDescription, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -1992,6 +2101,16 @@ class _$HoldCreationResponseHoldItemDaoImpl
                 other.quantity == quantity) &&
             (identical(other.subTotal, subTotal) ||
                 other.subTotal == subTotal) &&
+            (identical(other.isCustom, isCustom) ||
+                other.isCustom == isCustom) &&
+            (identical(other.customName, customName) ||
+                other.customName == customName) &&
+            (identical(other.customCost, customCost) ||
+                other.customCost == customCost) &&
+            (identical(other.customPrice, customPrice) ||
+                other.customPrice == customPrice) &&
+            (identical(other.customDescription, customDescription) ||
+                other.customDescription == customDescription) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -2000,25 +2119,31 @@ class _$HoldCreationResponseHoldItemDaoImpl
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      holdId,
-      productId,
-      productName,
-      productPrice,
-      netUnitPrice,
-      taxType,
-      taxValue,
-      taxAmount,
-      discountType,
-      discountValue,
-      discountAmount,
-      saleUnit,
-      quantity,
-      subTotal,
-      createdAt,
-      updatedAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        holdId,
+        productId,
+        productName,
+        productPrice,
+        netUnitPrice,
+        taxType,
+        taxValue,
+        taxAmount,
+        discountType,
+        discountValue,
+        discountAmount,
+        saleUnit,
+        quantity,
+        subTotal,
+        isCustom,
+        customName,
+        customCost,
+        customPrice,
+        customDescription,
+        createdAt,
+        updatedAt
+      ]);
 
   /// Create a copy of HoldCreationResponseHoldItemDao
   /// with the given fields replaced by the non-null parameter values.
@@ -2057,6 +2182,15 @@ abstract class _HoldCreationResponseHoldItemDao
           final HoldCreationResponseSaleUnitDao? saleUnit,
           final double? quantity,
           @JsonKey(name: 'sub_total') final double? subTotal,
+          @JsonKey(name: 'is_custom') @IntBoolConverter() final bool isCustom,
+          @JsonKey(name: 'custom_name') final String? customName,
+          @JsonKey(name: 'custom_cost')
+          @StringOrNumToDoubleConverter()
+          final double? customCost,
+          @JsonKey(name: 'custom_price')
+          @StringOrNumToDoubleConverter()
+          final double? customPrice,
+          @JsonKey(name: 'custom_description') final String? customDescription,
           @JsonKey(name: 'created_at') final DateTime? createdAt,
           @JsonKey(name: 'updated_at') final DateTime? updatedAt}) =
       _$HoldCreationResponseHoldItemDaoImpl;
@@ -2107,6 +2241,24 @@ abstract class _HoldCreationResponseHoldItemDao
   @override
   @JsonKey(name: 'sub_total')
   double? get subTotal;
+  @override
+  @JsonKey(name: 'is_custom')
+  @IntBoolConverter()
+  bool get isCustom;
+  @override
+  @JsonKey(name: 'custom_name')
+  String? get customName;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice;
+  @override
+  @JsonKey(name: 'custom_description')
+  String? get customDescription;
   @override
   @JsonKey(name: 'created_at')
   DateTime? get createdAt;

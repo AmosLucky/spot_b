@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'hold.dart';
 
 part 'grouped_hold.freezed.dart';
-part 'grouped_hold.g.dart';
 
 @freezed
 class GroupedHold with _$GroupedHold {
@@ -14,11 +13,11 @@ class GroupedHold with _$GroupedHold {
   const GroupedHold._();
 
   Hold? get _firstOrNull => holds.isNotEmpty ? holds.first : null;
+  Hold? get firstOrNull => _firstOrNull;
 
   int get holdCount => holds.length;
 
-  int get totalHoldItemsCount =>
-      holds.fold<int>(0, (total, hold) => total + (hold.holdItems?.length ?? 0));
+  int get totalHoldItemsCount => holds.fold<int>(0, (total, hold) => total + (hold.holdItems?.length ?? 0));
 
   String? get tableName => _firstOrNull?.tableName?.toString();
 
@@ -34,6 +33,8 @@ class GroupedHold with _$GroupedHold {
 
     return full.isEmpty ? null : full;
   }
+
+  String? get warehouseName => _firstOrNull?.warehouseName;
 
   double get grandTotal => holds.fold(0.0, (total, hold) => total + (hold.grandTotal ?? 0.0));
 
@@ -54,5 +55,14 @@ class GroupedHold with _$GroupedHold {
     });
 
     return ([firstRef] + suffixes.toList()).join("-");
+  }
+
+  bool? get hasUnsyncedHold {
+    for (final hold in holds) {
+      if (hold.isSynced == false) {
+        return true;
+      }
+    }
+    return false;
   }
 }

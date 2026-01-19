@@ -6,72 +6,6 @@ part of 'hold.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$HoldImpl _$$HoldImplFromJson(Map<String, dynamic> json) => _$HoldImpl(
-      id: (json['id'] as num?)?.toInt(),
-      type: json['type'] as String?,
-      links: json['links'] as Map<String, dynamic>?,
-      referenceCode: json['reference_code'] as String?,
-      date:
-          json['date'] == null ? null : DateTime.parse(json['date'] as String),
-      userId: (json['user_id'] as num?)?.toInt(),
-      attendant: json['attendant'] == null
-          ? null
-          : HoldAttendant.fromJson(json['attendant'] as Map<String, dynamic>),
-      customerId: (json['customer_id'] as num?)?.toInt(),
-      customerName: json['customer_name'] as String?,
-      staffId: (json['staff_id'] as num?)?.toInt(),
-      staffName: json['staff_name'] as String?,
-      warehouseId: (json['warehouse_id'] as num?)?.toInt(),
-      warehouseName: json['warehouse_name'] as String?,
-      taxRate: (json['tax_rate'] as num?)?.toDouble(),
-      taxAmount: (json['tax_amount'] as num?)?.toDouble(),
-      discount: (json['discount'] as num?)?.toDouble(),
-      shipping: (json['shipping'] as num?)?.toDouble(),
-      grandTotal: (json['grand_total'] as num?)?.toDouble(),
-      receivedAmount: (json['received_amount'] as num?)?.toDouble(),
-      paidAmount: (json['paid_amount'] as num?)?.toDouble(),
-      note: json['note'] as String?,
-      status: json['status'],
-      tableId: json['table_id'] as String?,
-      tableName: json['table_name'],
-      holdItems: (json['hold_items'] as List<dynamic>?)
-          ?.map((e) => HoldItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-    );
-
-Map<String, dynamic> _$$HoldImplToJson(_$HoldImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'type': instance.type,
-      'links': instance.links,
-      'reference_code': instance.referenceCode,
-      'date': instance.date?.toIso8601String(),
-      'user_id': instance.userId,
-      'attendant': instance.attendant,
-      'customer_id': instance.customerId,
-      'customer_name': instance.customerName,
-      'staff_id': instance.staffId,
-      'staff_name': instance.staffName,
-      'warehouse_id': instance.warehouseId,
-      'warehouse_name': instance.warehouseName,
-      'tax_rate': instance.taxRate,
-      'tax_amount': instance.taxAmount,
-      'discount': instance.discount,
-      'shipping': instance.shipping,
-      'grand_total': instance.grandTotal,
-      'received_amount': instance.receivedAmount,
-      'paid_amount': instance.paidAmount,
-      'note': instance.note,
-      'status': instance.status,
-      'table_id': instance.tableId,
-      'table_name': instance.tableName,
-      'hold_items': instance.holdItems,
-      'created_at': instance.createdAt?.toIso8601String(),
-    };
-
 _$HoldAttendantImpl _$$HoldAttendantImplFromJson(Map<String, dynamic> json) =>
     _$HoldAttendantImpl(
       id: (json['id'] as num?)?.toInt(),
@@ -147,6 +81,7 @@ Map<String, dynamic> _$$HoldAttendantImplToJson(_$HoldAttendantImpl instance) =>
 _$HoldItemImpl _$$HoldItemImplFromJson(Map<String, dynamic> json) =>
     _$HoldItemImpl(
       id: (json['id'] as num?)?.toInt(),
+      code: json['code'] as String?,
       holdId: (json['hold_id'] as num?)?.toInt(),
       productId: (json['product_id'] as num?)?.toInt(),
       productName: json['product_name'] as String?,
@@ -169,11 +104,21 @@ _$HoldItemImpl _$$HoldItemImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+      customCost:
+          const StringOrNumToDoubleConverter().fromJson(json['custom_cost']),
+      customPrice:
+          const StringOrNumToDoubleConverter().fromJson(json['custom_price']),
+      customName: json['custom_name'] as String?,
+      customDescription: json['custom_description'] as String?,
+      isCustom: json['is_custom'] == null
+          ? false
+          : const IntBoolConverter().fromJson(json['is_custom']),
     );
 
 Map<String, dynamic> _$$HoldItemImplToJson(_$HoldItemImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'code': instance.code,
       'hold_id': instance.holdId,
       'product_id': instance.productId,
       'product_name': instance.productName,
@@ -190,6 +135,13 @@ Map<String, dynamic> _$$HoldItemImplToJson(_$HoldItemImpl instance) =>
       'sub_total': instance.subTotal,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
+      'custom_cost':
+          const StringOrNumToDoubleConverter().toJson(instance.customCost),
+      'custom_price':
+          const StringOrNumToDoubleConverter().toJson(instance.customPrice),
+      'custom_name': instance.customName,
+      'custom_description': instance.customDescription,
+      'is_custom': const IntBoolConverter().toJson(instance.isCustom),
     };
 
 _$HoldUnitImpl _$$HoldUnitImplFromJson(Map<String, dynamic> json) =>
