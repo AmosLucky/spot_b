@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import '../../core/constants/strings/spotstock_strings.dart';
-import '../../core/enums/app_platform.dart';
+import '../../../core/constants/strings/spotstock_strings.dart';
+import '../../../core/enums/app_platform.dart';
 
 class PlatformService {
   AppPlatform get currentPlatform {
