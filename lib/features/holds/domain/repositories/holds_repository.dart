@@ -8,7 +8,14 @@ abstract class HoldsRepository {
     int? pageNumber,
     int? pageSize = SpotstockApiConstants.pageSize,
     int? limit = SpotstockApiConstants.limit,
+    int? userId,
   });
 
   Future<Result<Hold>> createHold(CreateHoldDto createHoldDto);
+
+  Future<Result<void>> syncHolds();
+
+  Future<Result<void>> deleteHold(Hold hold);
+
+  Stream<Result<Hold>> getHold(int holdId, {String? referenceCode});
 }
