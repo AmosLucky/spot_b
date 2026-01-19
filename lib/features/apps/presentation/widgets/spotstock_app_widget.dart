@@ -23,8 +23,8 @@ class SpotstockAppWidget extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: MediaQuery.of(context).size.width * SpotstockSizes.s0_3,
-            height: MediaQuery.of(context).size.width * SpotstockSizes.s0_3,
+            width: MediaQuery.of(context).size.width * SpotstockSizes.s0_25,
+            height: MediaQuery.of(context).size.width * SpotstockSizes.s0_25,
             padding: EdgeInsets.all(SpotstockSizes.s20),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -42,7 +42,19 @@ class SpotstockAppWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: SpotstockSizes.s10),
-          Text(name),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * SpotstockSizes.s0_25,
+            child: Text(
+              name,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: SpotstockSizes.s12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );
