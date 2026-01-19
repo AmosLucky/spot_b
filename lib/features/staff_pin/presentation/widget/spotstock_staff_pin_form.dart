@@ -4,6 +4,7 @@ import '../../../../core/constants/sizes/spotstock_sizes.dart';
 import '../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../core/error_handling/app_error.dart';
 import '../../../../core/presentation/progress_indicators/spotstock_progress_indicator.dart';
+import '../../../../core/presentation/haptic_feedback/spotstock_haptic_feedback.dart';
 import '../../../../core/presentation/textfields/spotstock_pinput.dart';
 import '../view_model/spotstock_staff_pin_form_view_model.dart';
 
@@ -12,12 +13,13 @@ class SpotstockStaffPinForm extends StatelessWidget {
   final String staffName;
   final Function() onPinCorrect;
   final Function(AppError error) onPinIncorrect;
-  const SpotstockStaffPinForm(
-      {super.key,
-      required this.viewModel,
-      required this.staffName,
-      required this.onPinCorrect,
-      required this.onPinIncorrect});
+  const SpotstockStaffPinForm({
+    super.key,
+    required this.viewModel,
+    required this.staffName,
+    required this.onPinCorrect,
+    required this.onPinIncorrect,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +71,7 @@ class SpotstockStaffPinForm extends StatelessWidget {
                                 onPinCorrect();
                               },
                               onFailure: (error) {
+                                SpotstockHapticFeedback.incorrectStaffPin();
                                 onPinIncorrect(error);
                               },
                             );
