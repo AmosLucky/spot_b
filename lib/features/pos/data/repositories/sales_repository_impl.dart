@@ -29,7 +29,7 @@ class SalesRepositoryImpl extends SalesRepository {
     final isConnected = await networkInfoRepository.isConnected;
 
     if (isConnected == true) {
-      final remoteResult = await remoteDatasource.createSale(createSaleDto.copyWith(isOffline: 0));
+      final remoteResult = await remoteDatasource.createSale(createSaleDto.copyWith(isOffline: false));
       if (remoteResult is Success) {
         final sale = SaleMapper.fromSaleCreationResponse(remoteResult.data);
         final localResult = await localDatasource.saveSale(sale);
@@ -42,12 +42,11 @@ class SalesRepositoryImpl extends SalesRepository {
         return Result.failure(remoteResult.error);
       }
     } else {
-      final receiptRefNoResult =
-          await localReceiptReferenceNoRepository.generateReceiptReferenceNo();
+      final receiptRefNoResult = await localReceiptReferenceNoRepository.generateReceiptReferenceNo();
       if (receiptRefNoResult is Success) {
         final localResult = await localDatasource.createSale(
           createSaleDto.copyWith(
-            isOffline: 1,
+            isOffline: true,
             referenceCode: receiptRefNoResult.data,
           ),
         );
@@ -56,7 +55,7 @@ class SalesRepositoryImpl extends SalesRepository {
         }
         final sale = SaleMapper.fromCreateDto(
           createSaleDto.copyWith(
-            isOffline: 1,
+            isOffline: true,
             referenceCode: receiptRefNoResult.data,
           ),
         );
