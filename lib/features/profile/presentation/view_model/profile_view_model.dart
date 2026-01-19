@@ -10,26 +10,42 @@ import '../../../../core/routing/navigation.dart';
 import '../../../../core/routing/router.dart';
 import '../../../../core/shared/command.dart';
 import '../../../../core/shared/result.dart';
+import '../../../../features/app/presentation/view_models/app_view_model.dart';
 import '../../../auth/data/models/spotstock_user.dart';
 import '../../../auth/domain/usecases/get_spotstock_user.dart';
 import '../../../auth/domain/usecases/remove_last_login_time.dart';
 import '../../../auth/domain/usecases/remove_token.dart';
+import '../../../theme/domain/usecases/get_theme.dart';
+import '../../../theme/domain/usecases/set_theme.dart';
 
 class ProfileViewModel extends SpotstockViewModel with SpotstockDialogMixin {
+  final AppViewModel appViewModel;
   final RemoveLastLoginTime removeLastLoginTime;
   final GetSpotstockUser getSpotstockUser;
   final RemoveToken removeToken;
+  final GetTheme getTheme;
+  final SetTheme setTheme;
 
-  ProfileViewModel(this.removeLastLoginTime, this.getSpotstockUser, this.removeToken);
+  ProfileViewModel(
+    this.appViewModel,
+    this.removeLastLoginTime,
+    this.getSpotstockUser,
+    this.removeToken,
+    this.getTheme,
+    this.setTheme,
+  );
 
   late Command1<void, BuildContext> logoutCommand;
 
   SpotstockUser? _spotstockUser;
   SpotstockUser? get spotstockUser => _spotstockUser;
 
+  ThemeMode get themeMode => appViewModel.themeMode;
+
   @override
   void bind(BuildContext context) async {
     logoutCommand = Command1<void, BuildContext>(_logout);
+    notifyListeners();
     final result = await getSpotstockUser();
     result.when(
       onSuccess: (spotstockUser) {
@@ -39,6 +55,11 @@ class ProfileViewModel extends SpotstockViewModel with SpotstockDialogMixin {
         addError(error);
       },
     );
+    notifyListeners();
+  }
+
+  void onThemeChanged(ThemeMode themeMode) async {
+    await appViewModel.onThemeChanged(themeMode);
     notifyListeners();
   }
 
@@ -53,7 +74,7 @@ class ProfileViewModel extends SpotstockViewModel with SpotstockDialogMixin {
           color: Theme.of(context).colorScheme.error,
           child: Text(
             SpotstockStrings.yesLogout,
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+            style: TextStyle(color: Theme.of(context).colorScheme.onError),
           ),
           onPressed: () {
             removeLastLoginTime();

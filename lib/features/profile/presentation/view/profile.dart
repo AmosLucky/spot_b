@@ -54,10 +54,7 @@ class Profile extends StatelessWidget {
                             Icon(
                               Icons.person_outlined,
                               size: SpotstockSizes.s18,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withAlpha(settingsSupportingTextColor),
+                              color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                             ),
                             SizedBox(width: SpotstockSizes.s5),
                             Text(
@@ -65,10 +62,7 @@ class Profile extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: SpotstockSizes.s14,
                                 fontWeight: FontWeight.w400,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withAlpha(settingsSupportingTextColor),
+                                color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                               ),
                             ),
                           ],
@@ -78,10 +72,7 @@ class Profile extends StatelessWidget {
                           SpotstockStrings.personalInformation,
                           style: TextStyle(
                             fontSize: SpotstockSizes.s13,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withAlpha(settingsSupportingTextColor),
+                            color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                           ),
                         ),
                         SizedBox(height: SpotstockSizes.s15),
@@ -112,46 +103,76 @@ class Profile extends StatelessWidget {
                         ),
                         SizedBox(height: SpotstockSizes.s15),
                         Divider(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withAlpha(settingsSupportingTextColor),
+                          color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                         ),
                         SizedBox(height: SpotstockSizes.s15),
                         Text(
                           SpotstockStrings.settings,
                           style: TextStyle(
                             fontSize: SpotstockSizes.s13,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withAlpha(settingsSupportingTextColor),
+                            color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                           ),
+                        ),
+                        SizedBox(height: SpotstockSizes.s10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              SpotstockStrings.theme,
+                              style: TextStyle(
+                                fontSize: SpotstockSizes.s13,
+                              ),
+                            ),
+                            SegmentedButton<ThemeMode>(
+                              multiSelectionEnabled: false,
+                              showSelectedIcon: false,
+                              selected: {viewModel.themeMode},
+                              onSelectionChanged: (themeMode) {
+                                viewModel.onThemeChanged(themeMode.first);
+                              },
+                              segments: [
+                                ButtonSegment(
+                                  value: ThemeMode.light,
+                                  label: Text(
+                                    SpotstockStrings.light,
+                                    style: TextStyle(fontSize: SpotstockSizes.s11),
+                                  ),
+                                ),
+                                ButtonSegment(
+                                  value: ThemeMode.system,
+                                  label: Text(
+                                    SpotstockStrings.system,
+                                    style: TextStyle(fontSize: SpotstockSizes.s11),
+                                  ),
+                                ),
+                                ButtonSegment(
+                                  value: ThemeMode.dark,
+                                  label: Text(
+                                    SpotstockStrings.dark,
+                                    style: TextStyle(fontSize: SpotstockSizes.s11),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                         SizedBox(height: SpotstockSizes.s15),
                         Divider(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withAlpha(settingsSupportingTextColor),
+                          color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                         ),
                         SizedBox(height: SpotstockSizes.s15),
                         Text(
                           SpotstockStrings.helpAndSupport,
                           style: TextStyle(
                             fontSize: SpotstockSizes.s13,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withAlpha(settingsSupportingTextColor),
+                            color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                           ),
                         ),
                         SizedBox(height: SpotstockSizes.s15),
                         Divider(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withAlpha(settingsSupportingTextColor),
+                          color: Theme.of(context).colorScheme.onSurface.withAlpha(settingsSupportingTextColor),
                         ),
                         SpotstockPrimaryButton(
                           color: Theme.of(context).colorScheme.error,
