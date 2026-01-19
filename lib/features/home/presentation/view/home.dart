@@ -31,7 +31,7 @@ class Home extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        '${SpotstockStrings.welcomeWithComma} ${viewModel.spotstockUser?.firstName} ${SpotstockStrings.waveHand}',
+                        '${SpotstockStrings.welcomeWithComma} ${viewModel.user?.firstName} ${SpotstockStrings.waveHand}',
                         style: TextStyle(
                           fontSize: SpotstockSizes.s16,
                           fontWeight: FontWeight.w600,
@@ -46,7 +46,7 @@ class Home extends StatelessWidget {
             ),
             floatingActionButton: SpotstockFloatingActionButton(
               onPressed: () async {
-                viewModel.navigateToSelectAppCommand.execute(context);
+                viewModel.onAppsPressed(context);
               },
               icon: Icon(
                 Icons.storefront,
