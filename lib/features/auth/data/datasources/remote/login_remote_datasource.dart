@@ -8,10 +8,10 @@ import '../../../../../core/shared/result.dart';
 import '../../models/login_dto.dart';
 import '../../models/login_response_dao.dart';
 
-class LoginDatasource {
+class LoginRemoteDatasource {
   final DioClient dioClient;
 
-  LoginDatasource(this.dioClient);
+  LoginRemoteDatasource(this.dioClient);
 
   Future<Result<SpotstockApiResponse<LoginResponseDao>>> login(LoginDto loginDto) async {
     try {
