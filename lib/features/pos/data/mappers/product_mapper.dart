@@ -20,7 +20,12 @@ extension ProductMapper on Product {
       inStock: Value(inStock),
       link: Value(link),
       stockId: Value(stock?.id),
-      warehouseId: Value(warehouseId),
+      warehouseId: Value(stock?.warehouseId ?? warehouseId),
+      brandName: Value(brandName),
+      productCategoryName: Value(productCategoryName),
+      stockAlert: Value(stockAlert),
+      productUnitName: Value(productUnitName),
+      warehouse: Value(warehouse),
     );
   }
 
@@ -28,6 +33,7 @@ extension ProductMapper on Product {
     return Product(
       id: row.id,
       name: row.name,
+      companyId: row.companyId,
       code: row.code,
       expiryDate: row.expiryDate,
       mainProductId: row.mainProductId,
@@ -39,6 +45,11 @@ extension ProductMapper on Product {
       inStock: row.inStock,
       link: row.link,
       stock: Stock(id: row.stockId, warehouseId: row.warehouseId),
+      brandName: row.brandName,
+      productCategoryName: row.productCategoryName,
+      stockAlert: row.stockAlert,
+      productUnitName: row.productUnitName,
+      warehouse: row.warehouse,
     );
   }
 }

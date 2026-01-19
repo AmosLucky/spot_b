@@ -4,6 +4,8 @@ import 'package:spotstock_inventory/core/networking/spotstock_api_constants.dart
 import '../../../../core/database/database_client.dart';
 import '../../../../core/networking/api_response/spotstock_api_data_item.dart';
 import '../../../../core/networking/api_response/spotstock_api_response.dart';
+import '../../../holds/data/models/create_hold_dto.dart';
+import '../../../holds/data/models/hold.dart';
 import '../enums/enums.dart';
 import '../models/create_sale_dto.dart';
 import '../models/sale.dart';
@@ -47,6 +49,12 @@ extension SaleMapper on Sale {
                 saleUnit: i.saleUnit,
                 quantity: i.quantity,
                 subTotal: i.subTotal,
+                isCustom: i.isCustom,
+                customCost: i.customCost,
+                customDescription: i.customDescription,
+                customName: i.customName,
+                customPrice: i.customPrice,
+                productName: i.productName,
               ))
           .toList(),
       staffId: staffId,
@@ -55,19 +63,33 @@ extension SaleMapper on Sale {
       attendantName: attendantName,
       roomDetails: roomDetails,
       isOffline: isOffline,
+      offlineCustomerName: offlineCustomerName,
     );
   }
 
   static Sale fromCreateDto(CreateSaleDto createSaleDto) {
-    final receivedAmount =
-        (createSaleDto.payments ?? []).fold<double>(0, (total, p) => total + (p.amount ?? 0));
+    final receivedAmount = (createSaleDto.payments ?? []).fold<double>(0, (total, p) => total + (p.amount ?? 0));
 
     final dueAmount = receivedAmount - (createSaleDto.grandTotal ?? 0);
+
+    SaleUnit? saleUnitFromHoldUnit(HoldUnit holdUnit) {
+      return SaleUnit(
+        id: holdUnit.id,
+        name: holdUnit.name,
+        shortName: holdUnit.shortName,
+        baseUnit: holdUnit.baseUnit,
+        createdAt: holdUnit.createdAt,
+        updatedAt: holdUnit.updatedAt,
+        companyId: holdUnit.companyId,
+      );
+    }
+
     return Sale(
       referenceCode: createSaleDto.referenceCode,
       date: createSaleDto.date ?? DateTime.now(),
       customerId: createSaleDto.customerId,
-      isOffline: createSaleDto.isOffline ?? 1,
+      isOffline: createSaleDto.isOffline ?? true,
+      offlineCustomerName: createSaleDto.offlineCustomerName,
       staffName: createSaleDto.staffName,
       warehouseId: createSaleDto.warehouseId,
       taxRate: createSaleDto.taxRate,
@@ -95,9 +117,14 @@ extension SaleMapper on Sale {
                 discountType: i.discountType,
                 discountValue: i.discountValue,
                 discountAmount: i.discountAmount,
-                saleUnit: i.saleUnit,
+                saleUnit: (i.saleUnit is HoldUnit) ? saleUnitFromHoldUnit(i.saleUnit) : i.saleUnit,
                 quantity: i.quantity,
                 subTotal: i.subTotal,
+                isCustom: i.isCustom,
+                customCost: i.customCost,
+                customDescription: i.customDescription,
+                customName: i.customName,
+                customPrice: i.customPrice,
               ))
           .toList(),
       payments: createSaleDto.payments
@@ -106,8 +133,7 @@ extension SaleMapper on Sale {
                 amount: p.amount,
               ))
           .toList(),
-      paymentMethods:
-          createSaleDto.payments?.map((p) => p.paymentType?.name).whereType<String>().toList(),
+      paymentMethods: createSaleDto.payments?.map((p) => p.paymentType?.name).whereType<String>().toList(),
       staffId: createSaleDto.staffId,
       attendantName: createSaleDto.staffName,
       dueAmount: dueAmount,
@@ -143,17 +169,17 @@ extension SaleMapper on Sale {
       paidAmount: Value(paidAmount),
       partialAmount: Value(partialAmount),
       dueAmount: Value(dueAmount),
-      paymentType: Value(paymentType?.index),
+      paymentType: Value(paymentType?.toInt),
       note: Value(note),
       status: Value(status?.index),
-      paymentStatus: Value(paymentStatus?.index),
+      paymentStatus: Value(paymentStatus?.toInt),
       referenceCode: Value(referenceCode),
       saleItems: Value(saleItems),
       payments: Value(payments),
       paymentMethods: Value(paymentMethods),
       createdAt: Value(createdAt),
       barcodeUrl: Value(barcodeUrl),
-      isOffline: Value(isOffline),
+      isOffline: Value(isOffline ?? false),
       offlineCustomerName: Value(offlineCustomerName),
       staffId: Value(staffId),
       attendantName: Value(attendantName),
@@ -290,6 +316,11 @@ extension SaleMapper on Sale {
                 ),
                 quantity: i.quantity,
                 subTotal: i.subTotal,
+                isCustom: i.isCustom,
+                customCost: i.customCost,
+                customDescription: i.customDescription,
+                customName: i.customName,
+                customPrice: i.customPrice,
               ))
           .toList(),
       payments: attributes.payments
@@ -307,7 +338,7 @@ extension SaleMapper on Sale {
       paymentMethods: attributes.paymentMethods,
       createdAt: attributes.createdAt,
       barcodeUrl: attributes.barcodeUrl,
-      isOffline: attributes.isOffline ?? 0,
+      isOffline: attributes.isOffline ?? false,
       offlineCustomerName: attributes.offlineCustomerName,
       staffId: attributes.staffId,
       attendantName: attributes.attendantName ?? attendantName,
@@ -363,6 +394,11 @@ extension LocalSaleMapper on LocalSale {
                   saleUnit: i.saleUnit,
                   quantity: i.quantity,
                   subTotal: i.subTotal,
+                  isCustom: i.isCustom,
+                  customCost: i.customCost,
+                  customDescription: i.customDescription,
+                  customName: i.customName,
+                  customPrice: i.customPrice,
                 ),
               )
               .toList() ??
@@ -370,6 +406,7 @@ extension LocalSaleMapper on LocalSale {
       staffId: staffId,
       staffName: staffName,
       isOffline: isOffline,
+      offlineCustomerName: offlineCustomerName,
       note: note,
       partialPaymentAmount: partialPaymentAmount,
       partialPaymentMethod: partialPaymentMethod,
@@ -402,22 +439,41 @@ extension CreateSaleDtoMapper on CreateSaleDto {
                 amount: p.amount,
               ))
           .toList()),
-      saleItems: Value(saleItems
-          ?.map((i) => SaleItem(
-                productId: i.productId,
-                productPrice: i.productPrice,
-                netUnitPrice: i.netUnitPrice,
-                taxType: i.taxType,
-                taxValue: i.taxValue,
-                taxAmount: i.taxAmount,
-                discountType: i.discountType,
-                discountValue: i.discountValue,
-                discountAmount: i.discountAmount,
-                saleUnit: i.saleUnit,
-                quantity: i.quantity,
-                subTotal: i.subTotal,
-              ))
-          .toList()),
+      saleItems: Value(saleItems?.map((i) {
+        SaleUnit? saleUnit;
+        if (i.saleUnit is HoldUnit) {
+          final holdUnit = i.saleUnit as HoldUnit;
+          saleUnit = SaleUnit(
+            id: holdUnit.id,
+            name: holdUnit.name,
+            shortName: holdUnit.shortName,
+            baseUnit: holdUnit.baseUnit,
+            createdAt: holdUnit.createdAt,
+            updatedAt: holdUnit.updatedAt,
+            companyId: holdUnit.companyId,
+          );
+        }
+        return SaleItem(
+          productId: i.productId,
+          productPrice: i.productPrice,
+          productName: i.productName,
+          netUnitPrice: i.netUnitPrice,
+          taxType: i.taxType,
+          taxValue: i.taxValue,
+          taxAmount: i.taxAmount,
+          discountType: i.discountType,
+          discountValue: i.discountValue,
+          discountAmount: i.discountAmount,
+          saleUnit: saleUnit,
+          quantity: i.quantity,
+          subTotal: i.subTotal,
+          isCustom: i.isCustom,
+          customCost: i.customCost,
+          customDescription: i.customDescription,
+          customName: i.customName,
+          customPrice: i.customPrice,
+        );
+      }).toList()),
       staffId: Value(staffId),
       staffName: Value(staffName),
       attendantId: Value(attendantId),
@@ -425,15 +481,78 @@ extension CreateSaleDtoMapper on CreateSaleDto {
       roomDetails: Value(roomDetails),
       partialPaymentAmount: Value(partialPaymentAmount),
       partialPaymentMethod: Value(partialPaymentMethod),
-      isOffline: Value(isOffline ?? 1),
+      isOffline: Value(isOffline ?? true),
+      offlineCustomerName: Value(offlineCustomerName),
       note: Value(note),
       status: Value(status?.index),
-      paymentStatus: Value(paymentStatus?.index),
-      paymentType: Value(paymentType?.index),
+      paymentStatus: Value(paymentStatus?.toInt),
+      paymentType: Value(paymentType?.toInt),
       isSynced: const Value(false),
       lastSyncedAt: const Value.absent(),
       createdLocallyAt: Value(DateTime.now()),
       isReturn: const Value(null),
+    );
+  }
+
+  CreateHoldDto toCreateHoldDto() {
+    return CreateHoldDto(
+      customerId: customerId,
+      date: date,
+      discount: discount,
+      discountAmount: discountAmount,
+      grandTotal: grandTotal,
+      holdItems: saleItems
+          ?.map(
+            (item) => HoldItemDto(
+              code: item.productCode,
+              customCost: item.customCost,
+              customDescription: item.customDescription,
+              customName: item.customName,
+              customPrice: item.customPrice,
+              discountAmount: item.discountAmount,
+              discountType: item.discountType,
+              discountValue: item.discountValue,
+              id: item.productId,
+              isCustom: item.isCustom ?? false,
+              name: item.productName,
+              netUnitCost: item.isCustom == true ? item.customCost : null,
+              netUnitPrice: item.netUnitPrice,
+              productId: item.productId,
+              productPrice: item.productPrice,
+              productUnit: item.saleUnit is String ? item.saleUnit : null,
+              quantity: item.quantity,
+              saleUnit: item.saleUnit,
+              subTotal: item.subTotal,
+              taxAmount: item.taxAmount,
+              taxType: item.taxType,
+              taxValue: item.taxValue,
+            ),
+          )
+          .toList(),
+      note: note,
+      referenceCode: referenceCode,
+      shipping: shipping,
+      staffId: staffId,
+      staffName: staffName,
+      subTotal: saleItems?.fold<double>(0, (sum, item) => sum + (item.subTotal ?? 0)),
+      taxAmount: taxAmount,
+      taxRate: taxRate,
+      tableId: saleItems != null && saleItems!.isNotEmpty ? saleItems!.first.tableId?.toString() : null,
+      warehouseId: warehouseId,
+      type: null,
+      links: null,
+      userId: null,
+      attendant: HoldAttendant(
+        id: attendantId,
+        firstName: attendantName,
+      ),
+      customerName: customerName ?? offlineCustomerName,
+      warehouseName: warehouseName,
+      status: status,
+      tableName: null,
+      createdAt: date,
+      receivedAmount: receivedAmount,
+      paidAmount: paidAmount,
     );
   }
 }
