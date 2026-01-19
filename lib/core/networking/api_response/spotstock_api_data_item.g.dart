@@ -12,7 +12,7 @@ _$SpotstockApiDataItemImpl _$$SpotstockApiDataItemImplFromJson(
       id: (json['id'] as num?)?.toInt(),
       type: json['type'] as String?,
       attributes: json['attributes'] as Map<String, dynamic>?,
-      links: json['links'] as Map<String, dynamic>?,
+      links: const FlexibleLinksConverter().fromJson(json['links']),
     );
 
 Map<String, dynamic> _$$SpotstockApiDataItemImplToJson(
@@ -21,5 +21,5 @@ Map<String, dynamic> _$$SpotstockApiDataItemImplToJson(
       'id': instance.id,
       'type': instance.type,
       'attributes': instance.attributes,
-      'links': instance.links,
+      'links': const FlexibleLinksConverter().toJson(instance.links),
     };

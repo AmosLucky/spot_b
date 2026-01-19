@@ -23,6 +23,7 @@ mixin _$SpotstockApiDataItem {
   int? get id => throw _privateConstructorUsedError;
   String? get type => throw _privateConstructorUsedError;
   Map<String, dynamic>? get attributes => throw _privateConstructorUsedError;
+  @FlexibleLinksConverter()
   Map<String, dynamic>? get links => throw _privateConstructorUsedError;
 
   /// Serializes this SpotstockApiDataItem to a JSON map.
@@ -45,7 +46,7 @@ abstract class $SpotstockApiDataItemCopyWith<$Res> {
       {int? id,
       String? type,
       Map<String, dynamic>? attributes,
-      Map<String, dynamic>? links});
+      @FlexibleLinksConverter() Map<String, dynamic>? links});
 }
 
 /// @nodoc
@@ -102,7 +103,7 @@ abstract class _$$SpotstockApiDataItemImplCopyWith<$Res>
       {int? id,
       String? type,
       Map<String, dynamic>? attributes,
-      Map<String, dynamic>? links});
+      @FlexibleLinksConverter() Map<String, dynamic>? links});
 }
 
 /// @nodoc
@@ -151,7 +152,7 @@ class _$SpotstockApiDataItemImpl implements _SpotstockApiDataItem {
       {this.id,
       this.type,
       final Map<String, dynamic>? attributes,
-      final Map<String, dynamic>? links})
+      @FlexibleLinksConverter() final Map<String, dynamic>? links})
       : _attributes = attributes,
         _links = links;
 
@@ -174,6 +175,7 @@ class _$SpotstockApiDataItemImpl implements _SpotstockApiDataItem {
 
   final Map<String, dynamic>? _links;
   @override
+  @FlexibleLinksConverter()
   Map<String, dynamic>? get links {
     final value = _links;
     if (value == null) return null;
@@ -228,10 +230,11 @@ class _$SpotstockApiDataItemImpl implements _SpotstockApiDataItem {
 
 abstract class _SpotstockApiDataItem implements SpotstockApiDataItem {
   const factory _SpotstockApiDataItem(
-      {final int? id,
-      final String? type,
-      final Map<String, dynamic>? attributes,
-      final Map<String, dynamic>? links}) = _$SpotstockApiDataItemImpl;
+          {final int? id,
+          final String? type,
+          final Map<String, dynamic>? attributes,
+          @FlexibleLinksConverter() final Map<String, dynamic>? links}) =
+      _$SpotstockApiDataItemImpl;
 
   factory _SpotstockApiDataItem.fromJson(Map<String, dynamic> json) =
       _$SpotstockApiDataItemImpl.fromJson;
@@ -243,6 +246,7 @@ abstract class _SpotstockApiDataItem implements SpotstockApiDataItem {
   @override
   Map<String, dynamic>? get attributes;
   @override
+  @FlexibleLinksConverter()
   Map<String, dynamic>? get links;
 
   /// Create a copy of SpotstockApiDataItem
