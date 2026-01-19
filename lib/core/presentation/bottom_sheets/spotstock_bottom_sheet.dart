@@ -4,8 +4,6 @@ import '../../constants/sizes/spotstock_sizes.dart';
 import '../../routing/navigation.dart';
 import '../buttons/spotstock_icon_button.dart';
 
-const maxBottomSheetHeight = 0.8;
-
 mixin SpotstockBottomSheetMixin {
   /// [body] should be a column of widgets
   Future<T?> showSpotstockBottomSheet<T>(
@@ -14,6 +12,13 @@ mixin SpotstockBottomSheetMixin {
     Widget? body,
     List<Widget>? actions,
   }) async {
+    double maxBottomSheetHeight = SpotstockSizes.s0_8;
+    if (actions != null && actions.isNotEmpty) {
+      maxBottomSheetHeight = SpotstockSizes.s0_8;
+    } else {
+      maxBottomSheetHeight = SpotstockSizes.s0_7;
+    }
+
     return showModalBottomSheet<T>(
       context: SpotstockNavigation.context ?? context,
       isScrollControlled: true,
@@ -36,8 +41,7 @@ mixin SpotstockBottomSheetMixin {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: SpotstockSizes.s16, vertical: SpotstockSizes.s16),
+                    padding: EdgeInsets.symmetric(horizontal: SpotstockSizes.s16, vertical: SpotstockSizes.s16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [

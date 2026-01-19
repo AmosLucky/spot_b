@@ -54,6 +54,7 @@ class SpotstockInputDecorations {
         fontSize: SpotstockSizes.s12,
         fontWeight: FontWeight.w500,
         color: theme.colorScheme.onSurface,
+        overflow: TextOverflow.ellipsis,
       ),
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
@@ -81,6 +82,9 @@ class SpotstockTextField extends StatelessWidget {
   final bool? enabled;
   final int? maxLines;
   final String? initialValue;
+  final TextCapitalization textCapitalization;
+  final Function()? onTap;
+  final bool readOnly;
   const SpotstockTextField({
     super.key,
     this.hintText,
@@ -101,12 +105,17 @@ class SpotstockTextField extends StatelessWidget {
     this.enabled,
     this.maxLines,
     this.initialValue,
+    this.textCapitalization = TextCapitalization.none,
+    this.onTap,
+    this.readOnly = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       initialValue: initialValue,
+      textCapitalization: textCapitalization,
+      readOnly: readOnly,
       focusNode: focusNode,
       enabled: enabled,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -136,6 +145,7 @@ class SpotstockTextField extends StatelessWidget {
         counterText: counterText,
       ),
       maxLines: maxLines,
+      onTap: onTap,
     );
   }
 }

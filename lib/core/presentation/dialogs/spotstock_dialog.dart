@@ -12,6 +12,7 @@ mixin SpotstockDialogMixin {
     Icon? icon,
     required String title,
     required String description,
+    Widget? banner,
     List<Widget>? actions,
     bool? isDismissible = true,
   }) {
@@ -43,6 +44,15 @@ mixin SpotstockDialogMixin {
                 description,
                 textAlign: TextAlign.center,
               ),
+              (banner != null)
+                  ? Column(
+                      children: [
+                        const SizedBox(height: SpotstockSizes.s8),
+                        banner,
+                        const SizedBox(height: SpotstockSizes.s4),
+                      ],
+                    )
+                  : SizedBox.shrink(),
               const SizedBox(height: SpotstockSizes.s16),
               ...actions ?? [],
               if (actions == null)
@@ -66,10 +76,11 @@ mixin SpotstockDialogMixin {
     BuildContext context, {
     required String title,
     required Widget form,
+    Widget? fab,
     List<Widget>? actions,
   }) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final maxDialogHeight = screenHeight - SpotstockSizes.s100; // leaves 50px margin top & bottom
+    final maxDialogHeight = screenHeight - SpotstockSizes.s100;
 
     return showDialog<T>(
       context: context,
@@ -111,7 +122,7 @@ mixin SpotstockDialogMixin {
                       const Spacer(),
                       SpotstockIconButton(
                         icon: const Icon(Icons.close, size: SpotstockSizes.s18),
-                        onPressed: () => SpotstockNavigation.goBack(context),
+                        onPressed: () => SpotstockNavigation.goBack(),
                       ),
                     ],
                   ),
@@ -120,15 +131,32 @@ mixin SpotstockDialogMixin {
                   height: SpotstockSizes.s0,
                 ),
                 Flexible(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        SpotstockSizes.s16,
-                        SpotstockSizes.s8,
-                        SpotstockSizes.s16,
-                        SpotstockSizes.s16,
-                      ),
-                      child: form,
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    removeBottom: true,
+                    child: Stack(
+                      children: [
+                        Scrollbar(
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                SpotstockSizes.s16,
+                                SpotstockSizes.s8,
+                                SpotstockSizes.s16,
+                                SpotstockSizes.s16,
+                              ),
+                              child: form,
+                            ),
+                          ),
+                        ),
+                        if (fab != null)
+                          Positioned(
+                            right: SpotstockSizes.s24,
+                            bottom: SpotstockSizes.bottomSpacing(context) + SpotstockSizes.s24,
+                            child: fab,
+                          ),
+                      ],
                     ),
                   ),
                 ),

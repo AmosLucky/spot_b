@@ -5,12 +5,12 @@ import '../../constants/sizes/spotstock_sizes.dart';
 import '../../constants/strings/spotstock_strings.dart';
 import '../../routing/navigation.dart';
 
-class SpotstockAppbar extends StatelessWidget {
+class SpotstockAppbar<T> extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final Color? backgroundColor;
   final bool? withBackButton;
-  final Future<bool?> Function()? onBackPressed;
+  final Future<T?> Function()? onBackPressed;
   const SpotstockAppbar({
     super.key,
     required this.title,
@@ -41,12 +41,9 @@ class SpotstockAppbar extends StatelessWidget {
                     ),
                     onPressed: () async {
                       if (onBackPressed != null) {
-                        final confirmed = await onBackPressed!();
-                        if (confirmed == true && context.mounted) {
-                          SpotstockNavigation.goBack(confirmed);
-                        }
+                        await onBackPressed!();
                       } else {
-                        SpotstockNavigation.goBack(true);
+                        SpotstockNavigation.goBack();
                       }
                     },
                     tooltip: SpotstockStrings.back,
