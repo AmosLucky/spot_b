@@ -27,6 +27,8 @@ mixin _$LoginUserDao {
   String? get lastName => throw _privateConstructorUsedError;
   String? get email => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool)
+  bool get isAdmin => throw _privateConstructorUsedError;
   LoginCompanyDao? get company => throw _privateConstructorUsedError;
 
   /// Serializes this LoginUserDao to a JSON map.
@@ -51,6 +53,8 @@ abstract class $LoginUserDaoCopyWith<$Res> {
       @JsonKey(name: 'last_name') String? lastName,
       String? email,
       String? phone,
+      @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool)
+      bool isAdmin,
       LoginCompanyDao? company});
 
   $LoginCompanyDaoCopyWith<$Res>? get company;
@@ -76,6 +80,7 @@ class _$LoginUserDaoCopyWithImpl<$Res, $Val extends LoginUserDao>
     Object? lastName = freezed,
     Object? email = freezed,
     Object? phone = freezed,
+    Object? isAdmin = null,
     Object? company = freezed,
   }) {
     return _then(_value.copyWith(
@@ -99,6 +104,10 @@ class _$LoginUserDaoCopyWithImpl<$Res, $Val extends LoginUserDao>
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
               as String?,
+      isAdmin: null == isAdmin
+          ? _value.isAdmin
+          : isAdmin // ignore: cast_nullable_to_non_nullable
+              as bool,
       company: freezed == company
           ? _value.company
           : company // ignore: cast_nullable_to_non_nullable
@@ -135,6 +144,8 @@ abstract class _$$LoginUserDaoImplCopyWith<$Res>
       @JsonKey(name: 'last_name') String? lastName,
       String? email,
       String? phone,
+      @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool)
+      bool isAdmin,
       LoginCompanyDao? company});
 
   @override
@@ -159,6 +170,7 @@ class __$$LoginUserDaoImplCopyWithImpl<$Res>
     Object? lastName = freezed,
     Object? email = freezed,
     Object? phone = freezed,
+    Object? isAdmin = null,
     Object? company = freezed,
   }) {
     return _then(_$LoginUserDaoImpl(
@@ -182,6 +194,10 @@ class __$$LoginUserDaoImplCopyWithImpl<$Res>
           ? _value.phone
           : phone // ignore: cast_nullable_to_non_nullable
               as String?,
+      isAdmin: null == isAdmin
+          ? _value.isAdmin
+          : isAdmin // ignore: cast_nullable_to_non_nullable
+              as bool,
       company: freezed == company
           ? _value.company
           : company // ignore: cast_nullable_to_non_nullable
@@ -199,6 +215,8 @@ class _$LoginUserDaoImpl implements _LoginUserDao {
       @JsonKey(name: 'last_name') required this.lastName,
       required this.email,
       required this.phone,
+      @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool)
+      required this.isAdmin,
       required this.company});
 
   factory _$LoginUserDaoImpl.fromJson(Map<String, dynamic> json) =>
@@ -217,11 +235,14 @@ class _$LoginUserDaoImpl implements _LoginUserDao {
   @override
   final String? phone;
   @override
+  @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool)
+  final bool isAdmin;
+  @override
   final LoginCompanyDao? company;
 
   @override
   String toString() {
-    return 'LoginUserDao(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, company: $company)';
+    return 'LoginUserDao(id: $id, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, isAdmin: $isAdmin, company: $company)';
   }
 
   @override
@@ -236,13 +257,14 @@ class _$LoginUserDaoImpl implements _LoginUserDao {
                 other.lastName == lastName) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin) &&
             (identical(other.company, company) || other.company == company));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, firstName, lastName, email, phone, company);
+  int get hashCode => Object.hash(
+      runtimeType, id, firstName, lastName, email, phone, isAdmin, company);
 
   /// Create a copy of LoginUserDao
   /// with the given fields replaced by the non-null parameter values.
@@ -267,6 +289,8 @@ abstract class _LoginUserDao implements LoginUserDao {
       @JsonKey(name: 'last_name') required final String? lastName,
       required final String? email,
       required final String? phone,
+      @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool)
+      required final bool isAdmin,
       required final LoginCompanyDao? company}) = _$LoginUserDaoImpl;
 
   factory _LoginUserDao.fromJson(Map<String, dynamic> json) =
@@ -284,6 +308,9 @@ abstract class _LoginUserDao implements LoginUserDao {
   String? get email;
   @override
   String? get phone;
+  @override
+  @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool)
+  bool get isAdmin;
   @override
   LoginCompanyDao? get company;
 

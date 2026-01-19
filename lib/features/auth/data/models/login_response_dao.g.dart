@@ -16,6 +16,9 @@ _$LoginResponseDaoImpl _$$LoginResponseDaoImplFromJson(
       role: json['role'] == null
           ? null
           : LoginRoleDao.fromJson(json['role'] as Map<String, dynamic>),
+      permissions: (json['permissions'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$$LoginResponseDaoImplToJson(
@@ -24,4 +27,5 @@ Map<String, dynamic> _$$LoginResponseDaoImplToJson(
       'token': instance.token,
       'user': instance.user,
       'role': instance.role,
+      'permissions': instance.permissions,
     };

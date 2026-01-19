@@ -13,6 +13,7 @@ _$LoginUserDaoImpl _$$LoginUserDaoImplFromJson(Map<String, dynamic> json) =>
       lastName: json['last_name'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
+      isAdmin: _toBool(json['is_admin']),
       company: json['company'] == null
           ? null
           : LoginCompanyDao.fromJson(json['company'] as Map<String, dynamic>),
@@ -25,5 +26,6 @@ Map<String, dynamic> _$$LoginUserDaoImplToJson(_$LoginUserDaoImpl instance) =>
       'last_name': instance.lastName,
       'email': instance.email,
       'phone': instance.phone,
+      'is_admin': _fromBool(instance.isAdmin),
       'company': instance.company,
     };

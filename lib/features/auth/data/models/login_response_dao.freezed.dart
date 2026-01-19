@@ -23,6 +23,7 @@ mixin _$LoginResponseDao {
   String? get token => throw _privateConstructorUsedError;
   LoginUserDao? get user => throw _privateConstructorUsedError;
   LoginRoleDao? get role => throw _privateConstructorUsedError;
+  List<String>? get permissions => throw _privateConstructorUsedError;
 
   /// Serializes this LoginResponseDao to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -40,7 +41,11 @@ abstract class $LoginResponseDaoCopyWith<$Res> {
           LoginResponseDao value, $Res Function(LoginResponseDao) then) =
       _$LoginResponseDaoCopyWithImpl<$Res, LoginResponseDao>;
   @useResult
-  $Res call({String? token, LoginUserDao? user, LoginRoleDao? role});
+  $Res call(
+      {String? token,
+      LoginUserDao? user,
+      LoginRoleDao? role,
+      List<String>? permissions});
 
   $LoginUserDaoCopyWith<$Res>? get user;
   $LoginRoleDaoCopyWith<$Res>? get role;
@@ -64,6 +69,7 @@ class _$LoginResponseDaoCopyWithImpl<$Res, $Val extends LoginResponseDao>
     Object? token = freezed,
     Object? user = freezed,
     Object? role = freezed,
+    Object? permissions = freezed,
   }) {
     return _then(_value.copyWith(
       token: freezed == token
@@ -78,6 +84,10 @@ class _$LoginResponseDaoCopyWithImpl<$Res, $Val extends LoginResponseDao>
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as LoginRoleDao?,
+      permissions: freezed == permissions
+          ? _value.permissions
+          : permissions // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ) as $Val);
   }
 
@@ -118,7 +128,11 @@ abstract class _$$LoginResponseDaoImplCopyWith<$Res>
       __$$LoginResponseDaoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? token, LoginUserDao? user, LoginRoleDao? role});
+  $Res call(
+      {String? token,
+      LoginUserDao? user,
+      LoginRoleDao? role,
+      List<String>? permissions});
 
   @override
   $LoginUserDaoCopyWith<$Res>? get user;
@@ -142,6 +156,7 @@ class __$$LoginResponseDaoImplCopyWithImpl<$Res>
     Object? token = freezed,
     Object? user = freezed,
     Object? role = freezed,
+    Object? permissions = freezed,
   }) {
     return _then(_$LoginResponseDaoImpl(
       token: freezed == token
@@ -156,6 +171,10 @@ class __$$LoginResponseDaoImplCopyWithImpl<$Res>
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
               as LoginRoleDao?,
+      permissions: freezed == permissions
+          ? _value._permissions
+          : permissions // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
     ));
   }
 }
@@ -163,7 +182,9 @@ class __$$LoginResponseDaoImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$LoginResponseDaoImpl implements _LoginResponseDao {
-  const _$LoginResponseDaoImpl({this.token, this.user, this.role});
+  const _$LoginResponseDaoImpl(
+      {this.token, this.user, this.role, final List<String>? permissions})
+      : _permissions = permissions;
 
   factory _$LoginResponseDaoImpl.fromJson(Map<String, dynamic> json) =>
       _$$LoginResponseDaoImplFromJson(json);
@@ -174,10 +195,19 @@ class _$LoginResponseDaoImpl implements _LoginResponseDao {
   final LoginUserDao? user;
   @override
   final LoginRoleDao? role;
+  final List<String>? _permissions;
+  @override
+  List<String>? get permissions {
+    final value = _permissions;
+    if (value == null) return null;
+    if (_permissions is EqualUnmodifiableListView) return _permissions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'LoginResponseDao(token: $token, user: $user, role: $role)';
+    return 'LoginResponseDao(token: $token, user: $user, role: $role, permissions: $permissions)';
   }
 
   @override
@@ -187,12 +217,15 @@ class _$LoginResponseDaoImpl implements _LoginResponseDao {
             other is _$LoginResponseDaoImpl &&
             (identical(other.token, token) || other.token == token) &&
             (identical(other.user, user) || other.user == user) &&
-            (identical(other.role, role) || other.role == role));
+            (identical(other.role, role) || other.role == role) &&
+            const DeepCollectionEquality()
+                .equals(other._permissions, _permissions));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, token, user, role);
+  int get hashCode => Object.hash(runtimeType, token, user, role,
+      const DeepCollectionEquality().hash(_permissions));
 
   /// Create a copy of LoginResponseDao
   /// with the given fields replaced by the non-null parameter values.
@@ -215,7 +248,8 @@ abstract class _LoginResponseDao implements LoginResponseDao {
   const factory _LoginResponseDao(
       {final String? token,
       final LoginUserDao? user,
-      final LoginRoleDao? role}) = _$LoginResponseDaoImpl;
+      final LoginRoleDao? role,
+      final List<String>? permissions}) = _$LoginResponseDaoImpl;
 
   factory _LoginResponseDao.fromJson(Map<String, dynamic> json) =
       _$LoginResponseDaoImpl.fromJson;
@@ -226,6 +260,8 @@ abstract class _LoginResponseDao implements LoginResponseDao {
   LoginUserDao? get user;
   @override
   LoginRoleDao? get role;
+  @override
+  List<String>? get permissions;
 
   /// Create a copy of LoginResponseDao
   /// with the given fields replaced by the non-null parameter values.

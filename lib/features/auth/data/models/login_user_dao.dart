@@ -15,8 +15,17 @@ class LoginUserDao with _$LoginUserDao {
     @JsonKey(name: 'last_name') required String? lastName,
     required String? email,
     required String? phone,
+    @JsonKey(name: 'is_admin', fromJson: _toBool, toJson: _fromBool) required bool isAdmin,
     required LoginCompanyDao? company,
   }) = _LoginUserDao;
 
   factory LoginUserDao.fromJson(Map<String, dynamic> json) => _$LoginUserDaoFromJson(json);
+}
+
+bool _toBool(dynamic value) {
+  return value == 1 || value == "1" || value == true;
+}
+
+dynamic _fromBool(bool value) {
+  return value ? 1 : 0;
 }

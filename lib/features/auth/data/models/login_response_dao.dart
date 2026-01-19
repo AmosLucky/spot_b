@@ -12,6 +12,7 @@ class LoginResponseDao with _$LoginResponseDao {
     String? token,
     LoginUserDao? user,
     LoginRoleDao? role,
+    List<String>? permissions,
   }) = _LoginResponseDao;
 
   factory LoginResponseDao.fromJson(Map<String, dynamic> json) => _$LoginResponseDaoFromJson(json);
