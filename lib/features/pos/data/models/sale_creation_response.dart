@@ -39,15 +39,14 @@ class SaleCreationResponseAttributesDao with _$SaleCreationResponseAttributesDao
     @JsonKey(name: 'payment_methods') List<String>? paymentMethods,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'barcode_url') String? barcodeUrl,
-    @JsonKey(name: 'is_offline') int? isOffline,
+    @JsonKey(name: 'is_offline') @IntOrBoolToBoolConverter() @Default(false) bool? isOffline,
     @JsonKey(name: 'offline_customer_name') String? offlineCustomerName,
     @JsonKey(name: 'staff_id') int? staffId,
     @JsonKey(name: 'attendant_name') String? attendantName,
     @JsonKey(name: 'room_details') dynamic roomDetails,
   }) = _SaleCreationResponseAttributesDao;
 
-  factory SaleCreationResponseAttributesDao.fromJson(Map<String, dynamic> json) =>
-      _$SaleCreationResponseAttributesDaoFromJson(json);
+  factory SaleCreationResponseAttributesDao.fromJson(Map<String, dynamic> json) => _$SaleCreationResponseAttributesDaoFromJson(json);
 }
 
 @freezed
@@ -79,8 +78,53 @@ class SaleCreationResponseLoggedUserDao with _$SaleCreationResponseLoggedUserDao
     List<dynamic>? media,
   }) = _SaleCreationResponseLoggedUserDao;
 
-  factory SaleCreationResponseLoggedUserDao.fromJson(Map<String, dynamic> json) =>
-      _$SaleCreationResponseLoggedUserDaoFromJson(json);
+  factory SaleCreationResponseLoggedUserDao.fromJson(Map<String, dynamic> json) => _$SaleCreationResponseLoggedUserDaoFromJson(json);
+}
+
+class StringOrNumToDoubleConverter implements JsonConverter<double?, dynamic> {
+  const StringOrNumToDoubleConverter();
+
+  @override
+  double? fromJson(dynamic json) {
+    if (json == null) return null;
+
+    if (json is num) {
+      return json.toDouble();
+    }
+
+    if (json is String) {
+      if (json.trim().isEmpty) return null;
+      return double.tryParse(json);
+    }
+
+    return null;
+  }
+
+  @override
+  dynamic toJson(double? object) => object;
+}
+
+class IntOrBoolToBoolConverter implements JsonConverter<bool, dynamic> {
+  const IntOrBoolToBoolConverter();
+
+  @override
+  bool fromJson(dynamic json) {
+    if (json == null) return false;
+
+    if (json is bool) return json;
+
+    if (json is num) return json == 1;
+
+    if (json is String) {
+      final value = json.toLowerCase();
+      return value == '1' || value == 'true';
+    }
+
+    return false;
+  }
+
+  @override
+  dynamic toJson(bool object) => object;
 }
 
 @freezed
@@ -90,7 +134,7 @@ class SaleCreationResponseSaleItemDao with _$SaleCreationResponseSaleItemDao {
     @JsonKey(name: 'product_name') String? productName,
     @JsonKey(name: 'company_id') int? companyId,
     @JsonKey(name: 'net_unit_price') double? netUnitPrice,
-    @JsonKey(name: 'product_price') double? productPrice,
+    @JsonKey(name: 'product_price') @StringOrNumToDoubleConverter() double? productPrice,
     @JsonKey(name: 'tax_type') int? taxType,
     @JsonKey(name: 'tax_value') double? taxValue,
     @JsonKey(name: 'tax_amount') double? taxAmount,
@@ -100,10 +144,14 @@ class SaleCreationResponseSaleItemDao with _$SaleCreationResponseSaleItemDao {
     @JsonKey(name: 'sale_unit') SaleCreationResponseSaleUnitDao? saleUnit,
     double? quantity,
     @JsonKey(name: 'sub_total') double? subTotal,
+    @JsonKey(name: 'is_custom') @IntOrBoolToBoolConverter() @Default(false) bool? isCustom,
+    @JsonKey(name: 'custom_name') String? customName,
+    @JsonKey(name: 'custom_description') String? customDescription,
+    @JsonKey(name: 'custom_cost') @StringOrNumToDoubleConverter() double? customCost,
+    @JsonKey(name: 'custom_price') @StringOrNumToDoubleConverter() double? customPrice,
   }) = _SaleCreationResponseSaleItemDao;
 
-  factory SaleCreationResponseSaleItemDao.fromJson(Map<String, dynamic> json) =>
-      _$SaleCreationResponseSaleItemDaoFromJson(json);
+  factory SaleCreationResponseSaleItemDao.fromJson(Map<String, dynamic> json) => _$SaleCreationResponseSaleItemDaoFromJson(json);
 }
 
 @freezed
@@ -118,8 +166,7 @@ class SaleCreationResponseSaleUnitDao with _$SaleCreationResponseSaleUnitDao {
     @JsonKey(name: 'company_id') int? companyId,
   }) = _SaleCreationResponseSaleUnitDao;
 
-  factory SaleCreationResponseSaleUnitDao.fromJson(Map<String, dynamic> json) =>
-      _$SaleCreationResponseSaleUnitDaoFromJson(json);
+  factory SaleCreationResponseSaleUnitDao.fromJson(Map<String, dynamic> json) => _$SaleCreationResponseSaleUnitDaoFromJson(json);
 }
 
 @freezed
@@ -135,6 +182,5 @@ class SaleCreationResponsePaymentDao with _$SaleCreationResponsePaymentDao {
     @JsonKey(name: 'received_amount') double? receivedAmount,
   }) = _SaleCreationResponsePaymentDao;
 
-  factory SaleCreationResponsePaymentDao.fromJson(Map<String, dynamic> json) =>
-      _$SaleCreationResponsePaymentDaoFromJson(json);
+  factory SaleCreationResponsePaymentDao.fromJson(Map<String, dynamic> json) => _$SaleCreationResponsePaymentDaoFromJson(json);
 }

@@ -15,6 +15,7 @@ class Customer with _$Customer {
     String? address,
     DateTime? createdAt,
     String? link,
+    bool? isSynced,
   }) = _Customer;
 
   factory Customer.fromJson(Map<String, dynamic> json) {
@@ -30,8 +31,7 @@ class Customer with _$Customer {
       country: attributes['country'],
       city: attributes['city'],
       address: attributes['address'],
-      createdAt:
-          attributes['created_at'] != null ? DateTime.tryParse(attributes['created_at']) : null,
+      createdAt: attributes['created_at'] != null ? DateTime.tryParse(attributes['created_at']) : null,
       link: links['self'],
     );
   }

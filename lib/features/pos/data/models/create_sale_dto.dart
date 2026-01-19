@@ -2,6 +2,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../enums/enums.dart';
+import 'sale_creation_response.dart';
 
 part 'create_sale_dto.freezed.dart';
 part 'create_sale_dto.g.dart';
@@ -35,7 +36,8 @@ class CreateSaleDto with _$CreateSaleDto {
     @JsonKey(name: 'attendant_id') int? attendantId,
     @JsonKey(name: 'attendant_name') String? attendantName,
     @JsonKey(name: 'room_details') dynamic roomDetails,
-    @JsonKey(name: 'is_offline') int? isOffline,
+    @JsonKey(name: 'is_offline') @IntOrBoolToBoolConverter() @Default(false) bool? isOffline,
+    @JsonKey(name: 'offline_customer_name') String? offlineCustomerName,
     @JsonKey(includeFromJson: false, includeToJson: false) String? warehouseName,
     @JsonKey(includeFromJson: false, includeToJson: false) String? customerName,
   }) = _CreateSaleDto;
@@ -69,8 +71,24 @@ class SaleItemDto with _$SaleItemDto {
     @JsonKey(name: 'sale_unit') dynamic saleUnit,
     @JsonKey(name: 'quantity') double? quantity,
     @JsonKey(name: 'sub_total') double? subTotal,
+    @JsonKey(name: 'is_custom', fromJson: _toBool, toJson: _fromBool) bool? isCustom,
+    @JsonKey(name: 'custom_cost') double? customCost,
+    @JsonKey(name: 'custom_description') String? customDescription,
+    @JsonKey(name: 'custom_name') String? customName,
+    @JsonKey(name: 'custom_price') double? customPrice,
     @JsonKey(includeFromJson: false, includeToJson: false) String? productName,
+    @JsonKey(includeFromJson: false, includeToJson: false) String? productCode,
   }) = _SaleItemDto;
 
   factory SaleItemDto.fromJson(Map<String, dynamic> json) => _$SaleItemDtoFromJson(json);
+}
+
+bool? _toBool(dynamic value) {
+  if (value == null) return null;
+  return value == 1 || value == "1" || value == true;
+}
+
+dynamic _fromBool(bool? value) {
+  if (value == null) return null;
+  return value ? 1 : 0;
 }

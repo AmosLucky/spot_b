@@ -77,7 +77,8 @@ mixin _$SaleCreationResponseAttributesDao {
   @JsonKey(name: 'barcode_url')
   String? get barcodeUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_offline')
-  int? get isOffline => throw _privateConstructorUsedError;
+  @IntOrBoolToBoolConverter()
+  bool? get isOffline => throw _privateConstructorUsedError;
   @JsonKey(name: 'offline_customer_name')
   String? get offlineCustomerName => throw _privateConstructorUsedError;
   @JsonKey(name: 'staff_id')
@@ -137,7 +138,7 @@ abstract class $SaleCreationResponseAttributesDaoCopyWith<$Res> {
       @JsonKey(name: 'payment_methods') List<String>? paymentMethods,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'barcode_url') String? barcodeUrl,
-      @JsonKey(name: 'is_offline') int? isOffline,
+      @JsonKey(name: 'is_offline') @IntOrBoolToBoolConverter() bool? isOffline,
       @JsonKey(name: 'offline_customer_name') String? offlineCustomerName,
       @JsonKey(name: 'staff_id') int? staffId,
       @JsonKey(name: 'attendant_name') String? attendantName,
@@ -317,7 +318,7 @@ class _$SaleCreationResponseAttributesDaoCopyWithImpl<$Res,
       isOffline: freezed == isOffline
           ? _value.isOffline
           : isOffline // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as bool?,
       offlineCustomerName: freezed == offlineCustomerName
           ? _value.offlineCustomerName
           : offlineCustomerName // ignore: cast_nullable_to_non_nullable
@@ -394,7 +395,7 @@ abstract class _$$SaleCreationResponseAttributesDaoImplCopyWith<$Res>
       @JsonKey(name: 'payment_methods') List<String>? paymentMethods,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'barcode_url') String? barcodeUrl,
-      @JsonKey(name: 'is_offline') int? isOffline,
+      @JsonKey(name: 'is_offline') @IntOrBoolToBoolConverter() bool? isOffline,
       @JsonKey(name: 'offline_customer_name') String? offlineCustomerName,
       @JsonKey(name: 'staff_id') int? staffId,
       @JsonKey(name: 'attendant_name') String? attendantName,
@@ -574,7 +575,7 @@ class __$$SaleCreationResponseAttributesDaoImplCopyWithImpl<$Res>
       isOffline: freezed == isOffline
           ? _value.isOffline
           : isOffline // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as bool?,
       offlineCustomerName: freezed == offlineCustomerName
           ? _value.offlineCustomerName
           : offlineCustomerName // ignore: cast_nullable_to_non_nullable
@@ -630,7 +631,9 @@ class _$SaleCreationResponseAttributesDaoImpl
       @JsonKey(name: 'payment_methods') final List<String>? paymentMethods,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'barcode_url') this.barcodeUrl,
-      @JsonKey(name: 'is_offline') this.isOffline,
+      @JsonKey(name: 'is_offline')
+      @IntOrBoolToBoolConverter()
+      this.isOffline = false,
       @JsonKey(name: 'offline_customer_name') this.offlineCustomerName,
       @JsonKey(name: 'staff_id') this.staffId,
       @JsonKey(name: 'attendant_name') this.attendantName,
@@ -750,7 +753,8 @@ class _$SaleCreationResponseAttributesDaoImpl
   final String? barcodeUrl;
   @override
   @JsonKey(name: 'is_offline')
-  final int? isOffline;
+  @IntOrBoolToBoolConverter()
+  final bool? isOffline;
   @override
   @JsonKey(name: 'offline_customer_name')
   final String? offlineCustomerName;
@@ -930,7 +934,9 @@ abstract class _SaleCreationResponseAttributesDao
       @JsonKey(name: 'payment_methods') final List<String>? paymentMethods,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'barcode_url') final String? barcodeUrl,
-      @JsonKey(name: 'is_offline') final int? isOffline,
+      @JsonKey(name: 'is_offline')
+      @IntOrBoolToBoolConverter()
+      final bool? isOffline,
       @JsonKey(name: 'offline_customer_name') final String? offlineCustomerName,
       @JsonKey(name: 'staff_id') final int? staffId,
       @JsonKey(name: 'attendant_name') final String? attendantName,
@@ -1024,7 +1030,8 @@ abstract class _SaleCreationResponseAttributesDao
   String? get barcodeUrl;
   @override
   @JsonKey(name: 'is_offline')
-  int? get isOffline;
+  @IntOrBoolToBoolConverter()
+  bool? get isOffline;
   @override
   @JsonKey(name: 'offline_customer_name')
   String? get offlineCustomerName;
@@ -1779,6 +1786,7 @@ mixin _$SaleCreationResponseSaleItemDao {
   @JsonKey(name: 'net_unit_price')
   double? get netUnitPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_price')
+  @StringOrNumToDoubleConverter()
   double? get productPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'tax_type')
   int? get taxType => throw _privateConstructorUsedError;
@@ -1798,6 +1806,19 @@ mixin _$SaleCreationResponseSaleItemDao {
   double? get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'sub_total')
   double? get subTotal => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_custom')
+  @IntOrBoolToBoolConverter()
+  bool? get isCustom => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_name')
+  String? get customName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_description')
+  String? get customDescription => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice => throw _privateConstructorUsedError;
 
   /// Serializes this SaleCreationResponseSaleItemDao to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1822,7 +1843,9 @@ abstract class $SaleCreationResponseSaleItemDaoCopyWith<$Res> {
       @JsonKey(name: 'product_name') String? productName,
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'net_unit_price') double? netUnitPrice,
-      @JsonKey(name: 'product_price') double? productPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      double? productPrice,
       @JsonKey(name: 'tax_type') int? taxType,
       @JsonKey(name: 'tax_value') double? taxValue,
       @JsonKey(name: 'tax_amount') double? taxAmount,
@@ -1831,7 +1854,16 @@ abstract class $SaleCreationResponseSaleItemDaoCopyWith<$Res> {
       @JsonKey(name: 'discount_amount') double? discountAmount,
       @JsonKey(name: 'sale_unit') SaleCreationResponseSaleUnitDao? saleUnit,
       double? quantity,
-      @JsonKey(name: 'sub_total') double? subTotal});
+      @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(name: 'is_custom') @IntOrBoolToBoolConverter() bool? isCustom,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_description') String? customDescription,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice});
 
   $SaleCreationResponseSaleUnitDaoCopyWith<$Res>? get saleUnit;
 }
@@ -1866,6 +1898,11 @@ class _$SaleCreationResponseSaleItemDaoCopyWithImpl<$Res,
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? isCustom = freezed,
+    Object? customName = freezed,
+    Object? customDescription = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
   }) {
     return _then(_value.copyWith(
       productId: freezed == productId
@@ -1924,6 +1961,26 @@ class _$SaleCreationResponseSaleItemDaoCopyWithImpl<$Res,
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      isCustom: freezed == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
     ) as $Val);
   }
 
@@ -1957,7 +2014,9 @@ abstract class _$$SaleCreationResponseSaleItemDaoImplCopyWith<$Res>
       @JsonKey(name: 'product_name') String? productName,
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'net_unit_price') double? netUnitPrice,
-      @JsonKey(name: 'product_price') double? productPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      double? productPrice,
       @JsonKey(name: 'tax_type') int? taxType,
       @JsonKey(name: 'tax_value') double? taxValue,
       @JsonKey(name: 'tax_amount') double? taxAmount,
@@ -1966,7 +2025,16 @@ abstract class _$$SaleCreationResponseSaleItemDaoImplCopyWith<$Res>
       @JsonKey(name: 'discount_amount') double? discountAmount,
       @JsonKey(name: 'sale_unit') SaleCreationResponseSaleUnitDao? saleUnit,
       double? quantity,
-      @JsonKey(name: 'sub_total') double? subTotal});
+      @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(name: 'is_custom') @IntOrBoolToBoolConverter() bool? isCustom,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_description') String? customDescription,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice});
 
   @override
   $SaleCreationResponseSaleUnitDaoCopyWith<$Res>? get saleUnit;
@@ -2001,6 +2069,11 @@ class __$$SaleCreationResponseSaleItemDaoImplCopyWithImpl<$Res>
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? isCustom = freezed,
+    Object? customName = freezed,
+    Object? customDescription = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
   }) {
     return _then(_$SaleCreationResponseSaleItemDaoImpl(
       productId: freezed == productId
@@ -2059,6 +2132,26 @@ class __$$SaleCreationResponseSaleItemDaoImplCopyWithImpl<$Res>
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      isCustom: freezed == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -2072,7 +2165,9 @@ class _$SaleCreationResponseSaleItemDaoImpl
       @JsonKey(name: 'product_name') this.productName,
       @JsonKey(name: 'company_id') this.companyId,
       @JsonKey(name: 'net_unit_price') this.netUnitPrice,
-      @JsonKey(name: 'product_price') this.productPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      this.productPrice,
       @JsonKey(name: 'tax_type') this.taxType,
       @JsonKey(name: 'tax_value') this.taxValue,
       @JsonKey(name: 'tax_amount') this.taxAmount,
@@ -2081,7 +2176,18 @@ class _$SaleCreationResponseSaleItemDaoImpl
       @JsonKey(name: 'discount_amount') this.discountAmount,
       @JsonKey(name: 'sale_unit') this.saleUnit,
       this.quantity,
-      @JsonKey(name: 'sub_total') this.subTotal});
+      @JsonKey(name: 'sub_total') this.subTotal,
+      @JsonKey(name: 'is_custom')
+      @IntOrBoolToBoolConverter()
+      this.isCustom = false,
+      @JsonKey(name: 'custom_name') this.customName,
+      @JsonKey(name: 'custom_description') this.customDescription,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      this.customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      this.customPrice});
 
   factory _$SaleCreationResponseSaleItemDaoImpl.fromJson(
           Map<String, dynamic> json) =>
@@ -2101,6 +2207,7 @@ class _$SaleCreationResponseSaleItemDaoImpl
   final double? netUnitPrice;
   @override
   @JsonKey(name: 'product_price')
+  @StringOrNumToDoubleConverter()
   final double? productPrice;
   @override
   @JsonKey(name: 'tax_type')
@@ -2128,10 +2235,28 @@ class _$SaleCreationResponseSaleItemDaoImpl
   @override
   @JsonKey(name: 'sub_total')
   final double? subTotal;
+  @override
+  @JsonKey(name: 'is_custom')
+  @IntOrBoolToBoolConverter()
+  final bool? isCustom;
+  @override
+  @JsonKey(name: 'custom_name')
+  final String? customName;
+  @override
+  @JsonKey(name: 'custom_description')
+  final String? customDescription;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  final double? customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  final double? customPrice;
 
   @override
   String toString() {
-    return 'SaleCreationResponseSaleItemDao(productId: $productId, productName: $productName, companyId: $companyId, netUnitPrice: $netUnitPrice, productPrice: $productPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal)';
+    return 'SaleCreationResponseSaleItemDao(productId: $productId, productName: $productName, companyId: $companyId, netUnitPrice: $netUnitPrice, productPrice: $productPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal, isCustom: $isCustom, customName: $customName, customDescription: $customDescription, customCost: $customCost, customPrice: $customPrice)';
   }
 
   @override
@@ -2165,27 +2290,43 @@ class _$SaleCreationResponseSaleItemDaoImpl
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
             (identical(other.subTotal, subTotal) ||
-                other.subTotal == subTotal));
+                other.subTotal == subTotal) &&
+            (identical(other.isCustom, isCustom) ||
+                other.isCustom == isCustom) &&
+            (identical(other.customName, customName) ||
+                other.customName == customName) &&
+            (identical(other.customDescription, customDescription) ||
+                other.customDescription == customDescription) &&
+            (identical(other.customCost, customCost) ||
+                other.customCost == customCost) &&
+            (identical(other.customPrice, customPrice) ||
+                other.customPrice == customPrice));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      productId,
-      productName,
-      companyId,
-      netUnitPrice,
-      productPrice,
-      taxType,
-      taxValue,
-      taxAmount,
-      discountType,
-      discountValue,
-      discountAmount,
-      saleUnit,
-      quantity,
-      subTotal);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        productId,
+        productName,
+        companyId,
+        netUnitPrice,
+        productPrice,
+        taxType,
+        taxValue,
+        taxAmount,
+        discountType,
+        discountValue,
+        discountAmount,
+        saleUnit,
+        quantity,
+        subTotal,
+        isCustom,
+        customName,
+        customDescription,
+        customCost,
+        customPrice
+      ]);
 
   /// Create a copy of SaleCreationResponseSaleItemDao
   /// with the given fields replaced by the non-null parameter values.
@@ -2208,22 +2349,34 @@ class _$SaleCreationResponseSaleItemDaoImpl
 abstract class _SaleCreationResponseSaleItemDao
     implements SaleCreationResponseSaleItemDao {
   const factory _SaleCreationResponseSaleItemDao(
-          {@JsonKey(name: 'product_id') final int? productId,
-          @JsonKey(name: 'product_name') final String? productName,
-          @JsonKey(name: 'company_id') final int? companyId,
-          @JsonKey(name: 'net_unit_price') final double? netUnitPrice,
-          @JsonKey(name: 'product_price') final double? productPrice,
-          @JsonKey(name: 'tax_type') final int? taxType,
-          @JsonKey(name: 'tax_value') final double? taxValue,
-          @JsonKey(name: 'tax_amount') final double? taxAmount,
-          @JsonKey(name: 'discount_type') final int? discountType,
-          @JsonKey(name: 'discount_value') final double? discountValue,
-          @JsonKey(name: 'discount_amount') final double? discountAmount,
-          @JsonKey(name: 'sale_unit')
-          final SaleCreationResponseSaleUnitDao? saleUnit,
-          final double? quantity,
-          @JsonKey(name: 'sub_total') final double? subTotal}) =
-      _$SaleCreationResponseSaleItemDaoImpl;
+      {@JsonKey(name: 'product_id') final int? productId,
+      @JsonKey(name: 'product_name') final String? productName,
+      @JsonKey(name: 'company_id') final int? companyId,
+      @JsonKey(name: 'net_unit_price') final double? netUnitPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      final double? productPrice,
+      @JsonKey(name: 'tax_type') final int? taxType,
+      @JsonKey(name: 'tax_value') final double? taxValue,
+      @JsonKey(name: 'tax_amount') final double? taxAmount,
+      @JsonKey(name: 'discount_type') final int? discountType,
+      @JsonKey(name: 'discount_value') final double? discountValue,
+      @JsonKey(name: 'discount_amount') final double? discountAmount,
+      @JsonKey(name: 'sale_unit')
+      final SaleCreationResponseSaleUnitDao? saleUnit,
+      final double? quantity,
+      @JsonKey(name: 'sub_total') final double? subTotal,
+      @JsonKey(name: 'is_custom')
+      @IntOrBoolToBoolConverter()
+      final bool? isCustom,
+      @JsonKey(name: 'custom_name') final String? customName,
+      @JsonKey(name: 'custom_description') final String? customDescription,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      final double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      final double? customPrice}) = _$SaleCreationResponseSaleItemDaoImpl;
 
   factory _SaleCreationResponseSaleItemDao.fromJson(Map<String, dynamic> json) =
       _$SaleCreationResponseSaleItemDaoImpl.fromJson;
@@ -2242,6 +2395,7 @@ abstract class _SaleCreationResponseSaleItemDao
   double? get netUnitPrice;
   @override
   @JsonKey(name: 'product_price')
+  @StringOrNumToDoubleConverter()
   double? get productPrice;
   @override
   @JsonKey(name: 'tax_type')
@@ -2269,6 +2423,24 @@ abstract class _SaleCreationResponseSaleItemDao
   @override
   @JsonKey(name: 'sub_total')
   double? get subTotal;
+  @override
+  @JsonKey(name: 'is_custom')
+  @IntOrBoolToBoolConverter()
+  bool? get isCustom;
+  @override
+  @JsonKey(name: 'custom_name')
+  String? get customName;
+  @override
+  @JsonKey(name: 'custom_description')
+  String? get customDescription;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice;
 
   /// Create a copy of SaleCreationResponseSaleItemDao
   /// with the given fields replaced by the non-null parameter values.

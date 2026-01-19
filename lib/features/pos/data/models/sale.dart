@@ -3,6 +3,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../enums/enums.dart';
+import 'sale_creation_response.dart';
 
 part 'sale.freezed.dart';
 part 'sale.g.dart';
@@ -42,7 +43,7 @@ class Sale with _$Sale {
     @JsonKey(name: 'payment_methods') List<String>? paymentMethods,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'barcode_url') String? barcodeUrl,
-    @JsonKey(name: 'is_offline') required int isOffline,
+    @JsonKey(name: 'is_offline') @IntOrBoolToBoolConverter() @Default(false) bool? isOffline,
     @JsonKey(name: 'offline_customer_name') String? offlineCustomerName,
     @JsonKey(name: 'staff_id') int? staffId,
     @JsonKey(name: 'attendant_name') String? attendantName,
@@ -95,7 +96,7 @@ class SaleItem with _$SaleItem {
     @JsonKey(name: 'product_name') String? productName,
     @JsonKey(name: 'company_id') int? companyId,
     @JsonKey(name: 'net_unit_price') double? netUnitPrice,
-    @JsonKey(name: 'product_price') double? productPrice,
+    @JsonKey(name: 'product_price') @StringOrNumToDoubleConverter() double? productPrice,
     @JsonKey(name: 'tax_type') int? taxType,
     @JsonKey(name: 'tax_value') double? taxValue,
     @JsonKey(name: 'tax_amount') double? taxAmount,
@@ -105,6 +106,11 @@ class SaleItem with _$SaleItem {
     @JsonKey(name: 'sale_unit') SaleUnit? saleUnit,
     double? quantity,
     @JsonKey(name: 'sub_total') double? subTotal,
+    @JsonKey(name: 'custom_cost') @StringOrNumToDoubleConverter() double? customCost,
+    @JsonKey(name: 'custom_price') @StringOrNumToDoubleConverter() double? customPrice,
+    @JsonKey(name: 'custom_name') String? customName,
+    @JsonKey(name: 'custom_description') String? customDescription,
+    @JsonKey(name: 'is_custom') @IntOrBoolToBoolConverter() @Default(false) bool? isCustom,
   }) = _SaleItem;
 
   factory SaleItem.fromJson(Map<String, dynamic> json) => _$SaleItemFromJson(json);

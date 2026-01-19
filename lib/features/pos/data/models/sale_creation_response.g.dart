@@ -56,7 +56,9 @@ _$SaleCreationResponseAttributesDaoImpl
               ? null
               : DateTime.parse(json['created_at'] as String),
           barcodeUrl: json['barcode_url'] as String?,
-          isOffline: (json['is_offline'] as num?)?.toInt(),
+          isOffline: json['is_offline'] == null
+              ? false
+              : const IntOrBoolToBoolConverter().fromJson(json['is_offline']),
           offlineCustomerName: json['offline_customer_name'] as String?,
           staffId: (json['staff_id'] as num?)?.toInt(),
           attendantName: json['attendant_name'] as String?,
@@ -95,7 +97,8 @@ Map<String, dynamic> _$$SaleCreationResponseAttributesDaoImplToJson(
       'payment_methods': instance.paymentMethods,
       'created_at': instance.createdAt?.toIso8601String(),
       'barcode_url': instance.barcodeUrl,
-      'is_offline': instance.isOffline,
+      'is_offline': _$JsonConverterToJson<dynamic, bool>(
+          instance.isOffline, const IntOrBoolToBoolConverter().toJson),
       'offline_customer_name': instance.offlineCustomerName,
       'staff_id': instance.staffId,
       'attendant_name': instance.attendantName,
@@ -121,6 +124,12 @@ const _$PaymentStatusEnumMap = {
   PaymentStatus.unpaid: 2,
   PaymentStatus.partial: 3,
 };
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) =>
+    value == null ? null : toJson(value);
 
 _$SaleCreationResponseLoggedUserDaoImpl
     _$$SaleCreationResponseLoggedUserDaoImplFromJson(
@@ -200,7 +209,8 @@ _$SaleCreationResponseSaleItemDaoImpl
           productName: json['product_name'] as String?,
           companyId: (json['company_id'] as num?)?.toInt(),
           netUnitPrice: (json['net_unit_price'] as num?)?.toDouble(),
-          productPrice: (json['product_price'] as num?)?.toDouble(),
+          productPrice: const StringOrNumToDoubleConverter()
+              .fromJson(json['product_price']),
           taxType: (json['tax_type'] as num?)?.toInt(),
           taxValue: (json['tax_value'] as num?)?.toDouble(),
           taxAmount: (json['tax_amount'] as num?)?.toDouble(),
@@ -213,6 +223,15 @@ _$SaleCreationResponseSaleItemDaoImpl
                   json['sale_unit'] as Map<String, dynamic>),
           quantity: (json['quantity'] as num?)?.toDouble(),
           subTotal: (json['sub_total'] as num?)?.toDouble(),
+          isCustom: json['is_custom'] == null
+              ? false
+              : const IntOrBoolToBoolConverter().fromJson(json['is_custom']),
+          customName: json['custom_name'] as String?,
+          customDescription: json['custom_description'] as String?,
+          customCost: const StringOrNumToDoubleConverter()
+              .fromJson(json['custom_cost']),
+          customPrice: const StringOrNumToDoubleConverter()
+              .fromJson(json['custom_price']),
         );
 
 Map<String, dynamic> _$$SaleCreationResponseSaleItemDaoImplToJson(
@@ -222,7 +241,8 @@ Map<String, dynamic> _$$SaleCreationResponseSaleItemDaoImplToJson(
       'product_name': instance.productName,
       'company_id': instance.companyId,
       'net_unit_price': instance.netUnitPrice,
-      'product_price': instance.productPrice,
+      'product_price':
+          const StringOrNumToDoubleConverter().toJson(instance.productPrice),
       'tax_type': instance.taxType,
       'tax_value': instance.taxValue,
       'tax_amount': instance.taxAmount,
@@ -232,6 +252,14 @@ Map<String, dynamic> _$$SaleCreationResponseSaleItemDaoImplToJson(
       'sale_unit': instance.saleUnit,
       'quantity': instance.quantity,
       'sub_total': instance.subTotal,
+      'is_custom': _$JsonConverterToJson<dynamic, bool>(
+          instance.isCustom, const IntOrBoolToBoolConverter().toJson),
+      'custom_name': instance.customName,
+      'custom_description': instance.customDescription,
+      'custom_cost':
+          const StringOrNumToDoubleConverter().toJson(instance.customCost),
+      'custom_price':
+          const StringOrNumToDoubleConverter().toJson(instance.customPrice),
     };
 
 _$SaleCreationResponseSaleUnitDaoImpl

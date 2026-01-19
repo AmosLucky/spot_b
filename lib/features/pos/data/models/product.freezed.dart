@@ -30,6 +30,15 @@ mixin _$Product {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   int? get inStock => throw _privateConstructorUsedError;
   String? get link => throw _privateConstructorUsedError;
+  double? get customCost => throw _privateConstructorUsedError;
+  String? get customDescription => throw _privateConstructorUsedError;
+  String? get customName => throw _privateConstructorUsedError;
+  double? get customPrice => throw _privateConstructorUsedError;
+  String? get brandName => throw _privateConstructorUsedError;
+  String? get productCategoryName => throw _privateConstructorUsedError;
+  String? get stockAlert => throw _privateConstructorUsedError;
+  ProductUnitName? get productUnitName => throw _privateConstructorUsedError;
+  List<ProductWarehouse>? get warehouse => throw _privateConstructorUsedError;
 
   /// Create a copy of Product
   /// with the given fields replaced by the non-null parameter values.
@@ -56,9 +65,19 @@ abstract class $ProductCopyWith<$Res> {
       Stock? stock,
       DateTime? createdAt,
       int? inStock,
-      String? link});
+      String? link,
+      double? customCost,
+      String? customDescription,
+      String? customName,
+      double? customPrice,
+      String? brandName,
+      String? productCategoryName,
+      String? stockAlert,
+      ProductUnitName? productUnitName,
+      List<ProductWarehouse>? warehouse});
 
   $StockCopyWith<$Res>? get stock;
+  $ProductUnitNameCopyWith<$Res>? get productUnitName;
 }
 
 /// @nodoc
@@ -90,6 +109,15 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
     Object? createdAt = freezed,
     Object? inStock = freezed,
     Object? link = freezed,
+    Object? customCost = freezed,
+    Object? customDescription = freezed,
+    Object? customName = freezed,
+    Object? customPrice = freezed,
+    Object? brandName = freezed,
+    Object? productCategoryName = freezed,
+    Object? stockAlert = freezed,
+    Object? productUnitName = freezed,
+    Object? warehouse = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -148,6 +176,42 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
               as String?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      brandName: freezed == brandName
+          ? _value.brandName
+          : brandName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productCategoryName: freezed == productCategoryName
+          ? _value.productCategoryName
+          : productCategoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stockAlert: freezed == stockAlert
+          ? _value.stockAlert
+          : stockAlert // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productUnitName: freezed == productUnitName
+          ? _value.productUnitName
+          : productUnitName // ignore: cast_nullable_to_non_nullable
+              as ProductUnitName?,
+      warehouse: freezed == warehouse
+          ? _value.warehouse
+          : warehouse // ignore: cast_nullable_to_non_nullable
+              as List<ProductWarehouse>?,
     ) as $Val);
   }
 
@@ -162,6 +226,20 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
 
     return $StockCopyWith<$Res>(_value.stock!, (value) {
       return _then(_value.copyWith(stock: value) as $Val);
+    });
+  }
+
+  /// Create a copy of Product
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $ProductUnitNameCopyWith<$Res>? get productUnitName {
+    if (_value.productUnitName == null) {
+      return null;
+    }
+
+    return $ProductUnitNameCopyWith<$Res>(_value.productUnitName!, (value) {
+      return _then(_value.copyWith(productUnitName: value) as $Val);
     });
   }
 }
@@ -187,10 +265,21 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
       Stock? stock,
       DateTime? createdAt,
       int? inStock,
-      String? link});
+      String? link,
+      double? customCost,
+      String? customDescription,
+      String? customName,
+      double? customPrice,
+      String? brandName,
+      String? productCategoryName,
+      String? stockAlert,
+      ProductUnitName? productUnitName,
+      List<ProductWarehouse>? warehouse});
 
   @override
   $StockCopyWith<$Res>? get stock;
+  @override
+  $ProductUnitNameCopyWith<$Res>? get productUnitName;
 }
 
 /// @nodoc
@@ -220,6 +309,15 @@ class __$$ProductImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? inStock = freezed,
     Object? link = freezed,
+    Object? customCost = freezed,
+    Object? customDescription = freezed,
+    Object? customName = freezed,
+    Object? customPrice = freezed,
+    Object? brandName = freezed,
+    Object? productCategoryName = freezed,
+    Object? stockAlert = freezed,
+    Object? productUnitName = freezed,
+    Object? warehouse = freezed,
   }) {
     return _then(_$ProductImpl(
       id: freezed == id
@@ -278,6 +376,42 @@ class __$$ProductImplCopyWithImpl<$Res>
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
               as String?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      brandName: freezed == brandName
+          ? _value.brandName
+          : brandName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productCategoryName: freezed == productCategoryName
+          ? _value.productCategoryName
+          : productCategoryName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stockAlert: freezed == stockAlert
+          ? _value.stockAlert
+          : stockAlert // ignore: cast_nullable_to_non_nullable
+              as String?,
+      productUnitName: freezed == productUnitName
+          ? _value.productUnitName
+          : productUnitName // ignore: cast_nullable_to_non_nullable
+              as ProductUnitName?,
+      warehouse: freezed == warehouse
+          ? _value._warehouse
+          : warehouse // ignore: cast_nullable_to_non_nullable
+              as List<ProductWarehouse>?,
     ));
   }
 }
@@ -299,7 +433,17 @@ class _$ProductImpl implements _Product {
       this.stock,
       this.createdAt,
       this.inStock,
-      this.link});
+      this.link,
+      this.customCost,
+      this.customDescription,
+      this.customName,
+      this.customPrice,
+      this.brandName,
+      this.productCategoryName,
+      this.stockAlert,
+      this.productUnitName,
+      final List<ProductWarehouse>? warehouse})
+      : _warehouse = warehouse;
 
   @override
   final int? id;
@@ -329,10 +473,35 @@ class _$ProductImpl implements _Product {
   final int? inStock;
   @override
   final String? link;
+  @override
+  final double? customCost;
+  @override
+  final String? customDescription;
+  @override
+  final String? customName;
+  @override
+  final double? customPrice;
+  @override
+  final String? brandName;
+  @override
+  final String? productCategoryName;
+  @override
+  final String? stockAlert;
+  @override
+  final ProductUnitName? productUnitName;
+  final List<ProductWarehouse>? _warehouse;
+  @override
+  List<ProductWarehouse>? get warehouse {
+    final value = _warehouse;
+    if (value == null) return null;
+    if (_warehouse is EqualUnmodifiableListView) return _warehouse;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
 
   @override
   String toString() {
-    return 'Product(id: $id, name: $name, companyId: $companyId, code: $code, expiryDate: $expiryDate, mainProductId: $mainProductId, productCategoryId: $productCategoryId, productCost: $productCost, productPrice: $productPrice, isActive: $isActive, stock: $stock, createdAt: $createdAt, inStock: $inStock, link: $link)';
+    return 'Product(id: $id, name: $name, companyId: $companyId, code: $code, expiryDate: $expiryDate, mainProductId: $mainProductId, productCategoryId: $productCategoryId, productCost: $productCost, productPrice: $productPrice, isActive: $isActive, stock: $stock, createdAt: $createdAt, inStock: $inStock, link: $link, customCost: $customCost, customDescription: $customDescription, customName: $customName, customPrice: $customPrice, brandName: $brandName, productCategoryName: $productCategoryName, stockAlert: $stockAlert, productUnitName: $productUnitName, warehouse: $warehouse)';
   }
 
   @override
@@ -361,26 +530,54 @@ class _$ProductImpl implements _Product {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.inStock, inStock) || other.inStock == inStock) &&
-            (identical(other.link, link) || other.link == link));
+            (identical(other.link, link) || other.link == link) &&
+            (identical(other.customCost, customCost) ||
+                other.customCost == customCost) &&
+            (identical(other.customDescription, customDescription) ||
+                other.customDescription == customDescription) &&
+            (identical(other.customName, customName) ||
+                other.customName == customName) &&
+            (identical(other.customPrice, customPrice) ||
+                other.customPrice == customPrice) &&
+            (identical(other.brandName, brandName) ||
+                other.brandName == brandName) &&
+            (identical(other.productCategoryName, productCategoryName) ||
+                other.productCategoryName == productCategoryName) &&
+            (identical(other.stockAlert, stockAlert) ||
+                other.stockAlert == stockAlert) &&
+            (identical(other.productUnitName, productUnitName) ||
+                other.productUnitName == productUnitName) &&
+            const DeepCollectionEquality()
+                .equals(other._warehouse, _warehouse));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      companyId,
-      code,
-      expiryDate,
-      mainProductId,
-      productCategoryId,
-      productCost,
-      productPrice,
-      isActive,
-      stock,
-      createdAt,
-      inStock,
-      link);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        name,
+        companyId,
+        code,
+        expiryDate,
+        mainProductId,
+        productCategoryId,
+        productCost,
+        productPrice,
+        isActive,
+        stock,
+        createdAt,
+        inStock,
+        link,
+        customCost,
+        customDescription,
+        customName,
+        customPrice,
+        brandName,
+        productCategoryName,
+        stockAlert,
+        productUnitName,
+        const DeepCollectionEquality().hash(_warehouse)
+      ]);
 
   /// Create a copy of Product
   /// with the given fields replaced by the non-null parameter values.
@@ -406,7 +603,16 @@ abstract class _Product implements Product {
       final Stock? stock,
       final DateTime? createdAt,
       final int? inStock,
-      final String? link}) = _$ProductImpl;
+      final String? link,
+      final double? customCost,
+      final String? customDescription,
+      final String? customName,
+      final double? customPrice,
+      final String? brandName,
+      final String? productCategoryName,
+      final String? stockAlert,
+      final ProductUnitName? productUnitName,
+      final List<ProductWarehouse>? warehouse}) = _$ProductImpl;
 
   @override
   int? get id;
@@ -436,6 +642,24 @@ abstract class _Product implements Product {
   int? get inStock;
   @override
   String? get link;
+  @override
+  double? get customCost;
+  @override
+  String? get customDescription;
+  @override
+  String? get customName;
+  @override
+  double? get customPrice;
+  @override
+  String? get brandName;
+  @override
+  String? get productCategoryName;
+  @override
+  String? get stockAlert;
+  @override
+  ProductUnitName? get productUnitName;
+  @override
+  List<ProductWarehouse>? get warehouse;
 
   /// Create a copy of Product
   /// with the given fields replaced by the non-null parameter values.

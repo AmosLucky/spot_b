@@ -76,7 +76,8 @@ mixin _$Sale {
   @JsonKey(name: 'barcode_url')
   String? get barcodeUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_offline')
-  int get isOffline => throw _privateConstructorUsedError;
+  @IntOrBoolToBoolConverter()
+  bool? get isOffline => throw _privateConstructorUsedError;
   @JsonKey(name: 'offline_customer_name')
   String? get offlineCustomerName => throw _privateConstructorUsedError;
   @JsonKey(name: 'staff_id')
@@ -137,7 +138,7 @@ abstract class $SaleCopyWith<$Res> {
       @JsonKey(name: 'payment_methods') List<String>? paymentMethods,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'barcode_url') String? barcodeUrl,
-      @JsonKey(name: 'is_offline') int isOffline,
+      @JsonKey(name: 'is_offline') @IntOrBoolToBoolConverter() bool? isOffline,
       @JsonKey(name: 'offline_customer_name') String? offlineCustomerName,
       @JsonKey(name: 'staff_id') int? staffId,
       @JsonKey(name: 'attendant_name') String? attendantName,
@@ -195,7 +196,7 @@ class _$SaleCopyWithImpl<$Res, $Val extends Sale>
     Object? paymentMethods = freezed,
     Object? createdAt = freezed,
     Object? barcodeUrl = freezed,
-    Object? isOffline = null,
+    Object? isOffline = freezed,
     Object? offlineCustomerName = freezed,
     Object? staffId = freezed,
     Object? attendantName = freezed,
@@ -332,10 +333,10 @@ class _$SaleCopyWithImpl<$Res, $Val extends Sale>
           ? _value.barcodeUrl
           : barcodeUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      isOffline: null == isOffline
+      isOffline: freezed == isOffline
           ? _value.isOffline
           : isOffline // ignore: cast_nullable_to_non_nullable
-              as int,
+              as bool?,
       offlineCustomerName: freezed == offlineCustomerName
           ? _value.offlineCustomerName
           : offlineCustomerName // ignore: cast_nullable_to_non_nullable
@@ -418,7 +419,7 @@ abstract class _$$SaleImplCopyWith<$Res> implements $SaleCopyWith<$Res> {
       @JsonKey(name: 'payment_methods') List<String>? paymentMethods,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'barcode_url') String? barcodeUrl,
-      @JsonKey(name: 'is_offline') int isOffline,
+      @JsonKey(name: 'is_offline') @IntOrBoolToBoolConverter() bool? isOffline,
       @JsonKey(name: 'offline_customer_name') String? offlineCustomerName,
       @JsonKey(name: 'staff_id') int? staffId,
       @JsonKey(name: 'attendant_name') String? attendantName,
@@ -474,7 +475,7 @@ class __$$SaleImplCopyWithImpl<$Res>
     Object? paymentMethods = freezed,
     Object? createdAt = freezed,
     Object? barcodeUrl = freezed,
-    Object? isOffline = null,
+    Object? isOffline = freezed,
     Object? offlineCustomerName = freezed,
     Object? staffId = freezed,
     Object? attendantName = freezed,
@@ -611,10 +612,10 @@ class __$$SaleImplCopyWithImpl<$Res>
           ? _value.barcodeUrl
           : barcodeUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      isOffline: null == isOffline
+      isOffline: freezed == isOffline
           ? _value.isOffline
           : isOffline // ignore: cast_nullable_to_non_nullable
-              as int,
+              as bool?,
       offlineCustomerName: freezed == offlineCustomerName
           ? _value.offlineCustomerName
           : offlineCustomerName // ignore: cast_nullable_to_non_nullable
@@ -679,7 +680,9 @@ class _$SaleImpl implements _Sale {
       @JsonKey(name: 'payment_methods') final List<String>? paymentMethods,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'barcode_url') this.barcodeUrl,
-      @JsonKey(name: 'is_offline') required this.isOffline,
+      @JsonKey(name: 'is_offline')
+      @IntOrBoolToBoolConverter()
+      this.isOffline = false,
       @JsonKey(name: 'offline_customer_name') this.offlineCustomerName,
       @JsonKey(name: 'staff_id') this.staffId,
       @JsonKey(name: 'attendant_name') this.attendantName,
@@ -815,7 +818,8 @@ class _$SaleImpl implements _Sale {
   final String? barcodeUrl;
   @override
   @JsonKey(name: 'is_offline')
-  final int isOffline;
+  @IntOrBoolToBoolConverter()
+  final bool? isOffline;
   @override
   @JsonKey(name: 'offline_customer_name')
   final String? offlineCustomerName;
@@ -1011,7 +1015,9 @@ abstract class _Sale implements Sale {
       @JsonKey(name: 'payment_methods') final List<String>? paymentMethods,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'barcode_url') final String? barcodeUrl,
-      @JsonKey(name: 'is_offline') required final int isOffline,
+      @JsonKey(name: 'is_offline')
+      @IntOrBoolToBoolConverter()
+      final bool? isOffline,
       @JsonKey(name: 'offline_customer_name') final String? offlineCustomerName,
       @JsonKey(name: 'staff_id') final int? staffId,
       @JsonKey(name: 'attendant_name') final String? attendantName,
@@ -1111,7 +1117,8 @@ abstract class _Sale implements Sale {
   String? get barcodeUrl;
   @override
   @JsonKey(name: 'is_offline')
-  int get isOffline;
+  @IntOrBoolToBoolConverter()
+  bool? get isOffline;
   @override
   @JsonKey(name: 'offline_customer_name')
   String? get offlineCustomerName;
@@ -1907,6 +1914,7 @@ mixin _$SaleItem {
   @JsonKey(name: 'net_unit_price')
   double? get netUnitPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'product_price')
+  @StringOrNumToDoubleConverter()
   double? get productPrice => throw _privateConstructorUsedError;
   @JsonKey(name: 'tax_type')
   int? get taxType => throw _privateConstructorUsedError;
@@ -1925,6 +1933,19 @@ mixin _$SaleItem {
   double? get quantity => throw _privateConstructorUsedError;
   @JsonKey(name: 'sub_total')
   double? get subTotal => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_name')
+  String? get customName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'custom_description')
+  String? get customDescription => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_custom')
+  @IntOrBoolToBoolConverter()
+  bool? get isCustom => throw _privateConstructorUsedError;
 
   /// Serializes this SaleItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1946,7 +1967,9 @@ abstract class $SaleItemCopyWith<$Res> {
       @JsonKey(name: 'product_name') String? productName,
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'net_unit_price') double? netUnitPrice,
-      @JsonKey(name: 'product_price') double? productPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      double? productPrice,
       @JsonKey(name: 'tax_type') int? taxType,
       @JsonKey(name: 'tax_value') double? taxValue,
       @JsonKey(name: 'tax_amount') double? taxAmount,
@@ -1955,7 +1978,16 @@ abstract class $SaleItemCopyWith<$Res> {
       @JsonKey(name: 'discount_amount') double? discountAmount,
       @JsonKey(name: 'sale_unit') SaleUnit? saleUnit,
       double? quantity,
-      @JsonKey(name: 'sub_total') double? subTotal});
+      @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_description') String? customDescription,
+      @JsonKey(name: 'is_custom') @IntOrBoolToBoolConverter() bool? isCustom});
 
   $SaleUnitCopyWith<$Res>? get saleUnit;
 }
@@ -1989,6 +2021,11 @@ class _$SaleItemCopyWithImpl<$Res, $Val extends SaleItem>
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
+    Object? customName = freezed,
+    Object? customDescription = freezed,
+    Object? isCustom = freezed,
   }) {
     return _then(_value.copyWith(
       productId: freezed == productId
@@ -2047,6 +2084,26 @@ class _$SaleItemCopyWithImpl<$Res, $Val extends SaleItem>
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isCustom: freezed == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 
@@ -2078,7 +2135,9 @@ abstract class _$$SaleItemImplCopyWith<$Res>
       @JsonKey(name: 'product_name') String? productName,
       @JsonKey(name: 'company_id') int? companyId,
       @JsonKey(name: 'net_unit_price') double? netUnitPrice,
-      @JsonKey(name: 'product_price') double? productPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      double? productPrice,
       @JsonKey(name: 'tax_type') int? taxType,
       @JsonKey(name: 'tax_value') double? taxValue,
       @JsonKey(name: 'tax_amount') double? taxAmount,
@@ -2087,7 +2146,16 @@ abstract class _$$SaleItemImplCopyWith<$Res>
       @JsonKey(name: 'discount_amount') double? discountAmount,
       @JsonKey(name: 'sale_unit') SaleUnit? saleUnit,
       double? quantity,
-      @JsonKey(name: 'sub_total') double? subTotal});
+      @JsonKey(name: 'sub_total') double? subTotal,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      double? customPrice,
+      @JsonKey(name: 'custom_name') String? customName,
+      @JsonKey(name: 'custom_description') String? customDescription,
+      @JsonKey(name: 'is_custom') @IntOrBoolToBoolConverter() bool? isCustom});
 
   @override
   $SaleUnitCopyWith<$Res>? get saleUnit;
@@ -2120,6 +2188,11 @@ class __$$SaleItemImplCopyWithImpl<$Res>
     Object? saleUnit = freezed,
     Object? quantity = freezed,
     Object? subTotal = freezed,
+    Object? customCost = freezed,
+    Object? customPrice = freezed,
+    Object? customName = freezed,
+    Object? customDescription = freezed,
+    Object? isCustom = freezed,
   }) {
     return _then(_$SaleItemImpl(
       productId: freezed == productId
@@ -2178,6 +2251,26 @@ class __$$SaleItemImplCopyWithImpl<$Res>
           ? _value.subTotal
           : subTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      customCost: freezed == customCost
+          ? _value.customCost
+          : customCost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customPrice: freezed == customPrice
+          ? _value.customPrice
+          : customPrice // ignore: cast_nullable_to_non_nullable
+              as double?,
+      customName: freezed == customName
+          ? _value.customName
+          : customName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      customDescription: freezed == customDescription
+          ? _value.customDescription
+          : customDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isCustom: freezed == isCustom
+          ? _value.isCustom
+          : isCustom // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -2190,7 +2283,9 @@ class _$SaleItemImpl implements _SaleItem {
       @JsonKey(name: 'product_name') this.productName,
       @JsonKey(name: 'company_id') this.companyId,
       @JsonKey(name: 'net_unit_price') this.netUnitPrice,
-      @JsonKey(name: 'product_price') this.productPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      this.productPrice,
       @JsonKey(name: 'tax_type') this.taxType,
       @JsonKey(name: 'tax_value') this.taxValue,
       @JsonKey(name: 'tax_amount') this.taxAmount,
@@ -2199,7 +2294,18 @@ class _$SaleItemImpl implements _SaleItem {
       @JsonKey(name: 'discount_amount') this.discountAmount,
       @JsonKey(name: 'sale_unit') this.saleUnit,
       this.quantity,
-      @JsonKey(name: 'sub_total') this.subTotal});
+      @JsonKey(name: 'sub_total') this.subTotal,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      this.customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      this.customPrice,
+      @JsonKey(name: 'custom_name') this.customName,
+      @JsonKey(name: 'custom_description') this.customDescription,
+      @JsonKey(name: 'is_custom')
+      @IntOrBoolToBoolConverter()
+      this.isCustom = false});
 
   factory _$SaleItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$SaleItemImplFromJson(json);
@@ -2218,6 +2324,7 @@ class _$SaleItemImpl implements _SaleItem {
   final double? netUnitPrice;
   @override
   @JsonKey(name: 'product_price')
+  @StringOrNumToDoubleConverter()
   final double? productPrice;
   @override
   @JsonKey(name: 'tax_type')
@@ -2245,10 +2352,28 @@ class _$SaleItemImpl implements _SaleItem {
   @override
   @JsonKey(name: 'sub_total')
   final double? subTotal;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  final double? customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  final double? customPrice;
+  @override
+  @JsonKey(name: 'custom_name')
+  final String? customName;
+  @override
+  @JsonKey(name: 'custom_description')
+  final String? customDescription;
+  @override
+  @JsonKey(name: 'is_custom')
+  @IntOrBoolToBoolConverter()
+  final bool? isCustom;
 
   @override
   String toString() {
-    return 'SaleItem(productId: $productId, productName: $productName, companyId: $companyId, netUnitPrice: $netUnitPrice, productPrice: $productPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal)';
+    return 'SaleItem(productId: $productId, productName: $productName, companyId: $companyId, netUnitPrice: $netUnitPrice, productPrice: $productPrice, taxType: $taxType, taxValue: $taxValue, taxAmount: $taxAmount, discountType: $discountType, discountValue: $discountValue, discountAmount: $discountAmount, saleUnit: $saleUnit, quantity: $quantity, subTotal: $subTotal, customCost: $customCost, customPrice: $customPrice, customName: $customName, customDescription: $customDescription, isCustom: $isCustom)';
   }
 
   @override
@@ -2282,27 +2407,43 @@ class _$SaleItemImpl implements _SaleItem {
             (identical(other.quantity, quantity) ||
                 other.quantity == quantity) &&
             (identical(other.subTotal, subTotal) ||
-                other.subTotal == subTotal));
+                other.subTotal == subTotal) &&
+            (identical(other.customCost, customCost) ||
+                other.customCost == customCost) &&
+            (identical(other.customPrice, customPrice) ||
+                other.customPrice == customPrice) &&
+            (identical(other.customName, customName) ||
+                other.customName == customName) &&
+            (identical(other.customDescription, customDescription) ||
+                other.customDescription == customDescription) &&
+            (identical(other.isCustom, isCustom) ||
+                other.isCustom == isCustom));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      productId,
-      productName,
-      companyId,
-      netUnitPrice,
-      productPrice,
-      taxType,
-      taxValue,
-      taxAmount,
-      discountType,
-      discountValue,
-      discountAmount,
-      saleUnit,
-      quantity,
-      subTotal);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        productId,
+        productName,
+        companyId,
+        netUnitPrice,
+        productPrice,
+        taxType,
+        taxValue,
+        taxAmount,
+        discountType,
+        discountValue,
+        discountAmount,
+        saleUnit,
+        quantity,
+        subTotal,
+        customCost,
+        customPrice,
+        customName,
+        customDescription,
+        isCustom
+      ]);
 
   /// Create a copy of SaleItem
   /// with the given fields replaced by the non-null parameter values.
@@ -2326,7 +2467,9 @@ abstract class _SaleItem implements SaleItem {
       @JsonKey(name: 'product_name') final String? productName,
       @JsonKey(name: 'company_id') final int? companyId,
       @JsonKey(name: 'net_unit_price') final double? netUnitPrice,
-      @JsonKey(name: 'product_price') final double? productPrice,
+      @JsonKey(name: 'product_price')
+      @StringOrNumToDoubleConverter()
+      final double? productPrice,
       @JsonKey(name: 'tax_type') final int? taxType,
       @JsonKey(name: 'tax_value') final double? taxValue,
       @JsonKey(name: 'tax_amount') final double? taxAmount,
@@ -2335,7 +2478,18 @@ abstract class _SaleItem implements SaleItem {
       @JsonKey(name: 'discount_amount') final double? discountAmount,
       @JsonKey(name: 'sale_unit') final SaleUnit? saleUnit,
       final double? quantity,
-      @JsonKey(name: 'sub_total') final double? subTotal}) = _$SaleItemImpl;
+      @JsonKey(name: 'sub_total') final double? subTotal,
+      @JsonKey(name: 'custom_cost')
+      @StringOrNumToDoubleConverter()
+      final double? customCost,
+      @JsonKey(name: 'custom_price')
+      @StringOrNumToDoubleConverter()
+      final double? customPrice,
+      @JsonKey(name: 'custom_name') final String? customName,
+      @JsonKey(name: 'custom_description') final String? customDescription,
+      @JsonKey(name: 'is_custom')
+      @IntOrBoolToBoolConverter()
+      final bool? isCustom}) = _$SaleItemImpl;
 
   factory _SaleItem.fromJson(Map<String, dynamic> json) =
       _$SaleItemImpl.fromJson;
@@ -2354,6 +2508,7 @@ abstract class _SaleItem implements SaleItem {
   double? get netUnitPrice;
   @override
   @JsonKey(name: 'product_price')
+  @StringOrNumToDoubleConverter()
   double? get productPrice;
   @override
   @JsonKey(name: 'tax_type')
@@ -2381,6 +2536,24 @@ abstract class _SaleItem implements SaleItem {
   @override
   @JsonKey(name: 'sub_total')
   double? get subTotal;
+  @override
+  @JsonKey(name: 'custom_cost')
+  @StringOrNumToDoubleConverter()
+  double? get customCost;
+  @override
+  @JsonKey(name: 'custom_price')
+  @StringOrNumToDoubleConverter()
+  double? get customPrice;
+  @override
+  @JsonKey(name: 'custom_name')
+  String? get customName;
+  @override
+  @JsonKey(name: 'custom_description')
+  String? get customDescription;
+  @override
+  @JsonKey(name: 'is_custom')
+  @IntOrBoolToBoolConverter()
+  bool? get isCustom;
 
   /// Create a copy of SaleItem
   /// with the given fields replaced by the non-null parameter values.

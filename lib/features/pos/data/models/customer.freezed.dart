@@ -26,6 +26,7 @@ mixin _$Customer {
   String? get address => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   String? get link => throw _privateConstructorUsedError;
+  bool? get isSynced => throw _privateConstructorUsedError;
 
   /// Create a copy of Customer
   /// with the given fields replaced by the non-null parameter values.
@@ -49,7 +50,8 @@ abstract class $CustomerCopyWith<$Res> {
       String? city,
       String? address,
       DateTime? createdAt,
-      String? link});
+      String? link,
+      bool? isSynced});
 }
 
 /// @nodoc
@@ -77,6 +79,7 @@ class _$CustomerCopyWithImpl<$Res, $Val extends Customer>
     Object? address = freezed,
     Object? createdAt = freezed,
     Object? link = freezed,
+    Object? isSynced = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -119,6 +122,10 @@ class _$CustomerCopyWithImpl<$Res, $Val extends Customer>
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
               as String?,
+      isSynced: freezed == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 }
@@ -141,7 +148,8 @@ abstract class _$$CustomerImplCopyWith<$Res>
       String? city,
       String? address,
       DateTime? createdAt,
-      String? link});
+      String? link,
+      bool? isSynced});
 }
 
 /// @nodoc
@@ -167,6 +175,7 @@ class __$$CustomerImplCopyWithImpl<$Res>
     Object? address = freezed,
     Object? createdAt = freezed,
     Object? link = freezed,
+    Object? isSynced = freezed,
   }) {
     return _then(_$CustomerImpl(
       id: freezed == id
@@ -209,6 +218,10 @@ class __$$CustomerImplCopyWithImpl<$Res>
           ? _value.link
           : link // ignore: cast_nullable_to_non_nullable
               as String?,
+      isSynced: freezed == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -226,7 +239,8 @@ class _$CustomerImpl implements _Customer {
       this.city,
       this.address,
       this.createdAt,
-      this.link});
+      this.link,
+      this.isSynced});
 
   @override
   final int? id;
@@ -248,10 +262,12 @@ class _$CustomerImpl implements _Customer {
   final DateTime? createdAt;
   @override
   final String? link;
+  @override
+  final bool? isSynced;
 
   @override
   String toString() {
-    return 'Customer(id: $id, name: $name, companyId: $companyId, email: $email, phone: $phone, country: $country, city: $city, address: $address, createdAt: $createdAt, link: $link)';
+    return 'Customer(id: $id, name: $name, companyId: $companyId, email: $email, phone: $phone, country: $country, city: $city, address: $address, createdAt: $createdAt, link: $link, isSynced: $isSynced)';
   }
 
   @override
@@ -270,12 +286,14 @@ class _$CustomerImpl implements _Customer {
             (identical(other.address, address) || other.address == address) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            (identical(other.link, link) || other.link == link));
+            (identical(other.link, link) || other.link == link) &&
+            (identical(other.isSynced, isSynced) ||
+                other.isSynced == isSynced));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, id, name, companyId, email,
-      phone, country, city, address, createdAt, link);
+      phone, country, city, address, createdAt, link, isSynced);
 
   /// Create a copy of Customer
   /// with the given fields replaced by the non-null parameter values.
@@ -297,7 +315,8 @@ abstract class _Customer implements Customer {
       final String? city,
       final String? address,
       final DateTime? createdAt,
-      final String? link}) = _$CustomerImpl;
+      final String? link,
+      final bool? isSynced}) = _$CustomerImpl;
 
   @override
   int? get id;
@@ -319,6 +338,8 @@ abstract class _Customer implements Customer {
   DateTime? get createdAt;
   @override
   String? get link;
+  @override
+  bool? get isSynced;
 
   /// Create a copy of Customer
   /// with the given fields replaced by the non-null parameter values.

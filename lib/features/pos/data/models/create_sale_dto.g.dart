@@ -42,7 +42,10 @@ _$CreateSaleDtoImpl _$$CreateSaleDtoImplFromJson(Map<String, dynamic> json) =>
       attendantId: (json['attendant_id'] as num?)?.toInt(),
       attendantName: json['attendant_name'] as String?,
       roomDetails: json['room_details'],
-      isOffline: (json['is_offline'] as num?)?.toInt(),
+      isOffline: json['is_offline'] == null
+          ? false
+          : const IntOrBoolToBoolConverter().fromJson(json['is_offline']),
+      offlineCustomerName: json['offline_customer_name'] as String?,
     );
 
 Map<String, dynamic> _$$CreateSaleDtoImplToJson(_$CreateSaleDtoImpl instance) =>
@@ -73,7 +76,9 @@ Map<String, dynamic> _$$CreateSaleDtoImplToJson(_$CreateSaleDtoImpl instance) =>
       'attendant_id': instance.attendantId,
       'attendant_name': instance.attendantName,
       'room_details': instance.roomDetails,
-      'is_offline': instance.isOffline,
+      'is_offline': _$JsonConverterToJson<dynamic, bool>(
+          instance.isOffline, const IntOrBoolToBoolConverter().toJson),
+      'offline_customer_name': instance.offlineCustomerName,
     };
 
 const _$SaleStatusEnumMap = {
@@ -95,6 +100,12 @@ const _$PaymentTypeEnumMap = {
   PaymentType.folio: 4,
   PaymentType.other: 5,
 };
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) =>
+    value == null ? null : toJson(value);
 
 _$PaymentDtoImpl _$$PaymentDtoImplFromJson(Map<String, dynamic> json) =>
     _$PaymentDtoImpl(
@@ -124,6 +135,11 @@ _$SaleItemDtoImpl _$$SaleItemDtoImplFromJson(Map<String, dynamic> json) =>
       saleUnit: json['sale_unit'],
       quantity: (json['quantity'] as num?)?.toDouble(),
       subTotal: (json['sub_total'] as num?)?.toDouble(),
+      isCustom: _toBool(json['is_custom']),
+      customCost: (json['custom_cost'] as num?)?.toDouble(),
+      customDescription: json['custom_description'] as String?,
+      customName: json['custom_name'] as String?,
+      customPrice: (json['custom_price'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$$SaleItemDtoImplToJson(_$SaleItemDtoImpl instance) =>
@@ -141,4 +157,9 @@ Map<String, dynamic> _$$SaleItemDtoImplToJson(_$SaleItemDtoImpl instance) =>
       'sale_unit': instance.saleUnit,
       'quantity': instance.quantity,
       'sub_total': instance.subTotal,
+      'is_custom': _fromBool(instance.isCustom),
+      'custom_cost': instance.customCost,
+      'custom_description': instance.customDescription,
+      'custom_name': instance.customName,
+      'custom_price': instance.customPrice,
     };
