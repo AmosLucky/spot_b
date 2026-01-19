@@ -31,7 +31,7 @@ class DioClient {
       ),
     );
     dio.interceptors.addAll([
-      // LogInterceptor(request: true, responseBody: true),
+      LogInterceptor(requestBody: true, responseBody: true),
       SpotstockTokenInterceptor(
         getIt<TokenRepository>(),
         getIt<RemoveLastLoginTime>(),
