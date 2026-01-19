@@ -12,12 +12,12 @@ class SpotstockNavigation {
     router = r;
   }
 
-  static void goTo(String route) {
-    router.push(route);
+  static Future<T?> goTo<T extends Object?>(String route, [T? arguments]) {
+    return router.push<T>(route, extra: arguments);
   }
 
-  static void replace(String route) {
-    router.go(route);
+  static void replace<T extends Object?>(String route, [T? arguments]) {
+    router.go(route, extra: arguments);
   }
 
   static void goBack<T extends Object?>([T? result]) {
