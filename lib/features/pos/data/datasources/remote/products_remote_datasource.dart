@@ -16,9 +16,8 @@ class ProductsRemoteDatasource {
   ProductsRemoteDatasource(this.dioClient);
 
   SpotstockApiResponse<List<Product>> _createApiResponse(Map<String, dynamic> responseData) {
-    final List<SpotstockApiDataItem> apiDataItems = (responseData['data'] as List<dynamic>)
-        .map((item) => SpotstockApiDataItem.fromJson(item as Map<String, dynamic>))
-        .toList();
+    final List<SpotstockApiDataItem> apiDataItems =
+        (responseData['data'] as List<dynamic>).map((item) => SpotstockApiDataItem.fromJson(item as Map<String, dynamic>)).toList();
     final List<Product> products = apiDataItems.map((item) {
       return Product.fromJson({
         'id': item.id,

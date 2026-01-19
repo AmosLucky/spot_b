@@ -16,22 +16,17 @@ class ProductsLocalDatasource {
   Future<Result<void>> saveProducts(List<Product> products, {int? warehouseId}) async {
     try {
       await db.transaction(() async {
-        if (warehouseId != null) {
-          await (db.delete(db.localProducts)..where((tbl) => tbl.warehouseId.equals(warehouseId)))
-              .go();
+        final companions = products.map((p) => p.toDrift(warehouseId: warehouseId)).toList();
 
-          final companions = products.map((p) => p.toDrift(warehouseId: warehouseId)).toList();
-
-          await db.batch((batch) {
-            for (final companion in companions) {
-              batch.insert(
-                db.localProducts,
-                companion,
-                mode: InsertMode.insertOrReplace,
-              );
-            }
-          });
-        }
+        await db.batch((batch) {
+          for (final companion in companions) {
+            batch.insert(
+              db.localProducts,
+              companion,
+              mode: InsertMode.insertOrReplace,
+            );
+          }
+        });
       });
       return Result.success(null);
     } catch (e) {

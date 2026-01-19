@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../../../../../core/constants/strings/spotstock_strings.dart';
 import '../../../../../core/database/database_client.dart';
 import '../../../../../core/networking/spotstock_status_code.dart';
@@ -33,7 +35,14 @@ class AttendantsLocalDatasource {
 
   Future<Result<List<Attendant>>> getAttendants() async {
     try {
-      final rows = await db.select(db.localAttendants).get();
+      final rows = await (db.select(db.localAttendants)
+            ..orderBy([
+              (tbl) => OrderingTerm(
+                    expression: tbl.createdAt,
+                    mode: OrderingMode.desc,
+                  ),
+            ]))
+          .get();
       final attendants = rows.map((attendant) => AttendantMapper.fromDrift(attendant)).toList();
       return Result.success(attendants);
     } catch (e) {

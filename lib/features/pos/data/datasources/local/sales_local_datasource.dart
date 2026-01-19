@@ -16,13 +16,14 @@ class SalesLocalDatasource {
 
   /// This method is used to create a new sale locally.
   /// Call this method when a sale is created offline.
-  Future<Result<void>> createSale(CreateSaleDto sale) async {
+  Future<Result<void>> createSale(CreateSaleDto createSaleDto) async {
     try {
       await db.transaction(() async {
-        final companion = sale.toDrift().copyWith(
+        final companion = createSaleDto.toDrift().copyWith(
+              createdAt: Value(DateTime.now()),
               createdLocallyAt: Value(DateTime.now()),
               isSynced: Value(false),
-              isOffline: Value(1),
+              isOffline: Value(true),
             );
         await db.into(db.localSales).insert(companion);
       });
@@ -46,7 +47,7 @@ class SalesLocalDatasource {
               createdLocallyAt: Value(DateTime.now()),
               isSynced: Value(true),
               lastSyncedAt: Value(DateTime.now()),
-              isOffline: Value(0),
+              isOffline: Value(false),
             );
         await db.into(db.localSales).insert(companion);
       });

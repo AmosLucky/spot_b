@@ -13,4 +13,6 @@ class SpotstockSaleCreationConstant {
   static const double paidAmount = 0;
   static const double partialPaymentAmount = 0;
   static const String partialPaymentMethod = '';
+  static const int minCustomProductId = 1000000000000000;
+  static const int maxCustomProductId = 9999999999999999;
 }
