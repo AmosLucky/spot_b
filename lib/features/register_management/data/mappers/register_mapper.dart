@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:spotstock_inventory/core/database/tables/local_registers.dart';
 
 import '../../../../core/database/database_client.dart';
+import '../../../../core/database/tables/local_registers.dart';
 import '../models/register.dart';
 
 extension RegisterMapper on Register {
@@ -9,11 +9,12 @@ extension RegisterMapper on Register {
     return LocalRegistersCompanion(
       id: id != null ? Value(id!) : const Value.absent(),
       createdAt: createdAt != null ? Value(createdAt!) : const Value.absent(),
-      isOpen: isOpen != null ? Value(isOpen!) : const Value.absent(),
-      openingCashAtHand:
-          openingCashAtHand != null ? Value(openingCashAtHand!) : const Value.absent(),
-      closingCashAtHand:
-          closingCashAtHand != null ? Value(closingCashAtHand!) : const Value.absent(),
+      closedAt: closedAt != null ? Value(closedAt!) : const Value.absent(),
+      openingCashAtHand: openingCashAtHand != null ? Value(openingCashAtHand!) : const Value.absent(),
+      cashInHandWhileClosing: closingCashAtHand != null ? Value(closingCashAtHand!) : const Value.absent(),
+      note: note != null ? Value(note!) : const Value.absent(),
+      isSynced: isSynced != null ? Value(isSynced!) : const Value.absent(),
+      user: user != null ? Value(user) : const Value.absent(),
     );
   }
 
@@ -21,10 +22,13 @@ extension RegisterMapper on Register {
     return Register(
       id: row.id,
       createdAt: row.createdAt,
-      isOpen: row.isOpen,
-      isValid: row.isValid,
+      closedAt: row.closedAt,
+      isClosed: row.isClosed,
       openingCashAtHand: row.openingCashAtHand,
-      closingCashAtHand: row.closingCashAtHand,
+      closingCashAtHand: row.cashInHandWhileClosing,
+      note: row.note,
+      isSynced: row.isSynced,
+      user: row.user,
     );
   }
 }

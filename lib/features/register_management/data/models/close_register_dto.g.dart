@@ -9,15 +9,15 @@ part of 'close_register_dto.dart';
 _$CloseRegisterDtoImpl _$$CloseRegisterDtoImplFromJson(
         Map<String, dynamic> json) =>
     _$CloseRegisterDtoImpl(
-      id: (json['id'] as num).toInt(),
-      closingCashAtHand: (json['closingCashAtHand'] as num).toDouble(),
-      closeCurrentRegister: json['closeCurrentRegister'] as bool?,
+      id: (json['id'] as num?)?.toInt(),
+      cashInHandWhileClosing:
+          (json['cash_in_hand_while_closing'] as num?)?.toDouble(),
+      notes: json['notes'] as String?,
     );
 
 Map<String, dynamic> _$$CloseRegisterDtoImplToJson(
         _$CloseRegisterDtoImpl instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'closingCashAtHand': instance.closingCashAtHand,
-      'closeCurrentRegister': instance.closeCurrentRegister,
+      'cash_in_hand_while_closing': instance.cashInHandWhileClosing,
+      'notes': instance.notes,
     };

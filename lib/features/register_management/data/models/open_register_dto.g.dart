@@ -9,13 +9,13 @@ part of 'open_register_dto.dart';
 _$OpenRegisterDtoImpl _$$OpenRegisterDtoImplFromJson(
         Map<String, dynamic> json) =>
     _$OpenRegisterDtoImpl(
-      openingCashAtHand: (json['openingCashAtHand'] as num?)?.toDouble(),
-      note: json['note'] as String?,
+      openingCashAtHand: (json['cash_in_hand'] as num?)?.toDouble(),
+      note: json['notes'] as String?,
     );
 
 Map<String, dynamic> _$$OpenRegisterDtoImplToJson(
         _$OpenRegisterDtoImpl instance) =>
     <String, dynamic>{
-      'openingCashAtHand': instance.openingCashAtHand,
-      'note': instance.note,
+      'cash_in_hand': instance.openingCashAtHand,
+      'notes': instance.note,
     };

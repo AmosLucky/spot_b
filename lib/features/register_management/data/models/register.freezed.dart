@@ -14,21 +14,17 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-Register _$RegisterFromJson(Map<String, dynamic> json) {
-  return _Register.fromJson(json);
-}
-
 /// @nodoc
 mixin _$Register {
   int? get id => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
-  bool? get isOpen => throw _privateConstructorUsedError;
-  bool? get isValid => throw _privateConstructorUsedError;
+  DateTime? get closedAt => throw _privateConstructorUsedError;
+  bool? get isClosed => throw _privateConstructorUsedError;
   double? get openingCashAtHand => throw _privateConstructorUsedError;
   double? get closingCashAtHand => throw _privateConstructorUsedError;
-
-  /// Serializes this Register to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  SpotstockUser? get user => throw _privateConstructorUsedError;
+  String? get note => throw _privateConstructorUsedError;
+  bool? get isSynced => throw _privateConstructorUsedError;
 
   /// Create a copy of Register
   /// with the given fields replaced by the non-null parameter values.
@@ -45,10 +41,15 @@ abstract class $RegisterCopyWith<$Res> {
   $Res call(
       {int? id,
       DateTime? createdAt,
-      bool? isOpen,
-      bool? isValid,
+      DateTime? closedAt,
+      bool? isClosed,
       double? openingCashAtHand,
-      double? closingCashAtHand});
+      double? closingCashAtHand,
+      SpotstockUser? user,
+      String? note,
+      bool? isSynced});
+
+  $SpotstockUserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -68,10 +69,13 @@ class _$RegisterCopyWithImpl<$Res, $Val extends Register>
   $Res call({
     Object? id = freezed,
     Object? createdAt = freezed,
-    Object? isOpen = freezed,
-    Object? isValid = freezed,
+    Object? closedAt = freezed,
+    Object? isClosed = freezed,
     Object? openingCashAtHand = freezed,
     Object? closingCashAtHand = freezed,
+    Object? user = freezed,
+    Object? note = freezed,
+    Object? isSynced = freezed,
   }) {
     return _then(_value.copyWith(
       id: freezed == id
@@ -82,13 +86,13 @@ class _$RegisterCopyWithImpl<$Res, $Val extends Register>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      isOpen: freezed == isOpen
-          ? _value.isOpen
-          : isOpen // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      isValid: freezed == isValid
-          ? _value.isValid
-          : isValid // ignore: cast_nullable_to_non_nullable
+      closedAt: freezed == closedAt
+          ? _value.closedAt
+          : closedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      isClosed: freezed == isClosed
+          ? _value.isClosed
+          : isClosed // ignore: cast_nullable_to_non_nullable
               as bool?,
       openingCashAtHand: freezed == openingCashAtHand
           ? _value.openingCashAtHand
@@ -98,7 +102,33 @@ class _$RegisterCopyWithImpl<$Res, $Val extends Register>
           ? _value.closingCashAtHand
           : closingCashAtHand // ignore: cast_nullable_to_non_nullable
               as double?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as SpotstockUser?,
+      note: freezed == note
+          ? _value.note
+          : note // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isSynced: freezed == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
+  }
+
+  /// Create a copy of Register
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SpotstockUserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $SpotstockUserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -113,10 +143,16 @@ abstract class _$$RegisterImplCopyWith<$Res>
   $Res call(
       {int? id,
       DateTime? createdAt,
-      bool? isOpen,
-      bool? isValid,
+      DateTime? closedAt,
+      bool? isClosed,
       double? openingCashAtHand,
-      double? closingCashAtHand});
+      double? closingCashAtHand,
+      SpotstockUser? user,
+      String? note,
+      bool? isSynced});
+
+  @override
+  $SpotstockUserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -134,10 +170,13 @@ class __$$RegisterImplCopyWithImpl<$Res>
   $Res call({
     Object? id = freezed,
     Object? createdAt = freezed,
-    Object? isOpen = freezed,
-    Object? isValid = freezed,
+    Object? closedAt = freezed,
+    Object? isClosed = freezed,
     Object? openingCashAtHand = freezed,
     Object? closingCashAtHand = freezed,
+    Object? user = freezed,
+    Object? note = freezed,
+    Object? isSynced = freezed,
   }) {
     return _then(_$RegisterImpl(
       id: freezed == id
@@ -148,13 +187,13 @@ class __$$RegisterImplCopyWithImpl<$Res>
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-      isOpen: freezed == isOpen
-          ? _value.isOpen
-          : isOpen // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      isValid: freezed == isValid
-          ? _value.isValid
-          : isValid // ignore: cast_nullable_to_non_nullable
+      closedAt: freezed == closedAt
+          ? _value.closedAt
+          : closedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      isClosed: freezed == isClosed
+          ? _value.isClosed
+          : isClosed // ignore: cast_nullable_to_non_nullable
               as bool?,
       openingCashAtHand: freezed == openingCashAtHand
           ? _value.openingCashAtHand
@@ -164,40 +203,58 @@ class __$$RegisterImplCopyWithImpl<$Res>
           ? _value.closingCashAtHand
           : closingCashAtHand // ignore: cast_nullable_to_non_nullable
               as double?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as SpotstockUser?,
+      note: freezed == note
+          ? _value.note
+          : note // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isSynced: freezed == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$RegisterImpl implements _Register {
   const _$RegisterImpl(
       {this.id,
       this.createdAt,
-      this.isOpen,
-      this.isValid,
+      this.closedAt,
+      this.isClosed,
       this.openingCashAtHand,
-      this.closingCashAtHand});
-
-  factory _$RegisterImpl.fromJson(Map<String, dynamic> json) =>
-      _$$RegisterImplFromJson(json);
+      this.closingCashAtHand,
+      this.user,
+      this.note,
+      this.isSynced});
 
   @override
   final int? id;
   @override
   final DateTime? createdAt;
   @override
-  final bool? isOpen;
+  final DateTime? closedAt;
   @override
-  final bool? isValid;
+  final bool? isClosed;
   @override
   final double? openingCashAtHand;
   @override
   final double? closingCashAtHand;
+  @override
+  final SpotstockUser? user;
+  @override
+  final String? note;
+  @override
+  final bool? isSynced;
 
   @override
   String toString() {
-    return 'Register(id: $id, createdAt: $createdAt, isOpen: $isOpen, isValid: $isValid, openingCashAtHand: $openingCashAtHand, closingCashAtHand: $closingCashAtHand)';
+    return 'Register(id: $id, createdAt: $createdAt, closedAt: $closedAt, isClosed: $isClosed, openingCashAtHand: $openingCashAtHand, closingCashAtHand: $closingCashAtHand, user: $user, note: $note, isSynced: $isSynced)';
   }
 
   @override
@@ -208,18 +265,23 @@ class _$RegisterImpl implements _Register {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            (identical(other.isOpen, isOpen) || other.isOpen == isOpen) &&
-            (identical(other.isValid, isValid) || other.isValid == isValid) &&
+            (identical(other.closedAt, closedAt) ||
+                other.closedAt == closedAt) &&
+            (identical(other.isClosed, isClosed) ||
+                other.isClosed == isClosed) &&
             (identical(other.openingCashAtHand, openingCashAtHand) ||
                 other.openingCashAtHand == openingCashAtHand) &&
             (identical(other.closingCashAtHand, closingCashAtHand) ||
-                other.closingCashAtHand == closingCashAtHand));
+                other.closingCashAtHand == closingCashAtHand) &&
+            (identical(other.user, user) || other.user == user) &&
+            (identical(other.note, note) || other.note == note) &&
+            (identical(other.isSynced, isSynced) ||
+                other.isSynced == isSynced));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, createdAt, isOpen, isValid,
-      openingCashAtHand, closingCashAtHand);
+  int get hashCode => Object.hash(runtimeType, id, createdAt, closedAt,
+      isClosed, openingCashAtHand, closingCashAtHand, user, note, isSynced);
 
   /// Create a copy of Register
   /// with the given fields replaced by the non-null parameter values.
@@ -228,39 +290,38 @@ class _$RegisterImpl implements _Register {
   @pragma('vm:prefer-inline')
   _$$RegisterImplCopyWith<_$RegisterImpl> get copyWith =>
       __$$RegisterImplCopyWithImpl<_$RegisterImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$RegisterImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _Register implements Register {
   const factory _Register(
       {final int? id,
       final DateTime? createdAt,
-      final bool? isOpen,
-      final bool? isValid,
+      final DateTime? closedAt,
+      final bool? isClosed,
       final double? openingCashAtHand,
-      final double? closingCashAtHand}) = _$RegisterImpl;
-
-  factory _Register.fromJson(Map<String, dynamic> json) =
-      _$RegisterImpl.fromJson;
+      final double? closingCashAtHand,
+      final SpotstockUser? user,
+      final String? note,
+      final bool? isSynced}) = _$RegisterImpl;
 
   @override
   int? get id;
   @override
   DateTime? get createdAt;
   @override
-  bool? get isOpen;
+  DateTime? get closedAt;
   @override
-  bool? get isValid;
+  bool? get isClosed;
   @override
   double? get openingCashAtHand;
   @override
   double? get closingCashAtHand;
+  @override
+  SpotstockUser? get user;
+  @override
+  String? get note;
+  @override
+  bool? get isSynced;
 
   /// Create a copy of Register
   /// with the given fields replaced by the non-null parameter values.

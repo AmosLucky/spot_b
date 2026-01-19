@@ -20,9 +20,12 @@ CloseRegisterDto _$CloseRegisterDtoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CloseRegisterDto {
-  int get id => throw _privateConstructorUsedError;
-  double get closingCashAtHand => throw _privateConstructorUsedError;
-  bool? get closeCurrentRegister => throw _privateConstructorUsedError;
+  @JsonKey(includeToJson: false)
+  int? get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'cash_in_hand_while_closing')
+  double? get cashInHandWhileClosing => throw _privateConstructorUsedError;
+  @JsonKey(name: 'notes')
+  String? get notes => throw _privateConstructorUsedError;
 
   /// Serializes this CloseRegisterDto to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -40,7 +43,11 @@ abstract class $CloseRegisterDtoCopyWith<$Res> {
           CloseRegisterDto value, $Res Function(CloseRegisterDto) then) =
       _$CloseRegisterDtoCopyWithImpl<$Res, CloseRegisterDto>;
   @useResult
-  $Res call({int id, double closingCashAtHand, bool? closeCurrentRegister});
+  $Res call(
+      {@JsonKey(includeToJson: false) int? id,
+      @JsonKey(name: 'cash_in_hand_while_closing')
+      double? cashInHandWhileClosing,
+      @JsonKey(name: 'notes') String? notes});
 }
 
 /// @nodoc
@@ -58,23 +65,23 @@ class _$CloseRegisterDtoCopyWithImpl<$Res, $Val extends CloseRegisterDto>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? closingCashAtHand = null,
-    Object? closeCurrentRegister = freezed,
+    Object? id = freezed,
+    Object? cashInHandWhileClosing = freezed,
+    Object? notes = freezed,
   }) {
     return _then(_value.copyWith(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      closingCashAtHand: null == closingCashAtHand
-          ? _value.closingCashAtHand
-          : closingCashAtHand // ignore: cast_nullable_to_non_nullable
-              as double,
-      closeCurrentRegister: freezed == closeCurrentRegister
-          ? _value.closeCurrentRegister
-          : closeCurrentRegister // ignore: cast_nullable_to_non_nullable
-              as bool?,
+              as int?,
+      cashInHandWhileClosing: freezed == cashInHandWhileClosing
+          ? _value.cashInHandWhileClosing
+          : cashInHandWhileClosing // ignore: cast_nullable_to_non_nullable
+              as double?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -87,7 +94,11 @@ abstract class _$$CloseRegisterDtoImplCopyWith<$Res>
       __$$CloseRegisterDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, double closingCashAtHand, bool? closeCurrentRegister});
+  $Res call(
+      {@JsonKey(includeToJson: false) int? id,
+      @JsonKey(name: 'cash_in_hand_while_closing')
+      double? cashInHandWhileClosing,
+      @JsonKey(name: 'notes') String? notes});
 }
 
 /// @nodoc
@@ -103,23 +114,23 @@ class __$$CloseRegisterDtoImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? id = null,
-    Object? closingCashAtHand = null,
-    Object? closeCurrentRegister = freezed,
+    Object? id = freezed,
+    Object? cashInHandWhileClosing = freezed,
+    Object? notes = freezed,
   }) {
     return _then(_$CloseRegisterDtoImpl(
-      id: null == id
+      id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      closingCashAtHand: null == closingCashAtHand
-          ? _value.closingCashAtHand
-          : closingCashAtHand // ignore: cast_nullable_to_non_nullable
-              as double,
-      closeCurrentRegister: freezed == closeCurrentRegister
-          ? _value.closeCurrentRegister
-          : closeCurrentRegister // ignore: cast_nullable_to_non_nullable
-              as bool?,
+              as int?,
+      cashInHandWhileClosing: freezed == cashInHandWhileClosing
+          ? _value.cashInHandWhileClosing
+          : cashInHandWhileClosing // ignore: cast_nullable_to_non_nullable
+              as double?,
+      notes: freezed == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -128,23 +139,26 @@ class __$$CloseRegisterDtoImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CloseRegisterDtoImpl implements _CloseRegisterDto {
   const _$CloseRegisterDtoImpl(
-      {required this.id,
-      required this.closingCashAtHand,
-      this.closeCurrentRegister});
+      {@JsonKey(includeToJson: false) this.id,
+      @JsonKey(name: 'cash_in_hand_while_closing') this.cashInHandWhileClosing,
+      @JsonKey(name: 'notes') this.notes});
 
   factory _$CloseRegisterDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$CloseRegisterDtoImplFromJson(json);
 
   @override
-  final int id;
+  @JsonKey(includeToJson: false)
+  final int? id;
   @override
-  final double closingCashAtHand;
+  @JsonKey(name: 'cash_in_hand_while_closing')
+  final double? cashInHandWhileClosing;
   @override
-  final bool? closeCurrentRegister;
+  @JsonKey(name: 'notes')
+  final String? notes;
 
   @override
   String toString() {
-    return 'CloseRegisterDto(id: $id, closingCashAtHand: $closingCashAtHand, closeCurrentRegister: $closeCurrentRegister)';
+    return 'CloseRegisterDto(id: $id, cashInHandWhileClosing: $cashInHandWhileClosing, notes: $notes)';
   }
 
   @override
@@ -153,16 +167,15 @@ class _$CloseRegisterDtoImpl implements _CloseRegisterDto {
         (other.runtimeType == runtimeType &&
             other is _$CloseRegisterDtoImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.closingCashAtHand, closingCashAtHand) ||
-                other.closingCashAtHand == closingCashAtHand) &&
-            (identical(other.closeCurrentRegister, closeCurrentRegister) ||
-                other.closeCurrentRegister == closeCurrentRegister));
+            (identical(other.cashInHandWhileClosing, cashInHandWhileClosing) ||
+                other.cashInHandWhileClosing == cashInHandWhileClosing) &&
+            (identical(other.notes, notes) || other.notes == notes));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, id, closingCashAtHand, closeCurrentRegister);
+      Object.hash(runtimeType, id, cashInHandWhileClosing, notes);
 
   /// Create a copy of CloseRegisterDto
   /// with the given fields replaced by the non-null parameter values.
@@ -183,19 +196,23 @@ class _$CloseRegisterDtoImpl implements _CloseRegisterDto {
 
 abstract class _CloseRegisterDto implements CloseRegisterDto {
   const factory _CloseRegisterDto(
-      {required final int id,
-      required final double closingCashAtHand,
-      final bool? closeCurrentRegister}) = _$CloseRegisterDtoImpl;
+      {@JsonKey(includeToJson: false) final int? id,
+      @JsonKey(name: 'cash_in_hand_while_closing')
+      final double? cashInHandWhileClosing,
+      @JsonKey(name: 'notes') final String? notes}) = _$CloseRegisterDtoImpl;
 
   factory _CloseRegisterDto.fromJson(Map<String, dynamic> json) =
       _$CloseRegisterDtoImpl.fromJson;
 
   @override
-  int get id;
+  @JsonKey(includeToJson: false)
+  int? get id;
   @override
-  double get closingCashAtHand;
+  @JsonKey(name: 'cash_in_hand_while_closing')
+  double? get cashInHandWhileClosing;
   @override
-  bool? get closeCurrentRegister;
+  @JsonKey(name: 'notes')
+  String? get notes;
 
   /// Create a copy of CloseRegisterDto
   /// with the given fields replaced by the non-null parameter values.

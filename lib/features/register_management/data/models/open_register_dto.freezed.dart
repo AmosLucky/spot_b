@@ -20,7 +20,9 @@ OpenRegisterDto _$OpenRegisterDtoFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$OpenRegisterDto {
+  @JsonKey(name: 'cash_in_hand')
   double? get openingCashAtHand => throw _privateConstructorUsedError;
+  @JsonKey(name: 'notes')
   String? get note => throw _privateConstructorUsedError;
 
   /// Serializes this OpenRegisterDto to a JSON map.
@@ -39,7 +41,9 @@ abstract class $OpenRegisterDtoCopyWith<$Res> {
           OpenRegisterDto value, $Res Function(OpenRegisterDto) then) =
       _$OpenRegisterDtoCopyWithImpl<$Res, OpenRegisterDto>;
   @useResult
-  $Res call({double? openingCashAtHand, String? note});
+  $Res call(
+      {@JsonKey(name: 'cash_in_hand') double? openingCashAtHand,
+      @JsonKey(name: 'notes') String? note});
 }
 
 /// @nodoc
@@ -81,7 +85,9 @@ abstract class _$$OpenRegisterDtoImplCopyWith<$Res>
       __$$OpenRegisterDtoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({double? openingCashAtHand, String? note});
+  $Res call(
+      {@JsonKey(name: 'cash_in_hand') double? openingCashAtHand,
+      @JsonKey(name: 'notes') String? note});
 }
 
 /// @nodoc
@@ -116,14 +122,18 @@ class __$$OpenRegisterDtoImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$OpenRegisterDtoImpl implements _OpenRegisterDto {
-  const _$OpenRegisterDtoImpl({this.openingCashAtHand, this.note});
+  const _$OpenRegisterDtoImpl(
+      {@JsonKey(name: 'cash_in_hand') this.openingCashAtHand,
+      @JsonKey(name: 'notes') this.note});
 
   factory _$OpenRegisterDtoImpl.fromJson(Map<String, dynamic> json) =>
       _$$OpenRegisterDtoImplFromJson(json);
 
   @override
+  @JsonKey(name: 'cash_in_hand')
   final double? openingCashAtHand;
   @override
+  @JsonKey(name: 'notes')
   final String? note;
 
   @override
@@ -164,15 +174,17 @@ class _$OpenRegisterDtoImpl implements _OpenRegisterDto {
 
 abstract class _OpenRegisterDto implements OpenRegisterDto {
   const factory _OpenRegisterDto(
-      {final double? openingCashAtHand,
-      final String? note}) = _$OpenRegisterDtoImpl;
+      {@JsonKey(name: 'cash_in_hand') final double? openingCashAtHand,
+      @JsonKey(name: 'notes') final String? note}) = _$OpenRegisterDtoImpl;
 
   factory _OpenRegisterDto.fromJson(Map<String, dynamic> json) =
       _$OpenRegisterDtoImpl.fromJson;
 
   @override
+  @JsonKey(name: 'cash_in_hand')
   double? get openingCashAtHand;
   @override
+  @JsonKey(name: 'notes')
   String? get note;
 
   /// Create a copy of OpenRegisterDto
