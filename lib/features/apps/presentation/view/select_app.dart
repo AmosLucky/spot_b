@@ -7,6 +7,8 @@ import '../../../../core/permissions/spotstock_permissions.dart';
 import '../../../../core/presentation/appbars/spotstock_appbar.dart';
 import '../../../../core/presentation/progress_indicators/spotstock_progress_indicator.dart';
 import '../../../../core/presentation/views/spotstock_view.dart';
+import '../../../../core/routing/navigation.dart';
+import '../../../../core/routing/router.dart';
 import '../view_model/select_app_view_model.dart';
 import '../widgets/spotstock_app_widget.dart';
 
@@ -51,7 +53,9 @@ class SelectApp extends StatelessWidget {
                                   SpotstockAppWidget(
                                     name: SpotstockStrings.hotel,
                                     iconPath: SpotstockIconAssets.hotel,
-                                    onTap: () {},
+                                    onTap: () {
+                                      SpotstockNavigation.replace(SpotstockDesktopRoutes.hotel);
+                                    },
                                   ),
                                 if (viewModel.isAdmin == true)
                                   SpotstockAppWidget(

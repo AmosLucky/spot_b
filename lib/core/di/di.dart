@@ -12,6 +12,7 @@ import '../../features/holds/domain/repositories/deleted_hold_ids_repository.dar
 import '../../features/holds/domain/usecases/delete_hold.dart';
 import '../../features/holds/domain/usecases/get_hold.dart';
 import '../../features/home/presentation/view_model/spotstock_close_register_form_view_model.dart';
+import '../../features/hotel/home/presentation/view_model/hotel_home_viewmodel.dart';
 import '../../features/platform/domain/usecases/check_if_is_mobile.dart';
 import '../../features/pos/domain/repositories/custom_product_repository.dart';
 import '../../features/pos/domain/usecases/get_custom_product_code.dart';
@@ -172,7 +173,8 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingletonAsync<SharedPreferences>(() async {
     return await SharedPreferences.getInstance();
   });
-  getIt.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
+  getIt.registerLazySingleton<FlutterSecureStorage>(
+      () => const FlutterSecureStorage());
 
   // ============ SERVICES ============
   getIt.registerLazySingleton<PlatformService>(() => PlatformService());
@@ -185,14 +187,20 @@ Future<void> setupServiceLocator() async {
     );
   });
   getIt.registerLazySingleton<DatabaseClient>(() => DatabaseClient());
-  getIt.registerLazySingleton<NetworkInfoService>(() => NetworkInfoService()..start());
-  getIt.registerLazySingleton<PdfSaleReceiptService>(() => PdfSaleReceiptService());
-  getIt.registerLazySingleton<ReceiptReferenceNoService>(() => ReceiptReferenceNoServiceImpl());
-  getIt.registerLazySingleton<SaltGenerationService>(() => SaltGenerationService());
-  getIt.registerLazySingleton<PasswordHashingService>(() => PasswordHashingService());
+  getIt.registerLazySingleton<NetworkInfoService>(
+      () => NetworkInfoService()..start());
+  getIt.registerLazySingleton<PdfSaleReceiptService>(
+      () => PdfSaleReceiptService());
+  getIt.registerLazySingleton<ReceiptReferenceNoService>(
+      () => ReceiptReferenceNoServiceImpl());
+  getIt.registerLazySingleton<SaltGenerationService>(
+      () => SaltGenerationService());
+  getIt.registerLazySingleton<PasswordHashingService>(
+      () => PasswordHashingService());
 
   // ============ DATASOURCES ============
-  getIt.registerLazySingleton<LoginRemoteDatasource>(() => LoginRemoteDatasource(getIt<DioClient>()));
+  getIt.registerLazySingleton<LoginRemoteDatasource>(
+      () => LoginRemoteDatasource(getIt<DioClient>()));
   getIt.registerLazySingleton<LastLoginTimeDatasource>(
     () => LastLoginTimeDatasource(getIt<LocalStorageClient>()),
   );
@@ -359,7 +367,8 @@ Future<void> setupServiceLocator() async {
     ),
   );
   getIt.registerLazySingleton<LocalReceiptReferenceNoRepository>(
-    () => LocalReceiptReferenceNoRepositoryImpl(getIt<ReceiptReferenceNoService>()),
+    () => LocalReceiptReferenceNoRepositoryImpl(
+        getIt<ReceiptReferenceNoService>()),
   );
   getIt.registerLazySingleton<SalesRepository>(
     () => SalesRepositoryImpl(
@@ -412,36 +421,66 @@ Future<void> setupServiceLocator() async {
 
   // ============ USE CASES ============
   getIt.registerLazySingleton<Login>(() => Login(getIt<LoginRepository>()));
-  getIt.registerLazySingleton<GetToken>(() => GetToken(getIt<TokenRepository>()));
-  getIt.registerLazySingleton<GetSpotstockUser>(() => GetSpotstockUser(getIt<UserRepository>()));
-  getIt.registerLazySingleton<GetLastLoginTime>(() => GetLastLoginTime(getIt<LastLoginTimeRepository>()));
-  getIt.registerLazySingleton<SaveToken>(() => SaveToken(getIt<TokenRepository>()));
-  getIt.registerLazySingleton<SaveSpotstockUser>(() => SaveSpotstockUser(getIt<UserRepository>()));
-  getIt.registerLazySingleton<SaveLastLoginTime>(() => SaveLastLoginTime(getIt<LastLoginTimeRepository>()));
-  getIt.registerLazySingleton<RemoveLastLoginTime>(() => RemoveLastLoginTime(getIt<LastLoginTimeRepository>()));
-  getIt.registerLazySingleton<RemoveToken>(() => RemoveToken(getIt<TokenRepository>()));
-  getIt.registerLazySingleton<RemoveSpotstockUser>(() => RemoveSpotstockUser(getIt<UserRepository>()));
-  getIt.registerLazySingleton<ListenForNetworkChange>(() => ListenForNetworkChange(getIt<NetworkInfoRepository>()));
-  getIt.registerLazySingleton<CheckIfRegisterIsOpen>(() => CheckIfRegisterIsOpen(getIt<RegisterRepository>()));
-  getIt.registerLazySingleton<OpenRegister>(() => OpenRegister(getIt<RegisterRepository>()));
-  getIt.registerLazySingleton<CloseRegister>(() => CloseRegister(getIt<RegisterRepository>()));
-  getIt.registerLazySingleton<CheckAndUpdateNetworkStatus>(() => CheckAndUpdateNetworkStatus(getIt<NetworkInfoRepository>()));
-  getIt.registerLazySingleton<GetAttendants>(() => GetAttendants(getIt<AttendantsRepository>()));
-  getIt.registerLazySingleton<GetBarTables>(() => GetBarTables(getIt<BarTablesRepository>()));
-  getIt.registerLazySingleton<GetCustomers>(() => GetCustomers(getIt<CustomersRepository>()));
-  getIt.registerLazySingleton<GetProductCategories>(() => GetProductCategories(getIt<ProductCategoriesRepository>()));
-  getIt.registerLazySingleton<GetProducts>(() => GetProducts(getIt<ProductsRepository>()));
-  getIt.registerLazySingleton<GetWarehouses>(() => GetWarehouses(getIt<WarehousesRepository>()));
-  getIt.registerLazySingleton<CreateSale>(() => CreateSale(getIt<SalesRepository>()));
-  getIt.registerLazySingleton<PrintPdfReceipt>(() => PrintPdfReceipt(getIt<PdfSaleReceiptService>(), getIt<GetSpotstockUser>()));
-  getIt.registerLazySingleton<SharePdfReceipt>(() => SharePdfReceipt(getIt<PdfSaleReceiptService>(), getIt<GetSpotstockUser>()));
-  getIt.registerLazySingleton<GenerateReceiptReferenceNo>(() => GenerateReceiptReferenceNo(getIt<ReceiptReferenceNoService>()));
-  getIt.registerLazySingleton<VerifyStaffPin>(() => VerifyStaffPin(getIt<StaffPinRepository>()));
-  getIt.registerLazySingleton<GetGroupedHolds>(() => GetGroupedHolds(getIt<GroupedHoldsRepository>()));
-  getIt.registerLazySingleton<GetHolds>(() => GetHolds(getIt<HoldsRepository>()));
-  getIt.registerLazySingleton<CreateHold>(() => CreateHold(getIt<HoldsRepository>()));
-  getIt.registerLazySingleton<SyncHolds>(() => SyncHolds(getIt<HoldsRepository>()));
-  getIt.registerLazySingleton<SyncCustomers>(() => SyncCustomers(getIt<CustomersRepository>()));
+  getIt.registerLazySingleton<GetToken>(
+      () => GetToken(getIt<TokenRepository>()));
+  getIt.registerLazySingleton<GetSpotstockUser>(
+      () => GetSpotstockUser(getIt<UserRepository>()));
+  getIt.registerLazySingleton<GetLastLoginTime>(
+      () => GetLastLoginTime(getIt<LastLoginTimeRepository>()));
+  getIt.registerLazySingleton<SaveToken>(
+      () => SaveToken(getIt<TokenRepository>()));
+  getIt.registerLazySingleton<SaveSpotstockUser>(
+      () => SaveSpotstockUser(getIt<UserRepository>()));
+  getIt.registerLazySingleton<SaveLastLoginTime>(
+      () => SaveLastLoginTime(getIt<LastLoginTimeRepository>()));
+  getIt.registerLazySingleton<RemoveLastLoginTime>(
+      () => RemoveLastLoginTime(getIt<LastLoginTimeRepository>()));
+  getIt.registerLazySingleton<RemoveToken>(
+      () => RemoveToken(getIt<TokenRepository>()));
+  getIt.registerLazySingleton<RemoveSpotstockUser>(
+      () => RemoveSpotstockUser(getIt<UserRepository>()));
+  getIt.registerLazySingleton<ListenForNetworkChange>(
+      () => ListenForNetworkChange(getIt<NetworkInfoRepository>()));
+  getIt.registerLazySingleton<CheckIfRegisterIsOpen>(
+      () => CheckIfRegisterIsOpen(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton<OpenRegister>(
+      () => OpenRegister(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton<CloseRegister>(
+      () => CloseRegister(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton<CheckAndUpdateNetworkStatus>(
+      () => CheckAndUpdateNetworkStatus(getIt<NetworkInfoRepository>()));
+  getIt.registerLazySingleton<GetAttendants>(
+      () => GetAttendants(getIt<AttendantsRepository>()));
+  getIt.registerLazySingleton<GetBarTables>(
+      () => GetBarTables(getIt<BarTablesRepository>()));
+  getIt.registerLazySingleton<GetCustomers>(
+      () => GetCustomers(getIt<CustomersRepository>()));
+  getIt.registerLazySingleton<GetProductCategories>(
+      () => GetProductCategories(getIt<ProductCategoriesRepository>()));
+  getIt.registerLazySingleton<GetProducts>(
+      () => GetProducts(getIt<ProductsRepository>()));
+  getIt.registerLazySingleton<GetWarehouses>(
+      () => GetWarehouses(getIt<WarehousesRepository>()));
+  getIt.registerLazySingleton<CreateSale>(
+      () => CreateSale(getIt<SalesRepository>()));
+  getIt.registerLazySingleton<PrintPdfReceipt>(() => PrintPdfReceipt(
+      getIt<PdfSaleReceiptService>(), getIt<GetSpotstockUser>()));
+  getIt.registerLazySingleton<SharePdfReceipt>(() => SharePdfReceipt(
+      getIt<PdfSaleReceiptService>(), getIt<GetSpotstockUser>()));
+  getIt.registerLazySingleton<GenerateReceiptReferenceNo>(
+      () => GenerateReceiptReferenceNo(getIt<ReceiptReferenceNoService>()));
+  getIt.registerLazySingleton<VerifyStaffPin>(
+      () => VerifyStaffPin(getIt<StaffPinRepository>()));
+  getIt.registerLazySingleton<GetGroupedHolds>(
+      () => GetGroupedHolds(getIt<GroupedHoldsRepository>()));
+  getIt.registerLazySingleton<GetHolds>(
+      () => GetHolds(getIt<HoldsRepository>()));
+  getIt.registerLazySingleton<CreateHold>(
+      () => CreateHold(getIt<HoldsRepository>()));
+  getIt.registerLazySingleton<SyncHolds>(
+      () => SyncHolds(getIt<HoldsRepository>()));
+  getIt.registerLazySingleton<SyncCustomers>(
+      () => SyncCustomers(getIt<CustomersRepository>()));
   getIt.registerLazySingleton<SyncOfflineData>(
     () => SyncOfflineData(
       [
@@ -451,22 +490,37 @@ Future<void> setupServiceLocator() async {
       ],
     ),
   );
-  getIt.registerLazySingleton<DeleteHold>(() => DeleteHold(getIt<HoldsRepository>()));
-  getIt.registerLazySingleton<DeleteHolds>(() => DeleteHolds(getIt<HoldsRepository>()));
+  getIt.registerLazySingleton<DeleteHold>(
+      () => DeleteHold(getIt<HoldsRepository>()));
+  getIt.registerLazySingleton<DeleteHolds>(
+      () => DeleteHolds(getIt<HoldsRepository>()));
   getIt.registerLazySingleton<GetHold>(() => GetHold(getIt<HoldsRepository>()));
-  getIt.registerLazySingleton<SyncDeletedHolds>(() => SyncDeletedHolds(getIt<DeletedHoldIdsRepository>()));
-  getIt.registerLazySingleton<CheckIsAdmin>(() => CheckIsAdmin(getIt<UserRepository>()));
-  getIt.registerLazySingleton<SaveOfflineUser>(() => SaveOfflineUser(getIt<LoginLocalDatasource>()));
-  getIt.registerLazySingleton<GetCustomProductId>(() => GetCustomProductId(getIt<CustomProductRepository>()));
-  getIt.registerLazySingleton<GetCustomProductCode>(() => GetCustomProductCode(getIt<CustomProductRepository>()));
-  getIt.registerLazySingleton<CreateCustomer>(() => CreateCustomer(getIt<CustomersRepository>()));
-  getIt.registerLazySingleton<CheckIfIsMobile>(() => CheckIfIsMobile(getIt<PlatformService>()));
-  getIt.registerLazySingleton<GetTheme>(() => GetTheme(getIt<ThemeRepository>()));
-  getIt.registerLazySingleton<SetTheme>(() => SetTheme(getIt<ThemeRepository>()));
-  getIt.registerLazySingleton<GetRegisterDetails>(() => GetRegisterDetails(getIt<RegisterRepository>()));
-  getIt.registerLazySingleton<GetStockItems>(() => GetStockItems(getIt<StockItemRepository>()));
-  getIt.registerLazySingleton<GetPOSRegisters>(() => GetPOSRegisters(getIt<RegisterRepository>()));
-  getIt.registerLazySingleton<GetPOSRegistersStream>(() => GetPOSRegistersStream(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton<SyncDeletedHolds>(
+      () => SyncDeletedHolds(getIt<DeletedHoldIdsRepository>()));
+  getIt.registerLazySingleton<CheckIsAdmin>(
+      () => CheckIsAdmin(getIt<UserRepository>()));
+  getIt.registerLazySingleton<SaveOfflineUser>(
+      () => SaveOfflineUser(getIt<LoginLocalDatasource>()));
+  getIt.registerLazySingleton<GetCustomProductId>(
+      () => GetCustomProductId(getIt<CustomProductRepository>()));
+  getIt.registerLazySingleton<GetCustomProductCode>(
+      () => GetCustomProductCode(getIt<CustomProductRepository>()));
+  getIt.registerLazySingleton<CreateCustomer>(
+      () => CreateCustomer(getIt<CustomersRepository>()));
+  getIt.registerLazySingleton<CheckIfIsMobile>(
+      () => CheckIfIsMobile(getIt<PlatformService>()));
+  getIt.registerLazySingleton<GetTheme>(
+      () => GetTheme(getIt<ThemeRepository>()));
+  getIt.registerLazySingleton<SetTheme>(
+      () => SetTheme(getIt<ThemeRepository>()));
+  getIt.registerLazySingleton<GetRegisterDetails>(
+      () => GetRegisterDetails(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton<GetStockItems>(
+      () => GetStockItems(getIt<StockItemRepository>()));
+  getIt.registerLazySingleton<GetPOSRegisters>(
+      () => GetPOSRegisters(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton<GetPOSRegistersStream>(
+      () => GetPOSRegistersStream(getIt<RegisterRepository>()));
 
   // ============ VIEW MODELS ============
   // Register as factories so fresh instances are created each time
@@ -503,10 +557,11 @@ Future<void> setupServiceLocator() async {
 
   getIt.registerFactory<SummaryViewModel>(() => SummaryViewModel());
 
-  getIt.registerFactory<SpotstockNetworkAwareViewModel>(() => SpotstockNetworkAwareViewModel(
-        getIt<ListenForNetworkChange>(),
-        getIt<SyncOfflineData>(),
-      ));
+  getIt.registerFactory<SpotstockNetworkAwareViewModel>(
+      () => SpotstockNetworkAwareViewModel(
+            getIt<ListenForNetworkChange>(),
+            getIt<SyncOfflineData>(),
+          ));
 
   getIt.registerFactory<SelectAppViewModel>(
     () => SelectAppViewModel(
@@ -533,14 +588,17 @@ Future<void> setupServiceLocator() async {
         getIt<DeleteHolds>(),
         getIt<CreateCustomer>(),
       ));
-  getIt.registerFactory<SpotstockProductsTabViewModel>(() => SpotstockProductsTabViewModel());
-  getIt.registerFactory<SpotstockCartTabViewModel>(() => SpotstockCartTabViewModel(getIt<GetHold>()));
+  getIt.registerFactory<SpotstockProductsTabViewModel>(
+      () => SpotstockProductsTabViewModel());
+  getIt.registerFactory<SpotstockCartTabViewModel>(
+      () => SpotstockCartTabViewModel(getIt<GetHold>()));
   getIt.registerFactory<HoldsViewModel>(() => HoldsViewModel(
         getIt<GetHolds>(),
         getIt<DeleteHold>(),
         getIt<GetSpotstockUser>(),
       ));
-  getIt.registerLazySingleton<AppViewModel>(() => AppViewModel(getIt<GetTheme>(), getIt<SetTheme>(), getIt<CheckIfIsMobile>()));
+  getIt.registerLazySingleton<AppViewModel>(() => AppViewModel(
+      getIt<GetTheme>(), getIt<SetTheme>(), getIt<CheckIfIsMobile>()));
 
   getIt.registerFactory<ProfileViewModel>(() => ProfileViewModel(
         getIt<AppViewModel>(),
@@ -551,37 +609,56 @@ Future<void> setupServiceLocator() async {
         getIt<SetTheme>(),
       ));
 
-  getIt.registerFactory<RegisterSummaryViewModel>(() => RegisterSummaryViewModel(
-        getIt<GetRegisterDetails>(),
-        getIt<GetStockItems>(),
-      ));
+  getIt
+      .registerFactory<RegisterSummaryViewModel>(() => RegisterSummaryViewModel(
+            getIt<GetRegisterDetails>(),
+            getIt<GetStockItems>(),
+          ));
 
-  getIt.registerFactory<RegisterManagementViewModel>(() => RegisterManagementViewModel(
-        getIt<GetPOSRegisters>(),
-        getIt<GetPOSRegistersStream>(),
-      ));
+  getIt.registerFactory<RegisterManagementViewModel>(
+      () => RegisterManagementViewModel(
+            getIt<GetPOSRegisters>(),
+            getIt<GetPOSRegistersStream>(),
+          ));
+
+  ////DESKTOP////
+  ///HOTEL ///
+  getIt.registerFactory<HotelHomeViewmodel>(() => HotelHomeViewmodel());
 
   // ============ FORM VIEW MODELS ============
   // Register as factories so fresh instances are created each time
-  getIt.registerFactory<SpotstockOpenRegisterFormViewModel>(() => SpotstockOpenRegisterFormViewModel(getIt<OpenRegister>()));
-  getIt.registerFactory<SpotstockSelectAttendantFormViewModel>(() => SpotstockSelectAttendantFormViewModel());
-  getIt.registerFactory<SpotstockSelectBranchFormViewModel>(() => SpotstockSelectBranchFormViewModel());
-  getIt.registerFactory<SpotstockSelectBarTableFormViewModel>(() => SpotstockSelectBarTableFormViewModel());
-  getIt.registerFactory<SpotstockSelectCustomerFormViewModel>(() => SpotstockSelectCustomerFormViewModel(getIt<GetCustomers>()));
-  getIt.registerFactory<SpotstockEditSaleItemFormViewModel>(() => SpotstockEditSaleItemFormViewModel());
-  getIt.registerFactory<SpotstockPaymentFormViewModel>(() => SpotstockPaymentFormViewModel());
-  getIt.registerFactory<SpotstockStaffPinFormViewModel>(() => SpotstockStaffPinFormViewModel(getIt<VerifyStaffPin>()));
-  getIt.registerFactory<SpotstockHoldsFormViewModel>(() => SpotstockHoldsFormViewModel(getIt<GetGroupedHolds>()));
-  getIt.registerFactory<SpotstockCreateHoldFormViewModel>(() => SpotstockCreateHoldFormViewModel());
+  getIt.registerFactory<SpotstockOpenRegisterFormViewModel>(
+      () => SpotstockOpenRegisterFormViewModel(getIt<OpenRegister>()));
+  getIt.registerFactory<SpotstockSelectAttendantFormViewModel>(
+      () => SpotstockSelectAttendantFormViewModel());
+  getIt.registerFactory<SpotstockSelectBranchFormViewModel>(
+      () => SpotstockSelectBranchFormViewModel());
+  getIt.registerFactory<SpotstockSelectBarTableFormViewModel>(
+      () => SpotstockSelectBarTableFormViewModel());
+  getIt.registerFactory<SpotstockSelectCustomerFormViewModel>(
+      () => SpotstockSelectCustomerFormViewModel(getIt<GetCustomers>()));
+  getIt.registerFactory<SpotstockEditSaleItemFormViewModel>(
+      () => SpotstockEditSaleItemFormViewModel());
+  getIt.registerFactory<SpotstockPaymentFormViewModel>(
+      () => SpotstockPaymentFormViewModel());
+  getIt.registerFactory<SpotstockStaffPinFormViewModel>(
+      () => SpotstockStaffPinFormViewModel(getIt<VerifyStaffPin>()));
+  getIt.registerFactory<SpotstockHoldsFormViewModel>(
+      () => SpotstockHoldsFormViewModel(getIt<GetGroupedHolds>()));
+  getIt.registerFactory<SpotstockCreateHoldFormViewModel>(
+      () => SpotstockCreateHoldFormViewModel());
   getIt.registerFactory<SpotstockAddCustomProductFormViewModel>(
     () => SpotstockAddCustomProductFormViewModel(
       getIt<GetCustomProductId>(),
       getIt<GetCustomProductCode>(),
     ),
   );
-  getIt.registerFactory<SpotstockAddNewCustomerFormViewModel>(() => SpotstockAddNewCustomerFormViewModel());
-  getIt.registerFactory<SpotstockCloseRegisterFormViewModel>(() => SpotstockCloseRegisterFormViewModel(getIt<CloseRegister>()));
-  getIt.registerFactory<SpotstockFilterRegisterFormViewModel>(() => SpotstockFilterRegisterFormViewModel());
+  getIt.registerFactory<SpotstockAddNewCustomerFormViewModel>(
+      () => SpotstockAddNewCustomerFormViewModel());
+  getIt.registerFactory<SpotstockCloseRegisterFormViewModel>(
+      () => SpotstockCloseRegisterFormViewModel(getIt<CloseRegister>()));
+  getIt.registerFactory<SpotstockFilterRegisterFormViewModel>(
+      () => SpotstockFilterRegisterFormViewModel());
 
   await getIt.allReady();
 }

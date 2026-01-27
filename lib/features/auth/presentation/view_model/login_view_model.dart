@@ -52,6 +52,7 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
 
   late Command1<void, BuildContext> loginCommand;
   late Command1<void, BuildContext> toggleObscurePasswordCommand;
+  
 
   @override
   void bind(BuildContext context) async {
@@ -59,12 +60,14 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
       ..addListener(() {
         notifyListeners();
       });
-    toggleObscurePasswordCommand = Command1<void, BuildContext>(_toggleObscurePassword);
+    toggleObscurePasswordCommand =
+        Command1<void, BuildContext>(_toggleObscurePassword);
     final result = await getSpotstockUser();
     result.when(
       onSuccess: (spotstockUser) {
         if (spotstockUser?.email != null) {
-          _emailController.text = spotstockUser?.email ?? SpotstockStrings.EMPTY;
+          _emailController.text =
+              spotstockUser?.email ?? SpotstockStrings.EMPTY;
         }
       },
       onFailure: (error) {
@@ -78,7 +81,8 @@ class LoginViewModel extends SpotstockViewModel with SpotstockSnackbarMixin {
     errorStream.listen((error) {
       if (context.mounted) {
         if (error is LoginError) {
-          showErrorSnackbar(error, title: error.title, subtitle: error.subtitle);
+          showErrorSnackbar(error,
+              title: error.title, subtitle: error.subtitle);
           return;
         }
       }

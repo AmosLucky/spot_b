@@ -14,6 +14,7 @@ const int maxLines = 1;
 
 class Login extends StatefulWidget {
   final LoginViewModel viewModel;
+
   const Login({super.key, required this.viewModel});
 
   @override
@@ -45,6 +46,7 @@ class _LoginState extends State<Login> with SpotstockInputValidationMixin {
                   ),
                   child: Form(
                     key: widget.viewModel.formKey,
+                    
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,

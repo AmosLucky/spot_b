@@ -9,6 +9,8 @@ import '../../features/holds/presentation/view_model/holds_view_model.dart';
 import '../../features/home/presentation/view/home.dart';
 import '../../features/home/presentation/view/root.dart';
 import '../../features/home/presentation/view_model/root_view_model.dart';
+import '../../features/hotel/home/presentation/view/hotel_home.dart';
+import '../../features/hotel/home/presentation/view_model/hotel_home_viewmodel.dart';
 import '../../features/pos/presentation/view/pos.dart';
 import '../../features/pos/presentation/view_model/pos_view_model.dart';
 import '../../features/register_management/presentation/view/register_management.dart';
@@ -38,8 +40,18 @@ class SpotstockMobileRoutes {
 
 class SpotstockDesktopRoutes {
   static const String splash = '/';
-  static const String login = '/desktop/login';
+  static const String login = '/mobile/login';
+  //static const String login = '/desktop/login';
   static const String dashboard = '/desktop/dashboard';
+  static const String hotel = '/desktop/hotel';
+  static const String amenities = '/desktop/amenities';
+  static const String facilities = '/desktop/facilities';
+  static const String bedTypes = '/desktop/bed_type';
+
+  static const String roomTypes = '/desktop/room_type';
+
+  static const String premiumTypes = '/desktop/premium_types';
+  static const String hotelRooms = '/desktop/hotel_rooms';
 }
 
 class SpotstockRouteParams {
@@ -61,6 +73,7 @@ class SpotstockRouter {
         path: SpotstockMobileRoutes.login,
         builder: (context, state) {
           final viewModel = getIt<LoginViewModel>();
+
           return Login(viewModel: viewModel);
         },
       ),
@@ -109,7 +122,9 @@ class SpotstockRouter {
         path: SpotstockMobileRoutes.registerSummary,
         builder: (context, state) {
           final viewModel = getIt<RegisterSummaryViewModel>();
-          final registerId = int.tryParse(state.uri.queryParameters[SpotstockRouteParams.registerId] ?? SpotstockStrings.EMPTY);
+          final registerId = int.tryParse(
+              state.uri.queryParameters[SpotstockRouteParams.registerId] ??
+                  SpotstockStrings.EMPTY);
           return RegisterSummary(viewModel: viewModel, registerId: registerId);
         },
       ),
@@ -124,6 +139,59 @@ class SpotstockRouter {
   );
 
   static final desktopRouter = GoRouter(
-    routes: [],
+    navigatorKey: spotstockNavigatorKey,
+    routes: [
+      GoRoute(
+        path: SpotstockMobileRoutes.splash,
+        builder: (context, state) {
+          final viewModel = getIt<SplashViewModel>();
+          return Splash(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockDesktopRoutes.login,
+        builder: (context, state) {
+          final viewModel = getIt<LoginViewModel>();
+
+          return Login(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.webview,
+        builder: (context, state) {
+          final viewModel = getIt<WebviewViewModel>();
+          return Webview(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.root,
+        builder: (context, state) {
+          final viewModel = getIt<RootViewModel>();
+          return Root(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.home,
+        builder: (context, state) {
+          return Home();
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.selectApp,
+        builder: (context, state) {
+          final viewModel = getIt<SelectAppViewModel>();
+          return SelectApp(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockDesktopRoutes.hotel,
+        builder: (context, state) {
+          final viewModel = getIt<HotelHomeViewmodel>();
+          return HotelHome(
+            homeViewmodel: viewModel,
+          );
+        },
+      ),
+    ],
   );
 }

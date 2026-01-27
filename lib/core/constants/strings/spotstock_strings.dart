@@ -6,7 +6,8 @@ class SpotstockStrings {
 
   static const String UNKNOWN_PLATFORM = 'Unknown platform';
   static const String somethingWentWrong = 'Something went wrong';
-  static const String anUnexpectedErrorOccurred = 'An unexpected error occurred';
+  static const String anUnexpectedErrorOccurred =
+      'An unexpected error occurred';
   static const String lastLoginTimeNotFound = 'Last login time not found';
   static const String tokenNotFound = 'Token not found';
   static const String userNotFound = 'User not found';
@@ -22,7 +23,8 @@ class SpotstockStrings {
   static const String emailIsRequired = 'Email is required';
   static const String passwordIsRequired = 'Password is required';
   static const String loginError = 'Login error';
-  static const String loginErrorSubtitle = 'Please, check your email and password';
+  static const String loginErrorSubtitle =
+      'Please, check your email and password';
   static const String invalidEmail = 'Invalid email';
   static const String spotstock = 'Spotstock';
   static const String spotstockInventory = 'Spotstock Inventory';
@@ -38,11 +40,13 @@ class SpotstockStrings {
   static const String salesSummary = 'Sales Summary';
   static const String waveHand = '👋';
   static const String home = 'Home';
-  static const String pleaseCheckYourInternetConnectionAndTryAgain = 'Please, check your internet connection and try again.';
+  static const String pleaseCheckYourInternetConnectionAndTryAgain =
+      'Please, check your internet connection and try again.';
   static const String dismiss = 'DISMISS';
   static const String youAreOffline = 'You are offline';
   static const String youAreOnline = 'You are online';
-  static const String areYouSureYouWantToLogout = 'Are you sure you want to logout?';
+  static const String areYouSureYouWantToLogout =
+      'Are you sure you want to logout?';
   static const String yesLogout = 'Yes, logout';
   static const String noCancel = 'No, cancel';
   static const String ok = 'Ok';
@@ -64,12 +68,14 @@ class SpotstockStrings {
   static const String note = 'Note';
   static const String cashAtHand = 'Cash at hand';
   static const String openRegister = 'Open register';
-  static const String cashAtHandRequired = 'Cash at hand is required, you can enter 0.00';
+  static const String cashAtHandRequired =
+      'Cash at hand is required, you can enter 0.00';
   static const String oneRegisterAtATime = 'One register at a time';
   static const String registerAlreadyOpen = 'Register already open';
   static const String pos = 'POS';
   static const String areYouSure = 'Are you sure?';
-  static const String youllLoseAllProgressWhenYouLeave = 'You\'ll lose all progress when you leave';
+  static const String youllLoseAllProgressWhenYouLeave =
+      'You\'ll lose all progress when you leave';
   static const String yesLeave = 'Yes, leave';
   static const String branch = 'Branch';
   static const String attendant = 'Attendant';
@@ -107,7 +113,8 @@ class SpotstockStrings {
   static const String noPhone = 'No phone';
   static const String na = 'N/A';
   static const String featureIsComingSoon = 'feature is coming soon';
-  static const String featureIsComingSoonSubtitle = 'This feature is not available';
+  static const String featureIsComingSoonSubtitle =
+      'This feature is not available';
   static const String cart = 'Cart';
   static const String products = 'Products';
   static const String pay = 'Pay';
@@ -142,7 +149,8 @@ class SpotstockStrings {
   static const String invalidPrice = 'Invalid price';
   static const String name = 'Name';
   static const String productName = 'Product name';
-  static const String youllLoseAllProgressWhenYouReset = 'You\'ll lose all progress when you reset';
+  static const String youllLoseAllProgressWhenYouReset =
+      'You\'ll lose all progress when you reset';
   static const String yesReset = 'Yes, reset';
   static const String payment = 'Payment';
   static const String payingAmount = 'Paying amount';
@@ -203,19 +211,24 @@ class SpotstockStrings {
   static const String payments = 'Payments';
   static const String amountOwed = 'Amount owed';
   static const String amountReceived = 'Amount received';
-  static const String thankYouForYourPurchaseExclamation = 'Thank you for your purchase!';
-  static const String pleaseKeepThisReceiptForYourRecords = 'Please keep this receipt for your records';
+  static const String thankYouForYourPurchaseExclamation =
+      'Thank you for your purchase!';
+  static const String pleaseKeepThisReceiptForYourRecords =
+      'Please keep this receipt for your records';
   static const String ref = 'Ref';
-  static const String failedToGenerateReceiptReferenceNo = 'Failed to generate receipt reference no';
+  static const String failedToGenerateReceiptReferenceNo =
+      'Failed to generate receipt reference no';
   static const String localReceiptReferenceNoPrefix = 'LO-INV-';
   static const String pinNotFound = 'Pin not found';
   static const String invalidPin = 'Invalid pin';
   static const String failedToVerifyPin = 'Failed to verify pin';
-  static const String verifyAttendantOnlineAndTryAgain = 'Verify attendant online and try again';
+  static const String verifyAttendantOnlineAndTryAgain =
+      'Verify attendant online and try again';
   static const String checkYourPinAndTryAgain = 'Check your pin and try again';
   static const String enterStaffPin = 'Enter staff pin';
   static const String verifyStaffPin = 'Verify staff pin';
-  static const String pleaseEnterYourPinToContinue = 'Please enter your pin to continue';
+  static const String pleaseEnterYourPinToContinue =
+      'Please enter your pin to continue';
   static const String hi = 'Hi';
   static const String verifyingPin = 'Verifying pin...';
   static const String holdsGroupedInBrackets = 'Holds (grouped)';
@@ -230,17 +243,21 @@ class SpotstockStrings {
   static const String itemSmallLetter = 'item';
   static const String manageHolds = 'Manage holds';
   static const String holdsSmallLetter = 'holds';
-  static const String manageHoldsTapHoldForActions = 'Manage holds, tap hold for actions';
-  static const String searchByReferenceCodeCustomerNameOrWarehouse = 'Search by reference code, customer name or warehouse';
+  static const String manageHoldsTapHoldForActions =
+      'Manage holds, tap hold for actions';
+  static const String searchByReferenceCodeCustomerNameOrWarehouse =
+      'Search by reference code, customer name or warehouse';
   static const String noHoldsFound = 'No holds found';
-  static const String manageHoldsTapAHoldForActions = 'Manage holds, tap a hold for actions';
+  static const String manageHoldsTapAHoldForActions =
+      'Manage holds, tap a hold for actions';
   static const String holdActions = 'Hold actions';
   static const String delete = 'Delete';
   static const String updatingHolds = 'Updating holds...';
   static const String gettingHolds = 'Getting holds...';
   static const String gettingGroupedHolds = 'Getting grouped holds...';
   static const String holdSale = 'Hold sale';
-  static const String youCanRetrieveTheHoldLaterInHoldsList = 'You can retrieve the hold later in holds list';
+  static const String youCanRetrieveTheHoldLaterInHoldsList =
+      'You can retrieve the hold later in holds list';
   static const String selectTableColon = 'Select table:';
   static const String selectTable = 'Select table';
   static const String creatingHold = 'Creating hold...';
@@ -261,8 +278,10 @@ class SpotstockStrings {
   static const String info = 'Info';
   static const String success = 'Success';
   static const String holdVoidedSuccessfully = 'Hold voided successfully';
-  static const String deleteHoldWarning = 'Warning: All items in this hold will be permanently removed';
-  static const String referenceCodeIsRequiredToSaveAHold = 'Reference code is required for saving a hold.';
+  static const String deleteHoldWarning =
+      'Warning: All items in this hold will be permanently removed';
+  static const String referenceCodeIsRequiredToSaveAHold =
+      'Reference code is required for saving a hold.';
   static const String deletedHolds = 'deleted holds';
   static const String smallHolds = 'holds';
   static const String voidHold = 'Void';
@@ -278,7 +297,8 @@ class SpotstockStrings {
   static const String addToCart = 'Add to cart';
   static const String productNameRequired = 'Product name required';
   static const String productCostRequired = 'Product cost required';
-  static const String producSellingPriceRequired = 'Product selling price required';
+  static const String producSellingPriceRequired =
+      'Product selling price required';
   static const String productQuantityRequired = 'Product quantity required';
   static const String optionalInBracket = '(Optional)';
   static const String custom = 'Custom';
@@ -292,7 +312,8 @@ class SpotstockStrings {
   static const String customerNameRequired = 'Customer name required';
   static const String createCustomer = 'Create customer';
   static const String phoneCapital = 'Phone';
-  static const String customerCreatedSuccessfully = 'Customer created successfully';
+  static const String customerCreatedSuccessfully =
+      'Customer created successfully';
   static const String creatingCustomer = 'Creating customer...';
   static const String phoneNumberIsRequired = 'Phone number is required';
   static const String invalidCustomerPhone = 'Invalid customer phone';
@@ -312,12 +333,14 @@ class SpotstockStrings {
   static const String openingRegister = 'Opening register...';
   static const String closingRegister = 'Closing register...';
   static const String leavePOSWarningHeading = 'Your register is still open';
-  static const String leavePOSWarningMessage = 'Warning: Leaving with an open register may cause issues.';
+  static const String leavePOSWarningMessage =
+      'Warning: Leaving with an open register may cause issues.';
   static const String closeRegister = 'Close register';
   static const String leaveAnyway = 'Leave anyway';
   static const String cancel = 'Cancel';
   static const String registerSummary = 'Register summary';
-  static const String unableToGetRegisterDetails = 'Unable to get register details';
+  static const String unableToGetRegisterDetails =
+      'Unable to get register details';
   static const String gettingRegisterSummary = 'Getting register summary...';
   static const String registerNotFound = 'Register not found';
   static const String openedAtColon = 'Opened at:';
@@ -349,7 +372,8 @@ class SpotstockStrings {
   static const String total = 'Total';
   static const String open = 'Open';
   static const String closed = 'Closed';
-  static const String registerManagementSubtitle = 'Manage registers, tap a register for actions';
+  static const String registerManagementSubtitle =
+      'Manage registers, tap a register for actions';
   static const String noRegistersFound = 'No registers found';
   static const String hashtagPos = '#POS';
   static const String opened = 'Opened';
@@ -365,4 +389,16 @@ class SpotstockStrings {
   static const String startDate = 'Start date';
   static const String endDate = 'End date';
   static const String status = 'Status';
+
+
+  ///////HOTEL STRINGS////
+
+  static const String monthlyPlan = 'Monthly Plan';
+
+  static const String amenities = 'Amenities';
+  static const String facilities = 'Facilities';
+  static const String bedTypes = 'Bed Types';
+  static const String roomTypes = 'Room Types';
+  static const String premiumServices = 'Premium Services';
+  static const String rooms = 'Rooms';
 }

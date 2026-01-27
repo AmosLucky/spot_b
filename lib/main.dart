@@ -10,10 +10,15 @@ import 'features/app/presentation/view_models/app_view_model.dart';
 
 final GetIt getIt = GetIt.instance;
 
+//247okolo@gmail.com
+//spotenugu123
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupServiceLocator();
-  SpotstockNavigation.init(getIt<AppViewModel>().isMobile ? SpotstockRouter.mobileRouter : SpotstockRouter.desktopRouter);
+  SpotstockNavigation.init(getIt<AppViewModel>().isMobile
+      ? SpotstockRouter.mobileRouter
+      : SpotstockRouter.desktopRouter);
   runApp(const SpotstockInventory());
 }
 
@@ -29,7 +34,11 @@ class SpotstockInventory extends StatelessWidget {
         return MaterialApp.router(
           title: SpotstockStrings.spotstockInventory,
           scaffoldMessengerKey: spotstockScaffoldMessengerKey,
-          routerConfig: viewModel.isMobile ? SpotstockRouter.mobileRouter : SpotstockRouter.desktopRouter,
+          routerConfig:
+               viewModel.isMobile ?
+              SpotstockRouter.mobileRouter
+           : SpotstockRouter.desktopRouter,
+
           themeMode: viewModel.themeMode,
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
