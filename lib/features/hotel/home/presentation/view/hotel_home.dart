@@ -38,9 +38,12 @@ class _HotelHomeState extends State<HotelHome> {
             child: AnimatedBuilder(
               animation: widget.homeViewmodel,
               builder: (_, __) {
-                return IndexedStack(
-                  index: widget.homeViewmodel.selectedIndex,
-                  children: hotelPages,
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: IndexedStack(
+                    index: widget.homeViewmodel.selectedIndex,
+                    children: hotelPages,
+                  ),
                 );
               },
             ),

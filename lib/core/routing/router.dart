@@ -44,14 +44,6 @@ class SpotstockDesktopRoutes {
   //static const String login = '/desktop/login';
   static const String dashboard = '/desktop/dashboard';
   static const String hotel = '/desktop/hotel';
-  static const String amenities = '/desktop/amenities';
-  static const String facilities = '/desktop/facilities';
-  static const String bedTypes = '/desktop/bed_type';
-
-  static const String roomTypes = '/desktop/room_type';
-
-  static const String premiumTypes = '/desktop/premium_types';
-  static const String hotelRooms = '/desktop/hotel_rooms';
 }
 
 class SpotstockRouteParams {

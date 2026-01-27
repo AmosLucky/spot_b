@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 
 import 'core/constants/keys/spotstock_app_keys.dart';
@@ -19,7 +20,7 @@ void main() async {
   SpotstockNavigation.init(getIt<AppViewModel>().isMobile
       ? SpotstockRouter.mobileRouter
       : SpotstockRouter.desktopRouter);
-  runApp(const SpotstockInventory());
+  runApp(ProviderScope(child: const SpotstockInventory()));
 }
 
 class SpotstockInventory extends StatelessWidget {
