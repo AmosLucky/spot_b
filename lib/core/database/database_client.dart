@@ -43,22 +43,23 @@ class DatabaseClient extends _$DatabaseClient {
   DatabaseClient() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 5;
 
   @override
-MigrationStrategy get migration => MigrationStrategy(
-  onCreate: (Migrator m) async {
-    // Called when database is created for the FIRST time
-    await m.createAll();
-  },
-  onUpgrade: (Migrator m, int from, int to) async {
-    // Called when schemaVersion increases
-    if (from < 2) {
-      await m.createTable(amenitiesTable);
-    }
-  },
-);
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          // Called when database is created for the FIRST time
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          // Called when schemaVersion increases
 
+          if (from < 5) {
+            await m.createTable(amenitiesTable);
+            await m.createTable(localFacilitiesTable);
+          }
+        },
+      );
 }
 
 LazyDatabase _openConnection() {

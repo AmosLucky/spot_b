@@ -5,7 +5,7 @@ class DeleteFacilityUseCase {
 
   DeleteFacilityUseCase(this.repository);
 
-  Future<void> call(int id) {
+  Future<void> execute(int id) {
     return repository.deleteFacility(id);
   }
 }

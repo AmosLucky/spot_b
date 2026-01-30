@@ -5,8 +5,6 @@ import '../../../../../../core/constants/colors/spotstock_colors.dart';
 import '../../../domain/entities/facility_entity.dart';
 import '../../providers/facilities_provider.dart';
 
-
-
 class FacilitiesPage extends ConsumerStatefulWidget {
   const FacilitiesPage({super.key});
 
@@ -70,12 +68,10 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                   /// STATUS DROPDOWN
                   DropdownButtonFormField<String>(
                     value: state.selectedFormStatus,
-                    decoration:
-                        const InputDecoration(labelText: 'Status'),
+                    decoration: const InputDecoration(labelText: 'Status'),
                     items: state.formStatusList
                         .map(
-                          (s) =>
-                              DropdownMenuItem(value: s, child: Text(s)),
+                          (s) => DropdownMenuItem(value: s, child: Text(s)),
                         )
                         .toList(),
                     onChanged: (value) => ref
@@ -99,7 +95,7 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
 
               if (facility == null) {
                 await controller.addFacility(
-                  name: nameCtrl.text,
+                  nameCtrl.text,
                 );
               } else {
                 await controller.updateFacility(
@@ -124,8 +120,7 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Delete Facility'),
-        content:
-            const Text('Are you sure you want to delete this facility?'),
+        content: const Text('Are you sure you want to delete this facility?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -201,15 +196,16 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                               controller: searchController,
                               decoration: InputDecoration(
                                 hintText: 'Search facilities...',
-                                prefixIcon:
-                                    const Icon(Icons.search),
+                                prefixIcon: const Icon(Icons.search),
                                 border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                               ),
                               onChanged: (value) {
                                 // optional: add search use case later
+                                ref
+                                    .read(facilitiesControllerProvider.notifier)
+                                    .filterByName(value);
                               },
                             ),
                           ),
@@ -225,9 +221,8 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                                 )
                                 .toList(),
                             onChanged: (value) => ref
-                                .read(
-                                    facilitiesControllerProvider.notifier)
-                                .changeFilterStatus(value!),
+                                .read(facilitiesControllerProvider.notifier)
+                                .changeSearchStatus(value!),
                           ),
                         ],
                       ),
@@ -236,8 +231,7 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
 
                       /// TABLE HEADER
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
@@ -267,15 +261,13 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                                   final facility = facilities[index];
 
                                   return Container(
-                                    padding:
-                                        const EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                       vertical: 14,
                                     ),
                                     decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
-                                          color:
-                                              SpotstockColors.grey200,
+                                          color: SpotstockColors.grey200,
                                         ),
                                       ),
                                     ),
@@ -294,10 +286,8 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                                           child: Text(
                                             facility.status,
                                             style: TextStyle(
-                                              fontWeight:
-                                                  FontWeight.w600,
-                                              color: facility.status ==
-                                                      'Active'
+                                              fontWeight: FontWeight.w600,
+                                              color: facility.status == 'Active'
                                                   ? SpotstockColors.green
                                                   : SpotstockColors.red,
                                             ),
@@ -310,8 +300,7 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                                               IconButton(
                                                 icon: const Icon(
                                                   Icons.edit,
-                                                  color:
-                                                      SpotstockColors.blue,
+                                                  color: SpotstockColors.blue,
                                                 ),
                                                 onPressed: () =>
                                                     showFacilityDialog(
@@ -321,8 +310,7 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                                               IconButton(
                                                 icon: const Icon(
                                                   Icons.delete,
-                                                  color:
-                                                      SpotstockColors.red,
+                                                  color: SpotstockColors.red,
                                                 ),
                                                 onPressed: () =>
                                                     showDeleteDialog(

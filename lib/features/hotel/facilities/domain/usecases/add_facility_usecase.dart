@@ -6,7 +6,7 @@ class AddFacilityUseCase {
 
   AddFacilityUseCase(this.repository);
 
-  Future<void> call(FacilityEntity facility) {
+  Future<void> execute(FacilityEntity facility) {
     return repository.addFacility(facility);
   }
 }
