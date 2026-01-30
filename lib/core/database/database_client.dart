@@ -13,6 +13,7 @@ import 'tables/amenities_table.dart';
 import 'tables/local_attendants.dart';
 import 'tables/local_customers.dart';
 import 'tables/local_bar_tables.dart';
+import 'tables/local_facilities_table.dart';
 import 'tables/local_product_categories.dart';
 import 'tables/local_product.dart';
 import 'tables/local_sales.dart';
@@ -33,14 +34,16 @@ part 'database_client.g.dart';
     LocalRegisters,
     LocalSales,
     LocalHolds,
-    AmenitiesTable
+    //dektop
+    AmenitiesTable,
+    LocalFacilitiesTable
   ],
 )
 class DatabaseClient extends _$DatabaseClient {
   DatabaseClient() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
 MigrationStrategy get migration => MigrationStrategy(

@@ -7344,6 +7344,271 @@ class AmenitiesTableCompanion extends UpdateCompanion<AmenitiesTableData> {
   }
 }
 
+class $LocalFacilitiesTableTable extends LocalFacilitiesTable
+    with TableInfo<$LocalFacilitiesTableTable, LocalFacilitiesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalFacilitiesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _iconCodePointMeta =
+      const VerificationMeta('iconCodePoint');
+  @override
+  late final GeneratedColumn<int> iconCodePoint = GeneratedColumn<int>(
+      'icon_code_point', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, name, iconCodePoint, status];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_facilities_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<LocalFacilitiesTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('icon_code_point')) {
+      context.handle(
+          _iconCodePointMeta,
+          iconCodePoint.isAcceptableOrUnknown(
+              data['icon_code_point']!, _iconCodePointMeta));
+    } else if (isInserting) {
+      context.missing(_iconCodePointMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalFacilitiesTableData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalFacilitiesTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      iconCodePoint: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}icon_code_point'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+    );
+  }
+
+  @override
+  $LocalFacilitiesTableTable createAlias(String alias) {
+    return $LocalFacilitiesTableTable(attachedDatabase, alias);
+  }
+}
+
+class LocalFacilitiesTableData extends DataClass
+    implements Insertable<LocalFacilitiesTableData> {
+  final int id;
+  final String name;
+  final int iconCodePoint;
+  final String status;
+  const LocalFacilitiesTableData(
+      {required this.id,
+      required this.name,
+      required this.iconCodePoint,
+      required this.status});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['icon_code_point'] = Variable<int>(iconCodePoint);
+    map['status'] = Variable<String>(status);
+    return map;
+  }
+
+  LocalFacilitiesTableCompanion toCompanion(bool nullToAbsent) {
+    return LocalFacilitiesTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      iconCodePoint: Value(iconCodePoint),
+      status: Value(status),
+    );
+  }
+
+  factory LocalFacilitiesTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalFacilitiesTableData(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      iconCodePoint: serializer.fromJson<int>(json['iconCodePoint']),
+      status: serializer.fromJson<String>(json['status']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'iconCodePoint': serializer.toJson<int>(iconCodePoint),
+      'status': serializer.toJson<String>(status),
+    };
+  }
+
+  LocalFacilitiesTableData copyWith(
+          {int? id, String? name, int? iconCodePoint, String? status}) =>
+      LocalFacilitiesTableData(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        iconCodePoint: iconCodePoint ?? this.iconCodePoint,
+        status: status ?? this.status,
+      );
+  LocalFacilitiesTableData copyWithCompanion(
+      LocalFacilitiesTableCompanion data) {
+    return LocalFacilitiesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      iconCodePoint: data.iconCodePoint.present
+          ? data.iconCodePoint.value
+          : this.iconCodePoint,
+      status: data.status.present ? data.status.value : this.status,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalFacilitiesTableData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('iconCodePoint: $iconCodePoint, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, iconCodePoint, status);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalFacilitiesTableData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.iconCodePoint == this.iconCodePoint &&
+          other.status == this.status);
+}
+
+class LocalFacilitiesTableCompanion
+    extends UpdateCompanion<LocalFacilitiesTableData> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> iconCodePoint;
+  final Value<String> status;
+  const LocalFacilitiesTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.iconCodePoint = const Value.absent(),
+    this.status = const Value.absent(),
+  });
+  LocalFacilitiesTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required int iconCodePoint,
+    required String status,
+  })  : name = Value(name),
+        iconCodePoint = Value(iconCodePoint),
+        status = Value(status);
+  static Insertable<LocalFacilitiesTableData> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? iconCodePoint,
+    Expression<String>? status,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (iconCodePoint != null) 'icon_code_point': iconCodePoint,
+      if (status != null) 'status': status,
+    });
+  }
+
+  LocalFacilitiesTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<int>? iconCodePoint,
+      Value<String>? status}) {
+    return LocalFacilitiesTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      iconCodePoint: iconCodePoint ?? this.iconCodePoint,
+      status: status ?? this.status,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (iconCodePoint.present) {
+      map['icon_code_point'] = Variable<int>(iconCodePoint.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalFacilitiesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('iconCodePoint: $iconCodePoint, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -7360,6 +7625,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
   late final $LocalSalesTable localSales = $LocalSalesTable(this);
   late final $LocalHoldsTable localHolds = $LocalHoldsTable(this);
   late final $AmenitiesTableTable amenitiesTable = $AmenitiesTableTable(this);
+  late final $LocalFacilitiesTableTable localFacilitiesTable =
+      $LocalFacilitiesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7374,7 +7641,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         localRegisters,
         localSales,
         localHolds,
-        amenitiesTable
+        amenitiesTable,
+        localFacilitiesTable
       ];
 }
 
@@ -10665,6 +10933,165 @@ typedef $$AmenitiesTableTableProcessedTableManager = ProcessedTableManager<
     ),
     AmenitiesTableData,
     PrefetchHooks Function()>;
+typedef $$LocalFacilitiesTableTableCreateCompanionBuilder
+    = LocalFacilitiesTableCompanion Function({
+  Value<int> id,
+  required String name,
+  required int iconCodePoint,
+  required String status,
+});
+typedef $$LocalFacilitiesTableTableUpdateCompanionBuilder
+    = LocalFacilitiesTableCompanion Function({
+  Value<int> id,
+  Value<String> name,
+  Value<int> iconCodePoint,
+  Value<String> status,
+});
+
+class $$LocalFacilitiesTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $LocalFacilitiesTableTable> {
+  $$LocalFacilitiesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get iconCodePoint => $composableBuilder(
+      column: $table.iconCodePoint, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+}
+
+class $$LocalFacilitiesTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $LocalFacilitiesTableTable> {
+  $$LocalFacilitiesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get iconCodePoint => $composableBuilder(
+      column: $table.iconCodePoint,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+}
+
+class $$LocalFacilitiesTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $LocalFacilitiesTableTable> {
+  $$LocalFacilitiesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get iconCodePoint => $composableBuilder(
+      column: $table.iconCodePoint, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+}
+
+class $$LocalFacilitiesTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $LocalFacilitiesTableTable,
+    LocalFacilitiesTableData,
+    $$LocalFacilitiesTableTableFilterComposer,
+    $$LocalFacilitiesTableTableOrderingComposer,
+    $$LocalFacilitiesTableTableAnnotationComposer,
+    $$LocalFacilitiesTableTableCreateCompanionBuilder,
+    $$LocalFacilitiesTableTableUpdateCompanionBuilder,
+    (
+      LocalFacilitiesTableData,
+      BaseReferences<_$DatabaseClient, $LocalFacilitiesTableTable,
+          LocalFacilitiesTableData>
+    ),
+    LocalFacilitiesTableData,
+    PrefetchHooks Function()> {
+  $$LocalFacilitiesTableTableTableManager(
+      _$DatabaseClient db, $LocalFacilitiesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalFacilitiesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalFacilitiesTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalFacilitiesTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> iconCodePoint = const Value.absent(),
+            Value<String> status = const Value.absent(),
+          }) =>
+              LocalFacilitiesTableCompanion(
+            id: id,
+            name: name,
+            iconCodePoint: iconCodePoint,
+            status: status,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+            required int iconCodePoint,
+            required String status,
+          }) =>
+              LocalFacilitiesTableCompanion.insert(
+            id: id,
+            name: name,
+            iconCodePoint: iconCodePoint,
+            status: status,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$LocalFacilitiesTableTableProcessedTableManager
+    = ProcessedTableManager<
+        _$DatabaseClient,
+        $LocalFacilitiesTableTable,
+        LocalFacilitiesTableData,
+        $$LocalFacilitiesTableTableFilterComposer,
+        $$LocalFacilitiesTableTableOrderingComposer,
+        $$LocalFacilitiesTableTableAnnotationComposer,
+        $$LocalFacilitiesTableTableCreateCompanionBuilder,
+        $$LocalFacilitiesTableTableUpdateCompanionBuilder,
+        (
+          LocalFacilitiesTableData,
+          BaseReferences<_$DatabaseClient, $LocalFacilitiesTableTable,
+              LocalFacilitiesTableData>
+        ),
+        LocalFacilitiesTableData,
+        PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -10690,4 +11117,6 @@ class $DatabaseClientManager {
       $$LocalHoldsTableTableManager(_db, _db.localHolds);
   $$AmenitiesTableTableTableManager get amenitiesTable =>
       $$AmenitiesTableTableTableManager(_db, _db.amenitiesTable);
+  $$LocalFacilitiesTableTableTableManager get localFacilitiesTable =>
+      $$LocalFacilitiesTableTableTableManager(_db, _db.localFacilitiesTable);
 }
