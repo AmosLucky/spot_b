@@ -9,6 +9,7 @@ import '../../features/holds/data/models/hold.dart';
 import '../../features/auth/data/models/spotstock_user.dart';
 import '../../features/pos/data/models/product_warehouse.dart';
 import '../../features/pos/data/models/product_unit_name.dart';
+import 'tables/amenities_table.dart';
 import 'tables/local_attendants.dart';
 import 'tables/local_customers.dart';
 import 'tables/local_bar_tables.dart';
@@ -32,13 +33,29 @@ part 'database_client.g.dart';
     LocalRegisters,
     LocalSales,
     LocalHolds,
+    AmenitiesTable
   ],
 )
 class DatabaseClient extends _$DatabaseClient {
   DatabaseClient() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+MigrationStrategy get migration => MigrationStrategy(
+  onCreate: (Migrator m) async {
+    // Called when database is created for the FIRST time
+    await m.createAll();
+  },
+  onUpgrade: (Migrator m, int from, int to) async {
+    // Called when schemaVersion increases
+    if (from < 2) {
+      await m.createTable(amenitiesTable);
+    }
+  },
+);
+
 }
 
 LazyDatabase _openConnection() {

@@ -7046,6 +7046,304 @@ class LocalHoldsCompanion extends UpdateCompanion<LocalHold> {
   }
 }
 
+class $AmenitiesTableTable extends AmenitiesTable
+    with TableInfo<$AmenitiesTableTable, AmenitiesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AmenitiesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _iconMeta = const VerificationMeta('icon');
+  @override
+  late final GeneratedColumn<String> icon = GeneratedColumn<String>(
+      'icon', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('Active'));
+  @override
+  List<GeneratedColumn> get $columns => [id, name, description, icon, status];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'amenities_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<AmenitiesTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('icon')) {
+      context.handle(
+          _iconMeta, icon.isAcceptableOrUnknown(data['icon']!, _iconMeta));
+    } else if (isInserting) {
+      context.missing(_iconMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AmenitiesTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AmenitiesTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+      icon: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}icon'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+    );
+  }
+
+  @override
+  $AmenitiesTableTable createAlias(String alias) {
+    return $AmenitiesTableTable(attachedDatabase, alias);
+  }
+}
+
+class AmenitiesTableData extends DataClass
+    implements Insertable<AmenitiesTableData> {
+  final int id;
+  final String name;
+  final String description;
+  final String icon;
+  final String status;
+  const AmenitiesTableData(
+      {required this.id,
+      required this.name,
+      required this.description,
+      required this.icon,
+      required this.status});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['description'] = Variable<String>(description);
+    map['icon'] = Variable<String>(icon);
+    map['status'] = Variable<String>(status);
+    return map;
+  }
+
+  AmenitiesTableCompanion toCompanion(bool nullToAbsent) {
+    return AmenitiesTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: Value(description),
+      icon: Value(icon),
+      status: Value(status),
+    );
+  }
+
+  factory AmenitiesTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AmenitiesTableData(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String>(json['description']),
+      icon: serializer.fromJson<String>(json['icon']),
+      status: serializer.fromJson<String>(json['status']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String>(description),
+      'icon': serializer.toJson<String>(icon),
+      'status': serializer.toJson<String>(status),
+    };
+  }
+
+  AmenitiesTableData copyWith(
+          {int? id,
+          String? name,
+          String? description,
+          String? icon,
+          String? status}) =>
+      AmenitiesTableData(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        icon: icon ?? this.icon,
+        status: status ?? this.status,
+      );
+  AmenitiesTableData copyWithCompanion(AmenitiesTableCompanion data) {
+    return AmenitiesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description:
+          data.description.present ? data.description.value : this.description,
+      icon: data.icon.present ? data.icon.value : this.icon,
+      status: data.status.present ? data.status.value : this.status,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmenitiesTableData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('icon: $icon, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, description, icon, status);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AmenitiesTableData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.icon == this.icon &&
+          other.status == this.status);
+}
+
+class AmenitiesTableCompanion extends UpdateCompanion<AmenitiesTableData> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String> description;
+  final Value<String> icon;
+  final Value<String> status;
+  const AmenitiesTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.icon = const Value.absent(),
+    this.status = const Value.absent(),
+  });
+  AmenitiesTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required String description,
+    required String icon,
+    this.status = const Value.absent(),
+  })  : name = Value(name),
+        description = Value(description),
+        icon = Value(icon);
+  static Insertable<AmenitiesTableData> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<String>? icon,
+    Expression<String>? status,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (icon != null) 'icon': icon,
+      if (status != null) 'status': status,
+    });
+  }
+
+  AmenitiesTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<String>? description,
+      Value<String>? icon,
+      Value<String>? status}) {
+    return AmenitiesTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      icon: icon ?? this.icon,
+      status: status ?? this.status,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (icon.present) {
+      map['icon'] = Variable<String>(icon.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AmenitiesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('icon: $icon, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -7061,6 +7359,7 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
   late final $LocalRegistersTable localRegisters = $LocalRegistersTable(this);
   late final $LocalSalesTable localSales = $LocalSalesTable(this);
   late final $LocalHoldsTable localHolds = $LocalHoldsTable(this);
+  late final $AmenitiesTableTable amenitiesTable = $AmenitiesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7074,7 +7373,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         localWarehouses,
         localRegisters,
         localSales,
-        localHolds
+        localHolds,
+        amenitiesTable
       ];
 }
 
@@ -10197,6 +10497,174 @@ typedef $$LocalHoldsTableProcessedTableManager = ProcessedTableManager<
     (LocalHold, BaseReferences<_$DatabaseClient, $LocalHoldsTable, LocalHold>),
     LocalHold,
     PrefetchHooks Function()>;
+typedef $$AmenitiesTableTableCreateCompanionBuilder = AmenitiesTableCompanion
+    Function({
+  Value<int> id,
+  required String name,
+  required String description,
+  required String icon,
+  Value<String> status,
+});
+typedef $$AmenitiesTableTableUpdateCompanionBuilder = AmenitiesTableCompanion
+    Function({
+  Value<int> id,
+  Value<String> name,
+  Value<String> description,
+  Value<String> icon,
+  Value<String> status,
+});
+
+class $$AmenitiesTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $AmenitiesTableTable> {
+  $$AmenitiesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get icon => $composableBuilder(
+      column: $table.icon, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+}
+
+class $$AmenitiesTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $AmenitiesTableTable> {
+  $$AmenitiesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get icon => $composableBuilder(
+      column: $table.icon, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+}
+
+class $$AmenitiesTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $AmenitiesTableTable> {
+  $$AmenitiesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<String> get icon =>
+      $composableBuilder(column: $table.icon, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+}
+
+class $$AmenitiesTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $AmenitiesTableTable,
+    AmenitiesTableData,
+    $$AmenitiesTableTableFilterComposer,
+    $$AmenitiesTableTableOrderingComposer,
+    $$AmenitiesTableTableAnnotationComposer,
+    $$AmenitiesTableTableCreateCompanionBuilder,
+    $$AmenitiesTableTableUpdateCompanionBuilder,
+    (
+      AmenitiesTableData,
+      BaseReferences<_$DatabaseClient, $AmenitiesTableTable, AmenitiesTableData>
+    ),
+    AmenitiesTableData,
+    PrefetchHooks Function()> {
+  $$AmenitiesTableTableTableManager(
+      _$DatabaseClient db, $AmenitiesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AmenitiesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AmenitiesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AmenitiesTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> description = const Value.absent(),
+            Value<String> icon = const Value.absent(),
+            Value<String> status = const Value.absent(),
+          }) =>
+              AmenitiesTableCompanion(
+            id: id,
+            name: name,
+            description: description,
+            icon: icon,
+            status: status,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+            required String description,
+            required String icon,
+            Value<String> status = const Value.absent(),
+          }) =>
+              AmenitiesTableCompanion.insert(
+            id: id,
+            name: name,
+            description: description,
+            icon: icon,
+            status: status,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$AmenitiesTableTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $AmenitiesTableTable,
+    AmenitiesTableData,
+    $$AmenitiesTableTableFilterComposer,
+    $$AmenitiesTableTableOrderingComposer,
+    $$AmenitiesTableTableAnnotationComposer,
+    $$AmenitiesTableTableCreateCompanionBuilder,
+    $$AmenitiesTableTableUpdateCompanionBuilder,
+    (
+      AmenitiesTableData,
+      BaseReferences<_$DatabaseClient, $AmenitiesTableTable, AmenitiesTableData>
+    ),
+    AmenitiesTableData,
+    PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -10220,4 +10688,6 @@ class $DatabaseClientManager {
       $$LocalSalesTableTableManager(_db, _db.localSales);
   $$LocalHoldsTableTableManager get localHolds =>
       $$LocalHoldsTableTableManager(_db, _db.localHolds);
+  $$AmenitiesTableTableTableManager get amenitiesTable =>
+      $$AmenitiesTableTableTableManager(_db, _db.amenitiesTable);
 }

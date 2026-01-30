@@ -11,4 +11,11 @@ class SpotstockColors {
   ///Desktop
   static const Color orange = Color(0xFFFFA500);
  static const Color white = Color(0xFFFFFFFF);
+ static const Color red = Colors.red;           // default red
+  static const Color green = Colors.green;       // default green
+  static const Color blue = Colors.blue;         // default blue
+
+  // grey shades (using .shade)
+  static Color grey300 = Colors.grey.shade300;  
+  static Color grey200 = Colors.grey.shade200;
 }

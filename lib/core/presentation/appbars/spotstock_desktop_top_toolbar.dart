@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:spotstock_inventory/core/constants/colors/spotstock_colors.dart';
 import 'package:spotstock_inventory/core/constants/strings/spotstock_strings.dart';
+
+import '../../routing/router.dart';
 
 class SpotstockDesktopTopToolbar extends StatelessWidget {
   const SpotstockDesktopTopToolbar({super.key});
@@ -24,6 +28,14 @@ class SpotstockDesktopTopToolbar extends StatelessWidget {
       color: Theme.of(context).colorScheme.primary,
       child: Row(
         children: [
+          IconButton(
+              onPressed: () {
+                context.go(SpotstockMobileRoutes.selectApp);
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: SpotstockColors.cF2FCFE,
+              )),
           // const SizedBox(width: 12),
           // ...['FRD', 'IN', 'RSV1', 'OUT', 'DTY', 'MTR', 'AVB2', 'INR']
           //     .map(_chip),
