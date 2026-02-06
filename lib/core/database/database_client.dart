@@ -20,6 +20,8 @@ import 'tables/local_sales.dart';
 import 'tables/local_warehouses.dart';
 import 'tables/local_registers.dart';
 import 'tables/local_holds.dart';
+import 'tables/bed_types_table.dart';
+import 'tables/room_types_table.dart';
 
 part 'database_client.g.dart';
 
@@ -36,14 +38,16 @@ part 'database_client.g.dart';
     LocalHolds,
     //dektop
     AmenitiesTable,
-    LocalFacilitiesTable
+    LocalFacilitiesTable,
+    BedTypesTable,
+    RoomTypesTable
   ],
 )
 class DatabaseClient extends _$DatabaseClient {
   DatabaseClient() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -54,9 +58,11 @@ class DatabaseClient extends _$DatabaseClient {
         onUpgrade: (Migrator m, int from, int to) async {
           // Called when schemaVersion increases
 
-          if (from < 5) {
+          if (from < 6) {
             await m.createTable(amenitiesTable);
             await m.createTable(localFacilitiesTable);
+            await m.createTable(bedTypesTable);
+            await m.createTable(roomTypesTable);
           }
         },
       );

@@ -184,6 +184,20 @@ class SpotstockRouter {
           );
         },
       ),
+      GoRoute(
+        path: SpotstockMobileRoutes.registerManagement,
+        builder: (context, state) {
+          final viewModel = getIt<RegisterManagementViewModel>();
+          return RegisterManagement(viewModel: viewModel);
+        },
+      ),
+      GoRoute(
+        path: SpotstockMobileRoutes.pos,
+        builder: (context, state) {
+          final viewModel = getIt<PosViewModel>();
+          return Pos(viewModel: viewModel);
+        },
+      ),
     ],
   );
 }

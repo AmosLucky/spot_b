@@ -7609,6 +7609,1022 @@ class LocalFacilitiesTableCompanion
   }
 }
 
+class $BedTypesTableTable extends BedTypesTable
+    with TableInfo<$BedTypesTableTable, BedTypesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BedTypesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isActiveMeta =
+      const VerificationMeta('isActive');
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+      'is_active', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_active" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, name, description, isActive, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'bed_types_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<BedTypesTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(_isActiveMeta,
+          isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BedTypesTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BedTypesTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      isActive: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_active'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $BedTypesTableTable createAlias(String alias) {
+    return $BedTypesTableTable(attachedDatabase, alias);
+  }
+}
+
+class BedTypesTableData extends DataClass
+    implements Insertable<BedTypesTableData> {
+  final int id;
+  final String name;
+  final String? description;
+  final bool isActive;
+  final DateTime createdAt;
+  const BedTypesTableData(
+      {required this.id,
+      required this.name,
+      this.description,
+      required this.isActive,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BedTypesTableCompanion toCompanion(bool nullToAbsent) {
+    return BedTypesTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      isActive: Value(isActive),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory BedTypesTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BedTypesTableData(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String?>(json['description']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String?>(description),
+      'isActive': serializer.toJson<bool>(isActive),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  BedTypesTableData copyWith(
+          {int? id,
+          String? name,
+          Value<String?> description = const Value.absent(),
+          bool? isActive,
+          DateTime? createdAt}) =>
+      BedTypesTableData(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description.present ? description.value : this.description,
+        isActive: isActive ?? this.isActive,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  BedTypesTableData copyWithCompanion(BedTypesTableCompanion data) {
+    return BedTypesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description:
+          data.description.present ? data.description.value : this.description,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BedTypesTableData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, description, isActive, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BedTypesTableData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.isActive == this.isActive &&
+          other.createdAt == this.createdAt);
+}
+
+class BedTypesTableCompanion extends UpdateCompanion<BedTypesTableData> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String?> description;
+  final Value<bool> isActive;
+  final Value<DateTime> createdAt;
+  const BedTypesTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  BedTypesTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.description = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<BedTypesTableData> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<bool>? isActive,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (isActive != null) 'is_active': isActive,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  BedTypesTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<String?>? description,
+      Value<bool>? isActive,
+      Value<DateTime>? createdAt}) {
+    return BedTypesTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BedTypesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RoomTypesTableTable extends RoomTypesTable
+    with TableInfo<$RoomTypesTableTable, RoomTypesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RoomTypesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _totalAdultsMeta =
+      const VerificationMeta('totalAdults');
+  @override
+  late final GeneratedColumn<int> totalAdults = GeneratedColumn<int>(
+      'total_adults', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(1));
+  static const VerificationMeta _totalChildrenMeta =
+      const VerificationMeta('totalChildren');
+  @override
+  late final GeneratedColumn<int> totalChildren = GeneratedColumn<int>(
+      'total_children', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _totalBedsMeta =
+      const VerificationMeta('totalBeds');
+  @override
+  late final GeneratedColumn<int> totalBeds = GeneratedColumn<int>(
+      'total_beds', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _fareMeta = const VerificationMeta('fare');
+  @override
+  late final GeneratedColumn<double> fare = GeneratedColumn<double>(
+      'fare', aliasedName, false,
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _keywordsMeta =
+      const VerificationMeta('keywords');
+  @override
+  late final GeneratedColumn<String> keywords = GeneratedColumn<String>(
+      'keywords', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _cancellationFeeMeta =
+      const VerificationMeta('cancellationFee');
+  @override
+  late final GeneratedColumn<double> cancellationFee = GeneratedColumn<double>(
+      'cancellation_fee', aliasedName, false,
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _cancellationPolicyMeta =
+      const VerificationMeta('cancellationPolicy');
+  @override
+  late final GeneratedColumn<String> cancellationPolicy =
+      GeneratedColumn<String>('cancellation_policy', aliasedName, false,
+          type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _amenitiesMeta =
+      const VerificationMeta('amenities');
+  @override
+  late final GeneratedColumn<String> amenities = GeneratedColumn<String>(
+      'amenities', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _facilitiesMeta =
+      const VerificationMeta('facilities');
+  @override
+  late final GeneratedColumn<String> facilities = GeneratedColumn<String>(
+      'facilities', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _bedTypesMeta =
+      const VerificationMeta('bedTypes');
+  @override
+  late final GeneratedColumn<String> bedTypes = GeneratedColumn<String>(
+      'bed_types', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _isActiveMeta =
+      const VerificationMeta('isActive');
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+      'is_active', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_active" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        name,
+        totalAdults,
+        totalChildren,
+        totalBeds,
+        fare,
+        keywords,
+        description,
+        cancellationFee,
+        cancellationPolicy,
+        amenities,
+        facilities,
+        bedTypes,
+        isActive,
+        createdAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'room_types_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<RoomTypesTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('total_adults')) {
+      context.handle(
+          _totalAdultsMeta,
+          totalAdults.isAcceptableOrUnknown(
+              data['total_adults']!, _totalAdultsMeta));
+    }
+    if (data.containsKey('total_children')) {
+      context.handle(
+          _totalChildrenMeta,
+          totalChildren.isAcceptableOrUnknown(
+              data['total_children']!, _totalChildrenMeta));
+    }
+    if (data.containsKey('total_beds')) {
+      context.handle(_totalBedsMeta,
+          totalBeds.isAcceptableOrUnknown(data['total_beds']!, _totalBedsMeta));
+    }
+    if (data.containsKey('fare')) {
+      context.handle(
+          _fareMeta, fare.isAcceptableOrUnknown(data['fare']!, _fareMeta));
+    }
+    if (data.containsKey('keywords')) {
+      context.handle(_keywordsMeta,
+          keywords.isAcceptableOrUnknown(data['keywords']!, _keywordsMeta));
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('cancellation_fee')) {
+      context.handle(
+          _cancellationFeeMeta,
+          cancellationFee.isAcceptableOrUnknown(
+              data['cancellation_fee']!, _cancellationFeeMeta));
+    }
+    if (data.containsKey('cancellation_policy')) {
+      context.handle(
+          _cancellationPolicyMeta,
+          cancellationPolicy.isAcceptableOrUnknown(
+              data['cancellation_policy']!, _cancellationPolicyMeta));
+    } else if (isInserting) {
+      context.missing(_cancellationPolicyMeta);
+    }
+    if (data.containsKey('amenities')) {
+      context.handle(_amenitiesMeta,
+          amenities.isAcceptableOrUnknown(data['amenities']!, _amenitiesMeta));
+    }
+    if (data.containsKey('facilities')) {
+      context.handle(
+          _facilitiesMeta,
+          facilities.isAcceptableOrUnknown(
+              data['facilities']!, _facilitiesMeta));
+    }
+    if (data.containsKey('bed_types')) {
+      context.handle(_bedTypesMeta,
+          bedTypes.isAcceptableOrUnknown(data['bed_types']!, _bedTypesMeta));
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(_isActiveMeta,
+          isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RoomTypesTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoomTypesTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      totalAdults: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}total_adults'])!,
+      totalChildren: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}total_children'])!,
+      totalBeds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}total_beds'])!,
+      fare: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}fare'])!,
+      keywords: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}keywords']),
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+      cancellationFee: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}cancellation_fee'])!,
+      cancellationPolicy: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}cancellation_policy'])!,
+      amenities: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}amenities'])!,
+      facilities: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}facilities'])!,
+      bedTypes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}bed_types'])!,
+      isActive: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_active'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $RoomTypesTableTable createAlias(String alias) {
+    return $RoomTypesTableTable(attachedDatabase, alias);
+  }
+}
+
+class RoomTypesTableData extends DataClass
+    implements Insertable<RoomTypesTableData> {
+  final int id;
+  final String name;
+  final int totalAdults;
+  final int totalChildren;
+  final int totalBeds;
+  final double fare;
+  final String? keywords;
+  final String description;
+  final double cancellationFee;
+  final String cancellationPolicy;
+  final String amenities;
+  final String facilities;
+  final String bedTypes;
+  final bool isActive;
+  final DateTime createdAt;
+  const RoomTypesTableData(
+      {required this.id,
+      required this.name,
+      required this.totalAdults,
+      required this.totalChildren,
+      required this.totalBeds,
+      required this.fare,
+      this.keywords,
+      required this.description,
+      required this.cancellationFee,
+      required this.cancellationPolicy,
+      required this.amenities,
+      required this.facilities,
+      required this.bedTypes,
+      required this.isActive,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['total_adults'] = Variable<int>(totalAdults);
+    map['total_children'] = Variable<int>(totalChildren);
+    map['total_beds'] = Variable<int>(totalBeds);
+    map['fare'] = Variable<double>(fare);
+    if (!nullToAbsent || keywords != null) {
+      map['keywords'] = Variable<String>(keywords);
+    }
+    map['description'] = Variable<String>(description);
+    map['cancellation_fee'] = Variable<double>(cancellationFee);
+    map['cancellation_policy'] = Variable<String>(cancellationPolicy);
+    map['amenities'] = Variable<String>(amenities);
+    map['facilities'] = Variable<String>(facilities);
+    map['bed_types'] = Variable<String>(bedTypes);
+    map['is_active'] = Variable<bool>(isActive);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  RoomTypesTableCompanion toCompanion(bool nullToAbsent) {
+    return RoomTypesTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      totalAdults: Value(totalAdults),
+      totalChildren: Value(totalChildren),
+      totalBeds: Value(totalBeds),
+      fare: Value(fare),
+      keywords: keywords == null && nullToAbsent
+          ? const Value.absent()
+          : Value(keywords),
+      description: Value(description),
+      cancellationFee: Value(cancellationFee),
+      cancellationPolicy: Value(cancellationPolicy),
+      amenities: Value(amenities),
+      facilities: Value(facilities),
+      bedTypes: Value(bedTypes),
+      isActive: Value(isActive),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory RoomTypesTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoomTypesTableData(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      totalAdults: serializer.fromJson<int>(json['totalAdults']),
+      totalChildren: serializer.fromJson<int>(json['totalChildren']),
+      totalBeds: serializer.fromJson<int>(json['totalBeds']),
+      fare: serializer.fromJson<double>(json['fare']),
+      keywords: serializer.fromJson<String?>(json['keywords']),
+      description: serializer.fromJson<String>(json['description']),
+      cancellationFee: serializer.fromJson<double>(json['cancellationFee']),
+      cancellationPolicy:
+          serializer.fromJson<String>(json['cancellationPolicy']),
+      amenities: serializer.fromJson<String>(json['amenities']),
+      facilities: serializer.fromJson<String>(json['facilities']),
+      bedTypes: serializer.fromJson<String>(json['bedTypes']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'totalAdults': serializer.toJson<int>(totalAdults),
+      'totalChildren': serializer.toJson<int>(totalChildren),
+      'totalBeds': serializer.toJson<int>(totalBeds),
+      'fare': serializer.toJson<double>(fare),
+      'keywords': serializer.toJson<String?>(keywords),
+      'description': serializer.toJson<String>(description),
+      'cancellationFee': serializer.toJson<double>(cancellationFee),
+      'cancellationPolicy': serializer.toJson<String>(cancellationPolicy),
+      'amenities': serializer.toJson<String>(amenities),
+      'facilities': serializer.toJson<String>(facilities),
+      'bedTypes': serializer.toJson<String>(bedTypes),
+      'isActive': serializer.toJson<bool>(isActive),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  RoomTypesTableData copyWith(
+          {int? id,
+          String? name,
+          int? totalAdults,
+          int? totalChildren,
+          int? totalBeds,
+          double? fare,
+          Value<String?> keywords = const Value.absent(),
+          String? description,
+          double? cancellationFee,
+          String? cancellationPolicy,
+          String? amenities,
+          String? facilities,
+          String? bedTypes,
+          bool? isActive,
+          DateTime? createdAt}) =>
+      RoomTypesTableData(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        totalAdults: totalAdults ?? this.totalAdults,
+        totalChildren: totalChildren ?? this.totalChildren,
+        totalBeds: totalBeds ?? this.totalBeds,
+        fare: fare ?? this.fare,
+        keywords: keywords.present ? keywords.value : this.keywords,
+        description: description ?? this.description,
+        cancellationFee: cancellationFee ?? this.cancellationFee,
+        cancellationPolicy: cancellationPolicy ?? this.cancellationPolicy,
+        amenities: amenities ?? this.amenities,
+        facilities: facilities ?? this.facilities,
+        bedTypes: bedTypes ?? this.bedTypes,
+        isActive: isActive ?? this.isActive,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  RoomTypesTableData copyWithCompanion(RoomTypesTableCompanion data) {
+    return RoomTypesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      totalAdults:
+          data.totalAdults.present ? data.totalAdults.value : this.totalAdults,
+      totalChildren: data.totalChildren.present
+          ? data.totalChildren.value
+          : this.totalChildren,
+      totalBeds: data.totalBeds.present ? data.totalBeds.value : this.totalBeds,
+      fare: data.fare.present ? data.fare.value : this.fare,
+      keywords: data.keywords.present ? data.keywords.value : this.keywords,
+      description:
+          data.description.present ? data.description.value : this.description,
+      cancellationFee: data.cancellationFee.present
+          ? data.cancellationFee.value
+          : this.cancellationFee,
+      cancellationPolicy: data.cancellationPolicy.present
+          ? data.cancellationPolicy.value
+          : this.cancellationPolicy,
+      amenities: data.amenities.present ? data.amenities.value : this.amenities,
+      facilities:
+          data.facilities.present ? data.facilities.value : this.facilities,
+      bedTypes: data.bedTypes.present ? data.bedTypes.value : this.bedTypes,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoomTypesTableData(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('totalAdults: $totalAdults, ')
+          ..write('totalChildren: $totalChildren, ')
+          ..write('totalBeds: $totalBeds, ')
+          ..write('fare: $fare, ')
+          ..write('keywords: $keywords, ')
+          ..write('description: $description, ')
+          ..write('cancellationFee: $cancellationFee, ')
+          ..write('cancellationPolicy: $cancellationPolicy, ')
+          ..write('amenities: $amenities, ')
+          ..write('facilities: $facilities, ')
+          ..write('bedTypes: $bedTypes, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      name,
+      totalAdults,
+      totalChildren,
+      totalBeds,
+      fare,
+      keywords,
+      description,
+      cancellationFee,
+      cancellationPolicy,
+      amenities,
+      facilities,
+      bedTypes,
+      isActive,
+      createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoomTypesTableData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.totalAdults == this.totalAdults &&
+          other.totalChildren == this.totalChildren &&
+          other.totalBeds == this.totalBeds &&
+          other.fare == this.fare &&
+          other.keywords == this.keywords &&
+          other.description == this.description &&
+          other.cancellationFee == this.cancellationFee &&
+          other.cancellationPolicy == this.cancellationPolicy &&
+          other.amenities == this.amenities &&
+          other.facilities == this.facilities &&
+          other.bedTypes == this.bedTypes &&
+          other.isActive == this.isActive &&
+          other.createdAt == this.createdAt);
+}
+
+class RoomTypesTableCompanion extends UpdateCompanion<RoomTypesTableData> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> totalAdults;
+  final Value<int> totalChildren;
+  final Value<int> totalBeds;
+  final Value<double> fare;
+  final Value<String?> keywords;
+  final Value<String> description;
+  final Value<double> cancellationFee;
+  final Value<String> cancellationPolicy;
+  final Value<String> amenities;
+  final Value<String> facilities;
+  final Value<String> bedTypes;
+  final Value<bool> isActive;
+  final Value<DateTime> createdAt;
+  const RoomTypesTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.totalAdults = const Value.absent(),
+    this.totalChildren = const Value.absent(),
+    this.totalBeds = const Value.absent(),
+    this.fare = const Value.absent(),
+    this.keywords = const Value.absent(),
+    this.description = const Value.absent(),
+    this.cancellationFee = const Value.absent(),
+    this.cancellationPolicy = const Value.absent(),
+    this.amenities = const Value.absent(),
+    this.facilities = const Value.absent(),
+    this.bedTypes = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  RoomTypesTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.totalAdults = const Value.absent(),
+    this.totalChildren = const Value.absent(),
+    this.totalBeds = const Value.absent(),
+    this.fare = const Value.absent(),
+    this.keywords = const Value.absent(),
+    required String description,
+    this.cancellationFee = const Value.absent(),
+    required String cancellationPolicy,
+    this.amenities = const Value.absent(),
+    this.facilities = const Value.absent(),
+    this.bedTypes = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  })  : name = Value(name),
+        description = Value(description),
+        cancellationPolicy = Value(cancellationPolicy);
+  static Insertable<RoomTypesTableData> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? totalAdults,
+    Expression<int>? totalChildren,
+    Expression<int>? totalBeds,
+    Expression<double>? fare,
+    Expression<String>? keywords,
+    Expression<String>? description,
+    Expression<double>? cancellationFee,
+    Expression<String>? cancellationPolicy,
+    Expression<String>? amenities,
+    Expression<String>? facilities,
+    Expression<String>? bedTypes,
+    Expression<bool>? isActive,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (totalAdults != null) 'total_adults': totalAdults,
+      if (totalChildren != null) 'total_children': totalChildren,
+      if (totalBeds != null) 'total_beds': totalBeds,
+      if (fare != null) 'fare': fare,
+      if (keywords != null) 'keywords': keywords,
+      if (description != null) 'description': description,
+      if (cancellationFee != null) 'cancellation_fee': cancellationFee,
+      if (cancellationPolicy != null) 'cancellation_policy': cancellationPolicy,
+      if (amenities != null) 'amenities': amenities,
+      if (facilities != null) 'facilities': facilities,
+      if (bedTypes != null) 'bed_types': bedTypes,
+      if (isActive != null) 'is_active': isActive,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  RoomTypesTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? name,
+      Value<int>? totalAdults,
+      Value<int>? totalChildren,
+      Value<int>? totalBeds,
+      Value<double>? fare,
+      Value<String?>? keywords,
+      Value<String>? description,
+      Value<double>? cancellationFee,
+      Value<String>? cancellationPolicy,
+      Value<String>? amenities,
+      Value<String>? facilities,
+      Value<String>? bedTypes,
+      Value<bool>? isActive,
+      Value<DateTime>? createdAt}) {
+    return RoomTypesTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      totalAdults: totalAdults ?? this.totalAdults,
+      totalChildren: totalChildren ?? this.totalChildren,
+      totalBeds: totalBeds ?? this.totalBeds,
+      fare: fare ?? this.fare,
+      keywords: keywords ?? this.keywords,
+      description: description ?? this.description,
+      cancellationFee: cancellationFee ?? this.cancellationFee,
+      cancellationPolicy: cancellationPolicy ?? this.cancellationPolicy,
+      amenities: amenities ?? this.amenities,
+      facilities: facilities ?? this.facilities,
+      bedTypes: bedTypes ?? this.bedTypes,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (totalAdults.present) {
+      map['total_adults'] = Variable<int>(totalAdults.value);
+    }
+    if (totalChildren.present) {
+      map['total_children'] = Variable<int>(totalChildren.value);
+    }
+    if (totalBeds.present) {
+      map['total_beds'] = Variable<int>(totalBeds.value);
+    }
+    if (fare.present) {
+      map['fare'] = Variable<double>(fare.value);
+    }
+    if (keywords.present) {
+      map['keywords'] = Variable<String>(keywords.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (cancellationFee.present) {
+      map['cancellation_fee'] = Variable<double>(cancellationFee.value);
+    }
+    if (cancellationPolicy.present) {
+      map['cancellation_policy'] = Variable<String>(cancellationPolicy.value);
+    }
+    if (amenities.present) {
+      map['amenities'] = Variable<String>(amenities.value);
+    }
+    if (facilities.present) {
+      map['facilities'] = Variable<String>(facilities.value);
+    }
+    if (bedTypes.present) {
+      map['bed_types'] = Variable<String>(bedTypes.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoomTypesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('totalAdults: $totalAdults, ')
+          ..write('totalChildren: $totalChildren, ')
+          ..write('totalBeds: $totalBeds, ')
+          ..write('fare: $fare, ')
+          ..write('keywords: $keywords, ')
+          ..write('description: $description, ')
+          ..write('cancellationFee: $cancellationFee, ')
+          ..write('cancellationPolicy: $cancellationPolicy, ')
+          ..write('amenities: $amenities, ')
+          ..write('facilities: $facilities, ')
+          ..write('bedTypes: $bedTypes, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -7627,6 +8643,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
   late final $AmenitiesTableTable amenitiesTable = $AmenitiesTableTable(this);
   late final $LocalFacilitiesTableTable localFacilitiesTable =
       $LocalFacilitiesTableTable(this);
+  late final $BedTypesTableTable bedTypesTable = $BedTypesTableTable(this);
+  late final $RoomTypesTableTable roomTypesTable = $RoomTypesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7642,7 +8660,9 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         localSales,
         localHolds,
         amenitiesTable,
-        localFacilitiesTable
+        localFacilitiesTable,
+        bedTypesTable,
+        roomTypesTable
       ];
 }
 
@@ -11092,6 +12112,497 @@ typedef $$LocalFacilitiesTableTableProcessedTableManager
         ),
         LocalFacilitiesTableData,
         PrefetchHooks Function()>;
+typedef $$BedTypesTableTableCreateCompanionBuilder = BedTypesTableCompanion
+    Function({
+  Value<int> id,
+  required String name,
+  Value<String?> description,
+  Value<bool> isActive,
+  Value<DateTime> createdAt,
+});
+typedef $$BedTypesTableTableUpdateCompanionBuilder = BedTypesTableCompanion
+    Function({
+  Value<int> id,
+  Value<String> name,
+  Value<String?> description,
+  Value<bool> isActive,
+  Value<DateTime> createdAt,
+});
+
+class $$BedTypesTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $BedTypesTableTable> {
+  $$BedTypesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$BedTypesTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $BedTypesTableTable> {
+  $$BedTypesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$BedTypesTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $BedTypesTableTable> {
+  $$BedTypesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$BedTypesTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $BedTypesTableTable,
+    BedTypesTableData,
+    $$BedTypesTableTableFilterComposer,
+    $$BedTypesTableTableOrderingComposer,
+    $$BedTypesTableTableAnnotationComposer,
+    $$BedTypesTableTableCreateCompanionBuilder,
+    $$BedTypesTableTableUpdateCompanionBuilder,
+    (
+      BedTypesTableData,
+      BaseReferences<_$DatabaseClient, $BedTypesTableTable, BedTypesTableData>
+    ),
+    BedTypesTableData,
+    PrefetchHooks Function()> {
+  $$BedTypesTableTableTableManager(
+      _$DatabaseClient db, $BedTypesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BedTypesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BedTypesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BedTypesTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String?> description = const Value.absent(),
+            Value<bool> isActive = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              BedTypesTableCompanion(
+            id: id,
+            name: name,
+            description: description,
+            isActive: isActive,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+            Value<String?> description = const Value.absent(),
+            Value<bool> isActive = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              BedTypesTableCompanion.insert(
+            id: id,
+            name: name,
+            description: description,
+            isActive: isActive,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$BedTypesTableTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $BedTypesTableTable,
+    BedTypesTableData,
+    $$BedTypesTableTableFilterComposer,
+    $$BedTypesTableTableOrderingComposer,
+    $$BedTypesTableTableAnnotationComposer,
+    $$BedTypesTableTableCreateCompanionBuilder,
+    $$BedTypesTableTableUpdateCompanionBuilder,
+    (
+      BedTypesTableData,
+      BaseReferences<_$DatabaseClient, $BedTypesTableTable, BedTypesTableData>
+    ),
+    BedTypesTableData,
+    PrefetchHooks Function()>;
+typedef $$RoomTypesTableTableCreateCompanionBuilder = RoomTypesTableCompanion
+    Function({
+  Value<int> id,
+  required String name,
+  Value<int> totalAdults,
+  Value<int> totalChildren,
+  Value<int> totalBeds,
+  Value<double> fare,
+  Value<String?> keywords,
+  required String description,
+  Value<double> cancellationFee,
+  required String cancellationPolicy,
+  Value<String> amenities,
+  Value<String> facilities,
+  Value<String> bedTypes,
+  Value<bool> isActive,
+  Value<DateTime> createdAt,
+});
+typedef $$RoomTypesTableTableUpdateCompanionBuilder = RoomTypesTableCompanion
+    Function({
+  Value<int> id,
+  Value<String> name,
+  Value<int> totalAdults,
+  Value<int> totalChildren,
+  Value<int> totalBeds,
+  Value<double> fare,
+  Value<String?> keywords,
+  Value<String> description,
+  Value<double> cancellationFee,
+  Value<String> cancellationPolicy,
+  Value<String> amenities,
+  Value<String> facilities,
+  Value<String> bedTypes,
+  Value<bool> isActive,
+  Value<DateTime> createdAt,
+});
+
+class $$RoomTypesTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $RoomTypesTableTable> {
+  $$RoomTypesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalAdults => $composableBuilder(
+      column: $table.totalAdults, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalChildren => $composableBuilder(
+      column: $table.totalChildren, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalBeds => $composableBuilder(
+      column: $table.totalBeds, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get fare => $composableBuilder(
+      column: $table.fare, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get keywords => $composableBuilder(
+      column: $table.keywords, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get cancellationFee => $composableBuilder(
+      column: $table.cancellationFee,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get cancellationPolicy => $composableBuilder(
+      column: $table.cancellationPolicy,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get amenities => $composableBuilder(
+      column: $table.amenities, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get facilities => $composableBuilder(
+      column: $table.facilities, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get bedTypes => $composableBuilder(
+      column: $table.bedTypes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$RoomTypesTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $RoomTypesTableTable> {
+  $$RoomTypesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get totalAdults => $composableBuilder(
+      column: $table.totalAdults, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get totalChildren => $composableBuilder(
+      column: $table.totalChildren,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get totalBeds => $composableBuilder(
+      column: $table.totalBeds, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get fare => $composableBuilder(
+      column: $table.fare, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get keywords => $composableBuilder(
+      column: $table.keywords, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get cancellationFee => $composableBuilder(
+      column: $table.cancellationFee,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get cancellationPolicy => $composableBuilder(
+      column: $table.cancellationPolicy,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get amenities => $composableBuilder(
+      column: $table.amenities, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get facilities => $composableBuilder(
+      column: $table.facilities, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get bedTypes => $composableBuilder(
+      column: $table.bedTypes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+      column: $table.isActive, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$RoomTypesTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $RoomTypesTableTable> {
+  $$RoomTypesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get totalAdults => $composableBuilder(
+      column: $table.totalAdults, builder: (column) => column);
+
+  GeneratedColumn<int> get totalChildren => $composableBuilder(
+      column: $table.totalChildren, builder: (column) => column);
+
+  GeneratedColumn<int> get totalBeds =>
+      $composableBuilder(column: $table.totalBeds, builder: (column) => column);
+
+  GeneratedColumn<double> get fare =>
+      $composableBuilder(column: $table.fare, builder: (column) => column);
+
+  GeneratedColumn<String> get keywords =>
+      $composableBuilder(column: $table.keywords, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<double> get cancellationFee => $composableBuilder(
+      column: $table.cancellationFee, builder: (column) => column);
+
+  GeneratedColumn<String> get cancellationPolicy => $composableBuilder(
+      column: $table.cancellationPolicy, builder: (column) => column);
+
+  GeneratedColumn<String> get amenities =>
+      $composableBuilder(column: $table.amenities, builder: (column) => column);
+
+  GeneratedColumn<String> get facilities => $composableBuilder(
+      column: $table.facilities, builder: (column) => column);
+
+  GeneratedColumn<String> get bedTypes =>
+      $composableBuilder(column: $table.bedTypes, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$RoomTypesTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $RoomTypesTableTable,
+    RoomTypesTableData,
+    $$RoomTypesTableTableFilterComposer,
+    $$RoomTypesTableTableOrderingComposer,
+    $$RoomTypesTableTableAnnotationComposer,
+    $$RoomTypesTableTableCreateCompanionBuilder,
+    $$RoomTypesTableTableUpdateCompanionBuilder,
+    (
+      RoomTypesTableData,
+      BaseReferences<_$DatabaseClient, $RoomTypesTableTable, RoomTypesTableData>
+    ),
+    RoomTypesTableData,
+    PrefetchHooks Function()> {
+  $$RoomTypesTableTableTableManager(
+      _$DatabaseClient db, $RoomTypesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RoomTypesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RoomTypesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RoomTypesTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> totalAdults = const Value.absent(),
+            Value<int> totalChildren = const Value.absent(),
+            Value<int> totalBeds = const Value.absent(),
+            Value<double> fare = const Value.absent(),
+            Value<String?> keywords = const Value.absent(),
+            Value<String> description = const Value.absent(),
+            Value<double> cancellationFee = const Value.absent(),
+            Value<String> cancellationPolicy = const Value.absent(),
+            Value<String> amenities = const Value.absent(),
+            Value<String> facilities = const Value.absent(),
+            Value<String> bedTypes = const Value.absent(),
+            Value<bool> isActive = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              RoomTypesTableCompanion(
+            id: id,
+            name: name,
+            totalAdults: totalAdults,
+            totalChildren: totalChildren,
+            totalBeds: totalBeds,
+            fare: fare,
+            keywords: keywords,
+            description: description,
+            cancellationFee: cancellationFee,
+            cancellationPolicy: cancellationPolicy,
+            amenities: amenities,
+            facilities: facilities,
+            bedTypes: bedTypes,
+            isActive: isActive,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+            Value<int> totalAdults = const Value.absent(),
+            Value<int> totalChildren = const Value.absent(),
+            Value<int> totalBeds = const Value.absent(),
+            Value<double> fare = const Value.absent(),
+            Value<String?> keywords = const Value.absent(),
+            required String description,
+            Value<double> cancellationFee = const Value.absent(),
+            required String cancellationPolicy,
+            Value<String> amenities = const Value.absent(),
+            Value<String> facilities = const Value.absent(),
+            Value<String> bedTypes = const Value.absent(),
+            Value<bool> isActive = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              RoomTypesTableCompanion.insert(
+            id: id,
+            name: name,
+            totalAdults: totalAdults,
+            totalChildren: totalChildren,
+            totalBeds: totalBeds,
+            fare: fare,
+            keywords: keywords,
+            description: description,
+            cancellationFee: cancellationFee,
+            cancellationPolicy: cancellationPolicy,
+            amenities: amenities,
+            facilities: facilities,
+            bedTypes: bedTypes,
+            isActive: isActive,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$RoomTypesTableTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $RoomTypesTableTable,
+    RoomTypesTableData,
+    $$RoomTypesTableTableFilterComposer,
+    $$RoomTypesTableTableOrderingComposer,
+    $$RoomTypesTableTableAnnotationComposer,
+    $$RoomTypesTableTableCreateCompanionBuilder,
+    $$RoomTypesTableTableUpdateCompanionBuilder,
+    (
+      RoomTypesTableData,
+      BaseReferences<_$DatabaseClient, $RoomTypesTableTable, RoomTypesTableData>
+    ),
+    RoomTypesTableData,
+    PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -11119,4 +12630,8 @@ class $DatabaseClientManager {
       $$AmenitiesTableTableTableManager(_db, _db.amenitiesTable);
   $$LocalFacilitiesTableTableTableManager get localFacilitiesTable =>
       $$LocalFacilitiesTableTableTableManager(_db, _db.localFacilitiesTable);
+  $$BedTypesTableTableTableManager get bedTypesTable =>
+      $$BedTypesTableTableTableManager(_db, _db.bedTypesTable);
+  $$RoomTypesTableTableTableManager get roomTypesTable =>
+      $$RoomTypesTableTableTableManager(_db, _db.roomTypesTable);
 }

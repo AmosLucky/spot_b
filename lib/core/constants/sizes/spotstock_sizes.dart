@@ -86,6 +86,8 @@ class SpotstockSizes {
   static const double s255 = 255;
   static const double s256 = 256;
   static const double s1000 = 1000;
+   static const double windowMinWidth = 1100;
+    static const double windowMinHeight = 700;
 
   static double topSpacing(BuildContext context) {
     final notchHeight = MediaQuery.of(context).viewPadding.top;

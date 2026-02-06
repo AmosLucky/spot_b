@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
+import 'package:spotstock_inventory/core/constants/sizes/spotstock_sizes.dart';
+import 'package:window_size/window_size.dart';
 
 import 'core/constants/keys/spotstock_app_keys.dart';
 import 'core/constants/strings/spotstock_strings.dart';
@@ -20,6 +24,13 @@ void main() async {
   SpotstockNavigation.init(getIt<AppViewModel>().isMobile
       ? SpotstockRouter.mobileRouter
       : SpotstockRouter.desktopRouter);
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    setWindowTitle(SpotstockStrings.name);
+    setWindowMinSize(const Size(SpotstockSizes.windowMinWidth,
+        SpotstockSizes.windowMinHeight)); // 👈 minimum size
+    setWindowMaxSize(Size.infinite);
+  }
   runApp(ProviderScope(child: const SpotstockInventory()));
 }
 
@@ -35,11 +46,9 @@ class SpotstockInventory extends StatelessWidget {
         return MaterialApp.router(
           title: SpotstockStrings.spotstockInventory,
           scaffoldMessengerKey: spotstockScaffoldMessengerKey,
-          routerConfig:
-               viewModel.isMobile ?
-              SpotstockRouter.mobileRouter
-           : SpotstockRouter.desktopRouter,
-
+          routerConfig: viewModel.isMobile
+              ? SpotstockRouter.mobileRouter
+              : SpotstockRouter.desktopRouter,
           themeMode: viewModel.themeMode,
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),

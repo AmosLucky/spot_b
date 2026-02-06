@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spotstock_inventory/features/hotel/facilities/domain/usecases/get_all_facilities_usecase.dart';
 
 import '../../../../../core/database/database_client.dart';
 import '../../data/datasources/local/facilities_local_data_source.dart';
@@ -39,8 +38,8 @@ final deleteFacilityUseCaseProvider = Provider((ref) => DeleteFacilityUseCase(
       ref.read(facilitiesRepositoryProvider),
     ));
 
-    final getFacilitiesUseCaseProvider = Provider((ref) => GetFacilitiesUseCase(
-      ref.read(facilitiesRepositoryProvider)));
+final getFacilitiesUseCaseProvider = Provider(
+    (ref) => GetFacilitiesUseCase(ref.read(facilitiesRepositoryProvider)));
 
 // Controller
 final facilitiesControllerProvider =

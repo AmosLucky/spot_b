@@ -94,7 +94,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
                   itemBuilder: (context, index) {
                     return KpiCard(
                       title: 'Rooms',
-                      value: '29 / 14 obi',
+                      value: '29 / 14 ',
                       subtitle: '100% Occupancy',
                       color: Colors.indigo,
                     );
