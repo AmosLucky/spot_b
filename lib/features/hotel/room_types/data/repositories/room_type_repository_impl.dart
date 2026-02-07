@@ -2,7 +2,7 @@
 
 import '../../domain/entities/room_type_entities.dart';
 import '../datasources/local/room_types_local_service.dart';
-import 'room_type_repository.dart';
+import '../../domain/repositories/room_type_repository.dart';
 
 class RoomTypeRepositoryImpl implements RoomTypeRepository {
   final RoomTypeLocalService localService;

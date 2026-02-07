@@ -5,7 +5,7 @@ import '../../../../../core/database/database_client.dart';
 // data
 
 import '../../data/datasources/local/room_types_local_service.dart';
-import '../../data/repositories/room_type_repository.dart';
+import '../../domain/repositories/room_type_repository.dart';
 import '../../data/repositories/room_type_repository_impl.dart';
 
 // domain

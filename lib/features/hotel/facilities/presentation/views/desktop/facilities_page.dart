@@ -151,187 +151,221 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
     final facilities = state.facilities;
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// HEADER
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Facilities',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+      body: Container(
+        
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// HEADER
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Facilities',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () => showFacilityDialog(),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Facility'),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            /// CONTENT CARD
-            Expanded(
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      /// SEARCH + FILTER
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: searchController,
-                              decoration: InputDecoration(
-                                hintText: 'Search facilities...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                              onChanged: (value) {
-                                // optional: add search use case later
-                                ref
-                                    .read(facilitiesControllerProvider.notifier)
-                                    .filterByName(value);
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          DropdownButton<String>(
-                            value: state.selectedFilterStatus,
-                            items: state.filterStatusList
-                                .map(
-                                  (status) => DropdownMenuItem(
-                                    value: status,
-                                    child: Text(status),
+                  ElevatedButton.icon(
+                    onPressed: () => showFacilityDialog(),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Facility'),
+                  ),
+                ],
+              ),
+        
+              const SizedBox(height: 20),
+        
+              /// CONTENT CARD
+              Expanded(
+                child: Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        /// SEARCH + FILTER
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: searchController,
+                                decoration: InputDecoration(
+                                  hintText: 'Search facilities...',
+                                  prefixIcon: const Icon(Icons.search),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
-                                )
-                                .toList(),
-                            onChanged: (value) => ref
-                                .read(facilitiesControllerProvider.notifier)
-                                .changeSearchStatus(value!),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      /// TABLE HEADER
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: SpotstockColors.grey300,
+                                ),
+                                onChanged: (value) {
+                                  // optional: add search use case later
+                                  ref
+                                      .read(facilitiesControllerProvider.notifier)
+                                      .filterByName(value);
+                                },
+                              ),
                             ),
-                          ),
-                        ),
-                        child: Row(
-                          children: const [
-                            Expanded(flex: 3, child: Text('Facility')),
-                            Expanded(flex: 1, child: Text('Icon')),
-                            Expanded(flex: 1, child: Text('Status')),
-                            Expanded(flex: 2, child: Text('Actions')),
+                            const SizedBox(width: 16),
+                            DropdownButton<String>(
+                              value: state.selectedFilterStatus,
+                              items: state.filterStatusList
+                                  .map(
+                                    (status) => DropdownMenuItem(
+                                      value: status,
+                                      child: Text(status),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (value) => ref
+                                  .read(facilitiesControllerProvider.notifier)
+                                  .changeSearchStatus(value!),
+                            ),
                           ],
                         ),
-                      ),
-
-                      /// LIST
-                      Expanded(
-                        child: state.isLoading
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : ListView.builder(
-                                itemCount: facilities.length,
-                                itemBuilder: (context, index) {
-                                  final facility = facilities[index];
-
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: SpotstockColors.grey200,
+        
+                        const SizedBox(height: 20),
+        
+                        /// TABLE HEADER
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: SpotstockColors.grey300,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: const [
+                              Expanded(flex: 3, child: Text('Facility')),
+                              Expanded(flex: 1, child: Text('Icon')),
+                              Expanded(flex: 1, child: Text('Status')),
+                              Expanded(flex: 2, child: Text('Actions')),
+                            ],
+                          ),
+                        ),
+        
+                        /// LIST
+                        Expanded(
+                          child: state.isLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              : ListView.builder(
+                                  itemCount: facilities.length,
+                                  itemBuilder: (context, index) {
+                                    final facility = facilities[index];
+        
+                                    return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
                                         ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: Text(facility.name),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Icon(facility.icon),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Text(
-                                            facility.status,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: facility.status == 'Active'
-                                                  ? SpotstockColors.green
-                                                  : SpotstockColors.red,
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color: SpotstockColors.grey200,
                                             ),
                                           ),
                                         ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Row(
-                                            children: [
-                                              IconButton(
-                                                icon: const Icon(
-                                                  Icons.edit,
-                                                  color: SpotstockColors.blue,
-                                                ),
-                                                onPressed: () =>
-                                                    showFacilityDialog(
-                                                  facility: facility,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(
-                                                  Icons.delete,
-                                                  color: SpotstockColors.red,
-                                                ),
-                                                onPressed: () =>
-                                                    showDeleteDialog(
-                                                  facility,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            /// Facility name
+                                            Expanded(
+                                              flex: 3,
+                                              child: Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  facility.name,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500),
                                                 ),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                      ),
-                    ],
+                                            ),
+        
+                                            /// Icon
+                                            Expanded(
+                                              flex: 1,
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Icon(facility.icon),
+                                              ),
+                                            ),
+        
+                                            /// Status
+                                            Expanded(
+                                              flex: 1,
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  facility.status,
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: facility.status ==
+                                                            'Active'
+                                                        ? SpotstockColors.green
+                                                        : SpotstockColors.red,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+        
+                                            /// Actions
+                                            Expanded(
+                                              flex: 2,
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                        Icons.edit,
+                                                        color:
+                                                            SpotstockColors.blue,
+                                                      ),
+                                                      onPressed: () =>
+                                                          showFacilityDialog(
+                                                        facility: facility,
+                                                      ),
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                        Icons.delete,
+                                                        color:
+                                                            SpotstockColors.red,
+                                                      ),
+                                                      onPressed: () =>
+                                                          showDeleteDialog(
+                                                        facility,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ));
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

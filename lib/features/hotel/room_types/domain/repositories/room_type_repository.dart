@@ -1,4 +1,4 @@
-import '../../domain/entities/room_type_entities.dart';
+import '../entities/room_type_entities.dart';
 
 abstract class RoomTypeRepository {
   Future<List<RoomTypeEntity>> getRoomTypes();

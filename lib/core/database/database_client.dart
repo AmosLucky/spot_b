@@ -47,7 +47,7 @@ class DatabaseClient extends _$DatabaseClient {
   DatabaseClient() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,7 +58,7 @@ class DatabaseClient extends _$DatabaseClient {
         onUpgrade: (Migrator m, int from, int to) async {
           // Called when schemaVersion increases
 
-          if (from < 6) {
+          if (from < 7) {
             await m.createTable(amenitiesTable);
             await m.createTable(localFacilitiesTable);
             await m.createTable(bedTypesTable);

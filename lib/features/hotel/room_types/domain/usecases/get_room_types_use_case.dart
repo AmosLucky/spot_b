@@ -1,4 +1,4 @@
-import '../../data/repositories/room_type_repository.dart';
+import '../repositories/room_type_repository.dart';
 import '../entities/room_type_entities.dart';
 
 
