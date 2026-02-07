@@ -21,6 +21,7 @@ import 'tables/local_warehouses.dart';
 import 'tables/local_registers.dart';
 import 'tables/local_holds.dart';
 import 'tables/bed_types_table.dart';
+import 'tables/premium_type_table.dart';
 import 'tables/room_types_table.dart';
 
 part 'database_client.g.dart';
@@ -40,7 +41,8 @@ part 'database_client.g.dart';
     AmenitiesTable,
     LocalFacilitiesTable,
     BedTypesTable,
-    RoomTypesTable
+    RoomTypesTable,
+    PremiumTypesTable
   ],
 )
 class DatabaseClient extends _$DatabaseClient {
@@ -63,6 +65,7 @@ class DatabaseClient extends _$DatabaseClient {
             await m.createTable(localFacilitiesTable);
             await m.createTable(bedTypesTable);
             await m.createTable(roomTypesTable);
+            await m.createTable(premiumTypesTable);
           }
         },
       );
