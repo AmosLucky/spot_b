@@ -8961,6 +8961,312 @@ class PremiumTypesTableCompanion
   }
 }
 
+class $RoomsTableTable extends RoomsTable
+    with TableInfo<$RoomsTableTable, RoomsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RoomsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _roomNumberMeta =
+      const VerificationMeta('roomNumber');
+  @override
+  late final GeneratedColumn<String> roomNumber = GeneratedColumn<String>(
+      'room_number', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 10),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _roomTypeIdMeta =
+      const VerificationMeta('roomTypeId');
+  @override
+  late final GeneratedColumn<int> roomTypeId = GeneratedColumn<int>(
+      'room_type_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('active'));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, roomNumber, roomTypeId, status, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'rooms_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<RoomsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('room_number')) {
+      context.handle(
+          _roomNumberMeta,
+          roomNumber.isAcceptableOrUnknown(
+              data['room_number']!, _roomNumberMeta));
+    } else if (isInserting) {
+      context.missing(_roomNumberMeta);
+    }
+    if (data.containsKey('room_type_id')) {
+      context.handle(
+          _roomTypeIdMeta,
+          roomTypeId.isAcceptableOrUnknown(
+              data['room_type_id']!, _roomTypeIdMeta));
+    } else if (isInserting) {
+      context.missing(_roomTypeIdMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RoomsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoomsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      roomNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}room_number'])!,
+      roomTypeId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}room_type_id'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $RoomsTableTable createAlias(String alias) {
+    return $RoomsTableTable(attachedDatabase, alias);
+  }
+}
+
+class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
+  final int id;
+  final String roomNumber;
+  final int roomTypeId;
+  final String status;
+  final DateTime createdAt;
+  const RoomsTableData(
+      {required this.id,
+      required this.roomNumber,
+      required this.roomTypeId,
+      required this.status,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['room_number'] = Variable<String>(roomNumber);
+    map['room_type_id'] = Variable<int>(roomTypeId);
+    map['status'] = Variable<String>(status);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  RoomsTableCompanion toCompanion(bool nullToAbsent) {
+    return RoomsTableCompanion(
+      id: Value(id),
+      roomNumber: Value(roomNumber),
+      roomTypeId: Value(roomTypeId),
+      status: Value(status),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory RoomsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoomsTableData(
+      id: serializer.fromJson<int>(json['id']),
+      roomNumber: serializer.fromJson<String>(json['roomNumber']),
+      roomTypeId: serializer.fromJson<int>(json['roomTypeId']),
+      status: serializer.fromJson<String>(json['status']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'roomNumber': serializer.toJson<String>(roomNumber),
+      'roomTypeId': serializer.toJson<int>(roomTypeId),
+      'status': serializer.toJson<String>(status),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  RoomsTableData copyWith(
+          {int? id,
+          String? roomNumber,
+          int? roomTypeId,
+          String? status,
+          DateTime? createdAt}) =>
+      RoomsTableData(
+        id: id ?? this.id,
+        roomNumber: roomNumber ?? this.roomNumber,
+        roomTypeId: roomTypeId ?? this.roomTypeId,
+        status: status ?? this.status,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  RoomsTableData copyWithCompanion(RoomsTableCompanion data) {
+    return RoomsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      roomNumber:
+          data.roomNumber.present ? data.roomNumber.value : this.roomNumber,
+      roomTypeId:
+          data.roomTypeId.present ? data.roomTypeId.value : this.roomTypeId,
+      status: data.status.present ? data.status.value : this.status,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoomsTableData(')
+          ..write('id: $id, ')
+          ..write('roomNumber: $roomNumber, ')
+          ..write('roomTypeId: $roomTypeId, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, roomNumber, roomTypeId, status, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoomsTableData &&
+          other.id == this.id &&
+          other.roomNumber == this.roomNumber &&
+          other.roomTypeId == this.roomTypeId &&
+          other.status == this.status &&
+          other.createdAt == this.createdAt);
+}
+
+class RoomsTableCompanion extends UpdateCompanion<RoomsTableData> {
+  final Value<int> id;
+  final Value<String> roomNumber;
+  final Value<int> roomTypeId;
+  final Value<String> status;
+  final Value<DateTime> createdAt;
+  const RoomsTableCompanion({
+    this.id = const Value.absent(),
+    this.roomNumber = const Value.absent(),
+    this.roomTypeId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  RoomsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String roomNumber,
+    required int roomTypeId,
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  })  : roomNumber = Value(roomNumber),
+        roomTypeId = Value(roomTypeId);
+  static Insertable<RoomsTableData> custom({
+    Expression<int>? id,
+    Expression<String>? roomNumber,
+    Expression<int>? roomTypeId,
+    Expression<String>? status,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (roomNumber != null) 'room_number': roomNumber,
+      if (roomTypeId != null) 'room_type_id': roomTypeId,
+      if (status != null) 'status': status,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  RoomsTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? roomNumber,
+      Value<int>? roomTypeId,
+      Value<String>? status,
+      Value<DateTime>? createdAt}) {
+    return RoomsTableCompanion(
+      id: id ?? this.id,
+      roomNumber: roomNumber ?? this.roomNumber,
+      roomTypeId: roomTypeId ?? this.roomTypeId,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (roomNumber.present) {
+      map['room_number'] = Variable<String>(roomNumber.value);
+    }
+    if (roomTypeId.present) {
+      map['room_type_id'] = Variable<int>(roomTypeId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoomsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('roomNumber: $roomNumber, ')
+          ..write('roomTypeId: $roomTypeId, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -8983,6 +9289,7 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
   late final $RoomTypesTableTable roomTypesTable = $RoomTypesTableTable(this);
   late final $PremiumTypesTableTable premiumTypesTable =
       $PremiumTypesTableTable(this);
+  late final $RoomsTableTable roomsTable = $RoomsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9001,7 +9308,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         localFacilitiesTable,
         bedTypesTable,
         roomTypesTable,
-        premiumTypesTable
+        premiumTypesTable,
+        roomsTable
       ];
 }
 
@@ -13128,6 +13436,171 @@ typedef $$PremiumTypesTableTableProcessedTableManager = ProcessedTableManager<
     ),
     PremiumTypesTableData,
     PrefetchHooks Function()>;
+typedef $$RoomsTableTableCreateCompanionBuilder = RoomsTableCompanion Function({
+  Value<int> id,
+  required String roomNumber,
+  required int roomTypeId,
+  Value<String> status,
+  Value<DateTime> createdAt,
+});
+typedef $$RoomsTableTableUpdateCompanionBuilder = RoomsTableCompanion Function({
+  Value<int> id,
+  Value<String> roomNumber,
+  Value<int> roomTypeId,
+  Value<String> status,
+  Value<DateTime> createdAt,
+});
+
+class $$RoomsTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $RoomsTableTable> {
+  $$RoomsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get roomNumber => $composableBuilder(
+      column: $table.roomNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get roomTypeId => $composableBuilder(
+      column: $table.roomTypeId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$RoomsTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $RoomsTableTable> {
+  $$RoomsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get roomNumber => $composableBuilder(
+      column: $table.roomNumber, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get roomTypeId => $composableBuilder(
+      column: $table.roomTypeId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$RoomsTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $RoomsTableTable> {
+  $$RoomsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get roomNumber => $composableBuilder(
+      column: $table.roomNumber, builder: (column) => column);
+
+  GeneratedColumn<int> get roomTypeId => $composableBuilder(
+      column: $table.roomTypeId, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$RoomsTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $RoomsTableTable,
+    RoomsTableData,
+    $$RoomsTableTableFilterComposer,
+    $$RoomsTableTableOrderingComposer,
+    $$RoomsTableTableAnnotationComposer,
+    $$RoomsTableTableCreateCompanionBuilder,
+    $$RoomsTableTableUpdateCompanionBuilder,
+    (
+      RoomsTableData,
+      BaseReferences<_$DatabaseClient, $RoomsTableTable, RoomsTableData>
+    ),
+    RoomsTableData,
+    PrefetchHooks Function()> {
+  $$RoomsTableTableTableManager(_$DatabaseClient db, $RoomsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RoomsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RoomsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RoomsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> roomNumber = const Value.absent(),
+            Value<int> roomTypeId = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              RoomsTableCompanion(
+            id: id,
+            roomNumber: roomNumber,
+            roomTypeId: roomTypeId,
+            status: status,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String roomNumber,
+            required int roomTypeId,
+            Value<String> status = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              RoomsTableCompanion.insert(
+            id: id,
+            roomNumber: roomNumber,
+            roomTypeId: roomTypeId,
+            status: status,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$RoomsTableTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $RoomsTableTable,
+    RoomsTableData,
+    $$RoomsTableTableFilterComposer,
+    $$RoomsTableTableOrderingComposer,
+    $$RoomsTableTableAnnotationComposer,
+    $$RoomsTableTableCreateCompanionBuilder,
+    $$RoomsTableTableUpdateCompanionBuilder,
+    (
+      RoomsTableData,
+      BaseReferences<_$DatabaseClient, $RoomsTableTable, RoomsTableData>
+    ),
+    RoomsTableData,
+    PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -13161,4 +13634,6 @@ class $DatabaseClientManager {
       $$RoomTypesTableTableTableManager(_db, _db.roomTypesTable);
   $$PremiumTypesTableTableTableManager get premiumTypesTable =>
       $$PremiumTypesTableTableTableManager(_db, _db.premiumTypesTable);
+  $$RoomsTableTableTableManager get roomsTable =>
+      $$RoomsTableTableTableManager(_db, _db.roomsTable);
 }

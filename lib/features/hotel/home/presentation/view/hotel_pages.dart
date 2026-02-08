@@ -6,6 +6,7 @@ import '../../../dashboard/presentation/view/hotel_dashboard.dart';
 import '../../../facilities/presentation/views/desktop/facilities_page.dart';
 import '../../../premium_type/views/premium_types_page.dart';
 import '../../../room_types/presentation/pages/room_types_page.dart';
+import '../../../rooms/presentation/view/hotel_rooms_page.dart';
 
 final List<Widget> hotelPages = [
   HotelDashboardPage(),
@@ -13,7 +14,7 @@ final List<Widget> hotelPages = [
   FacilitiesPage(),
   BedTypesPage(),
   RoomTypesPage(),
-  PremiumTypesPage()
-  // PremiumServicesPage(),
+  PremiumTypesPage(),
+  HotelRoomsPage(),
   // RoomsPage(),
 ];
