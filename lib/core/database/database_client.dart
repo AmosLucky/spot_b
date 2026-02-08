@@ -11,6 +11,7 @@ import '../../features/pos/data/models/product_warehouse.dart';
 import '../../features/pos/data/models/product_unit_name.dart';
 import 'tables/amenities_table.dart';
 import 'tables/local_attendants.dart';
+import 'tables/local_bookings_table.dart';
 import 'tables/local_customers.dart';
 import 'tables/local_bar_tables.dart';
 import 'tables/local_facilities_table.dart';
@@ -44,14 +45,15 @@ part 'database_client.g.dart';
     BedTypesTable,
     RoomTypesTable,
     PremiumTypesTable,
-    RoomsTable 
+    RoomsTable,
+    LocalBookingsTable
   ],
 )
 class DatabaseClient extends _$DatabaseClient {
   DatabaseClient() : super(_openConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -62,13 +64,14 @@ class DatabaseClient extends _$DatabaseClient {
         onUpgrade: (Migrator m, int from, int to) async {
           // Called when schemaVersion increases
 
-          if (from < 8) {
+          if (from < 9) {
             await m.createTable(amenitiesTable);
             await m.createTable(localFacilitiesTable);
             await m.createTable(bedTypesTable);
             await m.createTable(roomTypesTable);
             await m.createTable(premiumTypesTable);
-            await m.createTable(roomsTable );
+            await m.createTable(roomsTable);
+            await m.createTable(localBookingsTable);
           }
         },
       );

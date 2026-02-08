@@ -8981,10 +8981,7 @@ class $RoomsTableTable extends RoomsTable
   @override
   late final GeneratedColumn<String> roomNumber = GeneratedColumn<String>(
       'room_number', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 10),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _roomTypeIdMeta =
       const VerificationMeta('roomTypeId');
   @override
@@ -8998,6 +8995,14 @@ class $RoomsTableTable extends RoomsTable
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('active'));
+  static const VerificationMeta _bookingStatusMeta =
+      const VerificationMeta('bookingStatus');
+  @override
+  late final GeneratedColumn<String> bookingStatus = GeneratedColumn<String>(
+      'booking_status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('available'));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -9006,9 +9011,17 @@ class $RoomsTableTable extends RoomsTable
       type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, roomNumber, roomTypeId, status, createdAt];
+      [id, roomNumber, roomTypeId, status, bookingStatus, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -9042,9 +9055,19 @@ class $RoomsTableTable extends RoomsTable
       context.handle(_statusMeta,
           status.isAcceptableOrUnknown(data['status']!, _statusMeta));
     }
+    if (data.containsKey('booking_status')) {
+      context.handle(
+          _bookingStatusMeta,
+          bookingStatus.isAcceptableOrUnknown(
+              data['booking_status']!, _bookingStatusMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     }
     return context;
   }
@@ -9063,8 +9086,12 @@ class $RoomsTableTable extends RoomsTable
           .read(DriftSqlType.int, data['${effectivePrefix}room_type_id'])!,
       status: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      bookingStatus: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}booking_status'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
   }
 
@@ -9078,14 +9105,24 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
   final int id;
   final String roomNumber;
   final int roomTypeId;
+
+  /// Room condition
+  /// active | inactive | dirty | maintenance
   final String status;
+
+  /// Booking state
+  /// available | booked | checked_in
+  final String bookingStatus;
   final DateTime createdAt;
+  final DateTime updatedAt;
   const RoomsTableData(
       {required this.id,
       required this.roomNumber,
       required this.roomTypeId,
       required this.status,
-      required this.createdAt});
+      required this.bookingStatus,
+      required this.createdAt,
+      required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -9093,7 +9130,9 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
     map['room_number'] = Variable<String>(roomNumber);
     map['room_type_id'] = Variable<int>(roomTypeId);
     map['status'] = Variable<String>(status);
+    map['booking_status'] = Variable<String>(bookingStatus);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -9103,7 +9142,9 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
       roomNumber: Value(roomNumber),
       roomTypeId: Value(roomTypeId),
       status: Value(status),
+      bookingStatus: Value(bookingStatus),
       createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -9115,7 +9156,9 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
       roomNumber: serializer.fromJson<String>(json['roomNumber']),
       roomTypeId: serializer.fromJson<int>(json['roomTypeId']),
       status: serializer.fromJson<String>(json['status']),
+      bookingStatus: serializer.fromJson<String>(json['bookingStatus']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -9126,7 +9169,9 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
       'roomNumber': serializer.toJson<String>(roomNumber),
       'roomTypeId': serializer.toJson<int>(roomTypeId),
       'status': serializer.toJson<String>(status),
+      'bookingStatus': serializer.toJson<String>(bookingStatus),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -9135,13 +9180,17 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
           String? roomNumber,
           int? roomTypeId,
           String? status,
-          DateTime? createdAt}) =>
+          String? bookingStatus,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
       RoomsTableData(
         id: id ?? this.id,
         roomNumber: roomNumber ?? this.roomNumber,
         roomTypeId: roomTypeId ?? this.roomTypeId,
         status: status ?? this.status,
+        bookingStatus: bookingStatus ?? this.bookingStatus,
         createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
       );
   RoomsTableData copyWithCompanion(RoomsTableCompanion data) {
     return RoomsTableData(
@@ -9151,7 +9200,11 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
       roomTypeId:
           data.roomTypeId.present ? data.roomTypeId.value : this.roomTypeId,
       status: data.status.present ? data.status.value : this.status,
+      bookingStatus: data.bookingStatus.present
+          ? data.bookingStatus.value
+          : this.bookingStatus,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -9162,14 +9215,16 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
           ..write('roomNumber: $roomNumber, ')
           ..write('roomTypeId: $roomTypeId, ')
           ..write('status: $status, ')
-          ..write('createdAt: $createdAt')
+          ..write('bookingStatus: $bookingStatus, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, roomNumber, roomTypeId, status, createdAt);
+  int get hashCode => Object.hash(
+      id, roomNumber, roomTypeId, status, bookingStatus, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -9178,7 +9233,9 @@ class RoomsTableData extends DataClass implements Insertable<RoomsTableData> {
           other.roomNumber == this.roomNumber &&
           other.roomTypeId == this.roomTypeId &&
           other.status == this.status &&
-          other.createdAt == this.createdAt);
+          other.bookingStatus == this.bookingStatus &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
 class RoomsTableCompanion extends UpdateCompanion<RoomsTableData> {
@@ -9186,20 +9243,26 @@ class RoomsTableCompanion extends UpdateCompanion<RoomsTableData> {
   final Value<String> roomNumber;
   final Value<int> roomTypeId;
   final Value<String> status;
+  final Value<String> bookingStatus;
   final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   const RoomsTableCompanion({
     this.id = const Value.absent(),
     this.roomNumber = const Value.absent(),
     this.roomTypeId = const Value.absent(),
     this.status = const Value.absent(),
+    this.bookingStatus = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
   RoomsTableCompanion.insert({
     this.id = const Value.absent(),
     required String roomNumber,
     required int roomTypeId,
     this.status = const Value.absent(),
+    this.bookingStatus = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   })  : roomNumber = Value(roomNumber),
         roomTypeId = Value(roomTypeId);
   static Insertable<RoomsTableData> custom({
@@ -9207,14 +9270,18 @@ class RoomsTableCompanion extends UpdateCompanion<RoomsTableData> {
     Expression<String>? roomNumber,
     Expression<int>? roomTypeId,
     Expression<String>? status,
+    Expression<String>? bookingStatus,
     Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (roomNumber != null) 'room_number': roomNumber,
       if (roomTypeId != null) 'room_type_id': roomTypeId,
       if (status != null) 'status': status,
+      if (bookingStatus != null) 'booking_status': bookingStatus,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
@@ -9223,13 +9290,17 @@ class RoomsTableCompanion extends UpdateCompanion<RoomsTableData> {
       Value<String>? roomNumber,
       Value<int>? roomTypeId,
       Value<String>? status,
-      Value<DateTime>? createdAt}) {
+      Value<String>? bookingStatus,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt}) {
     return RoomsTableCompanion(
       id: id ?? this.id,
       roomNumber: roomNumber ?? this.roomNumber,
       roomTypeId: roomTypeId ?? this.roomTypeId,
       status: status ?? this.status,
+      bookingStatus: bookingStatus ?? this.bookingStatus,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -9248,8 +9319,14 @@ class RoomsTableCompanion extends UpdateCompanion<RoomsTableData> {
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
+    if (bookingStatus.present) {
+      map['booking_status'] = Variable<String>(bookingStatus.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     return map;
   }
@@ -9261,6 +9338,675 @@ class RoomsTableCompanion extends UpdateCompanion<RoomsTableData> {
           ..write('roomNumber: $roomNumber, ')
           ..write('roomTypeId: $roomTypeId, ')
           ..write('status: $status, ')
+          ..write('bookingStatus: $bookingStatus, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LocalBookingsTableTable extends LocalBookingsTable
+    with TableInfo<$LocalBookingsTableTable, LocalBookingsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalBookingsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _bookingNumberMeta =
+      const VerificationMeta('bookingNumber');
+  @override
+  late final GeneratedColumn<String> bookingNumber = GeneratedColumn<String>(
+      'booking_number', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _customerIdMeta =
+      const VerificationMeta('customerId');
+  @override
+  late final GeneratedColumn<int> customerId = GeneratedColumn<int>(
+      'customer_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES local_customers (id)'));
+  static const VerificationMeta _roomNumbersMeta =
+      const VerificationMeta('roomNumbers');
+  @override
+  late final GeneratedColumn<String> roomNumbers = GeneratedColumn<String>(
+      'room_numbers', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dateFromMeta =
+      const VerificationMeta('dateFrom');
+  @override
+  late final GeneratedColumn<DateTime> dateFrom = GeneratedColumn<DateTime>(
+      'date_from', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _dateToMeta = const VerificationMeta('dateTo');
+  @override
+  late final GeneratedColumn<DateTime> dateTo = GeneratedColumn<DateTime>(
+      'date_to', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _paymentStatusMeta =
+      const VerificationMeta('paymentStatus');
+  @override
+  late final GeneratedColumn<String> paymentStatus = GeneratedColumn<String>(
+      'payment_status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _checkInStatusMeta =
+      const VerificationMeta('checkInStatus');
+  @override
+  late final GeneratedColumn<String> checkInStatus = GeneratedColumn<String>(
+      'check_in_status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _checkOutStatusMeta =
+      const VerificationMeta('checkOutStatus');
+  @override
+  late final GeneratedColumn<String> checkOutStatus = GeneratedColumn<String>(
+      'check_out_status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _roomKeyStatusMeta =
+      const VerificationMeta('roomKeyStatus');
+  @override
+  late final GeneratedColumn<String> roomKeyStatus = GeneratedColumn<String>(
+      'room_key_status', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _totalAmountMeta =
+      const VerificationMeta('totalAmount');
+  @override
+  late final GeneratedColumn<double> totalAmount = GeneratedColumn<double>(
+      'total_amount', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        bookingNumber,
+        customerId,
+        roomNumbers,
+        dateFrom,
+        dateTo,
+        status,
+        paymentStatus,
+        checkInStatus,
+        checkOutStatus,
+        roomKeyStatus,
+        totalAmount,
+        createdAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_bookings_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<LocalBookingsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('booking_number')) {
+      context.handle(
+          _bookingNumberMeta,
+          bookingNumber.isAcceptableOrUnknown(
+              data['booking_number']!, _bookingNumberMeta));
+    } else if (isInserting) {
+      context.missing(_bookingNumberMeta);
+    }
+    if (data.containsKey('customer_id')) {
+      context.handle(
+          _customerIdMeta,
+          customerId.isAcceptableOrUnknown(
+              data['customer_id']!, _customerIdMeta));
+    } else if (isInserting) {
+      context.missing(_customerIdMeta);
+    }
+    if (data.containsKey('room_numbers')) {
+      context.handle(
+          _roomNumbersMeta,
+          roomNumbers.isAcceptableOrUnknown(
+              data['room_numbers']!, _roomNumbersMeta));
+    } else if (isInserting) {
+      context.missing(_roomNumbersMeta);
+    }
+    if (data.containsKey('date_from')) {
+      context.handle(_dateFromMeta,
+          dateFrom.isAcceptableOrUnknown(data['date_from']!, _dateFromMeta));
+    } else if (isInserting) {
+      context.missing(_dateFromMeta);
+    }
+    if (data.containsKey('date_to')) {
+      context.handle(_dateToMeta,
+          dateTo.isAcceptableOrUnknown(data['date_to']!, _dateToMeta));
+    } else if (isInserting) {
+      context.missing(_dateToMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('payment_status')) {
+      context.handle(
+          _paymentStatusMeta,
+          paymentStatus.isAcceptableOrUnknown(
+              data['payment_status']!, _paymentStatusMeta));
+    } else if (isInserting) {
+      context.missing(_paymentStatusMeta);
+    }
+    if (data.containsKey('check_in_status')) {
+      context.handle(
+          _checkInStatusMeta,
+          checkInStatus.isAcceptableOrUnknown(
+              data['check_in_status']!, _checkInStatusMeta));
+    } else if (isInserting) {
+      context.missing(_checkInStatusMeta);
+    }
+    if (data.containsKey('check_out_status')) {
+      context.handle(
+          _checkOutStatusMeta,
+          checkOutStatus.isAcceptableOrUnknown(
+              data['check_out_status']!, _checkOutStatusMeta));
+    } else if (isInserting) {
+      context.missing(_checkOutStatusMeta);
+    }
+    if (data.containsKey('room_key_status')) {
+      context.handle(
+          _roomKeyStatusMeta,
+          roomKeyStatus.isAcceptableOrUnknown(
+              data['room_key_status']!, _roomKeyStatusMeta));
+    } else if (isInserting) {
+      context.missing(_roomKeyStatusMeta);
+    }
+    if (data.containsKey('total_amount')) {
+      context.handle(
+          _totalAmountMeta,
+          totalAmount.isAcceptableOrUnknown(
+              data['total_amount']!, _totalAmountMeta));
+    } else if (isInserting) {
+      context.missing(_totalAmountMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalBookingsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalBookingsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      bookingNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}booking_number'])!,
+      customerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}customer_id'])!,
+      roomNumbers: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}room_numbers'])!,
+      dateFrom: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_from'])!,
+      dateTo: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_to'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      paymentStatus: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payment_status'])!,
+      checkInStatus: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}check_in_status'])!,
+      checkOutStatus: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}check_out_status'])!,
+      roomKeyStatus: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}room_key_status'])!,
+      totalAmount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}total_amount'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $LocalBookingsTableTable createAlias(String alias) {
+    return $LocalBookingsTableTable(attachedDatabase, alias);
+  }
+}
+
+class LocalBookingsTableData extends DataClass
+    implements Insertable<LocalBookingsTableData> {
+  final int id;
+  final String bookingNumber;
+  final int customerId;
+
+  /// "102,104,105"
+  final String roomNumbers;
+  final DateTime dateFrom;
+  final DateTime dateTo;
+
+  /// active | canceled
+  final String status;
+
+  /// partial | fully_paid
+  final String paymentStatus;
+
+  /// not_checked_in | checked_in
+  final String checkInStatus;
+
+  /// not_checked_out | checked_out
+  final String checkOutStatus;
+
+  /// given | not_given
+  final String roomKeyStatus;
+
+  /// ✅ ADD THIS
+  final double totalAmount;
+  final DateTime createdAt;
+  const LocalBookingsTableData(
+      {required this.id,
+      required this.bookingNumber,
+      required this.customerId,
+      required this.roomNumbers,
+      required this.dateFrom,
+      required this.dateTo,
+      required this.status,
+      required this.paymentStatus,
+      required this.checkInStatus,
+      required this.checkOutStatus,
+      required this.roomKeyStatus,
+      required this.totalAmount,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['booking_number'] = Variable<String>(bookingNumber);
+    map['customer_id'] = Variable<int>(customerId);
+    map['room_numbers'] = Variable<String>(roomNumbers);
+    map['date_from'] = Variable<DateTime>(dateFrom);
+    map['date_to'] = Variable<DateTime>(dateTo);
+    map['status'] = Variable<String>(status);
+    map['payment_status'] = Variable<String>(paymentStatus);
+    map['check_in_status'] = Variable<String>(checkInStatus);
+    map['check_out_status'] = Variable<String>(checkOutStatus);
+    map['room_key_status'] = Variable<String>(roomKeyStatus);
+    map['total_amount'] = Variable<double>(totalAmount);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  LocalBookingsTableCompanion toCompanion(bool nullToAbsent) {
+    return LocalBookingsTableCompanion(
+      id: Value(id),
+      bookingNumber: Value(bookingNumber),
+      customerId: Value(customerId),
+      roomNumbers: Value(roomNumbers),
+      dateFrom: Value(dateFrom),
+      dateTo: Value(dateTo),
+      status: Value(status),
+      paymentStatus: Value(paymentStatus),
+      checkInStatus: Value(checkInStatus),
+      checkOutStatus: Value(checkOutStatus),
+      roomKeyStatus: Value(roomKeyStatus),
+      totalAmount: Value(totalAmount),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory LocalBookingsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalBookingsTableData(
+      id: serializer.fromJson<int>(json['id']),
+      bookingNumber: serializer.fromJson<String>(json['bookingNumber']),
+      customerId: serializer.fromJson<int>(json['customerId']),
+      roomNumbers: serializer.fromJson<String>(json['roomNumbers']),
+      dateFrom: serializer.fromJson<DateTime>(json['dateFrom']),
+      dateTo: serializer.fromJson<DateTime>(json['dateTo']),
+      status: serializer.fromJson<String>(json['status']),
+      paymentStatus: serializer.fromJson<String>(json['paymentStatus']),
+      checkInStatus: serializer.fromJson<String>(json['checkInStatus']),
+      checkOutStatus: serializer.fromJson<String>(json['checkOutStatus']),
+      roomKeyStatus: serializer.fromJson<String>(json['roomKeyStatus']),
+      totalAmount: serializer.fromJson<double>(json['totalAmount']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bookingNumber': serializer.toJson<String>(bookingNumber),
+      'customerId': serializer.toJson<int>(customerId),
+      'roomNumbers': serializer.toJson<String>(roomNumbers),
+      'dateFrom': serializer.toJson<DateTime>(dateFrom),
+      'dateTo': serializer.toJson<DateTime>(dateTo),
+      'status': serializer.toJson<String>(status),
+      'paymentStatus': serializer.toJson<String>(paymentStatus),
+      'checkInStatus': serializer.toJson<String>(checkInStatus),
+      'checkOutStatus': serializer.toJson<String>(checkOutStatus),
+      'roomKeyStatus': serializer.toJson<String>(roomKeyStatus),
+      'totalAmount': serializer.toJson<double>(totalAmount),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  LocalBookingsTableData copyWith(
+          {int? id,
+          String? bookingNumber,
+          int? customerId,
+          String? roomNumbers,
+          DateTime? dateFrom,
+          DateTime? dateTo,
+          String? status,
+          String? paymentStatus,
+          String? checkInStatus,
+          String? checkOutStatus,
+          String? roomKeyStatus,
+          double? totalAmount,
+          DateTime? createdAt}) =>
+      LocalBookingsTableData(
+        id: id ?? this.id,
+        bookingNumber: bookingNumber ?? this.bookingNumber,
+        customerId: customerId ?? this.customerId,
+        roomNumbers: roomNumbers ?? this.roomNumbers,
+        dateFrom: dateFrom ?? this.dateFrom,
+        dateTo: dateTo ?? this.dateTo,
+        status: status ?? this.status,
+        paymentStatus: paymentStatus ?? this.paymentStatus,
+        checkInStatus: checkInStatus ?? this.checkInStatus,
+        checkOutStatus: checkOutStatus ?? this.checkOutStatus,
+        roomKeyStatus: roomKeyStatus ?? this.roomKeyStatus,
+        totalAmount: totalAmount ?? this.totalAmount,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  LocalBookingsTableData copyWithCompanion(LocalBookingsTableCompanion data) {
+    return LocalBookingsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      bookingNumber: data.bookingNumber.present
+          ? data.bookingNumber.value
+          : this.bookingNumber,
+      customerId:
+          data.customerId.present ? data.customerId.value : this.customerId,
+      roomNumbers:
+          data.roomNumbers.present ? data.roomNumbers.value : this.roomNumbers,
+      dateFrom: data.dateFrom.present ? data.dateFrom.value : this.dateFrom,
+      dateTo: data.dateTo.present ? data.dateTo.value : this.dateTo,
+      status: data.status.present ? data.status.value : this.status,
+      paymentStatus: data.paymentStatus.present
+          ? data.paymentStatus.value
+          : this.paymentStatus,
+      checkInStatus: data.checkInStatus.present
+          ? data.checkInStatus.value
+          : this.checkInStatus,
+      checkOutStatus: data.checkOutStatus.present
+          ? data.checkOutStatus.value
+          : this.checkOutStatus,
+      roomKeyStatus: data.roomKeyStatus.present
+          ? data.roomKeyStatus.value
+          : this.roomKeyStatus,
+      totalAmount:
+          data.totalAmount.present ? data.totalAmount.value : this.totalAmount,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalBookingsTableData(')
+          ..write('id: $id, ')
+          ..write('bookingNumber: $bookingNumber, ')
+          ..write('customerId: $customerId, ')
+          ..write('roomNumbers: $roomNumbers, ')
+          ..write('dateFrom: $dateFrom, ')
+          ..write('dateTo: $dateTo, ')
+          ..write('status: $status, ')
+          ..write('paymentStatus: $paymentStatus, ')
+          ..write('checkInStatus: $checkInStatus, ')
+          ..write('checkOutStatus: $checkOutStatus, ')
+          ..write('roomKeyStatus: $roomKeyStatus, ')
+          ..write('totalAmount: $totalAmount, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      bookingNumber,
+      customerId,
+      roomNumbers,
+      dateFrom,
+      dateTo,
+      status,
+      paymentStatus,
+      checkInStatus,
+      checkOutStatus,
+      roomKeyStatus,
+      totalAmount,
+      createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalBookingsTableData &&
+          other.id == this.id &&
+          other.bookingNumber == this.bookingNumber &&
+          other.customerId == this.customerId &&
+          other.roomNumbers == this.roomNumbers &&
+          other.dateFrom == this.dateFrom &&
+          other.dateTo == this.dateTo &&
+          other.status == this.status &&
+          other.paymentStatus == this.paymentStatus &&
+          other.checkInStatus == this.checkInStatus &&
+          other.checkOutStatus == this.checkOutStatus &&
+          other.roomKeyStatus == this.roomKeyStatus &&
+          other.totalAmount == this.totalAmount &&
+          other.createdAt == this.createdAt);
+}
+
+class LocalBookingsTableCompanion
+    extends UpdateCompanion<LocalBookingsTableData> {
+  final Value<int> id;
+  final Value<String> bookingNumber;
+  final Value<int> customerId;
+  final Value<String> roomNumbers;
+  final Value<DateTime> dateFrom;
+  final Value<DateTime> dateTo;
+  final Value<String> status;
+  final Value<String> paymentStatus;
+  final Value<String> checkInStatus;
+  final Value<String> checkOutStatus;
+  final Value<String> roomKeyStatus;
+  final Value<double> totalAmount;
+  final Value<DateTime> createdAt;
+  const LocalBookingsTableCompanion({
+    this.id = const Value.absent(),
+    this.bookingNumber = const Value.absent(),
+    this.customerId = const Value.absent(),
+    this.roomNumbers = const Value.absent(),
+    this.dateFrom = const Value.absent(),
+    this.dateTo = const Value.absent(),
+    this.status = const Value.absent(),
+    this.paymentStatus = const Value.absent(),
+    this.checkInStatus = const Value.absent(),
+    this.checkOutStatus = const Value.absent(),
+    this.roomKeyStatus = const Value.absent(),
+    this.totalAmount = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  LocalBookingsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String bookingNumber,
+    required int customerId,
+    required String roomNumbers,
+    required DateTime dateFrom,
+    required DateTime dateTo,
+    required String status,
+    required String paymentStatus,
+    required String checkInStatus,
+    required String checkOutStatus,
+    required String roomKeyStatus,
+    required double totalAmount,
+    this.createdAt = const Value.absent(),
+  })  : bookingNumber = Value(bookingNumber),
+        customerId = Value(customerId),
+        roomNumbers = Value(roomNumbers),
+        dateFrom = Value(dateFrom),
+        dateTo = Value(dateTo),
+        status = Value(status),
+        paymentStatus = Value(paymentStatus),
+        checkInStatus = Value(checkInStatus),
+        checkOutStatus = Value(checkOutStatus),
+        roomKeyStatus = Value(roomKeyStatus),
+        totalAmount = Value(totalAmount);
+  static Insertable<LocalBookingsTableData> custom({
+    Expression<int>? id,
+    Expression<String>? bookingNumber,
+    Expression<int>? customerId,
+    Expression<String>? roomNumbers,
+    Expression<DateTime>? dateFrom,
+    Expression<DateTime>? dateTo,
+    Expression<String>? status,
+    Expression<String>? paymentStatus,
+    Expression<String>? checkInStatus,
+    Expression<String>? checkOutStatus,
+    Expression<String>? roomKeyStatus,
+    Expression<double>? totalAmount,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bookingNumber != null) 'booking_number': bookingNumber,
+      if (customerId != null) 'customer_id': customerId,
+      if (roomNumbers != null) 'room_numbers': roomNumbers,
+      if (dateFrom != null) 'date_from': dateFrom,
+      if (dateTo != null) 'date_to': dateTo,
+      if (status != null) 'status': status,
+      if (paymentStatus != null) 'payment_status': paymentStatus,
+      if (checkInStatus != null) 'check_in_status': checkInStatus,
+      if (checkOutStatus != null) 'check_out_status': checkOutStatus,
+      if (roomKeyStatus != null) 'room_key_status': roomKeyStatus,
+      if (totalAmount != null) 'total_amount': totalAmount,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  LocalBookingsTableCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? bookingNumber,
+      Value<int>? customerId,
+      Value<String>? roomNumbers,
+      Value<DateTime>? dateFrom,
+      Value<DateTime>? dateTo,
+      Value<String>? status,
+      Value<String>? paymentStatus,
+      Value<String>? checkInStatus,
+      Value<String>? checkOutStatus,
+      Value<String>? roomKeyStatus,
+      Value<double>? totalAmount,
+      Value<DateTime>? createdAt}) {
+    return LocalBookingsTableCompanion(
+      id: id ?? this.id,
+      bookingNumber: bookingNumber ?? this.bookingNumber,
+      customerId: customerId ?? this.customerId,
+      roomNumbers: roomNumbers ?? this.roomNumbers,
+      dateFrom: dateFrom ?? this.dateFrom,
+      dateTo: dateTo ?? this.dateTo,
+      status: status ?? this.status,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      checkInStatus: checkInStatus ?? this.checkInStatus,
+      checkOutStatus: checkOutStatus ?? this.checkOutStatus,
+      roomKeyStatus: roomKeyStatus ?? this.roomKeyStatus,
+      totalAmount: totalAmount ?? this.totalAmount,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bookingNumber.present) {
+      map['booking_number'] = Variable<String>(bookingNumber.value);
+    }
+    if (customerId.present) {
+      map['customer_id'] = Variable<int>(customerId.value);
+    }
+    if (roomNumbers.present) {
+      map['room_numbers'] = Variable<String>(roomNumbers.value);
+    }
+    if (dateFrom.present) {
+      map['date_from'] = Variable<DateTime>(dateFrom.value);
+    }
+    if (dateTo.present) {
+      map['date_to'] = Variable<DateTime>(dateTo.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (paymentStatus.present) {
+      map['payment_status'] = Variable<String>(paymentStatus.value);
+    }
+    if (checkInStatus.present) {
+      map['check_in_status'] = Variable<String>(checkInStatus.value);
+    }
+    if (checkOutStatus.present) {
+      map['check_out_status'] = Variable<String>(checkOutStatus.value);
+    }
+    if (roomKeyStatus.present) {
+      map['room_key_status'] = Variable<String>(roomKeyStatus.value);
+    }
+    if (totalAmount.present) {
+      map['total_amount'] = Variable<double>(totalAmount.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalBookingsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('bookingNumber: $bookingNumber, ')
+          ..write('customerId: $customerId, ')
+          ..write('roomNumbers: $roomNumbers, ')
+          ..write('dateFrom: $dateFrom, ')
+          ..write('dateTo: $dateTo, ')
+          ..write('status: $status, ')
+          ..write('paymentStatus: $paymentStatus, ')
+          ..write('checkInStatus: $checkInStatus, ')
+          ..write('checkOutStatus: $checkOutStatus, ')
+          ..write('roomKeyStatus: $roomKeyStatus, ')
+          ..write('totalAmount: $totalAmount, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -9290,6 +10036,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
   late final $PremiumTypesTableTable premiumTypesTable =
       $PremiumTypesTableTable(this);
   late final $RoomsTableTable roomsTable = $RoomsTableTable(this);
+  late final $LocalBookingsTableTable localBookingsTable =
+      $LocalBookingsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9309,7 +10057,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         bedTypesTable,
         roomTypesTable,
         premiumTypesTable,
-        roomsTable
+        roomsTable,
+        localBookingsTable
       ];
 }
 
@@ -9615,6 +10364,30 @@ typedef $$LocalCustomersTableUpdateCompanionBuilder = LocalCustomersCompanion
   Value<bool> isSynced,
 });
 
+final class $$LocalCustomersTableReferences extends BaseReferences<
+    _$DatabaseClient, $LocalCustomersTable, LocalCustomer> {
+  $$LocalCustomersTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$LocalBookingsTableTable,
+      List<LocalBookingsTableData>> _localBookingsTableRefsTable(
+          _$DatabaseClient db) =>
+      MultiTypedResultKey.fromTable(db.localBookingsTable,
+          aliasName: $_aliasNameGenerator(
+              db.localCustomers.id, db.localBookingsTable.customerId));
+
+  $$LocalBookingsTableTableProcessedTableManager get localBookingsTableRefs {
+    final manager =
+        $$LocalBookingsTableTableTableManager($_db, $_db.localBookingsTable)
+            .filter((f) => f.customerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_localBookingsTableRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
 class $$LocalCustomersTableFilterComposer
     extends Composer<_$DatabaseClient, $LocalCustomersTable> {
   $$LocalCustomersTableFilterComposer({
@@ -9656,6 +10429,27 @@ class $$LocalCustomersTableFilterComposer
 
   ColumnFilters<bool> get isSynced => $composableBuilder(
       column: $table.isSynced, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> localBookingsTableRefs(
+      Expression<bool> Function($$LocalBookingsTableTableFilterComposer f) f) {
+    final $$LocalBookingsTableTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.localBookingsTable,
+        getReferencedColumn: (t) => t.customerId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$LocalBookingsTableTableFilterComposer(
+              $db: $db,
+              $table: $db.localBookingsTable,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$LocalCustomersTableOrderingComposer
@@ -9742,6 +10536,28 @@ class $$LocalCustomersTableAnnotationComposer
 
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
+
+  Expression<T> localBookingsTableRefs<T extends Object>(
+      Expression<T> Function($$LocalBookingsTableTableAnnotationComposer a) f) {
+    final $$LocalBookingsTableTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.localBookingsTable,
+            getReferencedColumn: (t) => t.customerId,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$LocalBookingsTableTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.localBookingsTable,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
 }
 
 class $$LocalCustomersTableTableManager extends RootTableManager<
@@ -9753,12 +10569,9 @@ class $$LocalCustomersTableTableManager extends RootTableManager<
     $$LocalCustomersTableAnnotationComposer,
     $$LocalCustomersTableCreateCompanionBuilder,
     $$LocalCustomersTableUpdateCompanionBuilder,
-    (
-      LocalCustomer,
-      BaseReferences<_$DatabaseClient, $LocalCustomersTable, LocalCustomer>
-    ),
+    (LocalCustomer, $$LocalCustomersTableReferences),
     LocalCustomer,
-    PrefetchHooks Function()> {
+    PrefetchHooks Function({bool localBookingsTableRefs})> {
   $$LocalCustomersTableTableManager(
       _$DatabaseClient db, $LocalCustomersTable table)
       : super(TableManagerState(
@@ -9823,9 +10636,37 @@ class $$LocalCustomersTableTableManager extends RootTableManager<
             isSynced: isSynced,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable(table),
+                    $$LocalCustomersTableReferences(db, table, e)
+                  ))
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({localBookingsTableRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (localBookingsTableRefs) db.localBookingsTable
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (localBookingsTableRefs)
+                    await $_getPrefetchedData<LocalCustomer,
+                            $LocalCustomersTable, LocalBookingsTableData>(
+                        currentTable: table,
+                        referencedTable: $$LocalCustomersTableReferences
+                            ._localBookingsTableRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$LocalCustomersTableReferences(db, table, p0)
+                                .localBookingsTableRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.customerId == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
@@ -9838,12 +10679,9 @@ typedef $$LocalCustomersTableProcessedTableManager = ProcessedTableManager<
     $$LocalCustomersTableAnnotationComposer,
     $$LocalCustomersTableCreateCompanionBuilder,
     $$LocalCustomersTableUpdateCompanionBuilder,
-    (
-      LocalCustomer,
-      BaseReferences<_$DatabaseClient, $LocalCustomersTable, LocalCustomer>
-    ),
+    (LocalCustomer, $$LocalCustomersTableReferences),
     LocalCustomer,
-    PrefetchHooks Function()>;
+    PrefetchHooks Function({bool localBookingsTableRefs})>;
 typedef $$LocalBarTablesTableCreateCompanionBuilder = LocalBarTablesCompanion
     Function({
   Value<int?> id,
@@ -13441,14 +14279,18 @@ typedef $$RoomsTableTableCreateCompanionBuilder = RoomsTableCompanion Function({
   required String roomNumber,
   required int roomTypeId,
   Value<String> status,
+  Value<String> bookingStatus,
   Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
 typedef $$RoomsTableTableUpdateCompanionBuilder = RoomsTableCompanion Function({
   Value<int> id,
   Value<String> roomNumber,
   Value<int> roomTypeId,
   Value<String> status,
+  Value<String> bookingStatus,
   Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
 
 class $$RoomsTableTableFilterComposer
@@ -13472,8 +14314,14 @@ class $$RoomsTableTableFilterComposer
   ColumnFilters<String> get status => $composableBuilder(
       column: $table.status, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get bookingStatus => $composableBuilder(
+      column: $table.bookingStatus, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 }
 
 class $$RoomsTableTableOrderingComposer
@@ -13497,8 +14345,15 @@ class $$RoomsTableTableOrderingComposer
   ColumnOrderings<String> get status => $composableBuilder(
       column: $table.status, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get bookingStatus => $composableBuilder(
+      column: $table.bookingStatus,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
 
 class $$RoomsTableTableAnnotationComposer
@@ -13522,8 +14377,14 @@ class $$RoomsTableTableAnnotationComposer
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
+  GeneratedColumn<String> get bookingStatus => $composableBuilder(
+      column: $table.bookingStatus, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$RoomsTableTableTableManager extends RootTableManager<
@@ -13556,28 +14417,36 @@ class $$RoomsTableTableTableManager extends RootTableManager<
             Value<String> roomNumber = const Value.absent(),
             Value<int> roomTypeId = const Value.absent(),
             Value<String> status = const Value.absent(),
+            Value<String> bookingStatus = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
               RoomsTableCompanion(
             id: id,
             roomNumber: roomNumber,
             roomTypeId: roomTypeId,
             status: status,
+            bookingStatus: bookingStatus,
             createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required String roomNumber,
             required int roomTypeId,
             Value<String> status = const Value.absent(),
+            Value<String> bookingStatus = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
               RoomsTableCompanion.insert(
             id: id,
             roomNumber: roomNumber,
             roomTypeId: roomTypeId,
             status: status,
+            bookingStatus: bookingStatus,
             createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -13601,6 +14470,405 @@ typedef $$RoomsTableTableProcessedTableManager = ProcessedTableManager<
     ),
     RoomsTableData,
     PrefetchHooks Function()>;
+typedef $$LocalBookingsTableTableCreateCompanionBuilder
+    = LocalBookingsTableCompanion Function({
+  Value<int> id,
+  required String bookingNumber,
+  required int customerId,
+  required String roomNumbers,
+  required DateTime dateFrom,
+  required DateTime dateTo,
+  required String status,
+  required String paymentStatus,
+  required String checkInStatus,
+  required String checkOutStatus,
+  required String roomKeyStatus,
+  required double totalAmount,
+  Value<DateTime> createdAt,
+});
+typedef $$LocalBookingsTableTableUpdateCompanionBuilder
+    = LocalBookingsTableCompanion Function({
+  Value<int> id,
+  Value<String> bookingNumber,
+  Value<int> customerId,
+  Value<String> roomNumbers,
+  Value<DateTime> dateFrom,
+  Value<DateTime> dateTo,
+  Value<String> status,
+  Value<String> paymentStatus,
+  Value<String> checkInStatus,
+  Value<String> checkOutStatus,
+  Value<String> roomKeyStatus,
+  Value<double> totalAmount,
+  Value<DateTime> createdAt,
+});
+
+final class $$LocalBookingsTableTableReferences extends BaseReferences<
+    _$DatabaseClient, $LocalBookingsTableTable, LocalBookingsTableData> {
+  $$LocalBookingsTableTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $LocalCustomersTable _customerIdTable(_$DatabaseClient db) =>
+      db.localCustomers.createAlias($_aliasNameGenerator(
+          db.localBookingsTable.customerId, db.localCustomers.id));
+
+  $$LocalCustomersTableProcessedTableManager get customerId {
+    final $_column = $_itemColumn<int>('customer_id')!;
+
+    final manager = $$LocalCustomersTableTableManager($_db, $_db.localCustomers)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_customerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$LocalBookingsTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $LocalBookingsTableTable> {
+  $$LocalBookingsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get bookingNumber => $composableBuilder(
+      column: $table.bookingNumber, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get roomNumbers => $composableBuilder(
+      column: $table.roomNumbers, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get dateFrom => $composableBuilder(
+      column: $table.dateFrom, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get dateTo => $composableBuilder(
+      column: $table.dateTo, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get paymentStatus => $composableBuilder(
+      column: $table.paymentStatus, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get checkInStatus => $composableBuilder(
+      column: $table.checkInStatus, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get checkOutStatus => $composableBuilder(
+      column: $table.checkOutStatus,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get roomKeyStatus => $composableBuilder(
+      column: $table.roomKeyStatus, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get totalAmount => $composableBuilder(
+      column: $table.totalAmount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  $$LocalCustomersTableFilterComposer get customerId {
+    final $$LocalCustomersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.customerId,
+        referencedTable: $db.localCustomers,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$LocalCustomersTableFilterComposer(
+              $db: $db,
+              $table: $db.localCustomers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$LocalBookingsTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $LocalBookingsTableTable> {
+  $$LocalBookingsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get bookingNumber => $composableBuilder(
+      column: $table.bookingNumber,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get roomNumbers => $composableBuilder(
+      column: $table.roomNumbers, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get dateFrom => $composableBuilder(
+      column: $table.dateFrom, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get dateTo => $composableBuilder(
+      column: $table.dateTo, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get paymentStatus => $composableBuilder(
+      column: $table.paymentStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get checkInStatus => $composableBuilder(
+      column: $table.checkInStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get checkOutStatus => $composableBuilder(
+      column: $table.checkOutStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get roomKeyStatus => $composableBuilder(
+      column: $table.roomKeyStatus,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get totalAmount => $composableBuilder(
+      column: $table.totalAmount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  $$LocalCustomersTableOrderingComposer get customerId {
+    final $$LocalCustomersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.customerId,
+        referencedTable: $db.localCustomers,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$LocalCustomersTableOrderingComposer(
+              $db: $db,
+              $table: $db.localCustomers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$LocalBookingsTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $LocalBookingsTableTable> {
+  $$LocalBookingsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get bookingNumber => $composableBuilder(
+      column: $table.bookingNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get roomNumbers => $composableBuilder(
+      column: $table.roomNumbers, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dateFrom =>
+      $composableBuilder(column: $table.dateFrom, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dateTo =>
+      $composableBuilder(column: $table.dateTo, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get paymentStatus => $composableBuilder(
+      column: $table.paymentStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get checkInStatus => $composableBuilder(
+      column: $table.checkInStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get checkOutStatus => $composableBuilder(
+      column: $table.checkOutStatus, builder: (column) => column);
+
+  GeneratedColumn<String> get roomKeyStatus => $composableBuilder(
+      column: $table.roomKeyStatus, builder: (column) => column);
+
+  GeneratedColumn<double> get totalAmount => $composableBuilder(
+      column: $table.totalAmount, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$LocalCustomersTableAnnotationComposer get customerId {
+    final $$LocalCustomersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.customerId,
+        referencedTable: $db.localCustomers,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$LocalCustomersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.localCustomers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$LocalBookingsTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $LocalBookingsTableTable,
+    LocalBookingsTableData,
+    $$LocalBookingsTableTableFilterComposer,
+    $$LocalBookingsTableTableOrderingComposer,
+    $$LocalBookingsTableTableAnnotationComposer,
+    $$LocalBookingsTableTableCreateCompanionBuilder,
+    $$LocalBookingsTableTableUpdateCompanionBuilder,
+    (LocalBookingsTableData, $$LocalBookingsTableTableReferences),
+    LocalBookingsTableData,
+    PrefetchHooks Function({bool customerId})> {
+  $$LocalBookingsTableTableTableManager(
+      _$DatabaseClient db, $LocalBookingsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalBookingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalBookingsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalBookingsTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> bookingNumber = const Value.absent(),
+            Value<int> customerId = const Value.absent(),
+            Value<String> roomNumbers = const Value.absent(),
+            Value<DateTime> dateFrom = const Value.absent(),
+            Value<DateTime> dateTo = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<String> paymentStatus = const Value.absent(),
+            Value<String> checkInStatus = const Value.absent(),
+            Value<String> checkOutStatus = const Value.absent(),
+            Value<String> roomKeyStatus = const Value.absent(),
+            Value<double> totalAmount = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              LocalBookingsTableCompanion(
+            id: id,
+            bookingNumber: bookingNumber,
+            customerId: customerId,
+            roomNumbers: roomNumbers,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            status: status,
+            paymentStatus: paymentStatus,
+            checkInStatus: checkInStatus,
+            checkOutStatus: checkOutStatus,
+            roomKeyStatus: roomKeyStatus,
+            totalAmount: totalAmount,
+            createdAt: createdAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String bookingNumber,
+            required int customerId,
+            required String roomNumbers,
+            required DateTime dateFrom,
+            required DateTime dateTo,
+            required String status,
+            required String paymentStatus,
+            required String checkInStatus,
+            required String checkOutStatus,
+            required String roomKeyStatus,
+            required double totalAmount,
+            Value<DateTime> createdAt = const Value.absent(),
+          }) =>
+              LocalBookingsTableCompanion.insert(
+            id: id,
+            bookingNumber: bookingNumber,
+            customerId: customerId,
+            roomNumbers: roomNumbers,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            status: status,
+            paymentStatus: paymentStatus,
+            checkInStatus: checkInStatus,
+            checkOutStatus: checkOutStatus,
+            roomKeyStatus: roomKeyStatus,
+            totalAmount: totalAmount,
+            createdAt: createdAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$LocalBookingsTableTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({customerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (customerId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.customerId,
+                    referencedTable: $$LocalBookingsTableTableReferences
+                        ._customerIdTable(db),
+                    referencedColumn: $$LocalBookingsTableTableReferences
+                        ._customerIdTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$LocalBookingsTableTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $LocalBookingsTableTable,
+    LocalBookingsTableData,
+    $$LocalBookingsTableTableFilterComposer,
+    $$LocalBookingsTableTableOrderingComposer,
+    $$LocalBookingsTableTableAnnotationComposer,
+    $$LocalBookingsTableTableCreateCompanionBuilder,
+    $$LocalBookingsTableTableUpdateCompanionBuilder,
+    (LocalBookingsTableData, $$LocalBookingsTableTableReferences),
+    LocalBookingsTableData,
+    PrefetchHooks Function({bool customerId})>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -13636,4 +14904,6 @@ class $DatabaseClientManager {
       $$PremiumTypesTableTableTableManager(_db, _db.premiumTypesTable);
   $$RoomsTableTableTableManager get roomsTable =>
       $$RoomsTableTableTableManager(_db, _db.roomsTable);
+  $$LocalBookingsTableTableTableManager get localBookingsTable =>
+      $$LocalBookingsTableTableTableManager(_db, _db.localBookingsTable);
 }

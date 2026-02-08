@@ -16,5 +16,6 @@ final List<Widget> hotelPages = [
   RoomTypesPage(),
   PremiumTypesPage(),
   HotelRoomsPage(),
+  //BookingPage(),
   // RoomsPage(),
 ];

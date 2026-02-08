@@ -26,6 +26,7 @@ class HotelHome extends StatelessWidget {
               Tab(text: "Room Types"),
               Tab(text: "Premium"),
               Tab(text: "Rooms"),
+              Tab(text: "BookingPage"),
             ],
           ),
         ),
