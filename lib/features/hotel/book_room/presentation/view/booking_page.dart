@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../room_types/domain/entities/room_type_entities.dart';
+import '../../../room_types/presentation/providers/room_type_provider.dart';
 import '../providers/booking_provider.dart';
 import '../state/booking_state.dart';
 
@@ -77,6 +79,14 @@ class BookingPage extends ConsumerWidget {
   Widget _buildSearchCard(
       BuildContext context, WidgetRef ref, BookingState state) {
     final controller = ref.read(bookingControllerProvider.notifier);
+    final roomTypeState = ref.watch(roomTypeControllerProvider);
+    final bookingState = ref.watch(bookingControllerProvider);
+    // Ensure default is set once data loads
+    ref.listen(roomTypeControllerProvider, (_, next) {
+      if (next.roomTypes.isNotEmpty) {
+        controller.setDefaultRoomTypeIfNeeded();
+      }
+    });
 
     return Card(
       elevation: 4,
@@ -123,10 +133,17 @@ class BookingPage extends ConsumerWidget {
             // Room Type
             _buildDropdownField(
               label: 'Room Type',
-              value: state.roomType,
-              items: ['Standard', 'Deluxe', 'Suite', 'Executive'],
-              onChanged: (value) => controller.setRoomType(value!),
+              value: bookingState.roomType,
+              items: roomTypeState.roomTypes,
+              itemLabel: (item) => item.name,
+              onChanged: (value) {
+                if (value != null) {
+                  controller.setRoomType(value);
+                }
+              },
             ),
+
+            
             const SizedBox(height: 16),
 
             // Customer ID (for now, using a number field - can be replaced with customer dropdown)
@@ -248,41 +265,28 @@ class BookingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildDropdownField({
+  Widget _buildDropdownField<T>({
     required String label,
-    required String value,
-    required List<String> items,
-    required Function(String?) onChanged,
+    required T? value,
+    required List<T> items,
+    required String Function(T) itemLabel,
+    required ValueChanged<T?> onChanged,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: value,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          ),
-          items: items.map((item) {
-            return DropdownMenuItem(
+    return DropdownButtonFormField<T>(
+      value: value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(),
+      ),
+      items: items
+          .map(
+            (item) => DropdownMenuItem<T>(
               value: item,
-              child: Text(item),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
-      ],
+              child: Text(itemLabel(item)),
+            ),
+          )
+          .toList(),
+      onChanged: onChanged,
     );
   }
 
@@ -427,10 +431,11 @@ class BookingPage extends ConsumerWidget {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: availableRooms.map((roomNumber) {
-                      final isBooked = controller.isRoomBooked(day, roomNumber);
+                    children: availableRooms.map((room) {
+                      final isBooked =
+                          controller.isRoomBooked(day, room.roomNumber);
                       final isSelected =
-                          controller.isRoomSelected(day, roomNumber);
+                          controller.isRoomSelected(day, room.roomNumber);
 
                       Color chipColor;
                       Color textColor;
@@ -449,7 +454,7 @@ class BookingPage extends ConsumerWidget {
                       return InkWell(
                         onTap: isBooked
                             ? null
-                            : () => controller.toggleRoom(day, roomNumber),
+                            : () => controller.toggleRoom(day, room.roomNumber),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -460,7 +465,7 @@ class BookingPage extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            roomNumber,
+                            room.roomNumber,
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.bold,
@@ -547,7 +552,7 @@ class BookingPage extends ConsumerWidget {
             const SizedBox(height: 8),
             _buildSummaryRow('Nights:', '${state.numberOfNights}'),
             const SizedBox(height: 8),
-            _buildSummaryRow('Room Type:', state.roomType),
+            _buildSummaryRow('Room Type:', state.roomType!.name),
             const Divider(height: 24),
             const Text(
               'Selected Rooms by Day',

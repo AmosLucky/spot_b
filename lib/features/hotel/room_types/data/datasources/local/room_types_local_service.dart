@@ -109,4 +109,26 @@ RoomTypesTableCompanion _toCompanion(RoomTypeEntity e) {
     if (value == null || value.isEmpty) return [];
     return value.split(',').map((s) => int.tryParse(s) ?? 0).toList();
   }
+
+  /// ---------------- GET BY ROOM TYPE ----------------
+  Future<List<RoomTypeEntity>> getRoomsByRoomType(int roomTypeId) async {
+    try {
+      final rows = await (db.select(db.roomTypesTable)
+            ..where((t) => t.id.equals(roomTypeId)))
+          .get();
+
+      return rows.map(_toEntity).toList();
+    } catch (e) {
+      throw AppError(
+        message: 'Failed to load room type',
+        originalError: e,
+      );
+    }
+  }
+
+  
+
+
+
+  
 }

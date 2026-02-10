@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../../../core/database/database_client.dart';
+import '../../../../../core/error_handling/app_error.dart';
 import '../../domain/entities/room_entity.dart';
 
 class RoomLocalDataSource {
@@ -23,6 +24,10 @@ class RoomLocalDataSource {
 
   // ================== ADD ==================
   Future<void> addRoom(RoomEntity room) async {
+    print(room.bookingStatus);
+    print(room.status);
+    print(room.roomNumber);
+    print(room.roomTypeId);
     await db.into(db.roomsTable).insert(_toCompanion(room));
   }
 
@@ -33,10 +38,27 @@ class RoomLocalDataSource {
 
   // ================== DELETE ==================
   Future<void> deleteRoom(int id) async {
-    await (db.delete(db.roomsTable)
-          ..where((tbl) => tbl.id.equals(id)))
-        .go();
+    await (db.delete(db.roomsTable)..where((tbl) => tbl.id.equals(id))).go();
   }
+
+
+  Future<List<RoomEntity>> getRoomsByRoomType(int roomTypeId) async {
+  try {
+    final rows = await (db.select(db.roomsTable)
+          ..where((t) =>
+              t.roomTypeId.equals(roomTypeId) &
+              t.bookingStatus.equals('available')))
+        .get();
+
+    return rows.map(_toEntity).toList();
+  } catch (e) {
+    throw AppError(
+      message: 'Failed to load available rooms',
+      originalError: e,
+    );
+  }
+}
+
 
   // ================== HELPERS ==================
 

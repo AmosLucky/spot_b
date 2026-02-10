@@ -16,6 +16,8 @@ class RoomsTable extends Table {
   TextColumn get bookingStatus =>
       text().withDefault(const Constant('available'))();
 
+      
+
   DateTimeColumn get createdAt =>
       dateTime().withDefault(currentDateAndTime)();
 

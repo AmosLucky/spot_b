@@ -1,4 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spotstock_inventory/features/hotel/room_types/domain/entities/room_type_entities.dart';
+import 'package:spotstock_inventory/features/hotel/rooms/domain/entities/room_entity.dart';
+import '../../../room_types/presentation/providers/room_type_provider.dart';
 import '../../domain/entities/booking_entity.dart';
 
 import '../../domain/usecases/create_booking_usecase.dart';
@@ -13,13 +16,15 @@ class BookingController extends StateNotifier<BookingState> {
   final GetBookingsUseCase getBookingsUseCase;
   final UpdateBookingUseCase updateBookingUseCase;
   final GetAvailableRoomsUseCase getAvailableRoomsUseCase;
+  final Ref ref;
 
-  BookingController({
-    required this.createBookingUseCase,
-    required this.getBookingsUseCase,
-    required this.updateBookingUseCase,
-    required this.getAvailableRoomsUseCase,
-  }) : super(const BookingState());
+  BookingController(
+      {required this.createBookingUseCase,
+      required this.getBookingsUseCase,
+      required this.updateBookingUseCase,
+      required this.getAvailableRoomsUseCase,
+      required this.ref})
+      : super(const BookingState());
 
   // ==================== SETTERS ====================
 
@@ -41,12 +46,23 @@ class BookingController extends StateNotifier<BookingState> {
     );
   }
 
-  void setRoomType(String type) {
+  void setRoomType(RoomTypeEntity type) {
     state = state.copyWith(
       roomType: type,
       hasSearched: false,
       selectedRooms: {},
     );
+  }
+
+  /// Call this once room types are available
+  void setDefaultRoomTypeIfNeeded() {
+    final roomTypes = ref.read(roomTypeControllerProvider).roomTypes;
+
+    if (state.roomType == null && roomTypes.isNotEmpty) {
+      state = state.copyWith(
+          roomType: roomTypes.first, 
+          selectedRoomTypeId: roomTypes.first.id);
+    }
   }
 
   void setNumberOfRooms(int count) {
@@ -76,58 +92,105 @@ class BookingController extends StateNotifier<BookingState> {
   // ==================== SEARCH ROOMS ====================
 
   Future<void> searchRooms() async {
-    if (state.checkInDate == null || state.checkOutDate == null) {
-      state =
-          state.copyWith(error: 'Please select check-in and check-out dates');
-      return;
+    if (state.checkInDate == null || state.checkOutDate == null) return;
+
+    state = state.copyWith(isLoading: true, hasSearched: true);
+
+    final availableRooms = await getAvailableRoomsUseCase(
+      roomTypeId: state.roomType!.id!,
+      checkIn: state.checkInDate!,
+      checkOut: state.checkOutDate!,
+    );
+
+    final bookingDays = _generateDays(
+      state.checkInDate!,
+      state.checkOutDate!,
+    );
+
+    final Map<DateTime, List<RoomEntity>> roomsByDay = {};
+
+    for (final day in bookingDays) {
+      roomsByDay[day] = availableRooms.map((r) => r).toList();
     }
 
-    if (state.checkOutDate!.isBefore(state.checkInDate!) ||
-        state.checkOutDate!.isAtSameMomentAs(state.checkInDate!)) {
-      state =
-          state.copyWith(error: 'Check-out date must be after check-in date');
-      return;
-    }
-
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      // Get booked rooms for the date range
-      final bookedRoomsMap = await getAvailableRoomsUseCase(
-        checkIn: state.checkInDate!,
-        checkOut: state.checkOutDate!,
-        allRoomNumbers: state.allRoomNumbers,
-      );
-
-      // Calculate available rooms for each day
-      final availableRoomsMap = <DateTime, List<String>>{};
-
-      for (final entry in bookedRoomsMap.entries) {
-        final date = entry.key;
-        final bookedRooms = entry.value;
-
-        // Available rooms = all rooms - booked rooms
-        final available = state.allRoomNumbers
-            .where((room) => !bookedRooms.contains(room))
-            .toList();
-
-        availableRoomsMap[date] = available;
-      }
-
-      state = state.copyWith(
-        hasSearched: true,
-        isLoading: false,
-        availableRooms: availableRoomsMap,
-        bookedRooms: bookedRoomsMap,
-        selectedRooms: {},
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to search rooms: ${e.toString()}',
-      );
-    }
+    state = state.copyWith(
+      isLoading: false,
+      pricePerRoom: state.roomType!.fare,
+      // bookingDays: bookingDays,
+      availableRooms: roomsByDay,
+    );
   }
+
+  void setRoomTypeId(int id) {
+    state = state.copyWith(selectedRoomTypeId: id);
+  }
+
+  List<DateTime> _generateDays(DateTime start, DateTime end) {
+    final days = <DateTime>[];
+    var current = start;
+
+    while (current.isBefore(end)) {
+      days.add(current);
+      current = current.add(const Duration(days: 1));
+    }
+
+    return days;
+  }
+
+  // Future<void> searchRooms() async {
+  //   if (state.checkInDate == null || state.checkOutDate == null) {
+  //     state =
+  //         state.copyWith(error: 'Please select check-in and check-out dates');
+  //     return;
+  //   }
+
+  //   if (state.checkOutDate!.isBefore(state.checkInDate!) ||
+  //       state.checkOutDate!.isAtSameMomentAs(state.checkInDate!)) {
+  //     state =
+  //         state.copyWith(error: 'Check-out date must be after check-in date');
+  //     return;
+  //   }
+
+  //   state = state.copyWith(isLoading: true, error: null);
+
+  //   try {
+  //     // Get booked rooms for the date range
+  //     final bookedRoomsMap = await getAvailableRoomsUseCase(
+  //       checkIn: state.checkInDate!,
+  //       checkOut: state.checkOutDate!,
+
+  //     );
+  //     //allRoomNumbers: state.allRoomNumbers,
+
+  //     // Calculate available rooms for each day
+  //     final availableRoomsMap = <DateTime, List<String>>{};
+
+  //     for (final entry in bookedRoomsMap.entries) {
+  //       final date = entry.key;
+  //       final bookedRooms = entry.value;
+
+  //       // Available rooms = all rooms - booked rooms
+  //       final available = state.allRoomNumbers
+  //           .where((room) => !bookedRooms.contains(room))
+  //           .toList();
+
+  //       availableRoomsMap[date] = available;
+  //     }
+
+  //     state = state.copyWith(
+  //       hasSearched: true,
+  //       isLoading: false,
+  //       availableRooms: availableRoomsMap,
+  //       bookedRooms: bookedRoomsMap,
+  //       selectedRooms: {},
+  //     );
+  //   } catch (e) {
+  //     state = state.copyWith(
+  //       isLoading: false,
+  //       error: 'Failed to search rooms: ${e.toString()}',
+  //     );
+  //   }
+  // }
 
   // ==================== ROOM SELECTION ====================
 

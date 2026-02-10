@@ -1,9 +1,13 @@
-import 'package:flutter/foundation.dart';
+
+import '../../../room_types/domain/entities/room_type_entities.dart';
+import '../../../rooms/domain/entities/room_entity.dart';
 
 class BookingState {
+  final int? selectedRoomTypeId;
+
   final DateTime? checkInDate;
   final DateTime? checkOutDate;
-  final String roomType;
+  final RoomTypeEntity? roomType;
   final int numberOfRooms;
   final int adults;
   final int children;
@@ -11,17 +15,20 @@ class BookingState {
   final bool hasSearched;
   final bool isLoading;
   final Map<DateTime, List<String>> selectedRooms;
-  final Map<DateTime, List<String>> availableRooms;
+  final Map<DateTime, List<RoomEntity>> availableRooms;
   final Map<DateTime, List<String>> bookedRooms;
   final List<String> allRoomNumbers; // All room numbers in the system
+  final List<RoomTypeEntity> availableRoomTypes; // All room types
+  final List<RoomEntity> allRooms; // All rooms from database
   final double pricePerRoom;
   final String? error;
   final String? successMessage;
 
   const BookingState({
+    this.selectedRoomTypeId,
     this.checkInDate,
     this.checkOutDate,
-    this.roomType = 'Standard',
+    this.roomType,
     this.numberOfRooms = 1,
     this.adults = 1,
     this.children = 0,
@@ -31,7 +38,10 @@ class BookingState {
     this.selectedRooms = const {},
     this.availableRooms = const {},
     this.bookedRooms = const {},
-    this.allRoomNumbers = const ['102', '104', '105'], // Default rooms
+    this.allRoomNumbers = const [],
+    //const ['102', '104', '105'], // Default rooms
+    this.availableRoomTypes = const [],
+    this.allRooms = const [],
     this.pricePerRoom = 25000.00,
     this.error,
     this.successMessage,
@@ -60,9 +70,11 @@ class BookingState {
   }
 
   BookingState copyWith({
+      final int? selectedRoomTypeId,
+
     DateTime? checkInDate,
     DateTime? checkOutDate,
-    String? roomType,
+    RoomTypeEntity? roomType,
     int? numberOfRooms,
     int? adults,
     int? children,
@@ -70,14 +82,17 @@ class BookingState {
     bool? hasSearched,
     bool? isLoading,
     Map<DateTime, List<String>>? selectedRooms,
-    Map<DateTime, List<String>>? availableRooms,
+    Map<DateTime, List<RoomEntity>>? availableRooms,
     Map<DateTime, List<String>>? bookedRooms,
+    List<RoomTypeEntity>? availableRoomTypes,
+    List<RoomEntity>? allRooms,
     List<String>? allRoomNumbers,
     double? pricePerRoom,
     String? error,
     String? successMessage,
   }) {
     return BookingState(
+      selectedRoomTypeId: selectedRoomTypeId,
       checkInDate: checkInDate ?? this.checkInDate,
       checkOutDate: checkOutDate ?? this.checkOutDate,
       roomType: roomType ?? this.roomType,
@@ -91,6 +106,8 @@ class BookingState {
       availableRooms: availableRooms ?? this.availableRooms,
       bookedRooms: bookedRooms ?? this.bookedRooms,
       allRoomNumbers: allRoomNumbers ?? this.allRoomNumbers,
+      availableRoomTypes: availableRoomTypes ?? this.availableRoomTypes,
+      allRooms: allRooms ?? this.allRooms,
       pricePerRoom: pricePerRoom ?? this.pricePerRoom,
       error: error,
       successMessage: successMessage,

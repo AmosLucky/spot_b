@@ -54,5 +54,10 @@ class RoomRepositoryImpl implements RoomRepository {
       room.copyWith(bookingStatus: bookingStatus),
     );
   }
+
+  @override
+  Future<List<RoomEntity>> getRoomsByRoomType(int roomTypeId) async {
+    return await localDataSource.getRoomsByRoomType(roomTypeId);
+  }
   
 }

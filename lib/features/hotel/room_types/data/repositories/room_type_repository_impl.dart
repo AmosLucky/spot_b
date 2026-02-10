@@ -28,4 +28,8 @@ class RoomTypeRepositoryImpl implements RoomTypeRepository {
   Future<void> deleteRoomType(int id) {
     return localService.deleteRoomType(id);
   }
+  @override
+  Future<List<RoomTypeEntity>> getRoomsByRoomType(int roomTypeId) async {
+    return await localService.getRoomsByRoomType(roomTypeId);
+  }
 }

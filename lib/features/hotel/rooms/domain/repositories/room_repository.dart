@@ -11,4 +11,5 @@ abstract class RoomRepository {
    Future<void> updateRoomStatus(int roomId, String status);
 
   Future<void> updateBookingStatus(int roomId, String bookingStatus);
+  Future<List<RoomEntity>> getRoomsByRoomType(int roomTypeId);
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/database/database_client.dart';
 
+import '../../../rooms/presentation/providers/room_providers.dart';
 import '../../data/datasources/local/booking_local_data_source.dart';
 import '../../data/repositories/booking_repository_impl.dart';
 import '../../domain/repositories/booking_repository.dart';
@@ -52,7 +53,7 @@ final updateBookingUseCaseProvider = Provider<UpdateBookingUseCase>((ref) {
 final getAvailableRoomsUseCaseProvider =
     Provider<GetAvailableRoomsUseCase>((ref) {
   final repository = ref.watch(bookingRepositoryProvider);
-  return GetAvailableRoomsUseCase(repository);
+  return GetAvailableRoomsUseCase(repository,ref.read(roomRepositoryProvider));
 });
 
 // ==================== CONTROLLER ====================
@@ -63,5 +64,6 @@ final bookingControllerProvider =
     getBookingsUseCase: ref.watch(getBookingsUseCaseProvider),
     updateBookingUseCase: ref.watch(updateBookingUseCaseProvider),
     getAvailableRoomsUseCase: ref.watch(getAvailableRoomsUseCaseProvider),
+    ref: ref
   );
 });

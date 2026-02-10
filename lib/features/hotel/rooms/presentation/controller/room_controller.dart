@@ -33,10 +33,10 @@ class RoomController extends StateNotifier<RoomState> {
     for (final number in roomNumbers) {
       await repository.addRoom(
         RoomEntity(
-          roomNumber: number,
-          roomTypeId: roomTypeId,
-          status: status,
-        ),
+            roomNumber: number,
+            roomTypeId: roomTypeId,
+            status: status,
+            bookingStatus: "available"),
       );
     }
   }

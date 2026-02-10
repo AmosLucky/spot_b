@@ -7,8 +7,7 @@ import '../../domain/repositories/room_repository.dart';
 import '../controller/room_controller.dart';
 import '../state/room_state.dart';
 
-final appDatabaseProvider =
-    Provider<DatabaseClient>((ref) => DatabaseClient());
+final appDatabaseProvider = Provider<DatabaseClient>((ref) => DatabaseClient());
 
 final roomRepositoryProvider = Provider<RoomRepository>((ref) {
   final db = ref.read(appDatabaseProvider);

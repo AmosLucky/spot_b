@@ -5,4 +5,6 @@ abstract class RoomTypeRepository {
   Future<void> addRoomType(RoomTypeEntity roomType);
   Future<void> updateRoomType(RoomTypeEntity roomType);
   Future<void> deleteRoomType(int id);
+  Future<List<RoomTypeEntity>> getRoomsByRoomType(int roomTypeId);
+  
 }
