@@ -8,12 +8,17 @@ class PremiumTypeState {
   final String selectedFilterStatus;
   final List<String> filterStatusList;
 
+  final String selectedStatus;
+  final List<String> selectedStatusList;
+
   const PremiumTypeState({
     this.isLoading = false,
     this.all = const [],
     this.filtered = const [],
     this.selectedFilterStatus = 'All',
     this.filterStatusList = const ['All', 'Active', 'Inactive'],
+    this.selectedStatus = "Active",
+    this.selectedStatusList = const ["Active","Inactive"]
   });
 
   PremiumTypeState copyWith({
@@ -21,6 +26,8 @@ class PremiumTypeState {
     List<PremiumTypeEntity>? all,
     List<PremiumTypeEntity>? filtered,
     String? selectedFilterStatus,
+      String? selectedStatus,
+   List<String> ?selectedStatusList
   }) {
     return PremiumTypeState(
       isLoading: isLoading ?? this.isLoading,
@@ -29,6 +36,8 @@ class PremiumTypeState {
       selectedFilterStatus:
           selectedFilterStatus ?? this.selectedFilterStatus,
       filterStatusList: filterStatusList,
+      selectedStatus: selectedStatus?? this.selectedStatus,
+      selectedStatusList: selectedStatusList??this.selectedStatusList
     );
   }
 }

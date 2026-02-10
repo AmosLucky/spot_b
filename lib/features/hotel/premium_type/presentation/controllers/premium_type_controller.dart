@@ -66,17 +66,19 @@ class PremiumTypeController extends StateNotifier<PremiumTypeState> {
 
   void filterByName(String query) {
     final filtered = state.all.where((e) {
-      final matchesName =
-          e.name.toLowerCase().contains(query.toLowerCase());
+      final matchesName = e.name.toLowerCase().contains(query.toLowerCase());
 
-      final matchesStatus =
-          state.selectedFilterStatus == 'All' ||
-              e.status == state.selectedFilterStatus;
+      final matchesStatus = state.selectedFilterStatus == 'All' ||
+          e.status == state.selectedFilterStatus;
 
       return matchesName && matchesStatus;
     }).toList();
 
     state = state.copyWith(filtered: filtered);
+  }
+
+  void setStatus(selecedStatus) {
+    state = state.copyWith(selectedStatus: selecedStatus);
   }
 
   List<PremiumTypeEntity> _applyFilter(

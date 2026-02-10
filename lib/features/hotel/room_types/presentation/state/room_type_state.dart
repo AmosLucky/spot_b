@@ -12,6 +12,9 @@ class RoomTypeState {
   final List<int> selectedFacilityIds;
   final List<int> selectedBedTypeIds;
 
+  // NEW: separate toggle field
+  final bool isActive;
+
   RoomTypeState({
     required this.roomTypes,
     required this.isLoading,
@@ -19,6 +22,7 @@ class RoomTypeState {
     required this.selectedAmenityIds,
     required this.selectedFacilityIds,
     required this.selectedBedTypeIds,
+    this.isActive = true, // default true
   });
 
   factory RoomTypeState.initial() {
@@ -29,6 +33,7 @@ class RoomTypeState {
       selectedAmenityIds: [],
       selectedFacilityIds: [],
       selectedBedTypeIds: [],
+      isActive: true,
     );
   }
 
@@ -39,17 +44,16 @@ class RoomTypeState {
     List<int>? selectedAmenityIds,
     List<int>? selectedFacilityIds,
     List<int>? selectedBedTypeIds,
+    bool? isActive, // include in copyWith
   }) {
     return RoomTypeState(
       roomTypes: roomTypes ?? this.roomTypes,
       isLoading: isLoading ?? this.isLoading,
       status: status ?? this.status,
-      selectedAmenityIds:
-          selectedAmenityIds ?? this.selectedAmenityIds,
-      selectedFacilityIds:
-          selectedFacilityIds ?? this.selectedFacilityIds,
-      selectedBedTypeIds:
-          selectedBedTypeIds ?? this.selectedBedTypeIds,
+      selectedAmenityIds: selectedAmenityIds ?? this.selectedAmenityIds,
+      selectedFacilityIds: selectedFacilityIds ?? this.selectedFacilityIds,
+      selectedBedTypeIds: selectedBedTypeIds ?? this.selectedBedTypeIds,
+      isActive: isActive ?? this.isActive,
     );
   }
 }

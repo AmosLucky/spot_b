@@ -40,11 +40,6 @@ class BookingPage extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Room Search'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -65,7 +60,7 @@ class BookingPage extends ConsumerWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           flex: 2,
-                          child: _buildSummaryCard(ref, state,context),
+                          child: _buildSummaryCard(ref, state, context),
                         ),
                       ],
                     ),
@@ -130,36 +125,46 @@ class BookingPage extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // Room Type
-            _buildDropdownField(
-              label: 'Room Type',
-              value: bookingState.roomType,
-              items: roomTypeState.roomTypes,
-              itemLabel: (item) => item.name,
-              onChanged: (value) {
-                if (value != null) {
-                  controller.setRoomType(value);
-                }
-              },
+            Row(
+              children: [
+                Expanded(
+                  child: // Room Type
+                      _buildDropdownField(
+                    label: 'Room Type',
+                    value: bookingState.roomType,
+                    items: roomTypeState.roomTypes,
+                    itemLabel: (item) => item.name,
+                    onChanged: (value) {
+                      if (value != null) {
+                        controller.setRoomType(value);
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildNumberField(
+                    label: 'Number of Rooms',
+                    value: state.numberOfRooms,
+                    onChanged: (value) => controller.setNumberOfRooms(value),
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 16),
 
             // Customer ID (for now, using a number field - can be replaced with customer dropdown)
-            _buildCustomerField(
-              label: 'Customer ID',
-              value: state.customerId,
-              onChanged: (value) => controller.setCustomerId(value),
-            ),
-            const SizedBox(height: 16),
+            // _buildCustomerField(
+            //   label: 'Customer ID',
+            //   value: state.customerId,
+            //   onChanged: (value) => controller.setCustomerId(value),
+            // ),
+            // const SizedBox(height: 16),
 
             // Number of Rooms
-            _buildNumberField(
-              label: 'Number of Rooms',
-              value: state.numberOfRooms,
-              onChanged: (value) => controller.setNumberOfRooms(value),
-            ),
-            const SizedBox(height: 16),
+
+            // const SizedBox(height: 16),
 
             // Adults and Children
             Row(
@@ -516,7 +521,8 @@ class BookingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard(WidgetRef ref, BookingState state, BuildContext context) {
+  Widget _buildSummaryCard(
+      WidgetRef ref, BookingState state, BuildContext context) {
     final controller = ref.read(bookingControllerProvider.notifier);
     final formatter = NumberFormat('#,##0.00', 'en_US');
 
@@ -607,12 +613,13 @@ class BookingPage extends ConsumerWidget {
                 onPressed: state.selectedRooms.isEmpty
                     ? null
                     : () {
+                        controller.resetDiscountCalculator();
                         showDialog(
-  context: context,
-  builder: (_) => BookingConfirmationDialog(
-    //bookingState: state,
-    ),
-);
+                          context: context,
+                          builder: (_) => BookingConfirmationDialog(
+                              //bookingState: state,
+                              ),
+                        );
                       },
                 //controller.createBooking(),
                 style: ElevatedButton.styleFrom(

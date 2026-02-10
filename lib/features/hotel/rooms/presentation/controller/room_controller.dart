@@ -67,4 +67,10 @@ class RoomController extends StateNotifier<RoomState> {
   Future<void> updateRoom(RoomEntity room) {
     return repository.updateRoomStatus(room.id!, room.status);
   }
+
+  void setSelectedFilter(selectedFilter) {
+    state = state.copyWith(selectedFilter: selectedFilter);
+  }
+
+  
 }

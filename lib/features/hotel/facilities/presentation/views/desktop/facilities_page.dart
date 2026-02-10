@@ -15,60 +15,92 @@ class FacilitiesPage extends ConsumerStatefulWidget {
 class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
   final searchController = TextEditingController();
 
-  // ---------------- Add / Edit Dialog ----------------
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
+  // ---------------- Add / Edit Dialog ----------------
   void showFacilityDialog({FacilityEntity? facility}) {
+    if (facility != null) {
+      ref.read(facilitiesControllerProvider.notifier).initForm(facility);
+    }
+
     final nameCtrl = TextEditingController(text: facility?.name ?? '');
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => AlertDialog(
-        title: Text(facility == null ? 'Add Facility' : 'Edit Facility'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          facility == null ? 'Add Facility' : 'Edit Facility',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Consumer(
-          builder: (context, ref, _) {
+          builder: (_, ref, __) {
             final state = ref.watch(facilitiesControllerProvider);
 
             return SizedBox(
-              width: 400,
+              width: 420,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: nameCtrl,
-                    decoration:
-                        const InputDecoration(labelText: 'Facility name'),
-                  ),
-                  const SizedBox(height: 16),
-
-                  /// ICON DROPDOWN
-                  Row(
-                    children: [
-                      const Text('Icon:'),
-                      const SizedBox(width: 12),
-                      DropdownButton<IconData>(
-                        key: ValueKey(state.selectedIcon.codePoint),
-                        value: state.selectedIcon,
-                        items: state.icons
-                            .map(
-                              (icon) => DropdownMenuItem(
-                                value: icon,
-                                child: Icon(icon),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (icon) => ref
-                            .read(facilitiesControllerProvider.notifier)
-                            .changeSelectedIcon(icon!),
+                    decoration: InputDecoration(
+                      labelText: 'Facility name',
+                      filled: true,
+                      fillColor: Colors.grey.shade50,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  /// ICON PICKER
+                  DropdownButtonFormField<IconData>(
+                    value: state.selectedIcon,
+                    decoration: InputDecoration(
+                      labelText: 'Icon',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    items: state.icons
+                        .map(
+                          (icon) => DropdownMenuItem(
+                            value: icon,
+                            child: Row(
+                              children: [
+                                Icon(icon),
+                                const SizedBox(width: 12),
+                                Text(icon.codePoint.toString()),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (icon) => ref
+                        .read(facilitiesControllerProvider.notifier)
+                        .changeSelectedIcon(icon!),
                   ),
 
                   const SizedBox(height: 16),
 
-                  /// STATUS DROPDOWN
+                  /// STATUS
                   DropdownButtonFormField<String>(
                     value: state.selectedFormStatus,
-                    decoration: const InputDecoration(labelText: 'Status'),
+                    decoration: InputDecoration(
+                      labelText: 'Status',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     items: state.formStatusList
                         .map(
                           (s) => DropdownMenuItem(value: s, child: Text(s)),
@@ -84,7 +116,7 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
           },
         ),
         actions: [
-          TextButton(
+          OutlinedButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
@@ -94,9 +126,7 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
                   ref.read(facilitiesControllerProvider.notifier);
 
               if (facility == null) {
-                await controller.addFacility(
-                  nameCtrl.text,
-                );
+                await controller.addFacility(nameCtrl.text);
               } else {
                 await controller.updateFacility(
                   id: facility.id!,
@@ -106,6 +136,12 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
 
               Navigator.pop(context);
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: SpotstockColors.c473069,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             child: const Text('Save'),
           ),
         ],
@@ -113,260 +149,318 @@ class _FacilitiesPageState extends ConsumerState<FacilitiesPage> {
     );
   }
 
-  // ---------------- Delete Dialog ----------------
-
-  void showDeleteDialog(FacilityEntity facility) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Delete Facility'),
-        content: const Text('Are you sure you want to delete this facility?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: SpotstockColors.red,
-            ),
-            onPressed: () {
-              ref
-                  .read(facilitiesControllerProvider.notifier)
-                  .deleteFacility(facility.id!);
-              Navigator.pop(context);
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-  }
-
   // ---------------- UI ----------------
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(facilitiesControllerProvider);
     final facilities = state.facilities;
 
     return Scaffold(
-      body: Container(
-        
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// HEADER
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Facilities',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+      backgroundColor: Colors.grey.shade50,
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// HEADER
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Facilities',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () => showFacilityDialog(),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Facility'),
-                  ),
-                ],
-              ),
-        
-              const SizedBox(height: 20),
-        
-              /// CONTENT CARD
-              Expanded(
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        /// SEARCH + FILTER
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: searchController,
-                                decoration: InputDecoration(
-                                  hintText: 'Search facilities...',
-                                  prefixIcon: const Icon(Icons.search),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                ),
-                                onChanged: (value) {
-                                  // optional: add search use case later
-                                  ref
-                                      .read(facilitiesControllerProvider.notifier)
-                                      .filterByName(value);
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            DropdownButton<String>(
-                              value: state.selectedFilterStatus,
-                              items: state.filterStatusList
-                                  .map(
-                                    (status) => DropdownMenuItem(
-                                      value: status,
-                                      child: Text(status),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) => ref
-                                  .read(facilitiesControllerProvider.notifier)
-                                  .changeSearchStatus(value!),
-                            ),
-                          ],
-                        ),
-        
-                        const SizedBox(height: 20),
-        
-                        /// TABLE HEADER
-                        Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: SpotstockColors.grey300,
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            children: const [
-                              Expanded(flex: 3, child: Text('Facility')),
-                              Expanded(flex: 1, child: Text('Icon')),
-                              Expanded(flex: 1, child: Text('Status')),
-                              Expanded(flex: 2, child: Text('Actions')),
-                            ],
-                          ),
-                        ),
-        
-                        /// LIST
-                        Expanded(
-                          child: state.isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : ListView.builder(
-                                  itemCount: facilities.length,
-                                  itemBuilder: (context, index) {
-                                    final facility = facilities[index];
-        
-                                    return Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: SpotstockColors.grey200,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            /// Facility name
-                                            Expanded(
-                                              flex: 3,
-                                              child: Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  facility.name,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                              ),
-                                            ),
-        
-                                            /// Icon
-                                            Expanded(
-                                              flex: 1,
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Icon(facility.icon),
-                                              ),
-                                            ),
-        
-                                            /// Status
-                                            Expanded(
-                                              flex: 1,
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  facility.status,
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: facility.status ==
-                                                            'Active'
-                                                        ? SpotstockColors.green
-                                                        : SpotstockColors.red,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-        
-                                            /// Actions
-                                            Expanded(
-                                              flex: 2,
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                        Icons.edit,
-                                                        color:
-                                                            SpotstockColors.blue,
-                                                      ),
-                                                      onPressed: () =>
-                                                          showFacilityDialog(
-                                                        facility: facility,
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                        Icons.delete,
-                                                        color:
-                                                            SpotstockColors.red,
-                                                      ),
-                                                      onPressed: () =>
-                                                          showDeleteDialog(
-                                                        facility,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ));
-                                  },
-                                ),
-                        ),
-                      ],
+                    SizedBox(height: 4),
+                    Text(
+                      'Manage hotel facilities and amenities',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => showFacilityDialog(),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Facility'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: SpotstockColors.c473069,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            /// MAIN CARD
+            Expanded(
+              child: Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      /// SEARCH + FILTER
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Search facilities...',
+                                prefixIcon: const Icon(Icons.search),
+                                filled: true,
+                                fillColor: Colors.grey.shade50,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              onChanged: (value) => ref
+                                  .read(facilitiesControllerProvider.notifier)
+                                  .filterByName(value),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          DropdownButton<String>(
+                            value: state.selectedFilterStatus,
+                            underline: const SizedBox(),
+                            items: state.filterStatusList
+                                .map(
+                                  (status) => DropdownMenuItem(
+                                    value: status,
+                                    child: Text(status),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) => ref
+                                .read(facilitiesControllerProvider.notifier)
+                                .changeSearchStatus(value!),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      /// LIST
+                      Expanded(
+                        child: state.isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : facilities.isEmpty
+                                ? _buildEmptyState()
+                                : ListView.builder(
+                                    itemCount: facilities.length,
+                                    itemBuilder: (_, index) =>
+                                        _buildFacilityRow(
+                                      facilities[index],
+                                      index,
+                                    ),
+                                  ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFacilityRow(FacilityEntity facility, int index) {
+    final isActive = facility.status == 'Active';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: index.isEven ? Colors.white : Colors.grey.shade50,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: SpotstockColors.c473069.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(facility.icon),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  facility.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _statusBadge(isActive),
+          ),
+          SizedBox(
+            width: 100,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => showFacilityDialog(facility: facility),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline,
+                      color: SpotstockColors.red),
+                  onPressed: () => showDeleteDialog(
+                      facility, MediaQuery.of(context).size.width * 0.6),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showDeleteDialog(FacilityEntity facility, double width) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          width: width,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// Icon
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: SpotstockColors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: SpotstockColors.red,
+                    size: 48,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// Title
+                const Text(
+                  'Delete Facility',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /// Message
+                Text(
+                  'Are you sure you want to delete "${facility.name}"?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                /// Actions
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: SpotstockColors.red,
+                        ),
+                        onPressed: () {
+                          ref
+                              .read(facilitiesControllerProvider.notifier)
+                              .deleteFacility(facility.id!);
+
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Delete'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _statusBadge(bool isActive) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isActive
+            ? SpotstockColors.green.withOpacity(0.1)
+            : SpotstockColors.red.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        isActive ? 'Active' : 'Inactive',
+        style: TextStyle(
+          color: isActive ? SpotstockColors.green : SpotstockColors.red,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.home_work_outlined, size: 64, color: Colors.grey),
+          SizedBox(height: 16),
+          Text(
+            'No facilities found',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }

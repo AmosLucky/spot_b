@@ -9428,11 +9428,33 @@ class $LocalBookingsTableTable extends LocalBookingsTable
   late final GeneratedColumn<double> totalAmount = GeneratedColumn<double>(
       'total_amount', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _discountMeta =
+      const VerificationMeta('discount');
+  @override
+  late final GeneratedColumn<double> discount = GeneratedColumn<double>(
+      'discount', aliasedName, false,
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0.0));
+  static const VerificationMeta _guestTypeMeta =
+      const VerificationMeta('guestType');
+  @override
+  late final GeneratedColumn<String> guestType = GeneratedColumn<String>(
+      'guest_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
       type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
@@ -9450,7 +9472,10 @@ class $LocalBookingsTableTable extends LocalBookingsTable
         checkOutStatus,
         roomKeyStatus,
         totalAmount,
-        createdAt
+        discount,
+        guestType,
+        createdAt,
+        updatedAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -9548,9 +9573,23 @@ class $LocalBookingsTableTable extends LocalBookingsTable
     } else if (isInserting) {
       context.missing(_totalAmountMeta);
     }
+    if (data.containsKey('discount')) {
+      context.handle(_discountMeta,
+          discount.isAcceptableOrUnknown(data['discount']!, _discountMeta));
+    }
+    if (data.containsKey('guest_type')) {
+      context.handle(_guestTypeMeta,
+          guestType.isAcceptableOrUnknown(data['guest_type']!, _guestTypeMeta));
+    } else if (isInserting) {
+      context.missing(_guestTypeMeta);
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
     }
     return context;
   }
@@ -9585,8 +9624,14 @@ class $LocalBookingsTableTable extends LocalBookingsTable
           DriftSqlType.string, data['${effectivePrefix}room_key_status'])!,
       totalAmount: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}total_amount'])!,
+      discount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}discount'])!,
+      guestType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}guest_type'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
   }
 
@@ -9622,9 +9667,18 @@ class LocalBookingsTableData extends DataClass
   /// given | not_given
   final String roomKeyStatus;
 
-  /// ✅ ADD THIS
+  /// 💰 Total before discount
   final double totalAmount;
+
+  /// 💸 Discount applied
+  final double discount;
+
+  /// guest | walkin | existing
+  final String guestType;
   final DateTime createdAt;
+
+  /// 🔄 Updated timestamp
+  final DateTime updatedAt;
   const LocalBookingsTableData(
       {required this.id,
       required this.bookingNumber,
@@ -9638,7 +9692,10 @@ class LocalBookingsTableData extends DataClass
       required this.checkOutStatus,
       required this.roomKeyStatus,
       required this.totalAmount,
-      required this.createdAt});
+      required this.discount,
+      required this.guestType,
+      required this.createdAt,
+      required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -9654,7 +9711,10 @@ class LocalBookingsTableData extends DataClass
     map['check_out_status'] = Variable<String>(checkOutStatus);
     map['room_key_status'] = Variable<String>(roomKeyStatus);
     map['total_amount'] = Variable<double>(totalAmount);
+    map['discount'] = Variable<double>(discount);
+    map['guest_type'] = Variable<String>(guestType);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
 
@@ -9672,7 +9732,10 @@ class LocalBookingsTableData extends DataClass
       checkOutStatus: Value(checkOutStatus),
       roomKeyStatus: Value(roomKeyStatus),
       totalAmount: Value(totalAmount),
+      discount: Value(discount),
+      guestType: Value(guestType),
       createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
     );
   }
 
@@ -9692,7 +9755,10 @@ class LocalBookingsTableData extends DataClass
       checkOutStatus: serializer.fromJson<String>(json['checkOutStatus']),
       roomKeyStatus: serializer.fromJson<String>(json['roomKeyStatus']),
       totalAmount: serializer.fromJson<double>(json['totalAmount']),
+      discount: serializer.fromJson<double>(json['discount']),
+      guestType: serializer.fromJson<String>(json['guestType']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
   @override
@@ -9711,7 +9777,10 @@ class LocalBookingsTableData extends DataClass
       'checkOutStatus': serializer.toJson<String>(checkOutStatus),
       'roomKeyStatus': serializer.toJson<String>(roomKeyStatus),
       'totalAmount': serializer.toJson<double>(totalAmount),
+      'discount': serializer.toJson<double>(discount),
+      'guestType': serializer.toJson<String>(guestType),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
 
@@ -9728,7 +9797,10 @@ class LocalBookingsTableData extends DataClass
           String? checkOutStatus,
           String? roomKeyStatus,
           double? totalAmount,
-          DateTime? createdAt}) =>
+          double? discount,
+          String? guestType,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
       LocalBookingsTableData(
         id: id ?? this.id,
         bookingNumber: bookingNumber ?? this.bookingNumber,
@@ -9742,7 +9814,10 @@ class LocalBookingsTableData extends DataClass
         checkOutStatus: checkOutStatus ?? this.checkOutStatus,
         roomKeyStatus: roomKeyStatus ?? this.roomKeyStatus,
         totalAmount: totalAmount ?? this.totalAmount,
+        discount: discount ?? this.discount,
+        guestType: guestType ?? this.guestType,
         createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
       );
   LocalBookingsTableData copyWithCompanion(LocalBookingsTableCompanion data) {
     return LocalBookingsTableData(
@@ -9771,7 +9846,10 @@ class LocalBookingsTableData extends DataClass
           : this.roomKeyStatus,
       totalAmount:
           data.totalAmount.present ? data.totalAmount.value : this.totalAmount,
+      discount: data.discount.present ? data.discount.value : this.discount,
+      guestType: data.guestType.present ? data.guestType.value : this.guestType,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
@@ -9790,7 +9868,10 @@ class LocalBookingsTableData extends DataClass
           ..write('checkOutStatus: $checkOutStatus, ')
           ..write('roomKeyStatus: $roomKeyStatus, ')
           ..write('totalAmount: $totalAmount, ')
-          ..write('createdAt: $createdAt')
+          ..write('discount: $discount, ')
+          ..write('guestType: $guestType, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -9809,7 +9890,10 @@ class LocalBookingsTableData extends DataClass
       checkOutStatus,
       roomKeyStatus,
       totalAmount,
-      createdAt);
+      discount,
+      guestType,
+      createdAt,
+      updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -9826,7 +9910,10 @@ class LocalBookingsTableData extends DataClass
           other.checkOutStatus == this.checkOutStatus &&
           other.roomKeyStatus == this.roomKeyStatus &&
           other.totalAmount == this.totalAmount &&
-          other.createdAt == this.createdAt);
+          other.discount == this.discount &&
+          other.guestType == this.guestType &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
 }
 
 class LocalBookingsTableCompanion
@@ -9843,7 +9930,10 @@ class LocalBookingsTableCompanion
   final Value<String> checkOutStatus;
   final Value<String> roomKeyStatus;
   final Value<double> totalAmount;
+  final Value<double> discount;
+  final Value<String> guestType;
   final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   const LocalBookingsTableCompanion({
     this.id = const Value.absent(),
     this.bookingNumber = const Value.absent(),
@@ -9857,7 +9947,10 @@ class LocalBookingsTableCompanion
     this.checkOutStatus = const Value.absent(),
     this.roomKeyStatus = const Value.absent(),
     this.totalAmount = const Value.absent(),
+    this.discount = const Value.absent(),
+    this.guestType = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   });
   LocalBookingsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -9872,7 +9965,10 @@ class LocalBookingsTableCompanion
     required String checkOutStatus,
     required String roomKeyStatus,
     required double totalAmount,
+    this.discount = const Value.absent(),
+    required String guestType,
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
   })  : bookingNumber = Value(bookingNumber),
         customerId = Value(customerId),
         roomNumbers = Value(roomNumbers),
@@ -9883,7 +9979,8 @@ class LocalBookingsTableCompanion
         checkInStatus = Value(checkInStatus),
         checkOutStatus = Value(checkOutStatus),
         roomKeyStatus = Value(roomKeyStatus),
-        totalAmount = Value(totalAmount);
+        totalAmount = Value(totalAmount),
+        guestType = Value(guestType);
   static Insertable<LocalBookingsTableData> custom({
     Expression<int>? id,
     Expression<String>? bookingNumber,
@@ -9897,7 +9994,10 @@ class LocalBookingsTableCompanion
     Expression<String>? checkOutStatus,
     Expression<String>? roomKeyStatus,
     Expression<double>? totalAmount,
+    Expression<double>? discount,
+    Expression<String>? guestType,
     Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -9912,7 +10012,10 @@ class LocalBookingsTableCompanion
       if (checkOutStatus != null) 'check_out_status': checkOutStatus,
       if (roomKeyStatus != null) 'room_key_status': roomKeyStatus,
       if (totalAmount != null) 'total_amount': totalAmount,
+      if (discount != null) 'discount': discount,
+      if (guestType != null) 'guest_type': guestType,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
@@ -9929,7 +10032,10 @@ class LocalBookingsTableCompanion
       Value<String>? checkOutStatus,
       Value<String>? roomKeyStatus,
       Value<double>? totalAmount,
-      Value<DateTime>? createdAt}) {
+      Value<double>? discount,
+      Value<String>? guestType,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt}) {
     return LocalBookingsTableCompanion(
       id: id ?? this.id,
       bookingNumber: bookingNumber ?? this.bookingNumber,
@@ -9943,7 +10049,10 @@ class LocalBookingsTableCompanion
       checkOutStatus: checkOutStatus ?? this.checkOutStatus,
       roomKeyStatus: roomKeyStatus ?? this.roomKeyStatus,
       totalAmount: totalAmount ?? this.totalAmount,
+      discount: discount ?? this.discount,
+      guestType: guestType ?? this.guestType,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -9986,8 +10095,17 @@ class LocalBookingsTableCompanion
     if (totalAmount.present) {
       map['total_amount'] = Variable<double>(totalAmount.value);
     }
+    if (discount.present) {
+      map['discount'] = Variable<double>(discount.value);
+    }
+    if (guestType.present) {
+      map['guest_type'] = Variable<String>(guestType.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
     return map;
   }
@@ -10007,7 +10125,10 @@ class LocalBookingsTableCompanion
           ..write('checkOutStatus: $checkOutStatus, ')
           ..write('roomKeyStatus: $roomKeyStatus, ')
           ..write('totalAmount: $totalAmount, ')
-          ..write('createdAt: $createdAt')
+          ..write('discount: $discount, ')
+          ..write('guestType: $guestType, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
@@ -14484,7 +14605,10 @@ typedef $$LocalBookingsTableTableCreateCompanionBuilder
   required String checkOutStatus,
   required String roomKeyStatus,
   required double totalAmount,
+  Value<double> discount,
+  required String guestType,
   Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
 typedef $$LocalBookingsTableTableUpdateCompanionBuilder
     = LocalBookingsTableCompanion Function({
@@ -14500,7 +14624,10 @@ typedef $$LocalBookingsTableTableUpdateCompanionBuilder
   Value<String> checkOutStatus,
   Value<String> roomKeyStatus,
   Value<double> totalAmount,
+  Value<double> discount,
+  Value<String> guestType,
   Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
 });
 
 final class $$LocalBookingsTableTableReferences extends BaseReferences<
@@ -14567,8 +14694,17 @@ class $$LocalBookingsTableTableFilterComposer
   ColumnFilters<double> get totalAmount => $composableBuilder(
       column: $table.totalAmount, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<double> get discount => $composableBuilder(
+      column: $table.discount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get guestType => $composableBuilder(
+      column: $table.guestType, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
 
   $$LocalCustomersTableFilterComposer get customerId {
     final $$LocalCustomersTableFilterComposer composer = $composerBuilder(
@@ -14638,8 +14774,17 @@ class $$LocalBookingsTableTableOrderingComposer
   ColumnOrderings<double> get totalAmount => $composableBuilder(
       column: $table.totalAmount, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<double> get discount => $composableBuilder(
+      column: $table.discount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get guestType => $composableBuilder(
+      column: $table.guestType, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 
   $$LocalCustomersTableOrderingComposer get customerId {
     final $$LocalCustomersTableOrderingComposer composer = $composerBuilder(
@@ -14704,8 +14849,17 @@ class $$LocalBookingsTableTableAnnotationComposer
   GeneratedColumn<double> get totalAmount => $composableBuilder(
       column: $table.totalAmount, builder: (column) => column);
 
+  GeneratedColumn<double> get discount =>
+      $composableBuilder(column: $table.discount, builder: (column) => column);
+
+  GeneratedColumn<String> get guestType =>
+      $composableBuilder(column: $table.guestType, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
   $$LocalCustomersTableAnnotationComposer get customerId {
     final $$LocalCustomersTableAnnotationComposer composer = $composerBuilder(
@@ -14765,7 +14919,10 @@ class $$LocalBookingsTableTableTableManager extends RootTableManager<
             Value<String> checkOutStatus = const Value.absent(),
             Value<String> roomKeyStatus = const Value.absent(),
             Value<double> totalAmount = const Value.absent(),
+            Value<double> discount = const Value.absent(),
+            Value<String> guestType = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
               LocalBookingsTableCompanion(
             id: id,
@@ -14780,7 +14937,10 @@ class $$LocalBookingsTableTableTableManager extends RootTableManager<
             checkOutStatus: checkOutStatus,
             roomKeyStatus: roomKeyStatus,
             totalAmount: totalAmount,
+            discount: discount,
+            guestType: guestType,
             createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -14795,7 +14955,10 @@ class $$LocalBookingsTableTableTableManager extends RootTableManager<
             required String checkOutStatus,
             required String roomKeyStatus,
             required double totalAmount,
+            Value<double> discount = const Value.absent(),
+            required String guestType,
             Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
           }) =>
               LocalBookingsTableCompanion.insert(
             id: id,
@@ -14810,7 +14973,10 @@ class $$LocalBookingsTableTableTableManager extends RootTableManager<
             checkOutStatus: checkOutStatus,
             roomKeyStatus: roomKeyStatus,
             totalAmount: totalAmount,
+            discount: discount,
+            guestType: guestType,
             createdAt: createdAt,
+            updatedAt: updatedAt,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../../core/constants/colors/spotstock_colors.dart';
+import '../../../../../../../core/constants/colors/spotstock_colors.dart';
+import '../../domain/entities/premium_type_entity.dart';
+import '../providers/premium_type_provider.dart';
+import 'widgets/premium_type_dialog.dart';
 
-import '../../domain/entities/room_type_entities.dart';
-import '../providers/room_type_provider.dart';
-import 'widgets/room_type_dialog.dart';
-
-class RoomTypesPage extends ConsumerStatefulWidget {
-  const RoomTypesPage({super.key});
+class PremiumTypesPage extends ConsumerStatefulWidget {
+  const PremiumTypesPage({super.key});
 
   @override
-  ConsumerState<RoomTypesPage> createState() => _RoomTypesPageState();
+  ConsumerState<PremiumTypesPage> createState() => _PremiumTypesPageState();
 }
 
-class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
+class _PremiumTypesPageState extends ConsumerState<PremiumTypesPage> {
   final searchController = TextEditingController();
 
   @override
@@ -23,20 +22,20 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
     super.dispose();
   }
 
-  // ---------------- ADD / EDIT DIALOG ----------------
-  void showRoomTypeDialog({RoomTypeEntity? roomType}) {
+  // ---------------- Add / Edit Dialog ----------------
+  void showPremiumTypeDialog({PremiumTypeEntity? premiumType}) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => RoomTypeDialog(
-        roomType: roomType,
-        ref: ref,
+      builder: (_) => PremiumTypeDialog(
+        premiumType: premiumType,
+        // ref: ref,
       ),
     );
   }
 
-  // ---------------- DELETE DIALOG ----------------
-  void showDeleteDialog(RoomTypeEntity roomType) {
+  // ---------------- Delete Dialog ----------------
+  void showDeleteDialog(PremiumTypeEntity premiumType) {
     showDialog(
       context: context,
       builder: (_) => Dialog(
@@ -66,7 +65,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
 
               // Title
               const Text(
-                'Delete Room Type',
+                'Delete Premium Service',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -76,7 +75,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
 
               // Message
               Text(
-                'Are you sure you want to delete "${roomType.name}"? This action cannot be undone.',
+                'Are you sure you want to delete "${premiumType.name}"? This action cannot be undone.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -123,12 +122,12 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                       ),
                       onPressed: () {
                         ref
-                            .read(roomTypeControllerProvider.notifier)
-                            .deleteRoomType(roomType.id!);
+                            .read(premiumTypeControllerProvider.notifier)
+                            .deletePremiumType(premiumType.id!);
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${roomType.name} deleted'),
+                            content: Text('${premiumType.name} deleted'),
                             backgroundColor: SpotstockColors.green,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
@@ -158,8 +157,14 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
   // ---------------- UI ----------------
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(roomTypeControllerProvider);
-    final roomTypes = state.roomTypes;
+    final state = ref.watch(premiumTypeControllerProvider);
+    final premiumTypes = state.filtered;
+
+    // Statistics
+    final totalServices = state.all.length;
+    final activeServices = state.all.where((s) => s.status == 'Active').length;
+    final inactiveServices =
+        state.all.where((s) => s.status == 'Inactive').length;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -176,7 +181,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Room Types',
+                      'Premium Services',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -185,7 +190,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Configure room categories and pricing',
+                      'Manage additional services and amenities',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade600,
@@ -194,10 +199,10 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                   ],
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => showRoomTypeDialog(),
+                  onPressed: () => showPremiumTypeDialog(),
                   icon: const Icon(Icons.add, size: 20),
                   label: const Text(
-                    'Add Room Type',
+                    'Add Premium Service',
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -218,6 +223,34 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
 
             const SizedBox(height: 24),
 
+            /// STATISTICS CARDS
+            Row(
+              children: [
+                _buildStatCard(
+                  'Total Services',
+                  totalServices.toString(),
+                  Icons.star,
+                  SpotstockColors.c473069,
+                ),
+                const SizedBox(width: 16),
+                _buildStatCard(
+                  'Active',
+                  activeServices.toString(),
+                  Icons.check_circle,
+                  SpotstockColors.green,
+                ),
+                const SizedBox(width: 16),
+                _buildStatCard(
+                  'Inactive',
+                  inactiveServices.toString(),
+                  Icons.cancel,
+                  SpotstockColors.red,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
             /// MAIN CONTENT CARD
             Expanded(
               child: Card(
@@ -230,45 +263,88 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
-                      /// SEARCH BAR
-                      TextField(
-                        controller: searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search room types...',
-                          hintStyle: TextStyle(
-                            color: Colors.grey.shade400,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: Colors.grey.shade400,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.grey.shade200,
+                      /// SEARCH AND FILTER BAR
+                      Row(
+                        children: [
+                          // Search
+                          Expanded(
+                            child: TextField(
+                              controller: searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Search premium services...',
+                                hintStyle: TextStyle(
+                                  color: Colors.grey.shade400,
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                  color: Colors.grey.shade400,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey.shade50,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: SpotstockColors.c473069,
+                                    width: 2,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                              ),
+                              onChanged: (value) => ref
+                                  .read(premiumTypeControllerProvider.notifier)
+                                  .filterByName(value),
                             ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: SpotstockColors.c473069,
-                              width: 2,
+                          const SizedBox(width: 16),
+
+                          // Filter Dropdown
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade200),
+                            ),
+                            child: DropdownButton<String>(
+                              value: state.selectedFilterStatus,
+                              underline: const SizedBox(),
+                              icon: Icon(
+                                Icons.filter_list,
+                                color: SpotstockColors.c473069,
+                              ),
+                              items: state.filterStatusList.map((status) {
+                                return DropdownMenuItem(
+                                  value: status,
+                                  child: Text(
+                                    status,
+                                    style: TextStyle(
+                                      fontWeight:
+                                          state.selectedFilterStatus == status
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) => ref
+                                  .read(premiumTypeControllerProvider.notifier)
+                                  .changeSearchStatus(value!),
                             ),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                        ),
-                        onChanged: (v) => ref
-                            .read(roomTypeControllerProvider.notifier)
-                            .searchRoomType(v),
+                        ],
                       ),
 
                       const SizedBox(height: 24),
@@ -281,8 +357,8 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                                   color: SpotstockColors.c473069,
                                 ),
                               )
-                            : roomTypes.isEmpty
-                                ? _buildEmptyState()
+                            : premiumTypes.isEmpty
+                                ? _buildEmptyState(state)
                                 : Column(
                                     children: [
                                       // Table Header
@@ -301,21 +377,9 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                                         child: Row(
                                           children: [
                                             Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                'NAME',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey.shade700,
-                                                  letterSpacing: 0.5,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
                                               flex: 3,
                                               child: Text(
-                                                'DESCRIPTION',
+                                                'SERVICE NAME',
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
@@ -328,7 +392,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                                               flex: 2,
                                               child: Center(
                                                 child: Text(
-                                                  'FARE / NIGHT',
+                                                  'COST',
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.bold,
@@ -373,11 +437,11 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                                       // Table Rows
                                       Expanded(
                                         child: ListView.builder(
-                                          itemCount: roomTypes.length,
+                                          itemCount: premiumTypes.length,
                                           itemBuilder: (context, index) {
-                                            final room = roomTypes[index];
-                                            return _buildRoomTypeRow(
-                                              room,
+                                            final item = premiumTypes[index];
+                                            return _buildPremiumTypeRow(
+                                              item,
                                               index,
                                             );
                                           },
@@ -397,7 +461,66 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
     );
   }
 
-  Widget _buildRoomTypeRow(RoomTypeEntity room, int index) {
+  Widget _buildStatCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPremiumTypeRow(PremiumTypeEntity item, int index) {
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 16,
@@ -416,7 +539,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
         children: [
           /// NAME
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Row(
               children: [
                 Container(
@@ -426,54 +549,26 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    Icons.bed,
+                    Icons.star,
                     color: SpotstockColors.c473069,
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        room.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${room.totalAdults} Adults • ${room.totalChildren} Children • ${room.totalBeds} Beds',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    item.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
 
-          /// DESCRIPTION
-          Expanded(
-            flex: 3,
-            child: Text(
-              room.description,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade700,
-                height: 1.4,
-              ),
-            ),
-          ),
-
-          /// FARE
+          /// COST
           Expanded(
             flex: 2,
             child: Center(
@@ -487,7 +582,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '₦${room.fare.toStringAsFixed(2)}',
+                  '₦${item.cost.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
@@ -502,7 +597,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
           Expanded(
             flex: 1,
             child: Center(
-              child: _buildStatusBadge(room.isActive),
+              child: _buildStatusBadge(item.status),
             ),
           ),
 
@@ -518,7 +613,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                     size: 20,
                     color: Colors.grey.shade600,
                   ),
-                  onPressed: () => showRoomTypeDialog(roomType: room),
+                  onPressed: () => showPremiumTypeDialog(premiumType: item),
                   tooltip: 'Edit',
                   splashRadius: 20,
                 ),
@@ -528,7 +623,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
                     size: 20,
                     color: SpotstockColors.red,
                   ),
-                  onPressed: () => showDeleteDialog(room),
+                  onPressed: () => showDeleteDialog(item),
                   tooltip: 'Delete',
                   splashRadius: 20,
                 ),
@@ -540,7 +635,8 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
     );
   }
 
-  Widget _buildStatusBadge(bool isActive) {
+  Widget _buildStatusBadge(String status) {
+    final isActive = status == 'Active';
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
@@ -562,7 +658,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
           ),
           const SizedBox(width: 6),
           Text(
-            isActive ? 'Active' : 'Inactive',
+            status,
             style: TextStyle(
               color: isActive ? SpotstockColors.green : SpotstockColors.red,
               fontSize: 13,
@@ -574,7 +670,7 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(state) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -586,14 +682,14 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.bed_outlined,
+              Icons.star_outline,
               size: 64,
               color: Colors.grey.shade400,
             ),
           ),
           const SizedBox(height: 24),
           Text(
-            'No room types found',
+            'No premium services found',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -602,7 +698,9 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Create your first room type to get started',
+            state.selectedFilterStatus == 'All'
+                ? 'Create your first premium service'
+                : 'No services with status "${state.selectedFilterStatus}"',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey.shade500,
@@ -610,9 +708,9 @@ class _RoomTypesPageState extends ConsumerState<RoomTypesPage> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => showRoomTypeDialog(),
+            onPressed: () => showPremiumTypeDialog(),
             icon: const Icon(Icons.add),
-            label: const Text('Add Room Type'),
+            label: const Text('Add Premium Service'),
             style: ElevatedButton.styleFrom(
               backgroundColor: SpotstockColors.c473069,
               foregroundColor: Colors.white,

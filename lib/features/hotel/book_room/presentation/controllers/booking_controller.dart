@@ -288,8 +288,10 @@ class BookingController extends StateNotifier<BookingState> {
 
       // Create booking entity
       final booking = BookingEntity(
+        discount: state.discount,
+        guestType: state.guestType.name,
         bookingNumber: bookingNumber,
-        customerId: state.customerId!,
+        customerId: state.customerId == null ? 1 : state.customerId!,
         roomNumbers: allSelectedRooms.join(', '),
         dateFrom: state.checkInDate!,
         dateTo: state.checkOutDate!,
@@ -300,6 +302,7 @@ class BookingController extends StateNotifier<BookingState> {
         roomKeyStatus: 'Not Issued',
         totalAmount: state.totalPrice,
         createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
 
       // Save booking
@@ -317,6 +320,7 @@ class BookingController extends StateNotifier<BookingState> {
         isLoading: false,
         error: 'Failed to create booking: ${e.toString()}',
       );
+      print(e.toString());
     }
   }
 

@@ -7,7 +7,6 @@
 // import '../../domain/usecases/update_room_type_usecase.dart';
 // import '../state/room_type_state.dart';
 
-
 // class RoomTypeController extends StateNotifier<RoomTypeState> {
 //   final GetRoomTypesUseCase getUseCase;
 //   final AddRoomTypeUseCase addUseCase;
@@ -174,11 +173,26 @@ class RoomTypeController extends StateNotifier<RoomTypeState> {
     state = state.copyWith(selectedBedTypeIds: list);
   }
 
+   void toggleIsActive() {
+    state = state.copyWith(isActive: !state.isActive);
+  }
+
   void resetForm() {
     state = state.copyWith(
       selectedAmenityIds: [],
       selectedFacilityIds: [],
       selectedBedTypeIds: [],
+    );
+  }
+
+  void initForm(
+      {List<int>? selectedAmenityIds,
+      List<int>? selectedFacilityIds,
+      List<int>? selectedBedTypeIds}) {
+    state = state.copyWith(
+      selectedAmenityIds: selectedAmenityIds,
+      selectedFacilityIds: selectedFacilityIds,
+      selectedBedTypeIds: selectedBedTypeIds,
     );
   }
 }

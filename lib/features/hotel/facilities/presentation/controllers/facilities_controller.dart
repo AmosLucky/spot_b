@@ -137,6 +137,14 @@ class FacilitiesController extends StateNotifier<FacilitiesState> {
     state = state.copyWith(selectedIcon: icon);
   }
 
+  void initForm(FacilityEntity facility) {
+  state = state.copyWith(
+    selectedFormStatus: facility.status,
+    selectedIcon: facility.icon,
+  );
+}
+
+
   void resetForm() {
     state = state.copyWith(
       selectedFormStatus: 'Active',
