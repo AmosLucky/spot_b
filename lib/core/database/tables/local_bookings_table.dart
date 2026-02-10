@@ -30,9 +30,19 @@ class LocalBookingsTable extends Table {
   /// given | not_given
   TextColumn get roomKeyStatus => text()();
 
-  /// ✅ ADD THIS
+  /// 💰 Total before discount
   RealColumn get totalAmount => real()();
 
+  /// 💸 Discount applied
+  RealColumn get discount => real().withDefault(const Constant(0.0))();
+
+  /// guest | walkin | existing
+  TextColumn get guestType => text()();
+
   DateTimeColumn get createdAt =>
+      dateTime().withDefault(currentDateAndTime)();
+
+  /// 🔄 Updated timestamp
+  DateTimeColumn get updatedAt =>
       dateTime().withDefault(currentDateAndTime)();
 }
