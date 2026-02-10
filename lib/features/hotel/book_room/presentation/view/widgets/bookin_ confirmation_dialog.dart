@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,16 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:spotstock_inventory/features/hotel/book_room/presentation/providers/booking_provider.dart';
 import '../../../domain/repositories/enums/guest_type.dart';
 import '../../../domain/repositories/enums/payment_method.dart';
-import '../../state/booking_state.dart';
-
-
 
 class BookingConfirmationDialog extends ConsumerStatefulWidget {
-  final BookingState bookingState;
+  // final BookingState bookingState;
 
   const BookingConfirmationDialog({
     super.key,
-    required this.bookingState,
+    //required this.bookingState,
   });
 
   @override
@@ -26,14 +25,14 @@ class _BookingConfirmationDialogState
     extends ConsumerState<BookingConfirmationDialog> {
   final _formKey = GlobalKey<FormState>();
 
-  GuestType? _guestType;
-  String? _selectedCustomerId;
+  //GuestType? _guestType;
+  // String? _selectedCustomerId;
   String _guestName = '';
   String _phoneNumber = '';
   String _address = '';
   String _email = '';
-  double _discount = 0.0;
-  double _paidAmount = 0.0;
+  //double bookingState.discount = 0.0;
+  //double bookingState.paidAmount = 0.0;
   PaymentMethod? _paymentMethod;
 
   // Mock customer list - replace with actual data from your provider
@@ -59,35 +58,37 @@ class _BookingConfirmationDialogState
   ];
 
   double get _totalAfterDiscount {
-    return widget.bookingState.totalPrice - _discount;
+    return ref.read(bookingControllerProvider).totalPrice -
+        ref.read(bookingControllerProvider).discount;
+    //bookingState.discount;
   }
 
   double get _balance {
-    return _totalAfterDiscount - _paidAmount;
+    return _totalAfterDiscount - ref.read(bookingControllerProvider).paidAmount;
   }
 
-  void _onCustomerSelected(String? customerId) {
-    if (customerId == null) return;
+  // void _onCustomerSelected(String? customerId) {
+  //   if (customerId == null) return;
 
-    final customer = _existingCustomers.firstWhere(
-      (c) => c['id'] == customerId,
-      orElse: () => {},
-    );
+  //   final customer = _existingCustomers.firstWhere(
+  //     (c) => c['id'] == customerId,
+  //     orElse: () => {},
+  //   );
 
-    setState(() {
-      _selectedCustomerId = customerId;
-      _guestName = customer['name'] ?? '';
-      _email = customer['email'] ?? '';
-      _phoneNumber = customer['phone'] ?? '';
-    });
-  }
+  //   setState(() {
+  //     _selectedCustomerId = customerId;
+  //     _guestName = customer['name'] ?? '';
+  //     _email = customer['email'] ?? '';
+  //     _phoneNumber = customer['phone'] ?? '';
+  //   });
+  // }
 
   void _handleBooking() {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    if (_guestType == null) {
+    if (ref.read(bookingControllerProvider).guestType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a guest type'),
@@ -97,7 +98,7 @@ class _BookingConfirmationDialogState
       return;
     }
 
-    if (_paymentMethod == null) {
+    if (ref.read(bookingControllerProvider).paymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a payment method'),
@@ -112,23 +113,25 @@ class _BookingConfirmationDialogState
 
     // Return booking data to be processed
     Navigator.of(context).pop({
-      'guestType': _guestType,
-      'customerId': _selectedCustomerId,
-      'guestName': _guestName,
-      'phoneNumber': _phoneNumber,
-      'address': _address,
-      'email': _email,
-      'discount': _discount,
-      'paidAmount': _paidAmount,
-      'paymentMethod': _paymentMethod,
-      'totalAfterDiscount': _totalAfterDiscount,
-      'balance': _balance,
+      //'guestType': _guestType,
+      // 'customerId': _selectedCustomerId,
+      // 'guestName': _guestName,
+      // 'phoneNumber': _phoneNumber,
+      // 'address': _address,
+      // 'email': _email,
+      // 'discount': bookingState.discount,
+      // 'paidAmount': bookingState.paidAmount,
+      // 'paymentMethod': _paymentMethod,
+      // 'totalAfterDiscount': _totalAfterDiscount,
+      // 'balance': _balance,
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final formatter = NumberFormat('#,##0.00', 'en_US');
+    final bookingController = ref.read(bookingControllerProvider.notifier);
+    final bookingState = ref.watch(bookingControllerProvider);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -177,9 +180,10 @@ class _BookingConfirmationDialogState
 
                   // Guest Type
                   _buildLabel('Guest Type', required: true),
+
                   const SizedBox(height: 8),
                   DropdownButtonFormField<GuestType>(
-                    value: _guestType,
+                    value: bookingState.guestType,
                     decoration: _inputDecoration('Select guest type'),
                     validator: (value) {
                       if (value == null) {
@@ -188,6 +192,10 @@ class _BookingConfirmationDialogState
                       return null;
                     },
                     items: const [
+                      DropdownMenuItem(
+                        value: GuestType.guest,
+                        child: Text('Guest'),
+                      ),
                       DropdownMenuItem(
                         value: GuestType.walkin,
                         child: Text('Walk-in'),
@@ -198,28 +206,30 @@ class _BookingConfirmationDialogState
                       ),
                     ],
                     onChanged: (value) {
-                      setState(() {
-                        _guestType = value;
-                        // Reset fields when changing guest type
-                        _selectedCustomerId = null;
-                        _guestName = '';
-                        _email = '';
-                        _phoneNumber = '';
-                        _address = '';
-                      });
+                      bookingController.setGuestType(value!);
+                      // setState(() {
+                      //   _guestType = value;
+                      //   // Reset fields when changing guest type
+                      //   _selectedCustomerId = null;
+                      //   _guestName = '';
+                      //   _email = '';
+                      //   _phoneNumber = '';
+                      //   _address = '';
+                      // });
                     },
                   ),
                   const SizedBox(height: 16),
 
                   // Conditional fields based on guest type
-                  if (_guestType == GuestType.existing) ...[
+                  if (bookingState.guestType == GuestType.existing) ...[
                     _buildLabel('Select Customer', required: true),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
-                      value: _selectedCustomerId,
+                      value: _existingCustomers.first['id'],
                       decoration: _inputDecoration('Select customer'),
                       validator: (value) {
-                        if (_guestType == GuestType.existing && value == null) {
+                        if (bookingState.guestType == GuestType.existing &&
+                            value == null) {
                           return 'Please select a customer';
                         }
                         return null;
@@ -231,18 +241,20 @@ class _BookingConfirmationDialogState
                           child: Text(customer['name']),
                         );
                       }).toList(),
-                      onChanged: _onCustomerSelected,
+                      onChanged: (value) {
+                        bookingController.setCustomerId(int.parse(value!));
+                      },
                     ),
                     const SizedBox(height: 16),
                   ],
 
                   // Guest Name (required for walk-in, read-only for existing)
-                  if (_guestType != null) ...[
+                  if (bookingState.guestType == GuestType.walkin) ...[
                     _buildLabel('Guest Name', required: true),
                     const SizedBox(height: 8),
                     TextFormField(
                       initialValue: _guestName,
-                      enabled: _guestType == GuestType.walkin,
+                      enabled: bookingState.guestType == GuestType.walkin,
                       decoration: _inputDecoration('Enter guest name'),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -260,7 +272,7 @@ class _BookingConfirmationDialogState
                     const SizedBox(height: 8),
                     TextFormField(
                       initialValue: _phoneNumber,
-                      enabled: _guestType == GuestType.walkin,
+                      enabled: bookingState.guestType == GuestType.walkin,
                       decoration: _inputDecoration('Enter phone number'),
                       keyboardType: TextInputType.phone,
                       validator: (value) {
@@ -276,15 +288,15 @@ class _BookingConfirmationDialogState
 
                     // Email (read-only for existing, editable for walk-in)
                     _buildLabel('Email',
-                        required: _guestType == GuestType.walkin),
+                        required: bookingState.guestType == GuestType.walkin),
                     const SizedBox(height: 8),
                     TextFormField(
                       initialValue: _email,
-                      enabled: _guestType == GuestType.walkin,
+                      enabled: bookingState.guestType == GuestType.walkin,
                       decoration: _inputDecoration('Enter email address'),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (_guestType == GuestType.walkin &&
+                        if (bookingState.guestType == GuestType.walkin &&
                             (value == null || value.trim().isEmpty)) {
                           return 'Please enter email address';
                         }
@@ -301,7 +313,7 @@ class _BookingConfirmationDialogState
                     const SizedBox(height: 16),
 
                     // Address (only for walk-in)
-                    if (_guestType == GuestType.walkin) ...[
+                    if (bookingState.guestType == GuestType.walkin) ...[
                       _buildLabel('Address'),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -344,16 +356,15 @@ class _BookingConfirmationDialogState
                         if (discount == null) {
                           return 'Please enter a valid amount';
                         }
-                        if (discount > widget.bookingState.totalPrice) {
+                        if (discount > bookingState.totalPrice) {
                           return 'Discount cannot exceed total price';
                         }
                       }
                       return null;
                     },
                     onChanged: (value) {
-                      setState(() {
-                        _discount = double.tryParse(value) ?? 0.0;
-                      });
+                      final discount = double.tryParse(value) ?? 0.0;
+                      bookingController.setDiscount(discount);
                     },
                   ),
                   const SizedBox(height: 16),
@@ -381,9 +392,8 @@ class _BookingConfirmationDialogState
                       return null;
                     },
                     onChanged: (value) {
-                      setState(() {
-                        _paidAmount = double.tryParse(value) ?? 0.0;
-                      });
+                      bookingController
+                          .setPaidAmount(double.tryParse(value) ?? 0.0);
                     },
                   ),
                   const SizedBox(height: 16),
@@ -423,9 +433,10 @@ class _BookingConfirmationDialogState
                       ),
                     ],
                     onChanged: (value) {
-                      setState(() {
-                        _paymentMethod = value;
-                      });
+                      // setState(() {
+                      //   _paymentMethod = value;
+                      // });
+                      bookingController.setPaymentMethod(value!);
                     },
                   ),
 
@@ -439,6 +450,7 @@ class _BookingConfirmationDialogState
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  Text(bookingState.discount.toString()),
                   const SizedBox(height: 16),
 
                   Container(
@@ -451,28 +463,28 @@ class _BookingConfirmationDialogState
                       children: [
                         _buildSummaryRow(
                           'Check-in:',
-                          widget.bookingState.checkInDate != null
+                          bookingState.checkInDate != null
                               ? DateFormat('MM/dd/yyyy')
-                                  .format(widget.bookingState.checkInDate!)
+                                  .format(bookingState.checkInDate!)
                               : '-',
                         ),
                         const SizedBox(height: 8),
                         _buildSummaryRow(
                           'Check-out:',
-                          widget.bookingState.checkOutDate != null
+                          bookingState.checkOutDate != null
                               ? DateFormat('MM/dd/yyyy')
-                                  .format(widget.bookingState.checkOutDate!)
+                                  .format(bookingState.checkOutDate!)
                               : '-',
                         ),
                         const SizedBox(height: 8),
                         _buildSummaryRow(
                           'Nights:',
-                          '${widget.bookingState.numberOfNights}',
+                          '${bookingState.numberOfNights}',
                         ),
                         const SizedBox(height: 8),
                         _buildSummaryRow(
                           'Total Rooms:',
-                          '${widget.bookingState.numberOfRooms}',
+                          '${bookingState.numberOfRooms}',
                         ),
                         const Divider(height: 16),
                         const Text(
@@ -483,9 +495,8 @@ class _BookingConfirmationDialogState
                           ),
                         ),
                         const SizedBox(height: 8),
-                        ...widget.bookingState.bookingDays.map((day) {
-                          final rooms =
-                              widget.bookingState.selectedRooms[day] ?? [];
+                        ...bookingState.bookingDays.map((day) {
+                          final rooms = bookingState.selectedRooms[day] ?? [];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Row(
@@ -509,13 +520,13 @@ class _BookingConfirmationDialogState
                         const Divider(height: 16),
                         _buildSummaryRow(
                           'Subtotal:',
-                          '₦${formatter.format(widget.bookingState.totalPrice)}',
+                          '₦${formatter.format(bookingState.totalPrice)}',
                         ),
-                        if (_discount > 0) ...[
+                        if (bookingState.discount > 0) ...[
                           const SizedBox(height: 8),
                           _buildSummaryRow(
                             'Discount:',
-                            '- ₦${formatter.format(_discount)}',
+                            '- ₦${formatter.format(ref.read(bookingControllerProvider).discount)}',
                             valueColor: Colors.red,
                           ),
                         ],
@@ -525,11 +536,11 @@ class _BookingConfirmationDialogState
                           '₦${formatter.format(_totalAfterDiscount)}',
                           isBold: true,
                         ),
-                        if (_paidAmount > 0) ...[
+                        if (bookingState.paidAmount > 0) ...[
                           const SizedBox(height: 8),
                           _buildSummaryRow(
                             'Paid Amount:',
-                            '₦${formatter.format(_paidAmount)}',
+                            '₦${formatter.format(bookingState.paidAmount)}',
                             valueColor: Colors.green,
                           ),
                           const SizedBox(height: 8),
@@ -552,7 +563,9 @@ class _BookingConfirmationDialogState
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () {
+                          bookingController.createBooking();
+                        },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,

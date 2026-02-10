@@ -5,8 +5,11 @@ import '../../domain/repositories/enums/payment_method.dart';
 
 class BookingState {
   final int? selectedRoomTypeId;
-  // PaymentMethod paymentMethod;
-  // GuestType guestType;
+  final PaymentMethod paymentMethod;
+  final GuestType guestType ;
+  final double discount ;
+  final double paidAmount ;
+   
 
   final DateTime? checkInDate;
   final DateTime? checkOutDate;
@@ -27,8 +30,12 @@ class BookingState {
   final String? error;
   final String? successMessage;
 
-  const BookingState({
+   BookingState({
     this.selectedRoomTypeId,
+    this.paymentMethod = PaymentMethod.cash,
+    this.guestType = GuestType.guest,
+    this.discount = 0.0,
+    this.paidAmount = 0,
     this.checkInDate,
     this.checkOutDate,
     this.roomType,
@@ -73,7 +80,11 @@ class BookingState {
   }
 
   BookingState copyWith({
-    final int? selectedRoomTypeId,
+     int? selectedRoomTypeId,
+    PaymentMethod? paymentMethod,
+    GuestType? guestType,
+    double? discount,
+    double? paidAmount,
     DateTime? checkInDate,
     DateTime? checkOutDate,
     RoomTypeEntity? roomType,
@@ -94,7 +105,11 @@ class BookingState {
     String? successMessage,
   }) {
     return BookingState(
-      selectedRoomTypeId: selectedRoomTypeId,
+      selectedRoomTypeId: selectedRoomTypeId ?? this.selectedRoomTypeId,
+    paymentMethod: paymentMethod?? this.paymentMethod,
+    guestType: guestType ?? this.guestType,
+    discount: discount ?? this.discount,
+    paidAmount: paidAmount ?? this.paidAmount,
       checkInDate: checkInDate ?? this.checkInDate,
       checkOutDate: checkOutDate ?? this.checkOutDate,
       roomType: roomType ?? this.roomType,

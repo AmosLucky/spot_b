@@ -3,5 +3,4 @@ enum GuestType {
   guest,
   walkin,
   existing,
-
 }

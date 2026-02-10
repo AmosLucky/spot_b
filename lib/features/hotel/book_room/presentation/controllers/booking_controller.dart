@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spotstock_inventory/features/hotel/book_room/domain/repositories/enums/guest_type.dart';
 import 'package:spotstock_inventory/features/hotel/room_types/domain/entities/room_type_entities.dart';
 import 'package:spotstock_inventory/features/hotel/rooms/domain/entities/room_entity.dart';
 import '../../../room_types/presentation/providers/room_type_provider.dart';
 import '../../domain/entities/booking_entity.dart';
 
+import '../../domain/repositories/enums/payment_method.dart';
 import '../../domain/usecases/create_booking_usecase.dart';
 
 import '../../domain/usecases/get_available_rooms_use_case.dart';
@@ -24,7 +26,7 @@ class BookingController extends StateNotifier<BookingState> {
       required this.updateBookingUseCase,
       required this.getAvailableRoomsUseCase,
       required this.ref})
-      : super(const BookingState());
+      : super(BookingState());
 
   // ==================== SETTERS ====================
 
@@ -60,8 +62,7 @@ class BookingController extends StateNotifier<BookingState> {
 
     if (state.roomType == null && roomTypes.isNotEmpty) {
       state = state.copyWith(
-          roomType: roomTypes.first, 
-          selectedRoomTypeId: roomTypes.first.id);
+          roomType: roomTypes.first, selectedRoomTypeId: roomTypes.first.id);
     }
   }
 
@@ -251,7 +252,7 @@ class BookingController extends StateNotifier<BookingState> {
 
   Future<void> createBooking() async {
     // Validation
-    if (state.customerId == null) {
+    if (state.customerId == null && state.guestType == GuestType.existing) {
       state = state.copyWith(error: 'Please select a customer');
       return;
     }
@@ -339,7 +340,31 @@ class BookingController extends StateNotifier<BookingState> {
     state = state.copyWith(successMessage: null);
   }
 
+  void setPaidAmount(amountPaid) {
+    state = state.copyWith(paidAmount: amountPaid);
+  }
+
+  void setDiscount(dicount) {
+    state = state.copyWith(discount: dicount);
+  }
+
+  void setPaymentMethod(PaymentMethod paymentMethod) {
+    state = state.copyWith(paymentMethod: paymentMethod);
+  }
+
+  void setGuestType(GuestType guestType) {
+    state = state.copyWith(guestType: guestType);
+  }
+
+  void resetDiscountCalculator() {
+    state = state.copyWith(
+        paymentMethod: PaymentMethod.cash,
+        paidAmount: 0,
+        discount: 0,
+        guestType: GuestType.guest);
+  }
+
   void reset() {
-    state = const BookingState();
+    state = BookingState();
   }
 }

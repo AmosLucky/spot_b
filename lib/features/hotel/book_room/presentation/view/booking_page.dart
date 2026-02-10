@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../room_types/domain/entities/room_type_entities.dart';
 import '../../../room_types/presentation/providers/room_type_provider.dart';
 import '../providers/booking_provider.dart';
 import '../state/booking_state.dart';
@@ -610,7 +609,9 @@ class BookingPage extends ConsumerWidget {
                     : () {
                         showDialog(
   context: context,
-  builder: (_) => BookingConfirmationDialog(bookingState: state,),
+  builder: (_) => BookingConfirmationDialog(
+    //bookingState: state,
+    ),
 );
                       },
                 //controller.createBooking(),
