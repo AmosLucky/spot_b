@@ -1,9 +1,12 @@
-
 import '../../../room_types/domain/entities/room_type_entities.dart';
 import '../../../rooms/domain/entities/room_entity.dart';
+import '../../domain/repositories/enums/guest_type.dart';
+import '../../domain/repositories/enums/payment_method.dart';
 
 class BookingState {
   final int? selectedRoomTypeId;
+  // PaymentMethod paymentMethod;
+  // GuestType guestType;
 
   final DateTime? checkInDate;
   final DateTime? checkOutDate;
@@ -70,8 +73,7 @@ class BookingState {
   }
 
   BookingState copyWith({
-      final int? selectedRoomTypeId,
-
+    final int? selectedRoomTypeId,
     DateTime? checkInDate,
     DateTime? checkOutDate,
     RoomTypeEntity? roomType,

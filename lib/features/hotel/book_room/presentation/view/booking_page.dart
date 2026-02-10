@@ -5,6 +5,7 @@ import '../../../room_types/domain/entities/room_type_entities.dart';
 import '../../../room_types/presentation/providers/room_type_provider.dart';
 import '../providers/booking_provider.dart';
 import '../state/booking_state.dart';
+import 'widgets/bookin_ confirmation_dialog.dart';
 
 class BookingPage extends ConsumerWidget {
   const BookingPage({super.key});
@@ -65,7 +66,7 @@ class BookingPage extends ConsumerWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           flex: 2,
-                          child: _buildSummaryCard(ref, state),
+                          child: _buildSummaryCard(ref, state,context),
                         ),
                       ],
                     ),
@@ -143,7 +144,6 @@ class BookingPage extends ConsumerWidget {
               },
             ),
 
-            
             const SizedBox(height: 16),
 
             // Customer ID (for now, using a number field - can be replaced with customer dropdown)
@@ -517,7 +517,7 @@ class BookingPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard(WidgetRef ref, BookingState state) {
+  Widget _buildSummaryCard(WidgetRef ref, BookingState state, BuildContext context) {
     final controller = ref.read(bookingControllerProvider.notifier);
     final formatter = NumberFormat('#,##0.00', 'en_US');
 
@@ -607,7 +607,13 @@ class BookingPage extends ConsumerWidget {
               child: ElevatedButton(
                 onPressed: state.selectedRooms.isEmpty
                     ? null
-                    : () => controller.createBooking(),
+                    : () {
+                        showDialog(
+  context: context,
+  builder: (_) => BookingConfirmationDialog(bookingState: state,),
+);
+                      },
+                //controller.createBooking(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
