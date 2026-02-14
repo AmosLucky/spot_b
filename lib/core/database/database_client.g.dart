@@ -10134,6 +10134,546 @@ class LocalBookingsTableCompanion
   }
 }
 
+class $PaymentsTableTable extends PaymentsTable
+    with TableInfo<$PaymentsTableTable, PaymentsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PaymentsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _bookingIdMeta =
+      const VerificationMeta('bookingId');
+  @override
+  late final GeneratedColumn<int> bookingId = GeneratedColumn<int>(
+      'booking_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+      'amount', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _taxMeta = const VerificationMeta('tax');
+  @override
+  late final GeneratedColumn<double> tax = GeneratedColumn<double>(
+      'tax', aliasedName, false,
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _paymentMethodMeta =
+      const VerificationMeta('paymentMethod');
+  @override
+  late final GeneratedColumn<String> paymentMethod = GeneratedColumn<String>(
+      'payment_method', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+      'date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _registerIdMeta =
+      const VerificationMeta('registerId');
+  @override
+  late final GeneratedColumn<int> registerId = GeneratedColumn<int>(
+      'register_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        bookingId,
+        amount,
+        tax,
+        paymentMethod,
+        description,
+        date,
+        userId,
+        registerId,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'payments_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<PaymentsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('booking_id')) {
+      context.handle(_bookingIdMeta,
+          bookingId.isAcceptableOrUnknown(data['booking_id']!, _bookingIdMeta));
+    } else if (isInserting) {
+      context.missing(_bookingIdMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(_amountMeta,
+          amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('tax')) {
+      context.handle(
+          _taxMeta, tax.isAcceptableOrUnknown(data['tax']!, _taxMeta));
+    }
+    if (data.containsKey('payment_method')) {
+      context.handle(
+          _paymentMethodMeta,
+          paymentMethod.isAcceptableOrUnknown(
+              data['payment_method']!, _paymentMethodMeta));
+    } else if (isInserting) {
+      context.missing(_paymentMethodMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('register_id')) {
+      context.handle(
+          _registerIdMeta,
+          registerId.isAcceptableOrUnknown(
+              data['register_id']!, _registerIdMeta));
+    } else if (isInserting) {
+      context.missing(_registerIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PaymentsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PaymentsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      bookingId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}booking_id'])!,
+      amount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}amount'])!,
+      tax: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}tax'])!,
+      paymentMethod: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payment_method'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      date: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
+      registerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}register_id'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at']),
+    );
+  }
+
+  @override
+  $PaymentsTableTable createAlias(String alias) {
+    return $PaymentsTableTable(attachedDatabase, alias);
+  }
+}
+
+class PaymentsTableData extends DataClass
+    implements Insertable<PaymentsTableData> {
+  final int id;
+  final int bookingId;
+  final double amount;
+  final double tax;
+  final String paymentMethod;
+  final String? description;
+  final DateTime date;
+  final int userId;
+  final int registerId;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  const PaymentsTableData(
+      {required this.id,
+      required this.bookingId,
+      required this.amount,
+      required this.tax,
+      required this.paymentMethod,
+      this.description,
+      required this.date,
+      required this.userId,
+      required this.registerId,
+      required this.createdAt,
+      this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['booking_id'] = Variable<int>(bookingId);
+    map['amount'] = Variable<double>(amount);
+    map['tax'] = Variable<double>(tax);
+    map['payment_method'] = Variable<String>(paymentMethod);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['date'] = Variable<DateTime>(date);
+    map['user_id'] = Variable<int>(userId);
+    map['register_id'] = Variable<int>(registerId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  PaymentsTableCompanion toCompanion(bool nullToAbsent) {
+    return PaymentsTableCompanion(
+      id: Value(id),
+      bookingId: Value(bookingId),
+      amount: Value(amount),
+      tax: Value(tax),
+      paymentMethod: Value(paymentMethod),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      date: Value(date),
+      userId: Value(userId),
+      registerId: Value(registerId),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory PaymentsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PaymentsTableData(
+      id: serializer.fromJson<int>(json['id']),
+      bookingId: serializer.fromJson<int>(json['bookingId']),
+      amount: serializer.fromJson<double>(json['amount']),
+      tax: serializer.fromJson<double>(json['tax']),
+      paymentMethod: serializer.fromJson<String>(json['paymentMethod']),
+      description: serializer.fromJson<String?>(json['description']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      userId: serializer.fromJson<int>(json['userId']),
+      registerId: serializer.fromJson<int>(json['registerId']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bookingId': serializer.toJson<int>(bookingId),
+      'amount': serializer.toJson<double>(amount),
+      'tax': serializer.toJson<double>(tax),
+      'paymentMethod': serializer.toJson<String>(paymentMethod),
+      'description': serializer.toJson<String?>(description),
+      'date': serializer.toJson<DateTime>(date),
+      'userId': serializer.toJson<int>(userId),
+      'registerId': serializer.toJson<int>(registerId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  PaymentsTableData copyWith(
+          {int? id,
+          int? bookingId,
+          double? amount,
+          double? tax,
+          String? paymentMethod,
+          Value<String?> description = const Value.absent(),
+          DateTime? date,
+          int? userId,
+          int? registerId,
+          DateTime? createdAt,
+          Value<DateTime?> updatedAt = const Value.absent()}) =>
+      PaymentsTableData(
+        id: id ?? this.id,
+        bookingId: bookingId ?? this.bookingId,
+        amount: amount ?? this.amount,
+        tax: tax ?? this.tax,
+        paymentMethod: paymentMethod ?? this.paymentMethod,
+        description: description.present ? description.value : this.description,
+        date: date ?? this.date,
+        userId: userId ?? this.userId,
+        registerId: registerId ?? this.registerId,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+      );
+  PaymentsTableData copyWithCompanion(PaymentsTableCompanion data) {
+    return PaymentsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      bookingId: data.bookingId.present ? data.bookingId.value : this.bookingId,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      tax: data.tax.present ? data.tax.value : this.tax,
+      paymentMethod: data.paymentMethod.present
+          ? data.paymentMethod.value
+          : this.paymentMethod,
+      description:
+          data.description.present ? data.description.value : this.description,
+      date: data.date.present ? data.date.value : this.date,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      registerId:
+          data.registerId.present ? data.registerId.value : this.registerId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PaymentsTableData(')
+          ..write('id: $id, ')
+          ..write('bookingId: $bookingId, ')
+          ..write('amount: $amount, ')
+          ..write('tax: $tax, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('description: $description, ')
+          ..write('date: $date, ')
+          ..write('userId: $userId, ')
+          ..write('registerId: $registerId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, bookingId, amount, tax, paymentMethod,
+      description, date, userId, registerId, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PaymentsTableData &&
+          other.id == this.id &&
+          other.bookingId == this.bookingId &&
+          other.amount == this.amount &&
+          other.tax == this.tax &&
+          other.paymentMethod == this.paymentMethod &&
+          other.description == this.description &&
+          other.date == this.date &&
+          other.userId == this.userId &&
+          other.registerId == this.registerId &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PaymentsTableCompanion extends UpdateCompanion<PaymentsTableData> {
+  final Value<int> id;
+  final Value<int> bookingId;
+  final Value<double> amount;
+  final Value<double> tax;
+  final Value<String> paymentMethod;
+  final Value<String?> description;
+  final Value<DateTime> date;
+  final Value<int> userId;
+  final Value<int> registerId;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  const PaymentsTableCompanion({
+    this.id = const Value.absent(),
+    this.bookingId = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.tax = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.description = const Value.absent(),
+    this.date = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.registerId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  PaymentsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required int bookingId,
+    required double amount,
+    this.tax = const Value.absent(),
+    required String paymentMethod,
+    this.description = const Value.absent(),
+    required DateTime date,
+    required int userId,
+    required int registerId,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  })  : bookingId = Value(bookingId),
+        amount = Value(amount),
+        paymentMethod = Value(paymentMethod),
+        date = Value(date),
+        userId = Value(userId),
+        registerId = Value(registerId);
+  static Insertable<PaymentsTableData> custom({
+    Expression<int>? id,
+    Expression<int>? bookingId,
+    Expression<double>? amount,
+    Expression<double>? tax,
+    Expression<String>? paymentMethod,
+    Expression<String>? description,
+    Expression<DateTime>? date,
+    Expression<int>? userId,
+    Expression<int>? registerId,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bookingId != null) 'booking_id': bookingId,
+      if (amount != null) 'amount': amount,
+      if (tax != null) 'tax': tax,
+      if (paymentMethod != null) 'payment_method': paymentMethod,
+      if (description != null) 'description': description,
+      if (date != null) 'date': date,
+      if (userId != null) 'user_id': userId,
+      if (registerId != null) 'register_id': registerId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  PaymentsTableCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? bookingId,
+      Value<double>? amount,
+      Value<double>? tax,
+      Value<String>? paymentMethod,
+      Value<String?>? description,
+      Value<DateTime>? date,
+      Value<int>? userId,
+      Value<int>? registerId,
+      Value<DateTime>? createdAt,
+      Value<DateTime?>? updatedAt}) {
+    return PaymentsTableCompanion(
+      id: id ?? this.id,
+      bookingId: bookingId ?? this.bookingId,
+      amount: amount ?? this.amount,
+      tax: tax ?? this.tax,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      description: description ?? this.description,
+      date: date ?? this.date,
+      userId: userId ?? this.userId,
+      registerId: registerId ?? this.registerId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bookingId.present) {
+      map['booking_id'] = Variable<int>(bookingId.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    if (tax.present) {
+      map['tax'] = Variable<double>(tax.value);
+    }
+    if (paymentMethod.present) {
+      map['payment_method'] = Variable<String>(paymentMethod.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (registerId.present) {
+      map['register_id'] = Variable<int>(registerId.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PaymentsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('bookingId: $bookingId, ')
+          ..write('amount: $amount, ')
+          ..write('tax: $tax, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('description: $description, ')
+          ..write('date: $date, ')
+          ..write('userId: $userId, ')
+          ..write('registerId: $registerId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -10159,6 +10699,7 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
   late final $RoomsTableTable roomsTable = $RoomsTableTable(this);
   late final $LocalBookingsTableTable localBookingsTable =
       $LocalBookingsTableTable(this);
+  late final $PaymentsTableTable paymentsTable = $PaymentsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10179,7 +10720,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         roomTypesTable,
         premiumTypesTable,
         roomsTable,
-        localBookingsTable
+        localBookingsTable,
+        paymentsTable
       ];
 }
 
@@ -15035,6 +15577,265 @@ typedef $$LocalBookingsTableTableProcessedTableManager = ProcessedTableManager<
     (LocalBookingsTableData, $$LocalBookingsTableTableReferences),
     LocalBookingsTableData,
     PrefetchHooks Function({bool customerId})>;
+typedef $$PaymentsTableTableCreateCompanionBuilder = PaymentsTableCompanion
+    Function({
+  Value<int> id,
+  required int bookingId,
+  required double amount,
+  Value<double> tax,
+  required String paymentMethod,
+  Value<String?> description,
+  required DateTime date,
+  required int userId,
+  required int registerId,
+  Value<DateTime> createdAt,
+  Value<DateTime?> updatedAt,
+});
+typedef $$PaymentsTableTableUpdateCompanionBuilder = PaymentsTableCompanion
+    Function({
+  Value<int> id,
+  Value<int> bookingId,
+  Value<double> amount,
+  Value<double> tax,
+  Value<String> paymentMethod,
+  Value<String?> description,
+  Value<DateTime> date,
+  Value<int> userId,
+  Value<int> registerId,
+  Value<DateTime> createdAt,
+  Value<DateTime?> updatedAt,
+});
+
+class $$PaymentsTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $PaymentsTableTable> {
+  $$PaymentsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get bookingId => $composableBuilder(
+      column: $table.bookingId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get tax => $composableBuilder(
+      column: $table.tax, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get paymentMethod => $composableBuilder(
+      column: $table.paymentMethod, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get registerId => $composableBuilder(
+      column: $table.registerId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$PaymentsTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $PaymentsTableTable> {
+  $$PaymentsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get bookingId => $composableBuilder(
+      column: $table.bookingId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get tax => $composableBuilder(
+      column: $table.tax, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get paymentMethod => $composableBuilder(
+      column: $table.paymentMethod,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get registerId => $composableBuilder(
+      column: $table.registerId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$PaymentsTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $PaymentsTableTable> {
+  $$PaymentsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get bookingId =>
+      $composableBuilder(column: $table.bookingId, builder: (column) => column);
+
+  GeneratedColumn<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<double> get tax =>
+      $composableBuilder(column: $table.tax, builder: (column) => column);
+
+  GeneratedColumn<String> get paymentMethod => $composableBuilder(
+      column: $table.paymentMethod, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<int> get registerId => $composableBuilder(
+      column: $table.registerId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PaymentsTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $PaymentsTableTable,
+    PaymentsTableData,
+    $$PaymentsTableTableFilterComposer,
+    $$PaymentsTableTableOrderingComposer,
+    $$PaymentsTableTableAnnotationComposer,
+    $$PaymentsTableTableCreateCompanionBuilder,
+    $$PaymentsTableTableUpdateCompanionBuilder,
+    (
+      PaymentsTableData,
+      BaseReferences<_$DatabaseClient, $PaymentsTableTable, PaymentsTableData>
+    ),
+    PaymentsTableData,
+    PrefetchHooks Function()> {
+  $$PaymentsTableTableTableManager(
+      _$DatabaseClient db, $PaymentsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PaymentsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PaymentsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PaymentsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> bookingId = const Value.absent(),
+            Value<double> amount = const Value.absent(),
+            Value<double> tax = const Value.absent(),
+            Value<String> paymentMethod = const Value.absent(),
+            Value<String?> description = const Value.absent(),
+            Value<DateTime> date = const Value.absent(),
+            Value<int> userId = const Value.absent(),
+            Value<int> registerId = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime?> updatedAt = const Value.absent(),
+          }) =>
+              PaymentsTableCompanion(
+            id: id,
+            bookingId: bookingId,
+            amount: amount,
+            tax: tax,
+            paymentMethod: paymentMethod,
+            description: description,
+            date: date,
+            userId: userId,
+            registerId: registerId,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int bookingId,
+            required double amount,
+            Value<double> tax = const Value.absent(),
+            required String paymentMethod,
+            Value<String?> description = const Value.absent(),
+            required DateTime date,
+            required int userId,
+            required int registerId,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime?> updatedAt = const Value.absent(),
+          }) =>
+              PaymentsTableCompanion.insert(
+            id: id,
+            bookingId: bookingId,
+            amount: amount,
+            tax: tax,
+            paymentMethod: paymentMethod,
+            description: description,
+            date: date,
+            userId: userId,
+            registerId: registerId,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$PaymentsTableTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $PaymentsTableTable,
+    PaymentsTableData,
+    $$PaymentsTableTableFilterComposer,
+    $$PaymentsTableTableOrderingComposer,
+    $$PaymentsTableTableAnnotationComposer,
+    $$PaymentsTableTableCreateCompanionBuilder,
+    $$PaymentsTableTableUpdateCompanionBuilder,
+    (
+      PaymentsTableData,
+      BaseReferences<_$DatabaseClient, $PaymentsTableTable, PaymentsTableData>
+    ),
+    PaymentsTableData,
+    PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -15072,4 +15873,6 @@ class $DatabaseClientManager {
       $$RoomsTableTableTableManager(_db, _db.roomsTable);
   $$LocalBookingsTableTableTableManager get localBookingsTable =>
       $$LocalBookingsTableTableTableManager(_db, _db.localBookingsTable);
+  $$PaymentsTableTableTableManager get paymentsTable =>
+      $$PaymentsTableTableTableManager(_db, _db.paymentsTable);
 }

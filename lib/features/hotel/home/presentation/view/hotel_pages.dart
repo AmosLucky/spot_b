@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../payments/presentation/views/payment_tab_view.dart';
 import '../../../amenities/presentation/views/amenities_page.dart';
 import '../../../bed_type/presentation/view/desktop/bed_types_page.dart';
+import '../../../book_room/presentation/view/booking_history_page.dart';
 import '../../../book_room/presentation/view/booking_page.dart';
 import '../../../dashboard/presentation/view/hotel_dashboard.dart';
 import '../../../facilities/presentation/views/desktop/facilities_page.dart';
@@ -18,5 +20,6 @@ final List<Widget> hotelPages = [
   PremiumTypesPage(),
   HotelRoomsPage(),
   BookingPage(),
-  // RoomsPage(),
+  BookingHistoryPage(),
+  // PaymentTabView()
 ];
