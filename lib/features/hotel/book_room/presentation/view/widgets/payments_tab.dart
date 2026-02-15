@@ -2,10 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotstock_inventory/features/hotel/book_room/presentation/providers/booking_history_provider.dart';
-import 'package:spotstock_inventory/features/hotel/book_room/presentation/providers/booking_provider.dart';
-import 'package:spotstock_inventory/features/payments/presentation/state/payment_state.dart';
 
-import '../../../../../../core/presentation/mesenger/app_messenger.dart';
 import '../../../../../payments/presentation/providers/payment_providers.dart';
 import 'table_cell.dart';
 import 'table_cell_status.dart';
@@ -89,6 +86,23 @@ class _PaymentsTabState extends ConsumerState<PaymentsTab> {
                 ),
                 onChanged: (value) {
                   formController.setTax(value);
+                },
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Amount is required';
+                  }
+
+                  final number = double.tryParse(value);
+
+                  if (number == null) {
+                    return 'Enter a valid number';
+                  }
+
+                  if (number <= 0) {
+                    return 'Amount must be greater than zero';
+                  }
+
+                  return null;
                 },
               ),
               const SizedBox(height: 24),

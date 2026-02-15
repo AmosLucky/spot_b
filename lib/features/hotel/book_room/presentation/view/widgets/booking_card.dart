@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotstock_inventory/features/payments/presentation/providers/payment_providers.dart';
 
 import '../../../../../../core/constants/colors/spotstock_colors.dart';
+import '../../../../discount/presentation/providers/discount_providers.dart';
 import '../../../domain/entities/booking_entity.dart';
 import '../../providers/booking_history_provider.dart';
 import 'booking_details_dialog_old.dart';
@@ -204,9 +205,13 @@ class BookingCard extends ConsumerWidget {
                           .read(bookingHistoryControllerProvider.notifier)
                           .selectBooking(booking);
 
-                           ref
+                      ref
                           .read(paymentControllerProvider.notifier)
                           .loadPayments(booking.id!);
+
+                      ref
+                          .read(discountControllerProvider.notifier)
+                          .loadDiscounts(booking.id!);
 
                       showDialog(
                         context: context,
