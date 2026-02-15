@@ -25,8 +25,10 @@ class BookingLocalDataSource {
   }
 
   // ================== ADD ==================
-  Future<void> createBooking(BookingEntity booking) async {
-    await db.into(db.localBookingsTable).insert(_toCompanion(booking));
+  Future<int> createBooking(BookingEntity booking) async {
+    
+     final id = await db.into(db.localBookingsTable).insert(_toCompanion(booking));
+      return id;
   }
 
   // ================== UPDATE ==================

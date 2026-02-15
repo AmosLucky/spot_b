@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spotstock_inventory/features/payments/presentation/providers/payment_providers.dart';
 
 import '../../../../../../core/constants/colors/spotstock_colors.dart';
 import '../../../domain/entities/booking_entity.dart';
@@ -198,9 +199,14 @@ class BookingCard extends ConsumerWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      //selectedBooking
                       ref
                           .read(bookingHistoryControllerProvider.notifier)
                           .selectBooking(booking);
+
+                           ref
+                          .read(paymentControllerProvider.notifier)
+                          .loadPayments(booking.id!);
 
                       showDialog(
                         context: context,

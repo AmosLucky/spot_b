@@ -6,7 +6,7 @@ class CreateBookingUseCase {
 
   CreateBookingUseCase(this.repository);
 
-  Future<void> call(BookingEntity booking) {
+  Future<int> call(BookingEntity booking) {
     return repository.createBooking(booking);
   }
 }

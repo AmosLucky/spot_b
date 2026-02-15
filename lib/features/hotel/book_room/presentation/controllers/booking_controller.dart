@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotstock_inventory/features/hotel/book_room/domain/repositories/enums/guest_type.dart';
 import 'package:spotstock_inventory/features/hotel/room_types/domain/entities/room_type_entities.dart';
 import 'package:spotstock_inventory/features/hotel/rooms/domain/entities/room_entity.dart';
+import 'package:spotstock_inventory/features/payments/domain/entities/payment_entity.dart';
+import 'package:spotstock_inventory/features/payments/presentation/providers/payment_providers.dart';
 import '../../../room_types/presentation/providers/room_type_provider.dart';
 import '../../domain/entities/booking_entity.dart';
 
@@ -306,7 +308,7 @@ class BookingController extends StateNotifier<BookingState> {
       );
 
       // Save booking
-      await createBookingUseCase(booking);
+      int bookingId = await createBookingUseCase(booking);
 
       state = state.copyWith(
         isLoading: false,
@@ -315,6 +317,17 @@ class BookingController extends StateNotifier<BookingState> {
         selectedRooms: {},
         hasSearched: false,
       );
+      if (state.paidAmount > 0) {
+        ref.read(paymentControllerProvider.notifier).createPaymentUC(
+            PaymentEntity(
+                bookingId: bookingId,
+                amount: state.paidAmount,
+                tax: 0,
+                paymentMethod: state.guestType.name,
+                date: DateTime.now(),
+                userId: 1,
+                registerId: 1));
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

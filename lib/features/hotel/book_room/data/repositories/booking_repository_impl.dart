@@ -8,7 +8,7 @@ class BookingRepositoryImpl implements BookingRepository {
   BookingRepositoryImpl(this.local);
 
   @override
-  Future<void> createBooking(BookingEntity booking) {
+  Future<int> createBooking(BookingEntity booking) {
     return local.createBooking(booking);
   }
 

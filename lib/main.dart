@@ -44,6 +44,7 @@ class SpotstockInventory extends StatelessWidget {
       listenable: viewModel,
       builder: (context, child) {
         return MaterialApp.router(
+          
           title: SpotstockStrings.spotstockInventory,
           scaffoldMessengerKey: spotstockScaffoldMessengerKey,
           routerConfig: viewModel.isMobile

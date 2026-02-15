@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/presentation/mesenger/app_messenger.dart';
 import '../../domain/entities/payment_entity.dart';
 import '../../domain/usecases/create_payment.dart';
 import '../state/payment_form_state.dart';
@@ -7,8 +8,7 @@ import '../state/payment_form_state.dart';
 class PaymentFormController extends StateNotifier<PaymentFormState> {
   final CreatePayment createPayment;
 
-  PaymentFormController(this.createPayment)
-      : super(PaymentFormState.initial());
+  PaymentFormController(this.createPayment) : super(PaymentFormState.initial());
 
   /// -------- FIELD UPDATES --------
 
@@ -78,9 +78,10 @@ class PaymentFormController extends StateNotifier<PaymentFormState> {
         ),
       );
 
+      AppMessenger.showSuccess("Payment Added Successfully");
+
       state = PaymentFormState.initial();
       return true;
-
     } catch (e) {
       state = state.copyWith(
         error: e.toString(),

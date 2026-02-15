@@ -23,10 +23,10 @@ class PaymentLocalDataSource {
     return db.into(db.paymentsTable).insert(PaymentsTableCompanion.insert(
       bookingId: payment.bookingId,
       amount: payment.amount,
-      tax:Value( payment.tax),
+      tax:Value( payment.tax!),
       paymentMethod: payment.paymentMethod,
       description: Value(payment.description),
-      date: payment.date,
+      date: payment.date!,
       userId: payment.userId,
       registerId: payment.registerId,
     ));
@@ -38,7 +38,7 @@ class PaymentLocalDataSource {
           ..where((tbl) => tbl.id.equals(payment.id!)))
         .write(PaymentsTableCompanion(
       amount: Value(payment.amount),
-      tax: Value(payment.tax),
+      tax: Value(payment.tax!),
       description: Value(payment.description),
       paymentMethod: Value(payment.paymentMethod),
     ));

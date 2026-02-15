@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/presentation/mesenger/app_messenger.dart';
 import '../../domain/entities/payment_entity.dart';
 import '../../domain/usecases/create_payment.dart';
 import '../../domain/usecases/delete_payment.dart';
@@ -7,7 +8,6 @@ import '../../domain/usecases/update_payment.dart';
 import '../state/payment_state.dart';
 
 class PaymentController extends StateNotifier<PaymentState> {
-
   final GetPaymentsByBooking getPayments;
   final CreatePayment createPaymentUC;
   final UpdatePayment updatePaymentUC;
@@ -38,6 +38,7 @@ class PaymentController extends StateNotifier<PaymentState> {
   Future<void> addPayment(PaymentEntity payment) async {
     await createPaymentUC(payment);
     await loadPayments(_bookingId!);
+    AppMessenger.showSuccess("Payment added successfully");
   }
 
   Future<void> deletePayment(int id) async {

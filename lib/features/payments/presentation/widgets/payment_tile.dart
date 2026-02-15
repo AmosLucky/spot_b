@@ -14,7 +14,7 @@ class PaymentTile extends ConsumerWidget {
     return Card(
       child: ListTile(
         title: Text("₦${payment.total} • ${payment.paymentMethod}"),
-        subtitle: Text(payment.description),
+        subtitle: Text(payment.description!),
         trailing: IconButton(
           icon: const Icon(Icons.delete, color: Colors.red),
           onPressed: () {
