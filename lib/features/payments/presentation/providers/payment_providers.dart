@@ -13,6 +13,8 @@ import '../../domain/usecases/update_payment.dart';
 import '../../domain/usecases/get_single_payment_by_booking.dart';
 
 import '../controller/payment_controller.dart';
+import '../controller/payment_form_controller.dart';
+import '../state/payment_form_state.dart';
 import '../state/payment_state.dart';
 
 
@@ -88,3 +90,12 @@ final paymentControllerProvider =
     ref.read(deletePaymentProvider),
   );
 });
+
+
+final paymentFormControllerProvider =
+    StateNotifierProvider<PaymentFormController, PaymentFormState>((ref) {
+  return PaymentFormController(
+    ref.read(createPaymentProvider),
+  );
+});
+
