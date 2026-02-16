@@ -232,8 +232,12 @@ class BookingCard extends ConsumerWidget {
                       );
                     },
                     icon: const Icon(Icons.visibility),
-                    label: const Text("View Details"),
+                    label: const Text(
+                      "View Details",
+                      style: TextStyle(color: SpotstockColors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
+                      iconColor: SpotstockColors.white,
                       backgroundColor: SpotstockColors.c4D2B5B,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10)),

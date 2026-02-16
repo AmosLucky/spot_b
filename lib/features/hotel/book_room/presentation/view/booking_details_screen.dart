@@ -24,7 +24,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 7, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -56,9 +56,9 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                         Text(
                           "Booking #${booking!.bookingNumber}",
                           style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: SpotstockColors.white),
                         ),
                         SizedBox(
                           width: 20,
@@ -95,12 +95,13 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                 indicatorColor: Colors.blue,
                 tabs: const [
                   Tab(text: 'Details'),
-                  Tab(text: 'Operations'),
+                  // Tab(text: 'Operations'),
                   Tab(text: 'Payments'),
                   Tab(text: 'Discount'),
                   Tab(text: 'Credit'),
-                  Tab(text: 'Invoice'),
+
                   Tab(text: 'Add Sercive'),
+                  Tab(text: 'Invoice'),
                 ],
               ),
             ),
@@ -109,12 +110,13 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                 controller: _tabController,
                 children: [
                   BookingDetailsTab(),
-                  const Center(child: Text('Operations')),
+                  // const Center(child: Text('Operations')),
                   PaymentsTab(),
                   DiscountTab(),
                   CreditRequestTab(),
-                  InvoiceTab(),
+
                   AddPremiumServiceTab(),
+                  InvoiceTab(),
                 ],
               ),
             ),
