@@ -11099,6 +11099,434 @@ class DiscountsTableCompanion extends UpdateCompanion<DiscountsTableData> {
   }
 }
 
+class $CreditRequestsTableTable extends CreditRequestsTable
+    with TableInfo<$CreditRequestsTableTable, CreditRequestsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CreditRequestsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _bookingIdMeta =
+      const VerificationMeta('bookingId');
+  @override
+  late final GeneratedColumn<int> bookingId = GeneratedColumn<int>(
+      'booking_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+      'amount', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('pending'));
+  static const VerificationMeta _dateCreatedMeta =
+      const VerificationMeta('dateCreated');
+  @override
+  late final GeneratedColumn<DateTime> dateCreated = GeneratedColumn<DateTime>(
+      'date_created', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _registerIdMeta =
+      const VerificationMeta('registerId');
+  @override
+  late final GeneratedColumn<int> registerId = GeneratedColumn<int>(
+      'register_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        bookingId,
+        amount,
+        description,
+        status,
+        dateCreated,
+        userId,
+        registerId
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'credit_requests_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<CreditRequestsTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('booking_id')) {
+      context.handle(_bookingIdMeta,
+          bookingId.isAcceptableOrUnknown(data['booking_id']!, _bookingIdMeta));
+    } else if (isInserting) {
+      context.missing(_bookingIdMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(_amountMeta,
+          amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
+    if (data.containsKey('date_created')) {
+      context.handle(
+          _dateCreatedMeta,
+          dateCreated.isAcceptableOrUnknown(
+              data['date_created']!, _dateCreatedMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('register_id')) {
+      context.handle(
+          _registerIdMeta,
+          registerId.isAcceptableOrUnknown(
+              data['register_id']!, _registerIdMeta));
+    } else if (isInserting) {
+      context.missing(_registerIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CreditRequestsTableData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CreditRequestsTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      bookingId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}booking_id'])!,
+      amount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}amount'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      dateCreated: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_created'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}user_id'])!,
+      registerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}register_id'])!,
+    );
+  }
+
+  @override
+  $CreditRequestsTableTable createAlias(String alias) {
+    return $CreditRequestsTableTable(attachedDatabase, alias);
+  }
+}
+
+class CreditRequestsTableData extends DataClass
+    implements Insertable<CreditRequestsTableData> {
+  final int id;
+  final int bookingId;
+  final double amount;
+  final String? description;
+  final String status;
+  final DateTime dateCreated;
+  final int userId;
+  final int registerId;
+  const CreditRequestsTableData(
+      {required this.id,
+      required this.bookingId,
+      required this.amount,
+      this.description,
+      required this.status,
+      required this.dateCreated,
+      required this.userId,
+      required this.registerId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['booking_id'] = Variable<int>(bookingId);
+    map['amount'] = Variable<double>(amount);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['status'] = Variable<String>(status);
+    map['date_created'] = Variable<DateTime>(dateCreated);
+    map['user_id'] = Variable<int>(userId);
+    map['register_id'] = Variable<int>(registerId);
+    return map;
+  }
+
+  CreditRequestsTableCompanion toCompanion(bool nullToAbsent) {
+    return CreditRequestsTableCompanion(
+      id: Value(id),
+      bookingId: Value(bookingId),
+      amount: Value(amount),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      status: Value(status),
+      dateCreated: Value(dateCreated),
+      userId: Value(userId),
+      registerId: Value(registerId),
+    );
+  }
+
+  factory CreditRequestsTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CreditRequestsTableData(
+      id: serializer.fromJson<int>(json['id']),
+      bookingId: serializer.fromJson<int>(json['bookingId']),
+      amount: serializer.fromJson<double>(json['amount']),
+      description: serializer.fromJson<String?>(json['description']),
+      status: serializer.fromJson<String>(json['status']),
+      dateCreated: serializer.fromJson<DateTime>(json['dateCreated']),
+      userId: serializer.fromJson<int>(json['userId']),
+      registerId: serializer.fromJson<int>(json['registerId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bookingId': serializer.toJson<int>(bookingId),
+      'amount': serializer.toJson<double>(amount),
+      'description': serializer.toJson<String?>(description),
+      'status': serializer.toJson<String>(status),
+      'dateCreated': serializer.toJson<DateTime>(dateCreated),
+      'userId': serializer.toJson<int>(userId),
+      'registerId': serializer.toJson<int>(registerId),
+    };
+  }
+
+  CreditRequestsTableData copyWith(
+          {int? id,
+          int? bookingId,
+          double? amount,
+          Value<String?> description = const Value.absent(),
+          String? status,
+          DateTime? dateCreated,
+          int? userId,
+          int? registerId}) =>
+      CreditRequestsTableData(
+        id: id ?? this.id,
+        bookingId: bookingId ?? this.bookingId,
+        amount: amount ?? this.amount,
+        description: description.present ? description.value : this.description,
+        status: status ?? this.status,
+        dateCreated: dateCreated ?? this.dateCreated,
+        userId: userId ?? this.userId,
+        registerId: registerId ?? this.registerId,
+      );
+  CreditRequestsTableData copyWithCompanion(CreditRequestsTableCompanion data) {
+    return CreditRequestsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      bookingId: data.bookingId.present ? data.bookingId.value : this.bookingId,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      description:
+          data.description.present ? data.description.value : this.description,
+      status: data.status.present ? data.status.value : this.status,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      registerId:
+          data.registerId.present ? data.registerId.value : this.registerId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CreditRequestsTableData(')
+          ..write('id: $id, ')
+          ..write('bookingId: $bookingId, ')
+          ..write('amount: $amount, ')
+          ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('dateCreated: $dateCreated, ')
+          ..write('userId: $userId, ')
+          ..write('registerId: $registerId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, bookingId, amount, description, status,
+      dateCreated, userId, registerId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CreditRequestsTableData &&
+          other.id == this.id &&
+          other.bookingId == this.bookingId &&
+          other.amount == this.amount &&
+          other.description == this.description &&
+          other.status == this.status &&
+          other.dateCreated == this.dateCreated &&
+          other.userId == this.userId &&
+          other.registerId == this.registerId);
+}
+
+class CreditRequestsTableCompanion
+    extends UpdateCompanion<CreditRequestsTableData> {
+  final Value<int> id;
+  final Value<int> bookingId;
+  final Value<double> amount;
+  final Value<String?> description;
+  final Value<String> status;
+  final Value<DateTime> dateCreated;
+  final Value<int> userId;
+  final Value<int> registerId;
+  const CreditRequestsTableCompanion({
+    this.id = const Value.absent(),
+    this.bookingId = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.description = const Value.absent(),
+    this.status = const Value.absent(),
+    this.dateCreated = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.registerId = const Value.absent(),
+  });
+  CreditRequestsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required int bookingId,
+    required double amount,
+    this.description = const Value.absent(),
+    this.status = const Value.absent(),
+    this.dateCreated = const Value.absent(),
+    required int userId,
+    required int registerId,
+  })  : bookingId = Value(bookingId),
+        amount = Value(amount),
+        userId = Value(userId),
+        registerId = Value(registerId);
+  static Insertable<CreditRequestsTableData> custom({
+    Expression<int>? id,
+    Expression<int>? bookingId,
+    Expression<double>? amount,
+    Expression<String>? description,
+    Expression<String>? status,
+    Expression<DateTime>? dateCreated,
+    Expression<int>? userId,
+    Expression<int>? registerId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bookingId != null) 'booking_id': bookingId,
+      if (amount != null) 'amount': amount,
+      if (description != null) 'description': description,
+      if (status != null) 'status': status,
+      if (dateCreated != null) 'date_created': dateCreated,
+      if (userId != null) 'user_id': userId,
+      if (registerId != null) 'register_id': registerId,
+    });
+  }
+
+  CreditRequestsTableCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? bookingId,
+      Value<double>? amount,
+      Value<String?>? description,
+      Value<String>? status,
+      Value<DateTime>? dateCreated,
+      Value<int>? userId,
+      Value<int>? registerId}) {
+    return CreditRequestsTableCompanion(
+      id: id ?? this.id,
+      bookingId: bookingId ?? this.bookingId,
+      amount: amount ?? this.amount,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      dateCreated: dateCreated ?? this.dateCreated,
+      userId: userId ?? this.userId,
+      registerId: registerId ?? this.registerId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bookingId.present) {
+      map['booking_id'] = Variable<int>(bookingId.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (dateCreated.present) {
+      map['date_created'] = Variable<DateTime>(dateCreated.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<int>(userId.value);
+    }
+    if (registerId.present) {
+      map['register_id'] = Variable<int>(registerId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CreditRequestsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('bookingId: $bookingId, ')
+          ..write('amount: $amount, ')
+          ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('dateCreated: $dateCreated, ')
+          ..write('userId: $userId, ')
+          ..write('registerId: $registerId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -11126,6 +11554,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
       $LocalBookingsTableTable(this);
   late final $PaymentsTableTable paymentsTable = $PaymentsTableTable(this);
   late final $DiscountsTableTable discountsTable = $DiscountsTableTable(this);
+  late final $CreditRequestsTableTable creditRequestsTable =
+      $CreditRequestsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -11148,7 +11578,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         roomsTable,
         localBookingsTable,
         paymentsTable,
-        discountsTable
+        discountsTable,
+        creditRequestsTable
       ];
 }
 
@@ -16476,6 +16907,223 @@ typedef $$DiscountsTableTableProcessedTableManager = ProcessedTableManager<
     ),
     DiscountsTableData,
     PrefetchHooks Function()>;
+typedef $$CreditRequestsTableTableCreateCompanionBuilder
+    = CreditRequestsTableCompanion Function({
+  Value<int> id,
+  required int bookingId,
+  required double amount,
+  Value<String?> description,
+  Value<String> status,
+  Value<DateTime> dateCreated,
+  required int userId,
+  required int registerId,
+});
+typedef $$CreditRequestsTableTableUpdateCompanionBuilder
+    = CreditRequestsTableCompanion Function({
+  Value<int> id,
+  Value<int> bookingId,
+  Value<double> amount,
+  Value<String?> description,
+  Value<String> status,
+  Value<DateTime> dateCreated,
+  Value<int> userId,
+  Value<int> registerId,
+});
+
+class $$CreditRequestsTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $CreditRequestsTableTable> {
+  $$CreditRequestsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get bookingId => $composableBuilder(
+      column: $table.bookingId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get registerId => $composableBuilder(
+      column: $table.registerId, builder: (column) => ColumnFilters(column));
+}
+
+class $$CreditRequestsTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $CreditRequestsTableTable> {
+  $$CreditRequestsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get bookingId => $composableBuilder(
+      column: $table.bookingId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get amount => $composableBuilder(
+      column: $table.amount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get registerId => $composableBuilder(
+      column: $table.registerId, builder: (column) => ColumnOrderings(column));
+}
+
+class $$CreditRequestsTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $CreditRequestsTableTable> {
+  $$CreditRequestsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get bookingId =>
+      $composableBuilder(column: $table.bookingId, builder: (column) => column);
+
+  GeneratedColumn<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => column);
+
+  GeneratedColumn<int> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<int> get registerId => $composableBuilder(
+      column: $table.registerId, builder: (column) => column);
+}
+
+class $$CreditRequestsTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $CreditRequestsTableTable,
+    CreditRequestsTableData,
+    $$CreditRequestsTableTableFilterComposer,
+    $$CreditRequestsTableTableOrderingComposer,
+    $$CreditRequestsTableTableAnnotationComposer,
+    $$CreditRequestsTableTableCreateCompanionBuilder,
+    $$CreditRequestsTableTableUpdateCompanionBuilder,
+    (
+      CreditRequestsTableData,
+      BaseReferences<_$DatabaseClient, $CreditRequestsTableTable,
+          CreditRequestsTableData>
+    ),
+    CreditRequestsTableData,
+    PrefetchHooks Function()> {
+  $$CreditRequestsTableTableTableManager(
+      _$DatabaseClient db, $CreditRequestsTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CreditRequestsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CreditRequestsTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CreditRequestsTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> bookingId = const Value.absent(),
+            Value<double> amount = const Value.absent(),
+            Value<String?> description = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<DateTime> dateCreated = const Value.absent(),
+            Value<int> userId = const Value.absent(),
+            Value<int> registerId = const Value.absent(),
+          }) =>
+              CreditRequestsTableCompanion(
+            id: id,
+            bookingId: bookingId,
+            amount: amount,
+            description: description,
+            status: status,
+            dateCreated: dateCreated,
+            userId: userId,
+            registerId: registerId,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int bookingId,
+            required double amount,
+            Value<String?> description = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<DateTime> dateCreated = const Value.absent(),
+            required int userId,
+            required int registerId,
+          }) =>
+              CreditRequestsTableCompanion.insert(
+            id: id,
+            bookingId: bookingId,
+            amount: amount,
+            description: description,
+            status: status,
+            dateCreated: dateCreated,
+            userId: userId,
+            registerId: registerId,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$CreditRequestsTableTableProcessedTableManager = ProcessedTableManager<
+    _$DatabaseClient,
+    $CreditRequestsTableTable,
+    CreditRequestsTableData,
+    $$CreditRequestsTableTableFilterComposer,
+    $$CreditRequestsTableTableOrderingComposer,
+    $$CreditRequestsTableTableAnnotationComposer,
+    $$CreditRequestsTableTableCreateCompanionBuilder,
+    $$CreditRequestsTableTableUpdateCompanionBuilder,
+    (
+      CreditRequestsTableData,
+      BaseReferences<_$DatabaseClient, $CreditRequestsTableTable,
+          CreditRequestsTableData>
+    ),
+    CreditRequestsTableData,
+    PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -16517,4 +17165,6 @@ class $DatabaseClientManager {
       $$PaymentsTableTableTableManager(_db, _db.paymentsTable);
   $$DiscountsTableTableTableManager get discountsTable =>
       $$DiscountsTableTableTableManager(_db, _db.discountsTable);
+  $$CreditRequestsTableTableTableManager get creditRequestsTable =>
+      $$CreditRequestsTableTableTableManager(_db, _db.creditRequestsTable);
 }

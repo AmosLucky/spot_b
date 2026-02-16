@@ -4,6 +4,7 @@ import 'package:spotstock_inventory/core/constants/colors/spotstock_colors.dart'
 
 import '../providers/booking_history_provider.dart';
 import 'widgets/booking_details_tab.dart';
+import 'widgets/credit_request_tab.dart';
 import 'widgets/discount_tab.dart';
 import 'widgets/payments_tab.dart';
 
@@ -109,7 +110,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                   const Center(child: Text('Operations')),
                   PaymentsTab(),
                   DiscountTab(),
-                  CreditTab(),
+                  CreditRequestTab(),
                   InvoiceTab(),
                 ],
               ),
@@ -124,81 +125,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
 
 
 
-// Credit Tab
-class CreditTab extends StatelessWidget {
-  const CreditTab({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey[300]!),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Request Credit',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Description',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Enter credit reason',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Date',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                hintText: '02/14/2026',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                suffixIcon: const Icon(Icons.calendar_today),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Credit Amount',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                hintText: '0',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 // Invoice Tab
 class InvoiceTab extends StatelessWidget {

@@ -10,6 +10,7 @@ import '../../features/auth/data/models/spotstock_user.dart';
 import '../../features/pos/data/models/product_warehouse.dart';
 import '../../features/pos/data/models/product_unit_name.dart';
 import 'tables/amenities_table.dart';
+import 'tables/credit_requests_table.dart';
 import 'tables/discounts_table.dart';
 import 'tables/local_attendants.dart';
 import 'tables/local_bookings_table.dart';
@@ -50,14 +51,15 @@ part 'database_client.g.dart';
     RoomsTable,
     LocalBookingsTable,
     PaymentsTable,
-    DiscountsTable
+    DiscountsTable,
+    CreditRequestsTable,
   ],
 )
 class DatabaseClient extends _$DatabaseClient {
   DatabaseClient() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -68,8 +70,9 @@ class DatabaseClient extends _$DatabaseClient {
         onUpgrade: (Migrator m, int from, int to) async {
           // Called when schemaVersion increases
 
-          if (from < 2) {
+          if (from < 4) {
             await m.createTable(discountsTable);
+            await m.createTable(creditRequestsTable,);
           }
           //       await m.createTable(localFacilitiesTable);
           //       await m.createTable(bedTypesTable);
