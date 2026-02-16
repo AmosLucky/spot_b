@@ -11527,6 +11527,529 @@ class CreditRequestsTableCompanion
   }
 }
 
+class $BookingPremiumServicesTableTable extends BookingPremiumServicesTable
+    with
+        TableInfo<$BookingPremiumServicesTableTable,
+            BookingPremiumServicesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BookingPremiumServicesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _bookingIdMeta =
+      const VerificationMeta('bookingId');
+  @override
+  late final GeneratedColumn<int> bookingId = GeneratedColumn<int>(
+      'booking_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _serviceIdMeta =
+      const VerificationMeta('serviceId');
+  @override
+  late final GeneratedColumn<int> serviceId = GeneratedColumn<int>(
+      'service_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _quantityMeta =
+      const VerificationMeta('quantity');
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+      'quantity', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(1));
+  static const VerificationMeta _unitPriceAtTimeMeta =
+      const VerificationMeta('unitPriceAtTime');
+  @override
+  late final GeneratedColumn<double> unitPriceAtTime = GeneratedColumn<double>(
+      'unit_price_at_time', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _startDateMeta =
+      const VerificationMeta('startDate');
+  @override
+  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
+      'start_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _endDateMeta =
+      const VerificationMeta('endDate');
+  @override
+  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
+      'end_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _numberOfDaysMeta =
+      const VerificationMeta('numberOfDays');
+  @override
+  late final GeneratedColumn<int> numberOfDays = GeneratedColumn<int>(
+      'number_of_days', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _totalPriceMeta =
+      const VerificationMeta('totalPrice');
+  @override
+  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
+      'total_price', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _dateCreatedMeta =
+      const VerificationMeta('dateCreated');
+  @override
+  late final GeneratedColumn<DateTime> dateCreated = GeneratedColumn<DateTime>(
+      'date_created', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        bookingId,
+        serviceId,
+        quantity,
+        unitPriceAtTime,
+        startDate,
+        endDate,
+        numberOfDays,
+        totalPrice,
+        dateCreated
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'booking_premium_services_table';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<BookingPremiumServicesTableData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('booking_id')) {
+      context.handle(_bookingIdMeta,
+          bookingId.isAcceptableOrUnknown(data['booking_id']!, _bookingIdMeta));
+    } else if (isInserting) {
+      context.missing(_bookingIdMeta);
+    }
+    if (data.containsKey('service_id')) {
+      context.handle(_serviceIdMeta,
+          serviceId.isAcceptableOrUnknown(data['service_id']!, _serviceIdMeta));
+    } else if (isInserting) {
+      context.missing(_serviceIdMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(_quantityMeta,
+          quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta));
+    }
+    if (data.containsKey('unit_price_at_time')) {
+      context.handle(
+          _unitPriceAtTimeMeta,
+          unitPriceAtTime.isAcceptableOrUnknown(
+              data['unit_price_at_time']!, _unitPriceAtTimeMeta));
+    } else if (isInserting) {
+      context.missing(_unitPriceAtTimeMeta);
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(_startDateMeta,
+          startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta));
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(_endDateMeta,
+          endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta));
+    } else if (isInserting) {
+      context.missing(_endDateMeta);
+    }
+    if (data.containsKey('number_of_days')) {
+      context.handle(
+          _numberOfDaysMeta,
+          numberOfDays.isAcceptableOrUnknown(
+              data['number_of_days']!, _numberOfDaysMeta));
+    } else if (isInserting) {
+      context.missing(_numberOfDaysMeta);
+    }
+    if (data.containsKey('total_price')) {
+      context.handle(
+          _totalPriceMeta,
+          totalPrice.isAcceptableOrUnknown(
+              data['total_price']!, _totalPriceMeta));
+    } else if (isInserting) {
+      context.missing(_totalPriceMeta);
+    }
+    if (data.containsKey('date_created')) {
+      context.handle(
+          _dateCreatedMeta,
+          dateCreated.isAcceptableOrUnknown(
+              data['date_created']!, _dateCreatedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BookingPremiumServicesTableData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BookingPremiumServicesTableData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      bookingId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}booking_id'])!,
+      serviceId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}service_id'])!,
+      quantity: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}quantity'])!,
+      unitPriceAtTime: attachedDatabase.typeMapping.read(
+          DriftSqlType.double, data['${effectivePrefix}unit_price_at_time'])!,
+      startDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}start_date'])!,
+      endDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}end_date'])!,
+      numberOfDays: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}number_of_days'])!,
+      totalPrice: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}total_price'])!,
+      dateCreated: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_created'])!,
+    );
+  }
+
+  @override
+  $BookingPremiumServicesTableTable createAlias(String alias) {
+    return $BookingPremiumServicesTableTable(attachedDatabase, alias);
+  }
+}
+
+class BookingPremiumServicesTableData extends DataClass
+    implements Insertable<BookingPremiumServicesTableData> {
+  final int id;
+  final int bookingId;
+  final int serviceId;
+  final int quantity;
+  final double unitPriceAtTime;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int numberOfDays;
+  final double totalPrice;
+  final DateTime dateCreated;
+  const BookingPremiumServicesTableData(
+      {required this.id,
+      required this.bookingId,
+      required this.serviceId,
+      required this.quantity,
+      required this.unitPriceAtTime,
+      required this.startDate,
+      required this.endDate,
+      required this.numberOfDays,
+      required this.totalPrice,
+      required this.dateCreated});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['booking_id'] = Variable<int>(bookingId);
+    map['service_id'] = Variable<int>(serviceId);
+    map['quantity'] = Variable<int>(quantity);
+    map['unit_price_at_time'] = Variable<double>(unitPriceAtTime);
+    map['start_date'] = Variable<DateTime>(startDate);
+    map['end_date'] = Variable<DateTime>(endDate);
+    map['number_of_days'] = Variable<int>(numberOfDays);
+    map['total_price'] = Variable<double>(totalPrice);
+    map['date_created'] = Variable<DateTime>(dateCreated);
+    return map;
+  }
+
+  BookingPremiumServicesTableCompanion toCompanion(bool nullToAbsent) {
+    return BookingPremiumServicesTableCompanion(
+      id: Value(id),
+      bookingId: Value(bookingId),
+      serviceId: Value(serviceId),
+      quantity: Value(quantity),
+      unitPriceAtTime: Value(unitPriceAtTime),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
+      numberOfDays: Value(numberOfDays),
+      totalPrice: Value(totalPrice),
+      dateCreated: Value(dateCreated),
+    );
+  }
+
+  factory BookingPremiumServicesTableData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BookingPremiumServicesTableData(
+      id: serializer.fromJson<int>(json['id']),
+      bookingId: serializer.fromJson<int>(json['bookingId']),
+      serviceId: serializer.fromJson<int>(json['serviceId']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+      unitPriceAtTime: serializer.fromJson<double>(json['unitPriceAtTime']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      endDate: serializer.fromJson<DateTime>(json['endDate']),
+      numberOfDays: serializer.fromJson<int>(json['numberOfDays']),
+      totalPrice: serializer.fromJson<double>(json['totalPrice']),
+      dateCreated: serializer.fromJson<DateTime>(json['dateCreated']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bookingId': serializer.toJson<int>(bookingId),
+      'serviceId': serializer.toJson<int>(serviceId),
+      'quantity': serializer.toJson<int>(quantity),
+      'unitPriceAtTime': serializer.toJson<double>(unitPriceAtTime),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'endDate': serializer.toJson<DateTime>(endDate),
+      'numberOfDays': serializer.toJson<int>(numberOfDays),
+      'totalPrice': serializer.toJson<double>(totalPrice),
+      'dateCreated': serializer.toJson<DateTime>(dateCreated),
+    };
+  }
+
+  BookingPremiumServicesTableData copyWith(
+          {int? id,
+          int? bookingId,
+          int? serviceId,
+          int? quantity,
+          double? unitPriceAtTime,
+          DateTime? startDate,
+          DateTime? endDate,
+          int? numberOfDays,
+          double? totalPrice,
+          DateTime? dateCreated}) =>
+      BookingPremiumServicesTableData(
+        id: id ?? this.id,
+        bookingId: bookingId ?? this.bookingId,
+        serviceId: serviceId ?? this.serviceId,
+        quantity: quantity ?? this.quantity,
+        unitPriceAtTime: unitPriceAtTime ?? this.unitPriceAtTime,
+        startDate: startDate ?? this.startDate,
+        endDate: endDate ?? this.endDate,
+        numberOfDays: numberOfDays ?? this.numberOfDays,
+        totalPrice: totalPrice ?? this.totalPrice,
+        dateCreated: dateCreated ?? this.dateCreated,
+      );
+  BookingPremiumServicesTableData copyWithCompanion(
+      BookingPremiumServicesTableCompanion data) {
+    return BookingPremiumServicesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      bookingId: data.bookingId.present ? data.bookingId.value : this.bookingId,
+      serviceId: data.serviceId.present ? data.serviceId.value : this.serviceId,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      unitPriceAtTime: data.unitPriceAtTime.present
+          ? data.unitPriceAtTime.value
+          : this.unitPriceAtTime,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      numberOfDays: data.numberOfDays.present
+          ? data.numberOfDays.value
+          : this.numberOfDays,
+      totalPrice:
+          data.totalPrice.present ? data.totalPrice.value : this.totalPrice,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BookingPremiumServicesTableData(')
+          ..write('id: $id, ')
+          ..write('bookingId: $bookingId, ')
+          ..write('serviceId: $serviceId, ')
+          ..write('quantity: $quantity, ')
+          ..write('unitPriceAtTime: $unitPriceAtTime, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('numberOfDays: $numberOfDays, ')
+          ..write('totalPrice: $totalPrice, ')
+          ..write('dateCreated: $dateCreated')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      bookingId,
+      serviceId,
+      quantity,
+      unitPriceAtTime,
+      startDate,
+      endDate,
+      numberOfDays,
+      totalPrice,
+      dateCreated);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BookingPremiumServicesTableData &&
+          other.id == this.id &&
+          other.bookingId == this.bookingId &&
+          other.serviceId == this.serviceId &&
+          other.quantity == this.quantity &&
+          other.unitPriceAtTime == this.unitPriceAtTime &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.numberOfDays == this.numberOfDays &&
+          other.totalPrice == this.totalPrice &&
+          other.dateCreated == this.dateCreated);
+}
+
+class BookingPremiumServicesTableCompanion
+    extends UpdateCompanion<BookingPremiumServicesTableData> {
+  final Value<int> id;
+  final Value<int> bookingId;
+  final Value<int> serviceId;
+  final Value<int> quantity;
+  final Value<double> unitPriceAtTime;
+  final Value<DateTime> startDate;
+  final Value<DateTime> endDate;
+  final Value<int> numberOfDays;
+  final Value<double> totalPrice;
+  final Value<DateTime> dateCreated;
+  const BookingPremiumServicesTableCompanion({
+    this.id = const Value.absent(),
+    this.bookingId = const Value.absent(),
+    this.serviceId = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.unitPriceAtTime = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.numberOfDays = const Value.absent(),
+    this.totalPrice = const Value.absent(),
+    this.dateCreated = const Value.absent(),
+  });
+  BookingPremiumServicesTableCompanion.insert({
+    this.id = const Value.absent(),
+    required int bookingId,
+    required int serviceId,
+    this.quantity = const Value.absent(),
+    required double unitPriceAtTime,
+    required DateTime startDate,
+    required DateTime endDate,
+    required int numberOfDays,
+    required double totalPrice,
+    this.dateCreated = const Value.absent(),
+  })  : bookingId = Value(bookingId),
+        serviceId = Value(serviceId),
+        unitPriceAtTime = Value(unitPriceAtTime),
+        startDate = Value(startDate),
+        endDate = Value(endDate),
+        numberOfDays = Value(numberOfDays),
+        totalPrice = Value(totalPrice);
+  static Insertable<BookingPremiumServicesTableData> custom({
+    Expression<int>? id,
+    Expression<int>? bookingId,
+    Expression<int>? serviceId,
+    Expression<int>? quantity,
+    Expression<double>? unitPriceAtTime,
+    Expression<DateTime>? startDate,
+    Expression<DateTime>? endDate,
+    Expression<int>? numberOfDays,
+    Expression<double>? totalPrice,
+    Expression<DateTime>? dateCreated,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bookingId != null) 'booking_id': bookingId,
+      if (serviceId != null) 'service_id': serviceId,
+      if (quantity != null) 'quantity': quantity,
+      if (unitPriceAtTime != null) 'unit_price_at_time': unitPriceAtTime,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (numberOfDays != null) 'number_of_days': numberOfDays,
+      if (totalPrice != null) 'total_price': totalPrice,
+      if (dateCreated != null) 'date_created': dateCreated,
+    });
+  }
+
+  BookingPremiumServicesTableCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? bookingId,
+      Value<int>? serviceId,
+      Value<int>? quantity,
+      Value<double>? unitPriceAtTime,
+      Value<DateTime>? startDate,
+      Value<DateTime>? endDate,
+      Value<int>? numberOfDays,
+      Value<double>? totalPrice,
+      Value<DateTime>? dateCreated}) {
+    return BookingPremiumServicesTableCompanion(
+      id: id ?? this.id,
+      bookingId: bookingId ?? this.bookingId,
+      serviceId: serviceId ?? this.serviceId,
+      quantity: quantity ?? this.quantity,
+      unitPriceAtTime: unitPriceAtTime ?? this.unitPriceAtTime,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      numberOfDays: numberOfDays ?? this.numberOfDays,
+      totalPrice: totalPrice ?? this.totalPrice,
+      dateCreated: dateCreated ?? this.dateCreated,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bookingId.present) {
+      map['booking_id'] = Variable<int>(bookingId.value);
+    }
+    if (serviceId.present) {
+      map['service_id'] = Variable<int>(serviceId.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    if (unitPriceAtTime.present) {
+      map['unit_price_at_time'] = Variable<double>(unitPriceAtTime.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<DateTime>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<DateTime>(endDate.value);
+    }
+    if (numberOfDays.present) {
+      map['number_of_days'] = Variable<int>(numberOfDays.value);
+    }
+    if (totalPrice.present) {
+      map['total_price'] = Variable<double>(totalPrice.value);
+    }
+    if (dateCreated.present) {
+      map['date_created'] = Variable<DateTime>(dateCreated.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BookingPremiumServicesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('bookingId: $bookingId, ')
+          ..write('serviceId: $serviceId, ')
+          ..write('quantity: $quantity, ')
+          ..write('unitPriceAtTime: $unitPriceAtTime, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('numberOfDays: $numberOfDays, ')
+          ..write('totalPrice: $totalPrice, ')
+          ..write('dateCreated: $dateCreated')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$DatabaseClient extends GeneratedDatabase {
   _$DatabaseClient(QueryExecutor e) : super(e);
   $DatabaseClientManager get managers => $DatabaseClientManager(this);
@@ -11556,6 +12079,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
   late final $DiscountsTableTable discountsTable = $DiscountsTableTable(this);
   late final $CreditRequestsTableTable creditRequestsTable =
       $CreditRequestsTableTable(this);
+  late final $BookingPremiumServicesTableTable bookingPremiumServicesTable =
+      $BookingPremiumServicesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -11579,7 +12104,8 @@ abstract class _$DatabaseClient extends GeneratedDatabase {
         localBookingsTable,
         paymentsTable,
         discountsTable,
-        creditRequestsTable
+        creditRequestsTable,
+        bookingPremiumServicesTable
       ];
 }
 
@@ -17124,6 +17650,258 @@ typedef $$CreditRequestsTableTableProcessedTableManager = ProcessedTableManager<
     ),
     CreditRequestsTableData,
     PrefetchHooks Function()>;
+typedef $$BookingPremiumServicesTableTableCreateCompanionBuilder
+    = BookingPremiumServicesTableCompanion Function({
+  Value<int> id,
+  required int bookingId,
+  required int serviceId,
+  Value<int> quantity,
+  required double unitPriceAtTime,
+  required DateTime startDate,
+  required DateTime endDate,
+  required int numberOfDays,
+  required double totalPrice,
+  Value<DateTime> dateCreated,
+});
+typedef $$BookingPremiumServicesTableTableUpdateCompanionBuilder
+    = BookingPremiumServicesTableCompanion Function({
+  Value<int> id,
+  Value<int> bookingId,
+  Value<int> serviceId,
+  Value<int> quantity,
+  Value<double> unitPriceAtTime,
+  Value<DateTime> startDate,
+  Value<DateTime> endDate,
+  Value<int> numberOfDays,
+  Value<double> totalPrice,
+  Value<DateTime> dateCreated,
+});
+
+class $$BookingPremiumServicesTableTableFilterComposer
+    extends Composer<_$DatabaseClient, $BookingPremiumServicesTableTable> {
+  $$BookingPremiumServicesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get bookingId => $composableBuilder(
+      column: $table.bookingId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get serviceId => $composableBuilder(
+      column: $table.serviceId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+      column: $table.quantity, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get unitPriceAtTime => $composableBuilder(
+      column: $table.unitPriceAtTime,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get startDate => $composableBuilder(
+      column: $table.startDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get endDate => $composableBuilder(
+      column: $table.endDate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get numberOfDays => $composableBuilder(
+      column: $table.numberOfDays, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => ColumnFilters(column));
+}
+
+class $$BookingPremiumServicesTableTableOrderingComposer
+    extends Composer<_$DatabaseClient, $BookingPremiumServicesTableTable> {
+  $$BookingPremiumServicesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get bookingId => $composableBuilder(
+      column: $table.bookingId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get serviceId => $composableBuilder(
+      column: $table.serviceId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+      column: $table.quantity, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get unitPriceAtTime => $composableBuilder(
+      column: $table.unitPriceAtTime,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get startDate => $composableBuilder(
+      column: $table.startDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get endDate => $composableBuilder(
+      column: $table.endDate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get numberOfDays => $composableBuilder(
+      column: $table.numberOfDays,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => ColumnOrderings(column));
+}
+
+class $$BookingPremiumServicesTableTableAnnotationComposer
+    extends Composer<_$DatabaseClient, $BookingPremiumServicesTableTable> {
+  $$BookingPremiumServicesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get bookingId =>
+      $composableBuilder(column: $table.bookingId, builder: (column) => column);
+
+  GeneratedColumn<int> get serviceId =>
+      $composableBuilder(column: $table.serviceId, builder: (column) => column);
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<double> get unitPriceAtTime => $composableBuilder(
+      column: $table.unitPriceAtTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<int> get numberOfDays => $composableBuilder(
+      column: $table.numberOfDays, builder: (column) => column);
+
+  GeneratedColumn<double> get totalPrice => $composableBuilder(
+      column: $table.totalPrice, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dateCreated => $composableBuilder(
+      column: $table.dateCreated, builder: (column) => column);
+}
+
+class $$BookingPremiumServicesTableTableTableManager extends RootTableManager<
+    _$DatabaseClient,
+    $BookingPremiumServicesTableTable,
+    BookingPremiumServicesTableData,
+    $$BookingPremiumServicesTableTableFilterComposer,
+    $$BookingPremiumServicesTableTableOrderingComposer,
+    $$BookingPremiumServicesTableTableAnnotationComposer,
+    $$BookingPremiumServicesTableTableCreateCompanionBuilder,
+    $$BookingPremiumServicesTableTableUpdateCompanionBuilder,
+    (
+      BookingPremiumServicesTableData,
+      BaseReferences<_$DatabaseClient, $BookingPremiumServicesTableTable,
+          BookingPremiumServicesTableData>
+    ),
+    BookingPremiumServicesTableData,
+    PrefetchHooks Function()> {
+  $$BookingPremiumServicesTableTableTableManager(
+      _$DatabaseClient db, $BookingPremiumServicesTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BookingPremiumServicesTableTableFilterComposer(
+                  $db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BookingPremiumServicesTableTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BookingPremiumServicesTableTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> bookingId = const Value.absent(),
+            Value<int> serviceId = const Value.absent(),
+            Value<int> quantity = const Value.absent(),
+            Value<double> unitPriceAtTime = const Value.absent(),
+            Value<DateTime> startDate = const Value.absent(),
+            Value<DateTime> endDate = const Value.absent(),
+            Value<int> numberOfDays = const Value.absent(),
+            Value<double> totalPrice = const Value.absent(),
+            Value<DateTime> dateCreated = const Value.absent(),
+          }) =>
+              BookingPremiumServicesTableCompanion(
+            id: id,
+            bookingId: bookingId,
+            serviceId: serviceId,
+            quantity: quantity,
+            unitPriceAtTime: unitPriceAtTime,
+            startDate: startDate,
+            endDate: endDate,
+            numberOfDays: numberOfDays,
+            totalPrice: totalPrice,
+            dateCreated: dateCreated,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int bookingId,
+            required int serviceId,
+            Value<int> quantity = const Value.absent(),
+            required double unitPriceAtTime,
+            required DateTime startDate,
+            required DateTime endDate,
+            required int numberOfDays,
+            required double totalPrice,
+            Value<DateTime> dateCreated = const Value.absent(),
+          }) =>
+              BookingPremiumServicesTableCompanion.insert(
+            id: id,
+            bookingId: bookingId,
+            serviceId: serviceId,
+            quantity: quantity,
+            unitPriceAtTime: unitPriceAtTime,
+            startDate: startDate,
+            endDate: endDate,
+            numberOfDays: numberOfDays,
+            totalPrice: totalPrice,
+            dateCreated: dateCreated,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$BookingPremiumServicesTableTableProcessedTableManager
+    = ProcessedTableManager<
+        _$DatabaseClient,
+        $BookingPremiumServicesTableTable,
+        BookingPremiumServicesTableData,
+        $$BookingPremiumServicesTableTableFilterComposer,
+        $$BookingPremiumServicesTableTableOrderingComposer,
+        $$BookingPremiumServicesTableTableAnnotationComposer,
+        $$BookingPremiumServicesTableTableCreateCompanionBuilder,
+        $$BookingPremiumServicesTableTableUpdateCompanionBuilder,
+        (
+          BookingPremiumServicesTableData,
+          BaseReferences<_$DatabaseClient, $BookingPremiumServicesTableTable,
+              BookingPremiumServicesTableData>
+        ),
+        BookingPremiumServicesTableData,
+        PrefetchHooks Function()>;
 
 class $DatabaseClientManager {
   final _$DatabaseClient _db;
@@ -17167,4 +17945,8 @@ class $DatabaseClientManager {
       $$DiscountsTableTableTableManager(_db, _db.discountsTable);
   $$CreditRequestsTableTableTableManager get creditRequestsTable =>
       $$CreditRequestsTableTableTableManager(_db, _db.creditRequestsTable);
+  $$BookingPremiumServicesTableTableTableManager
+      get bookingPremiumServicesTable =>
+          $$BookingPremiumServicesTableTableTableManager(
+              _db, _db.bookingPremiumServicesTable);
 }
