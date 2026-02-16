@@ -5,6 +5,7 @@ import 'package:spotstock_inventory/features/payments/presentation/providers/pay
 
 import '../../../../../../core/constants/colors/spotstock_colors.dart';
 import '../../../../discount/presentation/providers/discount_providers.dart';
+import '../../../../rooms/presentation/providers/room_providers.dart';
 import '../../../domain/entities/booking_entity.dart';
 import '../../providers/booking_history_provider.dart';
 import 'booking_details_dialog_old.dart';
@@ -217,6 +218,8 @@ class BookingCard extends ConsumerWidget {
                              ref
                           .read(creditControllerProvider.notifier)
                           .loadCredits(booking.id!);
+
+                          ref.watch(roomControllerProvider.notifier).getRooms();
 
                       showDialog(
                         context: context,

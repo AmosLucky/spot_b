@@ -23,6 +23,13 @@ class RoomController extends StateNotifier<RoomState> {
     });
   }
 
+  void getRooms() async{
+   state = state.copyWith(isLoading: true);
+    final list = await repository.getAllRooms();
+   
+    state = state.copyWith(all: list, isLoading: false);
+  }
+
   // ---------------- CRUD ----------------
 
   Future<void> addRooms({
@@ -71,6 +78,4 @@ class RoomController extends StateNotifier<RoomState> {
   void setSelectedFilter(selectedFilter) {
     state = state.copyWith(selectedFilter: selectedFilter);
   }
-
-  
 }

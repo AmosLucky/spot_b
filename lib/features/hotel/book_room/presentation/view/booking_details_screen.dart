@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotstock_inventory/core/constants/colors/spotstock_colors.dart';
+import 'package:spotstock_inventory/features/hotel/booking_premium_service/domain/usecases/add_booking_premium_service.dart';
 
 import '../providers/booking_history_provider.dart';
+import 'widgets/add_premuim_service_tab.dart';
 import 'widgets/booking_details_tab.dart';
 import 'widgets/credit_request_tab.dart';
 import 'widgets/discount_tab.dart';
@@ -23,7 +25,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
   }
 
   @override
@@ -99,6 +101,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                   Tab(text: 'Discount'),
                   Tab(text: 'Credit'),
                   Tab(text: 'Invoice'),
+                  Tab(text: 'Add Sercive'),
                 ],
               ),
             ),
@@ -112,6 +115,7 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
                   DiscountTab(),
                   CreditRequestTab(),
                   InvoiceTab(),
+                  AddPremuimServiceTab(),
                 ],
               ),
             ),
@@ -121,11 +125,6 @@ class _BookingDetailScreenState extends ConsumerState<BookingDetailScreen>
     );
   }
 }
-
-
-
-
-
 
 // Invoice Tab
 class InvoiceTab extends StatelessWidget {
