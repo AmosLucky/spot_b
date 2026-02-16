@@ -13,6 +13,9 @@ class BookingPremiumServicesTable extends Table {
   // Snapshot of price at time of adding
   RealColumn get unitPriceAtTime => real()();
 
+  TextColumn get serviceName => text().nullable()();
+
+
   // Service usage period
   DateTimeColumn get startDate => dateTime()();
 

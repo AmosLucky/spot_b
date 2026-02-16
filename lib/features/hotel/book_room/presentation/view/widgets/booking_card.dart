@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:spotstock_inventory/features/hotel/booking_premium_service/presentation/providers/booking_premium_service_providers.dart';
 import 'package:spotstock_inventory/features/hotel/credit/presentation/providers/credit_providers.dart';
 import 'package:spotstock_inventory/features/payments/presentation/providers/payment_providers.dart';
 
@@ -215,11 +216,15 @@ class BookingCard extends ConsumerWidget {
                           .read(discountControllerProvider.notifier)
                           .loadDiscounts(booking.id!);
 
-                             ref
+                      ref
                           .read(creditControllerProvider.notifier)
                           .loadCredits(booking.id!);
 
-                          ref.watch(roomControllerProvider.notifier).getRooms();
+                      ref.watch(roomControllerProvider.notifier).getRooms();
+                      ref
+                          .watch(
+                              bookingPremiumServiceControllerProvider.notifier)
+                          .load(booking.id!);
 
                       showDialog(
                         context: context,

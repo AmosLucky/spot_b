@@ -7,6 +7,8 @@ import '../../domain/usecases/add_booking_premium_service.dart';
 import '../../domain/usecases/delete_booking_premium_service.dart';
 import '../../domain/usecases/get_booking_premium_services.dart';
 import '../controller/booking_premium_service_controller.dart';
+import '../controller/booking_premium_service_form_controller.dart';
+import '../state/booking_premium_service_form_state.dart';
 import '../state/booking_premium_service_state.dart';
 
 
@@ -41,3 +43,12 @@ final bookingPremiumServiceControllerProvider =
     deleteUseCase: DeleteBookingPremiumService(repo),
   );
 });
+
+
+final bookingPremiumServiceFormProvider =
+    StateNotifierProvider<
+        BookingPremiumServiceFormController,
+        BookingPremiumServiceFormState>(
+  (ref) => BookingPremiumServiceFormController(),
+);
+

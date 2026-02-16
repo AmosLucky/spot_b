@@ -24,31 +24,30 @@ class BookingPremiumServiceController
   }
 
   Future<void> add(int bookingId) async {
-    if (state.serviceId == null ||
-        state.startDate == null ||
-        state.endDate == null) return;
+    if (state.serviceId == null
+        // state.startDate == null ||
+        // state.endDate == null
+        ) return;
 
-    int days =
-        state.endDate!.difference(state.startDate!).inDays;
+    int days = state.endDate!.difference(state.startDate!).inDays;
 
     if (days <= 0) days = 1;
 
-    final total =
-        state.unitPrice * state.quantity * days;
+    final total = state.unitPrice * state.quantity;
 
     final entity = BookingPremiumServiceEntity(
       bookingId: bookingId,
       serviceId: state.serviceId!,
       quantity: state.quantity,
       unitPriceAtTime: state.unitPrice,
-      startDate: state.startDate!,
-      endDate: state.endDate!,
+      startDate: DateTime.now(), //state.startDate!,
+      endDate: DateTime.now(), // state.endDate!,
       numberOfDays: days,
       totalPrice: total,
     );
 
     await addUseCase(entity);
-    
+
     await load(bookingId);
   }
 
@@ -58,18 +57,13 @@ class BookingPremiumServiceController
   }
 
   // FORM SETTERS
-  void setService(int id) =>
-      state = state.copyWith(serviceId: id);
+  void setService(int id) => state = state.copyWith(serviceId: id);
 
-  void setQuantity(int q) =>
-      state = state.copyWith(quantity: q);
+  void setQuantity(int q) => state = state.copyWith(quantity: q);
 
-  void setPrice(double p) =>
-      state = state.copyWith(unitPrice: p);
+  void setPrice(double p) => state = state.copyWith(unitPrice: p);
 
-  void setStartDate(DateTime d) =>
-      state = state.copyWith(startDate: d);
+  void setStartDate(DateTime d) => state = state.copyWith(startDate: d);
 
-  void setEndDate(DateTime d) =>
-      state = state.copyWith(endDate: d);
+  void setEndDate(DateTime d) => state = state.copyWith(endDate: d);
 }
