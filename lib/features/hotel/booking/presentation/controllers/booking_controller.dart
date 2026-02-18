@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spotstock_inventory/features/hotel/book_room/domain/repositories/enums/guest_type.dart';
+import 'package:spotstock_inventory/features/hotel/booking/domain/repositories/enums/guest_type.dart';
 import 'package:spotstock_inventory/features/hotel/room_types/domain/entities/room_type_entities.dart';
 import 'package:spotstock_inventory/features/hotel/rooms/domain/entities/room_entity.dart';
 import 'package:spotstock_inventory/features/payments/domain/entities/payment_entity.dart';

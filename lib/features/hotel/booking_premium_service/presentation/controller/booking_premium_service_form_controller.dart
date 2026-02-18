@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotstock_inventory/core/presentation/mesenger/app_messenger.dart';
-import 'package:spotstock_inventory/features/hotel/book_room/domain/entities/booking_entity.dart';
+import 'package:spotstock_inventory/features/hotel/booking/domain/entities/booking_entity.dart';
 import 'package:spotstock_inventory/features/hotel/premium_type/domain/entities/premium_type_entity.dart';
 
 import '../../domain/entities/booking_premium_service_entity.dart';

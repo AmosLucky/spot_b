@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:spotstock_inventory/features/hotel/book_room/presentation/providers/booking_provider.dart';
+import 'package:spotstock_inventory/features/hotel/booking/presentation/providers/booking_provider.dart';
 import '../../../domain/repositories/enums/guest_type.dart';
 import '../../../domain/repositories/enums/payment_method.dart';
 

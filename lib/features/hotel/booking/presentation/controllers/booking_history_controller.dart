@@ -24,6 +24,7 @@ class BookingHistoryController extends StateNotifier<BookingHistoryState> {
     );
 
     _applyFilters();
+    
   }
 
   void updateSearch(String value) {

@@ -1,7 +1,7 @@
 // Payments Tab
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spotstock_inventory/features/hotel/book_room/presentation/providers/booking_history_provider.dart';
+import 'package:spotstock_inventory/features/hotel/booking/presentation/providers/booking_history_provider.dart';
 
 import '../../../../../payments/presentation/providers/payment_providers.dart';
 import 'table_cell.dart';

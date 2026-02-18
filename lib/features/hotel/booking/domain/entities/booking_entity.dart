@@ -1,4 +1,4 @@
-import '../../domain/repositories/enums/guest_type.dart';
+import '../repositories/enums/guest_type.dart';
 
 class BookingEntity {
   final int? id;

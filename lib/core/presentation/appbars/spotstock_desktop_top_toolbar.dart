@@ -25,7 +25,7 @@ class SpotstockDesktopTopToolbar extends StatelessWidget {
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      color: Theme.of(context).colorScheme.primary,
+      color: SpotstockColors.c473069,
       child: Row(
         children: [
           IconButton(
@@ -43,7 +43,7 @@ class SpotstockDesktopTopToolbar extends StatelessWidget {
           Text(
             SpotstockStrings.monthlyPlan,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: SpotstockColors.c473069,
             ),
           ),
           // IconButton(

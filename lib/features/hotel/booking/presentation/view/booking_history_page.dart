@@ -32,13 +32,13 @@ class _BookingHistoryPageState extends ConsumerState<BookingHistoryPage> {
 
     return Scaffold(
         backgroundColor: Colors.grey.shade100,
-        appBar: AppBar(
-          title: const Text(
-            "Booking History",
-            style: TextStyle(color: SpotstockColors.white),
-          ),
-          backgroundColor: SpotstockColors.c4D2B5B,
-        ),
+        // appBar: AppBar(
+        //   title: const Text(
+        //     "Booking History",
+        //     style: TextStyle(color: SpotstockColors.white),
+        //   ),
+        //   backgroundColor: SpotstockColors.c4D2B5B,
+        // ),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -46,7 +46,12 @@ class _BookingHistoryPageState extends ConsumerState<BookingHistoryPage> {
               SizedBox(
                 height: MediaQuery.of(context).size.height, // or adjust
                 child: state.isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Column(
+                      children: [
+                        const Center(child: CircularProgressIndicator()),
+                        
+                      ],
+                    )
                     : GridView.builder(
                         padding: const EdgeInsets.all(16),
                         physics:

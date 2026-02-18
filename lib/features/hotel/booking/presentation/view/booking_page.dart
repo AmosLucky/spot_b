@@ -277,7 +277,7 @@ class BookingPage extends ConsumerWidget {
     required ValueChanged<T?> onChanged,
   }) {
     return DropdownButtonFormField<T>(
-      value: value,
+      //value: value,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(),
