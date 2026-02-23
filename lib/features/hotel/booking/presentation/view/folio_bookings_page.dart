@@ -398,7 +398,7 @@ class _BookingList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (state.isLoading) return const CircularProgressIndicator();
+    if (state.isLoading) return Center(child: const CircularProgressIndicator());
 
     if (state.error != null) {
       return _ErrorView(message: state.error!);

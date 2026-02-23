@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:spotstock_inventory/core/constants/colors/spotstock_colors.dart';
+import 'package:spotstock_inventory/features/payments/presentation/state/payment_state.dart';
+import '../../../../payments/presentation/providers/payment_providers.dart';
+import '../../../booking/domain/entities/booking_entity.dart';
+import '../../../booking/presentation/providers/booking_history_provider.dart';
+import '../../../rooms/presentation/providers/room_providers.dart';
 import '../providers/dashboard_provider.dart';
 
 class HotelDashboardPage extends ConsumerStatefulWidget {
   const HotelDashboardPage({super.key});
 
   @override
-  ConsumerState<HotelDashboardPage> createState() =>
-      _HotelDashboardPageState();
+  ConsumerState<HotelDashboardPage> createState() => _HotelDashboardPageState();
 }
 
 class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
@@ -25,6 +29,70 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(hotelDashboardControllerProvider);
     final controller = ref.read(hotelDashboardControllerProvider.notifier);
+    final roomState = ref.watch(roomControllerProvider);
+    final bookingHistoryState = ref.watch(bookingHistoryControllerProvider);
+    final PaymentState = ref.watch(paymentControllerProvider);
+
+    final allRooms = roomState.all;
+
+    final selectedDate = state.selectedDate.toLocal();
+
+// Helper to normalize a date to just Y-M-D
+    DateTime normalizeDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
+    final normalizedSelected = normalizeDate(selectedDate);
+
+// Filter bookings where selectedDate is between dateFrom and dateTo (inclusive)
+    final todaysBookings =
+        bookingHistoryState.allBookings.where((BookingEntity booking) {
+      final start = normalizeDate(booking.dateFrom.toLocal());
+      final end = normalizeDate(booking.dateTo.toLocal());
+
+      return !normalizedSelected.isBefore(start) &&
+          !normalizedSelected.isAfter(end);
+    }).toList();
+
+// Get all booked room numbers
+    final bookedRoomNumbers = <String>{};
+    for (final booking in todaysBookings) {
+      final rooms = booking.roomNumbers.split(',').map((r) => r.trim());
+      bookedRoomNumbers.addAll(rooms);
+    }
+
+// Separate rooms
+    final bookedRooms = allRooms
+        .where((room) => bookedRoomNumbers.contains(room.roomNumber))
+        .toList();
+    final availableRooms = allRooms
+        .where((room) => !bookedRoomNumbers.contains(room.roomNumber))
+        .toList();
+
+    final maintenanceRooms = roomState.all
+        .where((r) => r.status.toLowerCase() == 'maintenance')
+        .length;
+
+    final activeRooms =
+        roomState.all.where((r) => r.status.toLowerCase() == 'active').length;
+
+    final checkedInBookings =
+        todaysBookings.where((b) => b.checkInStatus == 'checked_in').toList();
+
+    final checkedOutBookings =
+        todaysBookings.where((b) => b.checkOutStatus == 'checked_out').toList();
+
+    /// Step 2: Get the booking IDs
+    final todaysBookingIds = todaysBookings.map((b) => b.id).toSet();
+
+// Step 3: Get all payments for these bookings
+    final todaysPayments = PaymentState.allPayments.where((payment) {
+      return todaysBookingIds.contains(payment.bookingId);
+    }).toList();
+
+// Step 4: Sum the payment amounts
+    final totalRevenue = todaysPayments.fold<double>(
+      0.0,
+      (sum, payment) => sum + payment.amount,
+    );
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -38,11 +106,13 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
             const SizedBox(height: 24),
 
             // KPI CARDS - OCCUPANCY & ROOMS
-            _buildOccupancySection(),
+            _buildOccupancySection(roomState, bookedRooms.length.toString(),
+                activeRooms.toString(), maintenanceRooms.toString()),
             const SizedBox(height: 16),
 
             // KPI CARDS - REVENUE & BOOKINGS
-            _buildRevenueSection(),
+            _buildRevenueSection("$totalRevenue", "${checkedInBookings.length}",
+                "${checkedOutBookings.length}", "51"),
             const SizedBox(height: 32),
 
             // ROOM OCCUPANCY SECTION
@@ -186,13 +256,14 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
     );
   }
 
-  Widget _buildOccupancySection() {
+  Widget _buildOccupancySection(dynamic roomState, bookedRoomsCount,
+      availableRoomsCount, maintenanceRooms) {
     return Row(
       children: [
         Expanded(
           child: _buildKpiCard(
             title: 'Total Rooms',
-            value: '29',
+            value: roomState.all.length.toString(),
             subtitle: 'Available in hotel',
             icon: Icons.meeting_room,
             color: SpotstockColors.c473069,
@@ -203,7 +274,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
         Expanded(
           child: _buildKpiCard(
             title: 'Occupied Rooms',
-            value: '14',
+            value: bookedRoomsCount,
             subtitle: '48% Occupancy',
             icon: Icons.bed,
             color: Colors.blue,
@@ -214,7 +285,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
         Expanded(
           child: _buildKpiCard(
             title: 'Available Rooms',
-            value: '15',
+            value: availableRoomsCount,
             subtitle: 'Ready for check-in',
             icon: Icons.check_circle,
             color: SpotstockColors.green,
@@ -225,7 +296,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
         Expanded(
           child: _buildKpiCard(
             title: 'Maintenance',
-            value: '0',
+            value: maintenanceRooms,
             subtitle: 'Under maintenance',
             icon: Icons.build,
             color: Colors.orange,
@@ -236,13 +307,14 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
     );
   }
 
-  Widget _buildRevenueSection() {
+  Widget _buildRevenueSection(String revenue, String checkedInBookings,
+      String checkedOutBookings, String guest) {
     return Row(
       children: [
         Expanded(
           child: _buildKpiCard(
             title: "Today's Revenue",
-            value: '₦4,424,000',
+            value: '₦ $revenue',
             subtitle: 'From 14 bookings',
             icon: Icons.attach_money,
             color: SpotstockColors.green,
@@ -253,7 +325,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
         Expanded(
           child: _buildKpiCard(
             title: 'Check-ins Today',
-            value: '8',
+            value: checkedInBookings,
             subtitle: '5 pending check-in',
             icon: Icons.login,
             color: Colors.indigo,
@@ -264,7 +336,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
         Expanded(
           child: _buildKpiCard(
             title: 'Check-outs Today',
-            value: '6',
+            value: checkedOutBookings,
             subtitle: '3 completed',
             icon: Icons.logout,
             color: Colors.purple,
@@ -275,7 +347,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
         Expanded(
           child: _buildKpiCard(
             title: 'Total Guests',
-            value: '28',
+            value: guest,
             subtitle: 'Currently staying',
             icon: Icons.people,
             color: Colors.teal,
