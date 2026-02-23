@@ -12,4 +12,7 @@ abstract class PaymentRepository {
 
   Future<void> deletePayment(int id);
 
+   // 🔥 NEW
+  Future<List<PaymentEntity>> getAllPayments();
+
 }

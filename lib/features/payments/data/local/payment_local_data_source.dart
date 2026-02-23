@@ -18,6 +18,18 @@ class PaymentLocalDataSource {
     return result.map((e) => _map(e)).toList();
   }
 
+
+  @override
+Future<List<PaymentEntity>> getAllPayments() async {
+  final result = await (db.select(db.paymentsTable)
+        ..orderBy([
+          (tbl) => OrderingTerm.desc(tbl.id),
+        ]))
+      .get();
+
+  return result.map((e) => _map(e)).toList();
+}
+
   @override
   Future<int> insert(PaymentEntity payment) {
     return db.into(db.paymentsTable).insert(PaymentsTableCompanion.insert(

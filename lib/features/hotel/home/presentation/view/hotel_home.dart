@@ -75,6 +75,7 @@ class _HotelHomeState extends ConsumerState<HotelHome>
               Tab(text: "Folio Booking"),
               Tab(text: "Discount Request Page"),
               Tab(text: "Credit Request Page"),
+              Tab(text: "Payments Page"),
             ],
           ),
         ),

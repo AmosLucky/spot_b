@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spotstock_inventory/features/hotel/booking/presentation/view/folio_bookings_page.dart';
 
+import '../../../../payments/presentation/views/payment_page.dart';
 import '../../../amenities/presentation/views/amenities_page.dart';
 import '../../../bed_type/presentation/view/desktop/bed_types_page.dart';
 import '../../../booking/presentation/view/booking_history_page.dart';
@@ -28,4 +29,5 @@ final List<Widget> hotelPages = [
   FolioBookingsPage(),
   DiscountRequestPage(),
   CreditRequestPage(),
+  PaymentsPage()
 ];

@@ -40,4 +40,12 @@ class PaymentRepositoryImpl implements PaymentRepository {
     await local.update(payment);
     //await remote.updatePayment(payment);
   }
+
+
+  @override
+Future<List<PaymentEntity>> getAllPayments() async {
+  final localData = await local.getAllPayments();
+    return localData;
+}
+
 }

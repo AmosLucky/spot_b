@@ -8,6 +8,7 @@ import '../../data/repositories/payment_repository_impl.dart';
 import '../../domain/repositories/payment_repository.dart';
 import '../../domain/usecases/create_payment.dart';
 import '../../domain/usecases/delete_payment.dart';
+import '../../domain/usecases/get_all_payments.dart';
 import '../../domain/usecases/get_payments_by_booking.dart';
 import '../../domain/usecases/update_payment.dart';
 import '../../domain/usecases/get_single_payment_by_booking.dart';
@@ -77,6 +78,11 @@ final deletePaymentProvider = Provider<DeletePayment>((ref) {
   return DeletePayment(ref.read(paymentRepositoryProvider));
 });
 
+final getAllPaymentsProvider = Provider<GetAllPayments>((ref) {
+  final repo = ref.read(paymentRepositoryProvider);
+  return GetAllPayments(repo);
+});
+
 
 /// ------------------------------------------------
 /// CONTROLLER
@@ -85,9 +91,12 @@ final paymentControllerProvider =
     StateNotifierProvider<PaymentController, PaymentState>((ref) {
   return PaymentController(
     ref.read(getPaymentsByBookingProvider),
+    
     ref.read(createPaymentProvider),
     ref.read(updatePaymentProvider),
     ref.read(deletePaymentProvider),
+    ref.read(getAllPaymentsProvider)
+    
   );
 });
 
