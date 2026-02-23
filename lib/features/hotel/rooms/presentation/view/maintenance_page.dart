@@ -7,14 +7,14 @@ import '../../domain/entities/room_entity.dart';
 import '../providers/room_providers.dart';
 import 'widgets/create_room_dialog.dart';
 
-class HotelRoomsPage extends ConsumerStatefulWidget {
-  const HotelRoomsPage({super.key});
+class MaintenancePage extends ConsumerStatefulWidget {
+  const MaintenancePage({super.key});
 
   @override
-  ConsumerState<HotelRoomsPage> createState() => _HotelRoomsPageState();
+  ConsumerState<MaintenancePage> createState() => _MaintenancePageState();
 }
 
-class _HotelRoomsPageState extends ConsumerState<HotelRoomsPage> {
+class _MaintenancePageState extends ConsumerState<MaintenancePage> {
   final searchController = TextEditingController();
   // String _selectedFilter = 'All';
 
@@ -155,13 +155,11 @@ class _HotelRoomsPageState extends ConsumerState<HotelRoomsPage> {
     final roomTypes = ref.watch(roomTypeControllerProvider).roomTypes;
 
     // Filter rooms based on status
-    final filteredRooms = state.selectedFilter == 'All'
-        ? state.filtered
-        : state.filtered
-            .where((room) => room.status == state.selectedFilter)
-            .toList();
+    final filteredRooms = state.all.where((room) {
+      final status = room.status.toLowerCase();
+      return status == 'maintenance' || status == 'dirty';
+    }).toList();
 
-    // Statistics
     // Statistics
     final totalRooms = state.all.length;
     final activeRooms =
@@ -384,71 +382,71 @@ class _HotelRoomsPageState extends ConsumerState<HotelRoomsPage> {
                                 : Column(
                                     children: [
                                       // Table Header
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 16,
-                                          horizontal: 16,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade100,
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(12),
-                                            topRight: Radius.circular(12),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                'ROOM NUMBER',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey.shade700,
-                                                  letterSpacing: 0.5,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                'ROOM TYPE',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey.shade700,
-                                                  letterSpacing: 0.5,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              flex: 2,
-                                              child: Text(
-                                                'STATUS',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey.shade700,
-                                                  letterSpacing: 0.5,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 80,
-                                              child: Text(
-                                                'ACTIONS',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey,
-                                                  letterSpacing: 0.5,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      // Container(
+                                      //   padding: const EdgeInsets.symmetric(
+                                      //     vertical: 16,
+                                      //     horizontal: 16,
+                                      //   ),
+                                      //   decoration: BoxDecoration(
+                                      //     color: Colors.grey.shade100,
+                                      //     borderRadius: const BorderRadius.only(
+                                      //       topLeft: Radius.circular(12),
+                                      //       topRight: Radius.circular(12),
+                                      //     ),
+                                      //   ),
+                                      //   child: Row(
+                                      //     children: [
+                                      //       Expanded(
+                                      //         flex: 2,
+                                      //         child: Text(
+                                      //           'ROOM NUMBER',
+                                      //           style: TextStyle(
+                                      //             fontSize: 12,
+                                      //             fontWeight: FontWeight.bold,
+                                      //             color: Colors.grey.shade700,
+                                      //             letterSpacing: 0.5,
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       Expanded(
+                                      //         flex: 2,
+                                      //         child: Text(
+                                      //           'ROOM TYPE',
+                                      //           style: TextStyle(
+                                      //             fontSize: 12,
+                                      //             fontWeight: FontWeight.bold,
+                                      //             color: Colors.grey.shade700,
+                                      //             letterSpacing: 0.5,
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       Expanded(
+                                      //         flex: 2,
+                                      //         child: Text(
+                                      //           'STATUS',
+                                      //           style: TextStyle(
+                                      //             fontSize: 12,
+                                      //             fontWeight: FontWeight.bold,
+                                      //             color: Colors.grey.shade700,
+                                      //             letterSpacing: 0.5,
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //       const SizedBox(
+                                      //         width: 80,
+                                      //         child: Text(
+                                      //           'ACTIONS',
+                                      //           style: TextStyle(
+                                      //             fontSize: 12,
+                                      //             fontWeight: FontWeight.bold,
+                                      //             color: Colors.grey,
+                                      //             letterSpacing: 0.5,
+                                      //           ),
+                                      //         ),
+                                      //       ),
+                                      //     ],
+                                      //   ),
+                                      // ),
 
                                       // Table Rows
                                       Expanded(

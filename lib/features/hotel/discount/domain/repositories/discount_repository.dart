@@ -5,4 +5,5 @@ abstract class DiscountRepository {
   Future<int> create(DiscountEntity discount);
   Future<void> update(DiscountEntity discount);
   Future<void> delete(int id);
+  Future<List<DiscountEntity>> getAllDiscountRequests();
 }

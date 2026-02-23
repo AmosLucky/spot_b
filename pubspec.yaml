@@ -33,6 +33,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   window_size: ^0.1.0
   equatable:
+  excel: ^2.1.0
 
 
 dev_dependencies:

@@ -338,7 +338,7 @@ class _CreateRoomDialogState extends State<_CreateRoomDialog> {
                       _buildSectionTitle('Room Type', Icons.category),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<int>(
-                        value: _selectedRoomTypeId,
+                        initialValue: _selectedRoomTypeId,
                         decoration: InputDecoration(
                           hintText: 'Select room type',
                           prefixIcon: Icon(
@@ -403,7 +403,7 @@ class _CreateRoomDialogState extends State<_CreateRoomDialog> {
                                 _buildSectionTitle('Status', Icons.toggle_on),
                                 const SizedBox(height: 12),
                                 DropdownButtonFormField<String>(
-                                  value: _status,
+                                  initialValue: _status,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(
                                       _status == 'active'
@@ -469,7 +469,7 @@ class _CreateRoomDialogState extends State<_CreateRoomDialog> {
                                 ),
                                 const SizedBox(height: 12),
                                 DropdownButtonFormField<String>(
-                                  value: _availability,
+                                  initialValue: _availability,
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(
                                       _availability == 'available'

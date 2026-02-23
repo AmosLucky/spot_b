@@ -5,10 +5,13 @@ import '../../data/repositories/discount_repository_impl.dart';
 import '../../domain/repositories/discount_repository.dart';
 import '../../domain/usecase/create_discount.dart';
 import '../../domain/usecase/delete_discount.dart';
+import '../../domain/usecase/get_all_discount_requests.dart';
 import '../../domain/usecase/get_discounts_by_booking.dart';
 import '../../domain/usecase/update_discount.dart';
 
 import '../controller/discount_controller.dart';
+import '../controller/discount_request_controller.dart';
+import '../state/discount_request_state.dart';
 import '../state/discount_state.dart';
 
 final appDatabaseProvider =
@@ -43,4 +46,17 @@ final discountControllerProvider =
     updateDiscount: ref.read(updateDiscountProvider),
     deleteDiscount: ref.read(deleteDiscountProvider),
   );
+});
+
+
+final discountRequestProvider =
+    StateNotifierProvider<DiscountRequestController, DiscountRequestState>(
+  (ref) => DiscountRequestController(
+    ref.read(getAllDiscountRequestsProvider),
+  ),
+);
+
+final getAllDiscountRequestsProvider = Provider<GetAllDiscountRequests>((ref) {
+  final repo = ref.read(discountRepositoryProvider);
+  return GetAllDiscountRequests(repo);
 });

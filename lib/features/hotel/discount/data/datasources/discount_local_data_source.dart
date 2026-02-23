@@ -15,6 +15,19 @@ class DiscountLocalDataSource {
     return result.map(_map).toList();
   }
 
+Future<List<DiscountEntity>> getAllDiscountRequests() async {
+  final query = db.select(db.discountsTable)
+    ..orderBy([
+      (tbl) => OrderingTerm.desc(tbl.dateCreated),
+    ]);
+
+  final result = await query.get();
+
+  return result.map(_map).toList();
+}
+
+  
+
   Future<int> insert(DiscountEntity discount) {
     return db.into(db.discountsTable).insert(
           DiscountsTableCompanion.insert(

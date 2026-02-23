@@ -12,6 +12,9 @@ class DiscountRepositoryImpl implements DiscountRepository {
     return local.getByBooking(bookingId);
   }
 
+
+
+
   @override
   Future<int> create(DiscountEntity discount) {
     return local.insert(discount);
@@ -25,5 +28,11 @@ class DiscountRepositoryImpl implements DiscountRepository {
   @override
   Future<void> delete(int id) {
     return local.delete(id);
+  }
+  
+  @override
+  Future<List<DiscountEntity>> getAllDiscountRequests() {
+    // TODO: implement getAllDiscountRequests
+    return local.getAllDiscountRequests();
   }
 }
