@@ -217,7 +217,11 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
               ),
               child: IconButton(
                 icon: const Icon(Icons.refresh),
-                onPressed: () {},
+                onPressed: () {
+                  ref
+                      .read(hotelDashboardControllerProvider.notifier)
+                      .loadAllModule();
+                },
                 tooltip: 'Refresh',
                 color: Colors.grey.shade700,
               ),

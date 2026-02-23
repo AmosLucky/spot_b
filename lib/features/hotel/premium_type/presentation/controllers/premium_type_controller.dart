@@ -23,6 +23,10 @@ class PremiumTypeController extends StateNotifier<PremiumTypeState> {
     });
   }
 
+  void loadAllTypes() {
+    _init();
+  }
+
   // ---------------- CRUD ----------------
 
   Future<void> addPremiumType({

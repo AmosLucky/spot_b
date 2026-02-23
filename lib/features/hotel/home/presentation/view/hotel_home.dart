@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotstock_inventory/features/hotel/amenities/presentation/providers/amenities_provider.dart';
 import 'package:spotstock_inventory/features/hotel/bed_type/presentation/providers/bed_types_provider.dart';
+import 'package:spotstock_inventory/features/hotel/booking/presentation/providers/booking_history_provider.dart';
+import 'package:spotstock_inventory/features/hotel/booking/presentation/providers/booking_provider.dart';
+import 'package:spotstock_inventory/features/hotel/credit/presentation/providers/credit_providers.dart';
+import 'package:spotstock_inventory/features/hotel/discount/presentation/providers/discount_providers.dart';
 import 'package:spotstock_inventory/features/hotel/facilities/presentation/providers/facilities_provider.dart';
 import 'package:spotstock_inventory/features/hotel/premium_type/presentation/providers/premium_type_provider.dart';
 import 'package:spotstock_inventory/features/hotel/room_types/presentation/providers/room_type_provider.dart';
 import 'package:spotstock_inventory/features/hotel/rooms/presentation/providers/room_providers.dart';
+import 'package:spotstock_inventory/features/payments/presentation/providers/payment_providers.dart';
 
 import '../../../../../core/presentation/appbars/spotstock_desktop_top_toolbar.dart';
+import '../../../dashboard/presentation/providers/dashboard_provider.dart';
 import '../view_model/hotel_home_viewmodel.dart';
 import 'hotel_pages.dart';
 
@@ -33,12 +39,7 @@ class _HotelHomeState extends ConsumerState<HotelHome>
     // Example: call some provider on init
     // ✅ Load room and room type data on init
     Future.microtask(() {
-      ref.read(roomControllerProvider.notifier).getRooms();
-      ref.read(roomTypeControllerProvider.notifier).loadRoomTypes();
-      ref.read(amenitiesControllerProvider.notifier).loadAmenities();
-      ref.read(facilitiesControllerProvider.notifier).loadFacilities();
-      ref.read(bedTypesControllerProvider.notifier).loadBedTypes();
-      // ref.read(premiumTypeControllerProvider.notifier).addListener();
+      ref.read(hotelDashboardControllerProvider.notifier).loadAllModule();
     });
   }
 
