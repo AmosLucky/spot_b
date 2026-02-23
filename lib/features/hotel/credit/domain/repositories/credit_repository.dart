@@ -5,4 +5,6 @@ abstract class CreditRepository {
   Future<int> create(CreditRequestEntity credit);
   Future<void> update(CreditRequestEntity credit);
   Future<void> delete(int id);
+  // 🔥 NEW
+  Future<List<CreditRequestEntity>> getAllCredits();
 }

@@ -7,6 +7,18 @@ class CreditLocalDataSource {
 
   CreditLocalDataSource(this.db);
 
+ @override
+Future<List<CreditRequestEntity>> getAllCredits() async {
+  final result = await (db.select(db.creditRequestsTable)
+        ..orderBy([
+          (tbl) => OrderingTerm.desc(tbl.dateCreated),
+        ]))
+      .get();
+
+  return result.map(_map).toList();
+}
+
+
   // ================== GET BY BOOKING ==================
   Future<List<CreditRequestEntity>> getByBooking(int bookingId) async {
     final result = await (db.select(db.creditRequestsTable)

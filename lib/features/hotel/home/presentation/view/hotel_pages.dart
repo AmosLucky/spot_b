@@ -5,6 +5,7 @@ import '../../../amenities/presentation/views/amenities_page.dart';
 import '../../../bed_type/presentation/view/desktop/bed_types_page.dart';
 import '../../../booking/presentation/view/booking_history_page.dart';
 import '../../../booking/presentation/view/booking_page.dart';
+import '../../../credit/presentation/views/credit_request_page.dart';
 import '../../../dashboard/presentation/view/hotel_dashboard.dart';
 import '../../../discount/presentation/view/discount_request_page.dart';
 import '../../../facilities/presentation/views/desktop/facilities_page.dart';
@@ -25,5 +26,6 @@ final List<Widget> hotelPages = [
   BookingHistoryPage(),
   MaintenancePage(),
   FolioBookingsPage(),
-  DiscountRequestPage()
+  DiscountRequestPage(),
+  CreditRequestPage(),
 ];

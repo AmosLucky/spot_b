@@ -9,9 +9,11 @@ import '../../data/repositories/credit_repository_impl.dart';
 import '../../domain/repositories/credit_repository.dart';
 import '../../domain/usecases/create_credit_request.dart';
 import '../../domain/usecases/delete_credit_request.dart';
+import '../../domain/usecases/get_all_credits.dart';
 import '../../domain/usecases/get_credit_by_booking.dart';
 import '../../domain/usecases/update_credit_request.dart';
 import '../controller/credit_controller.dart';
+import '../controller/select_id_controller.dart';
 import '../state/credit_state.dart';
 
 final appDatabaseProvider =
@@ -49,6 +51,20 @@ final deleteCreditProvider = Provider(
   ),
 );
 
+
+
+// final getAllCreditsProvider = Provider<GetAllCredits>((ref) {
+//   final repo = ref.read(creditRepositoryProvider);
+//   return GetAllCredits(repo);
+// });
+
+
+final getAllCreditsProvider = Provider(
+  (ref) => GetAllCredits(
+    ref.read(creditRepositoryProvider),
+  ),
+);
+
 final creditControllerProvider =
     StateNotifierProvider<CreditController, CreditState>(
   (ref) => CreditController(
@@ -57,5 +73,14 @@ final creditControllerProvider =
         ref.read(getCreditByBookingProvider),
     updateCredit: ref.read(updateCreditProvider),
     deleteCredit: ref.read(deleteCreditProvider),
+    getAllCredits: ref.read(getAllCreditsProvider)
   ),
 );
+
+
+final selectedCreditIdsProvider =
+    StateNotifierProvider<SelectedCreditIdsNotifier, Set<int>>((ref) {
+  return SelectedCreditIdsNotifier();
+});
+
+

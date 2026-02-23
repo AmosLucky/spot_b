@@ -26,4 +26,9 @@ class CreditRepositoryImpl implements CreditRepository {
   Future<void> delete(int id) {
     return local.delete(id);
   }
+
+  @override
+  Future<List<CreditRequestEntity>> getAllCredits() {
+    return local.getAllCredits();
+  }
 }

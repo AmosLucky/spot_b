@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spotstock_inventory/core/presentation/mesenger/app_messenger.dart';
+import 'package:spotstock_inventory/features/hotel/credit/domain/usecases/get_all_credits.dart';
 import '../../domain/entities/credit_request_entity.dart';
 import '../../domain/usecases/create_credit_request.dart';
 import '../../domain/usecases/delete_credit_request.dart';
 import '../../domain/usecases/get_credit_by_booking.dart';
 import '../../domain/usecases/update_credit_request.dart';
+import '../providers/credit_providers.dart';
 import '../state/credit_state.dart';
 
 class CreditController extends StateNotifier<CreditState> {
@@ -12,13 +14,15 @@ class CreditController extends StateNotifier<CreditState> {
   final GetCreditByBooking getCreditByBooking;
   final UpdateCreditRequest updateCredit;
   final DeleteCreditRequest deleteCredit;
+  final GetAllCredits getAllCredits;
 
-  CreditController({
-    required this.createCredit,
-    required this.getCreditByBooking,
-    required this.updateCredit,
-    required this.deleteCredit,
-  }) : super(const CreditState());
+  CreditController(
+      {required this.createCredit,
+      required this.getCreditByBooking,
+      required this.updateCredit,
+      required this.deleteCredit,
+      required this.getAllCredits})
+      : super(const CreditState());
 
   // ===============================
   // FORM FIELD CONTROLLERS
@@ -43,6 +47,25 @@ class CreditController extends StateNotifier<CreditState> {
       description: null,
       date: null,
     );
+  }
+
+  Future<void> loadAllCredits() async {
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final allCredits = await getAllCredits();
+     
+
+      state = state.copyWith(
+        isLoading: false,
+        allCredits: allCredits,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+    }
   }
 
   // ===============================
@@ -98,7 +121,7 @@ class CreditController extends StateNotifier<CreditState> {
 
       resetForm();
     } catch (e) {
-       AppMessenger.showError("Failed to credit request");
+      AppMessenger.showError("Failed to credit request");
       state = state.copyWith(error: e.toString());
     }
 
@@ -109,12 +132,12 @@ class CreditController extends StateNotifier<CreditState> {
   // APPROVE / UPDATE
   // ===============================
 
-  Future<void> approveCredit(CreditRequestEntity credit) async {
-    final updated = credit.copyWith(status: "aproved");
+  // Future<void> approveCredit(CreditRequestEntity credit) async {
+  //   final updated = credit.copyWith(status: "aproved");
 
-    await updateCredit(updated);
-    await loadCredits(credit.bookingId);
-  }
+  //   await updateCredit(updated);
+  //   await loadCredits(credit.bookingId);
+  // }
 
   // ===============================
   // DELETE
@@ -123,5 +146,25 @@ class CreditController extends StateNotifier<CreditState> {
   Future<void> deleteCreditItem(int id, int bookingId) async {
     await deleteCredit(id);
     await loadCredits(bookingId);
+  }
+
+  void search(String value) {
+    state = state.copyWith(searchQuery: value);
+  }
+
+  void setRowsPerPage(int value) {
+    state = state.copyWith(rowsPerPage: value);
+  }
+
+  Future<void> approveCredit(CreditRequestEntity credit) async {
+    final updated = credit.copyWith(status: "approved"); // FIXED typo
+    await updateCredit(updated);
+    await loadCredits(credit.bookingId);
+  }
+
+  Future<void> rejectCredit(CreditRequestEntity credit) async {
+    final updated = credit.copyWith(status: "rejected");
+    await updateCredit(updated);
+    await loadCredits(credit.bookingId);
   }
 }
