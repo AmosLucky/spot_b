@@ -1,7 +1,7 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)
-// swift-module-flags: -target x86_64-apple-macos10.15 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name ObjectBox
-// swift-module-flags-ignorable: -enable-bare-slash-regex
+// swift-compiler-version: Apple Swift version 6.0 effective-5.10 (swiftlang-6.0.0.9.10 clang-1600.0.26.2)
+// swift-module-flags: -target x86_64-apple-macos10.15 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name ObjectBox
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
 import Combine
 import Foundation
 @_exported import ObjectBox
@@ -119,6 +119,7 @@ public enum HnswDistanceType : Swift.UInt16 {
   case euclidean
   case cosine
   case dotProduct
+  case geo
   case dotProductNonNormalized
   public static var max: ObjectBox.HnswDistanceType {
     get
@@ -350,8 +351,13 @@ public protocol EntityScalarPropertyType {
 }
 public protocol LongPropertyType : ObjectBox.EntityPropertyTypeConvertible, ObjectBox.EntityScalarPropertyType {
 }
+#if compiler(>=5.3) && $NoncopyableGenerics
 extension Swift.Optional : ObjectBox.LongPropertyType, ObjectBox.EntityScalarPropertyType where Wrapped : ObjectBox.LongPropertyType {
 }
+#else
+extension Swift.Optional : ObjectBox.LongPropertyType, ObjectBox.EntityScalarPropertyType where Wrapped : ObjectBox.LongPropertyType {
+}
+#endif
 public protocol LongPropertyQueryType : ObjectBox.LongPropertyType {
   var int64Value: Swift.Int64 { get }
 }
@@ -383,20 +389,35 @@ public protocol StringPropertyType : ObjectBox.EntityPropertyTypeConvertible {
 }
 extension Swift.String : ObjectBox.StringPropertyType {
 }
+#if compiler(>=5.3) && $NoncopyableGenerics
 extension Swift.Optional : ObjectBox.StringPropertyType where Wrapped == Swift.String {
 }
+#else
+extension Swift.Optional : ObjectBox.StringPropertyType where Wrapped == Swift.String {
+}
+#endif
 public protocol DatePropertyType : ObjectBox.EntityPropertyTypeConvertible {
 }
 extension Foundation.Date : ObjectBox.DatePropertyType {
 }
+#if compiler(>=5.3) && $NoncopyableGenerics
 extension Swift.Optional : ObjectBox.DatePropertyType where Wrapped == Foundation.Date {
 }
+#else
+extension Swift.Optional : ObjectBox.DatePropertyType where Wrapped == Foundation.Date {
+}
+#endif
 public protocol DataPropertyType : ObjectBox.EntityPropertyTypeConvertible {
 }
 extension Foundation.Data : ObjectBox.DataPropertyType {
 }
+#if compiler(>=5.3) && $NoncopyableGenerics
 extension Swift.Optional : ObjectBox.DataPropertyType where Wrapped == Foundation.Data {
 }
+#else
+extension Swift.Optional : ObjectBox.DataPropertyType where Wrapped == Foundation.Data {
+}
+#endif
 extension Swift.Array : ObjectBox.EntityPropertyTypeConvertible where Element == Swift.UInt8 {
   public static var entityPropertyType: ObjectBox.PropertyType {
     get
@@ -492,11 +513,19 @@ extension Foundation.Data : ObjectBox.EntityPropertyTypeConvertible {
     get
   }
 }
+#if compiler(>=5.3) && $NoncopyableGenerics
 extension Swift.Optional : ObjectBox.EntityPropertyTypeConvertible where Wrapped : ObjectBox.EntityPropertyTypeConvertible {
   public static var entityPropertyType: ObjectBox.PropertyType {
     get
   }
 }
+#else
+extension Swift.Optional : ObjectBox.EntityPropertyTypeConvertible where Wrapped : ObjectBox.EntityPropertyTypeConvertible {
+  public static var entityPropertyType: ObjectBox.PropertyType {
+    get
+  }
+}
+#endif
 extension ObjectBox.EntityId : ObjectBox.EntityPropertyTypeConvertible {
   public static var entityPropertyType: ObjectBox.PropertyType {
     get
@@ -621,6 +650,7 @@ public enum ObjectBoxError : Swift.Error {
   case illegalState(message: Swift.String)
   case illegalArgument(message: Swift.String)
   case allocation(message: Swift.String)
+  case featureNotAvailable(message: Swift.String)
   case noErrorInfo(message: Swift.String)
   case general(message: Swift.String)
   case dbFull(message: Swift.String)
@@ -1015,6 +1045,7 @@ public protocol SyncClient : AnyObject {
   func isClosed() -> Swift.Bool
   func close()
   func setCredentials(_ credentials: ObjectBox.SyncCredentials) throws
+  func setCredentials(_ credentials: [ObjectBox.SyncCredentials]) throws
   func start() throws
   func stop() throws
   @discardableResult
@@ -1050,12 +1081,19 @@ public protocol SyncListener : ObjectBox.SyncChangeListener, ObjectBox.SyncCompl
 @_hasMissingDesignatedInitializers public class Sync {
   public static func isAvailable() -> Swift.Bool
   public static func makeClient(store: ObjectBox.Store, url: Foundation.URL? = nil, urlString: Swift.String? = nil, credentials: ObjectBox.SyncCredentials? = nil) throws -> any ObjectBox.SyncClient
+  public static func makeClient(store: ObjectBox.Store, url: Foundation.URL, urlString: Swift.String, credentials: [ObjectBox.SyncCredentials]) throws -> any ObjectBox.SyncClient
   @objc deinit
 }
 @_hasMissingDesignatedInitializers public class SyncCredentials {
   public static func makeNone() -> ObjectBox.SyncCredentials
   public static func makeSharedSecret(_ data: Foundation.Data) -> ObjectBox.SyncCredentials
   public static func makeSharedSecret(_ string: Swift.String) -> ObjectBox.SyncCredentials
+  public static func makeObxAdminUser(_ username: Swift.String, _ password: Swift.String) -> ObjectBox.SyncCredentials
+  public static func makeUsernamePassword(_ username: Swift.String, _ password: Swift.String) -> ObjectBox.SyncCredentials
+  public static func makeJwtIdToken(_ jwtIdToken: Swift.String) -> ObjectBox.SyncCredentials
+  public static func makeJwtAccessToken(_ jwtAccessToken: Swift.String) -> ObjectBox.SyncCredentials
+  public static func makeJwtRefreshToken(_ jwtRefreshToken: Swift.String) -> ObjectBox.SyncCredentials
+  public static func makeJwtCustomToken(_ jwtCustomToken: Swift.String) -> ObjectBox.SyncCredentials
   @objc deinit
 }
 @_hasMissingDesignatedInitializers public class PropertyBuilder {
@@ -1063,7 +1101,7 @@ public protocol SyncListener : ObjectBox.SyncChangeListener, ObjectBox.SyncCompl
   @objc deinit
 }
 public enum SyncCredentialsType : Swift.UInt32 {
-  case none, sharedSecret, googleAuth
+  case none, sharedSecretDeprecated, googleAuth, sharedSecret, obxAdminUser, userPassword, jwtIdToken, jwtAccessToken, jwtRefreshToken, jwtCustomToken
   public init?(rawValue: Swift.UInt32)
   public typealias RawValue = Swift.UInt32
   public var rawValue: Swift.UInt32 {

@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\Users\IFEANYI\flutter-extract\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\IFEANYI\flutter-app\Inventory_MobileApp"
+export "FLUTTER_ROOT=C:\Users\USER\flutter_windows\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\USER\flutter-projects\Inventory_MobileApp"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=0.1.0"

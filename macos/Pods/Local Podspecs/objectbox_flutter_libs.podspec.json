@@ -13,11 +13,9 @@
   },
   "source_files": "Classes/**/*",
   "dependencies": {
-    "FlutterMacOS": [
-
-    ],
+    "FlutterMacOS": [],
     "ObjectBox": [
-      "4.0.1"
+      "4.1.0"
     ]
   },
   "pod_target_xcconfig": {

@@ -16,9 +16,7 @@
   "source_files": "share_plus/Sources/share_plus/**/*.swift",
   "public_header_files": "share_plus/Sources/share_plus/**/*.h",
   "dependencies": {
-    "FlutterMacOS": [
-
-    ]
+    "FlutterMacOS": []
   },
   "platforms": {
     "osx": "10.14"

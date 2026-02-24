@@ -3,6 +3,7 @@
   "packages": [
     {
       "name": "_fe_analyzer_shared",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/_fe_analyzer_shared-67.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
@@ -12,6 +13,17 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/analyzer-6.4.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/_fe_analyzer_shared-85.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "analyzer",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/analyzer-7.7.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+>>>>>>> amoslucky
     },
     {
       "name": "ansicolor",
@@ -21,7 +33,11 @@
     },
     {
       "name": "archive",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/archive-4.0.7",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/archive-3.6.1",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -33,6 +49,7 @@
     },
     {
       "name": "async",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.11.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
@@ -78,6 +95,11 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/audioplayers_windows-4.2.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.13.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+>>>>>>> amoslucky
     },
     {
       "name": "barcode",
@@ -92,6 +114,7 @@
       "languageVersion": "2.12"
     },
     {
+<<<<<<< HEAD
       "name": "black_hole_flutter",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/black_hole_flutter-1.1.0",
       "packageUri": "lib/",
@@ -106,14 +129,24 @@
     {
       "name": "boolean_selector",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/boolean_selector-2.1.1",
+=======
+      "name": "boolean_selector",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/boolean_selector-2.1.2",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.1"
     },
     {
       "name": "build",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/build-2.4.1",
       "packageUri": "lib/",
       "languageVersion": "2.19"
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/build-2.5.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+>>>>>>> amoslucky
     },
     {
       "name": "build_config",
@@ -129,6 +162,7 @@
     },
     {
       "name": "build_resolvers",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/build_resolvers-2.4.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
@@ -144,6 +178,23 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner_core-7.3.2",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/build_resolvers-2.5.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "build_runner",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner-2.5.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "build_runner_core",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/build_runner_core-9.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+>>>>>>> amoslucky
     },
     {
       "name": "built_collection",
@@ -153,6 +204,7 @@
     },
     {
       "name": "built_value",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.10.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
@@ -172,6 +224,9 @@
     {
       "name": "cached_network_image_web",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/cached_network_image_web-1.3.1",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.12.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -182,6 +237,7 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "checked_yaml",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/checked_yaml-2.0.3",
       "packageUri": "lib/",
@@ -196,8 +252,18 @@
     {
       "name": "cli_config",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/cli_config-0.2.0",
+=======
+      "name": "charcode",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/charcode-1.4.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "checked_yaml",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/checked_yaml-2.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
     },
     {
       "name": "cli_util",
@@ -213,9 +279,13 @@
     },
     {
       "name": "code_builder",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/code_builder-4.10.1",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/code_builder-4.11.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.7"
     },
     {
       "name": "collection",
@@ -242,6 +312,7 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "coverage",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/coverage-1.14.0",
       "packageUri": "lib/",
@@ -256,6 +327,10 @@
     {
       "name": "crypto",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/crypto-3.0.6",
+=======
+      "name": "crypto",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/crypto-3.0.7",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -266,6 +341,7 @@
       "languageVersion": "3.1"
     },
     {
+<<<<<<< HEAD
       "name": "curved_navigation_bar",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/curved_navigation_bar-1.0.6",
       "packageUri": "lib/",
@@ -288,6 +364,12 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/data_table_2-2.6.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+=======
+      "name": "dart_style",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/dart_style-3.1.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+>>>>>>> amoslucky
     },
     {
       "name": "dbus",
@@ -296,6 +378,7 @@
       "languageVersion": "2.17"
     },
     {
+<<<<<<< HEAD
       "name": "debug_overlay",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/debug_overlay-1.0.0",
       "packageUri": "lib/",
@@ -314,12 +397,15 @@
       "languageVersion": "2.18"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "dio",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/dio-5.8.0+1",
       "packageUri": "lib/",
       "languageVersion": "2.18"
     },
     {
+<<<<<<< HEAD
       "name": "dio_cache_interceptor",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/dio_cache_interceptor-3.5.1",
       "packageUri": "lib/",
@@ -332,22 +418,51 @@
       "languageVersion": "2.14"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "dio_web_adapter",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/dio_web_adapter-2.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
+      "name": "drift",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/drift-2.28.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "drift_dev",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/drift_dev-2.28.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "drift_flutter",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/drift_flutter-0.2.7",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "equatable",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/equatable-2.0.7",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/equatable-2.0.8",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
+<<<<<<< HEAD
       "name": "esc_pos_utils_plus",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/esc_pos_utils_plus-2.0.4",
+=======
+      "name": "excel",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/excel-2.1.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.19"
+      "languageVersion": "2.17"
     },
     {
       "name": "fake_async",
@@ -368,6 +483,7 @@
       "languageVersion": "3.0"
     },
     {
+<<<<<<< HEAD
       "name": "file_selector_linux",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/file_selector_linux-0.9.3+2",
       "packageUri": "lib/",
@@ -392,12 +508,15 @@
       "languageVersion": "3.4"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "fixnum",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/fixnum-1.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.1"
     },
     {
+<<<<<<< HEAD
       "name": "fl_chart",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/fl_chart-0.71.0",
       "packageUri": "lib/",
@@ -410,10 +529,13 @@
       "languageVersion": "2.12"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "flutter",
       "rootUri": "file:///C:/Users/USER/flutter_windows/flutter/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.8"
+<<<<<<< HEAD
     },
     {
       "name": "flutter_cache_manager",
@@ -426,6 +548,8 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_fast_forms-18.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+=======
+>>>>>>> amoslucky
     },
     {
       "name": "flutter_launcher_icons",
@@ -446,16 +570,62 @@
       "languageVersion": "3.0"
     },
     {
+<<<<<<< HEAD
       "name": "flutter_plugin_android_lifecycle",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.28",
+=======
+      "name": "flutter_riverpod",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_riverpod-2.6.1",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.6"
+      "languageVersion": "2.17"
     },
     {
+<<<<<<< HEAD
       "name": "flutter_scanner_devxhub",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_scanner_devxhub-1.0.3",
+=======
+      "name": "flutter_secure_storage",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage-9.2.4",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_linux",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_linux-1.2.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_macos",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_macos-3.1.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_platform_interface",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_platform_interface-1.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_web",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_web-1.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_secure_storage_windows",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_secure_storage_windows-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_svg",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_svg-2.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
     },
     {
       "name": "flutter_test",
@@ -470,28 +640,48 @@
       "languageVersion": "3.8"
     },
     {
+<<<<<<< HEAD
       "name": "frontend_server_client",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/frontend_server_client-4.0.0",
+=======
+      "name": "freezed",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/freezed-2.5.8",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
+<<<<<<< HEAD
       "name": "gap",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/gap-3.0.1",
+=======
+      "name": "freezed_annotation",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/freezed_annotation-2.4.4",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.0"
     },
     {
+<<<<<<< HEAD
       "name": "get",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/get-4.7.2",
+=======
+      "name": "frontend_server_client",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/frontend_server_client-4.0.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "3.0"
     },
     {
+<<<<<<< HEAD
       "name": "get_storage",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/get_storage-2.1.1",
+=======
+      "name": "get_it",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/get_it-8.2.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.16"
+      "languageVersion": "3.0"
     },
     {
       "name": "glob",
@@ -500,10 +690,15 @@
       "languageVersion": "3.3"
     },
     {
+<<<<<<< HEAD
       "name": "google_fonts",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/google_fonts-6.2.1",
+=======
+      "name": "go_router",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/go_router-16.2.1",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "3.7"
     },
     {
       "name": "graphs",
@@ -512,6 +707,7 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "hexcolor",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/hexcolor-3.0.1",
       "packageUri": "lib/",
@@ -524,6 +720,8 @@
       "languageVersion": "2.12"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "html",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/html-0.15.6",
       "packageUri": "lib/",
@@ -548,6 +746,7 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "iconsax_flutter",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/iconsax_flutter-1.0.1",
       "packageUri": "lib/",
@@ -618,6 +817,12 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/input_quantity-2.5.1",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+=======
+      "name": "image",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+>>>>>>> amoslucky
     },
     {
       "name": "intl",
@@ -633,9 +838,13 @@
     },
     {
       "name": "js",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.7.1",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.6.7",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "2.19"
     },
     {
       "name": "json_annotation",
@@ -644,10 +853,15 @@
       "languageVersion": "3.0"
     },
     {
+<<<<<<< HEAD
       "name": "json_view",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/json_view-0.4.2",
+=======
+      "name": "json_serializable",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/json_serializable-6.9.5",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "3.6"
     },
     {
       "name": "leak_tracker",
@@ -674,6 +888,7 @@
       "languageVersion": "3.6"
     },
     {
+<<<<<<< HEAD
       "name": "list_diff",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/list_diff-2.0.1",
       "packageUri": "lib/",
@@ -700,10 +915,15 @@
     {
       "name": "matcher",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.17",
+=======
+      "name": "logging",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/logging-1.3.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "material_color_utilities",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/material_color_utilities-0.11.1",
       "packageUri": "lib/",
@@ -772,20 +992,100 @@
     {
       "name": "package_config",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/package_config-2.2.0",
+=======
+      "name": "matcher",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.17",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "package_info_plus",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/package_info_plus-8.3.0",
+=======
+      "name": "material_color_utilities",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/material_color_utilities-0.11.1",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "2.17"
     },
     {
+<<<<<<< HEAD
       "name": "package_info_plus_platform_interface",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/package_info_plus_platform_interface-3.2.0",
+=======
+      "name": "meta",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/meta-1.17.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "mime",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/mime-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "nm",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/nm-0.5.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "open_file",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file-3.5.11",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_android",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file_android-1.0.6",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_ios",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file_ios-1.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_linux",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file_linux-0.0.5",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_mac",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file_mac-1.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_platform_interface",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file_platform_interface-1.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_web",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file_web-0.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "open_file_windows",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/open_file_windows-0.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "package_config",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/package_config-2.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "path",
@@ -836,12 +1136,15 @@
       "languageVersion": "3.2"
     },
     {
+<<<<<<< HEAD
       "name": "pausable_timer",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/pausable_timer-3.1.0+3",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "pdf",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/pdf-3.11.3",
       "packageUri": "lib/",
@@ -854,6 +1157,7 @@
       "languageVersion": "2.18"
     },
     {
+<<<<<<< HEAD
       "name": "permission_handler",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-11.4.0",
       "packageUri": "lib/",
@@ -890,10 +1194,18 @@
       "languageVersion": "2.12"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "petitparser",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/petitparser-6.0.2",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "pinput",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/pinput-5.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
     },
     {
       "name": "platform",
@@ -908,6 +1220,7 @@
       "languageVersion": "3.0"
     },
     {
+<<<<<<< HEAD
       "name": "pointycastle",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/pointycastle-3.9.1",
       "packageUri": "lib/",
@@ -924,6 +1237,12 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/posix-6.0.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+=======
+      "name": "pool",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/pool-1.5.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+>>>>>>> amoslucky
     },
     {
       "name": "printing",
@@ -932,12 +1251,15 @@
       "languageVersion": "3.3"
     },
     {
+<<<<<<< HEAD
       "name": "provider",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/provider-6.1.5",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "pub_semver",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/pub_semver-2.2.0",
       "packageUri": "lib/",
@@ -956,12 +1278,18 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "responsive_sizer",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/responsive_sizer-3.3.1",
+=======
+      "name": "recase",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/recase-4.1.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
+<<<<<<< HEAD
       "name": "retry",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/retry-3.1.2",
       "packageUri": "lib/",
@@ -1008,6 +1336,12 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/share_plus_platform_interface-5.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.18"
+=======
+      "name": "riverpod",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/riverpod-2.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+>>>>>>> amoslucky
     },
     {
       "name": "shared_preferences",
@@ -1017,9 +1351,13 @@
     },
     {
       "name": "shared_preferences_android",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_android-2.4.10",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/shared_preferences_android-2.4.13",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.6"
+      "languageVersion": "3.7"
     },
     {
       "name": "shared_preferences_foundation",
@@ -1058,6 +1396,7 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "shelf_packages_handler",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/shelf_packages_handler-3.0.2",
       "packageUri": "lib/",
@@ -1086,12 +1425,19 @@
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/skeleton_text-3.0.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+=======
+      "name": "shelf_web_socket",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/shelf_web_socket-3.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+>>>>>>> amoslucky
     },
     {
       "name": "sky_engine",
       "rootUri": "file:///C:/Users/USER/flutter_windows/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.8"
+<<<<<<< HEAD
     },
     {
       "name": "sliver_tools",
@@ -1102,10 +1448,17 @@
     {
       "name": "source_gen",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/source_gen-1.5.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.0"
+=======
     },
     {
+      "name": "source_gen",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/source_gen-2.0.0",
+>>>>>>> amoslucky
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+<<<<<<< HEAD
       "name": "source_map_stack_trace",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/source_map_stack_trace-2.1.2",
       "packageUri": "lib/",
@@ -1120,16 +1473,38 @@
     {
       "name": "source_span",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/source_span-1.10.0",
+=======
+      "name": "source_helper",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/source_helper-1.3.5",
       "packageUri": "lib/",
-      "languageVersion": "2.18"
+      "languageVersion": "3.4"
     },
     {
+      "name": "source_span",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/source_span-1.10.1",
+>>>>>>> amoslucky
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
+<<<<<<< HEAD
       "name": "sprintf",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/sprintf-7.0.0",
+=======
+      "name": "sqlite3",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/sqlite3-2.9.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "sqlite3_flutter_libs",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/sqlite3_flutter_libs-0.5.40",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
+<<<<<<< HEAD
       "name": "sqflite",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/sqflite-2.4.1",
       "packageUri": "lib/",
@@ -1168,6 +1543,10 @@
     {
       "name": "sqlite3",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/sqlite3-2.7.6",
+=======
+      "name": "sqlparser",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/sqlparser-0.41.2",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -1178,9 +1557,21 @@
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "stream_channel",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/stream_channel-2.1.4",
       "packageUri": "lib/",
+=======
+      "name": "state_notifier",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/state_notifier-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "stream_channel",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/stream_channel-2.1.4",
+      "packageUri": "lib/",
+>>>>>>> amoslucky
       "languageVersion": "3.3"
     },
     {
@@ -1191,17 +1582,27 @@
     },
     {
       "name": "string_scanner",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/string_scanner-1.3.0",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/string_scanner-1.4.1",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.1"
     },
     {
+<<<<<<< HEAD
       "name": "syncfusion_flutter_core",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/syncfusion_flutter_core-29.1.38",
+=======
+      "name": "term_glyph",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/term_glyph-1.2.2",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.1"
     },
     {
+<<<<<<< HEAD
       "name": "syncfusion_flutter_datepicker",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/syncfusion_flutter_datepicker-29.1.38",
       "packageUri": "lib/",
@@ -1210,10 +1611,15 @@
     {
       "name": "synchronized",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/synchronized-3.3.0+3",
+=======
+      "name": "test_api",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/test_api-0.7.7",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
     {
+<<<<<<< HEAD
       "name": "term_glyph",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/term_glyph-1.2.1",
       "packageUri": "lib/",
@@ -1238,18 +1644,23 @@
       "languageVersion": "3.5"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "timing",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/timing-1.0.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "toastification",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/toastification-3.0.3",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
+=======
+>>>>>>> amoslucky
       "name": "typed_data",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/typed_data-1.4.0",
       "packageUri": "lib/",
@@ -1262,12 +1673,18 @@
       "languageVersion": "2.17"
     },
     {
+<<<<<<< HEAD
       "name": "url_launcher_linux",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_linux-3.2.1",
+=======
+      "name": "universal_platform",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/universal_platform-1.1.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "2.12"
     },
     {
+<<<<<<< HEAD
       "name": "url_launcher_platform_interface",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_platform_interface-2.3.2",
       "packageUri": "lib/",
@@ -1276,20 +1693,34 @@
     {
       "name": "url_launcher_web",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_web-2.4.1",
+=======
+      "name": "vector_graphics",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics-1.1.19",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.6"
     },
     {
+<<<<<<< HEAD
       "name": "url_launcher_windows",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_windows-3.1.4",
+=======
+      "name": "vector_graphics_codec",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_codec-1.1.13",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
+<<<<<<< HEAD
       "name": "uuid",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/uuid-4.5.1",
+=======
+      "name": "vector_graphics_compiler",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/vector_graphics_compiler-1.1.19",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.7"
     },
     {
       "name": "vector_math",
@@ -1299,7 +1730,11 @@
     },
     {
       "name": "vm_service",
+<<<<<<< HEAD
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/vm_service-14.3.0",
+=======
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/vm_service-15.0.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -1328,10 +1763,33 @@
       "languageVersion": "3.3"
     },
     {
+<<<<<<< HEAD
       "name": "webkit_inspection_protocol",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/webkit_inspection_protocol-1.2.1",
+=======
+      "name": "webview_flutter",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter-4.13.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "webview_flutter_android",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_android-4.10.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.7"
+    },
+    {
+      "name": "webview_flutter_platform_interface",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_platform_interface-2.14.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
+    },
+    {
+      "name": "webview_flutter_wkwebview",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_wkwebview-3.23.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.6"
     },
     {
       "name": "win32",
@@ -1340,10 +1798,15 @@
       "languageVersion": "3.5"
     },
     {
+<<<<<<< HEAD
       "name": "win32_registry",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/win32_registry-1.1.5",
+=======
+      "name": "window_size",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/window_size-0.1.0",
+>>>>>>> amoslucky
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.0"
     },
     {
       "name": "xdg_directories",
