@@ -36,6 +36,10 @@ class SpotstockMobileRoutes {
   static const String holds = '/mobile/holds';
   static const String registerSummary = '/mobile/register-summary';
   static const String registerManagement = '/mobile/register-management';
+
+  // static const String bookRoom = 'bookRoom';
+  // static const String bookingHistory = 'bookingHistory';
+  // static const String maintenance = 'maintenance';
 }
 
 class SpotstockDesktopRoutes {

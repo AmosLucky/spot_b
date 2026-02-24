@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:spotstock_inventory/core/constants/colors/spotstock_colors.dart';
+import 'package:spotstock_inventory/features/hotel/dashboard/presentation/view/widget/dashboard_header.dart';
 import 'package:spotstock_inventory/features/payments/presentation/state/payment_state.dart';
 import '../../../../payments/presentation/providers/payment_providers.dart';
 import '../../../booking/domain/entities/booking_entity.dart';
 import '../../../booking/presentation/providers/booking_history_provider.dart';
+import '../../../home/presentation/provider/provider.dart';
 import '../../../rooms/presentation/providers/room_providers.dart';
 import '../providers/dashboard_provider.dart';
 
@@ -28,10 +30,10 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(hotelDashboardControllerProvider);
-    final controller = ref.read(hotelDashboardControllerProvider.notifier);
+    //final controller = ref.read(hotelDashboardControllerProvider.notifier);
     final roomState = ref.watch(roomControllerProvider);
     final bookingHistoryState = ref.watch(bookingHistoryControllerProvider);
-    final PaymentState = ref.watch(paymentControllerProvider);
+    final paymentState = ref.watch(paymentControllerProvider);
 
     final allRooms = roomState.all;
 
@@ -80,15 +82,14 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
     final checkedOutBookings =
         todaysBookings.where((b) => b.checkOutStatus == 'checked_out').toList();
 
-    /// Step 2: Get the booking IDs
-    final todaysBookingIds = todaysBookings.map((b) => b.id).toSet();
+// Step 1: Get payments made on selected day
+    final todaysPayments = paymentState.allPayments.where((payment) {
+      final paymentDate = normalizeDate(payment.date!.toLocal());
 
-// Step 3: Get all payments for these bookings
-    final todaysPayments = PaymentState.allPayments.where((payment) {
-      return todaysBookingIds.contains(payment.bookingId);
+      return paymentDate == normalizedSelected;
     }).toList();
 
-// Step 4: Sum the payment amounts
+// Step 2: Sum revenue
     final totalRevenue = todaysPayments.fold<double>(
       0.0,
       (sum, payment) => sum + payment.amount,
@@ -102,8 +103,12 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // HEADER SECTION
-            _buildHeader(context, state, controller),
+            DashboardHeader(),
             const SizedBox(height: 24),
+
+            paymentState.isLoading
+                ? Center(child: CircularProgressIndicator())
+                : SizedBox.shrink(),
 
             // KPI CARDS - OCCUPANCY & ROOMS
             _buildOccupancySection(roomState, bookedRooms.length.toString(),
@@ -120,145 +125,18 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
             const SizedBox(height: 20),
 
             // ROOM CARDS GRID
-            _buildRoomGrid(),
+            Visibility(
+              visible: false,
+              child: _buildRoomGrid()),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    dynamic state,
-    dynamic controller,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Title and Date
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Dashboard',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            InkWell(
-              onTap: () => controller.pickDate(context),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 16,
-                      color: SpotstockColors.c473069,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      DateFormat('EEEE, MMMM d, yyyy')
-                          .format(state.selectedDate.toLocal()),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+ 
 
-        // Action Buttons
-        Row(
-          children: [
-            _actionButton(
-              'Book Room',
-              Icons.add_business,
-              SpotstockColors.c473069,
-              () {},
-            ),
-            const SizedBox(width: 12),
-            _actionButton(
-              'Booking History',
-              Icons.history,
-              Colors.blue,
-              () {},
-            ),
-            const SizedBox(width: 12),
-            _actionButton(
-              'Maintenance',
-              Icons.build,
-              Colors.orange,
-              () {},
-            ),
-            const SizedBox(width: 12),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  ref
-                      .read(hotelDashboardControllerProvider.notifier)
-                      .loadAllModule();
-                },
-                tooltip: 'Refresh',
-                color: Colors.grey.shade700,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _actionButton(
-    String label,
-    IconData icon,
-    Color color,
-    VoidCallback onPressed,
-  ) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 0,
-      ),
-    );
-  }
+ 
 
   Widget _buildOccupancySection(dynamic roomState, bookedRoomsCount,
       availableRoomsCount, maintenanceRooms) {
@@ -277,7 +155,7 @@ class _HotelDashboardPageState extends ConsumerState<HotelDashboardPage> {
         const SizedBox(width: 16),
         Expanded(
           child: _buildKpiCard(
-            title: 'Occupied Rooms',
+            title: 'Booked Rooms',
             value: bookedRoomsCount,
             subtitle: '48% Occupancy',
             icon: Icons.bed,
